@@ -759,7 +759,7 @@ module Domain = struct
                          bdu_handler mvbdu (*restriction_bdu*)
                      in
                      let error =
-                       Handler.print_formula parameters error handler f
+                       Handler.print_formula parameters error handler (Logical_formulae.simplify f)
                      in
                      let dynamic = set_mvbdu_handler bdu_handler dynamic in
                      let () = Loggers.fprintf loggers "." in

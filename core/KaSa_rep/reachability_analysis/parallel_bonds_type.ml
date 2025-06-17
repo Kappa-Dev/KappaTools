@@ -263,7 +263,7 @@ let compute_mvbdus_for_parallel_vs_non_parallel_bounds parameters bdu_handler
     bdu_undefined_bonds )
 
 let print_guard_parameters_natural_language parameters prefix error
-    kappa_handler bdu_handler is_true mvbdu restriction_bdu =
+    kappa_handler bdu_handler is_true mvbdu =
   if not is_true then (
     let () =
       Loggers.fprintf
@@ -272,7 +272,7 @@ let print_guard_parameters_natural_language parameters prefix error
     in
     let error, bdu_handler =
       Handler.print_guard_mvbdu_decompose parameters error kappa_handler
-        bdu_handler mvbdu restriction_bdu
+        bdu_handler mvbdu
     in
     let () =
       Loggers.fprintf
@@ -437,7 +437,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
             in
             let error, bdu_handler =
               Handler.print_guard_mvbdu_decompose parameters error kappa_handler
-                bdu_handler parallel_bond_mvbdu restriction_bdu
+                bdu_handler parallel_bond_mvbdu
             in
             let () =
               Loggers.print_newline (Remanent_parameters.get_logger parameters)
@@ -455,7 +455,6 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                 let error, bdu_handler =
                   Handler.print_guard_mvbdu_decompose parameters error
                     kappa_handler bdu_handler parallel_bond_mvbdu
-                    restriction_bdu
                 in
                 let () =
                   Loggers.fprintf
@@ -489,7 +488,6 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
               let error, bdu_handler =
                 print_guard_parameters_natural_language parameters prefix error
                   kappa_handler bdu_handler parallel_is_true parallel_bond_mvbdu
-                  restriction_bdu
               in
               let () =
                 Loggers.fprintf
@@ -545,7 +543,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
             in
             let error, bdu_handler =
               Handler.print_guard_mvbdu_decompose parameters error kappa_handler
-                bdu_handler non_parallel_bond_mvbdu restriction_bdu
+                bdu_handler non_parallel_bond_mvbdu
             in
             let () =
               Loggers.print_newline (Remanent_parameters.get_logger parameters)
@@ -562,7 +560,6 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                 let error, bdu_handler =
                   Handler.print_guard_mvbdu_decompose parameters error
                     kappa_handler bdu_handler non_parallel_bond_mvbdu
-                    restriction_bdu
                 in
                 let () =
                   Loggers.fprintf
@@ -597,7 +594,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                 let error, bdu_handler =
                   print_guard_parameters_natural_language parameters prefix
                     error kappa_handler bdu_handler non_parallel_is_true
-                    non_parallel_bond_mvbdu restriction_bdu
+                    non_parallel_bond_mvbdu
                 in
                 let () =
                   Loggers.fprintf
@@ -652,7 +649,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                     let error, bdu_handler =
                       print_guard_parameters_natural_language parameters prefix
                         error kappa_handler bdu_handler any_bond_is_true
-                        any_bond_mvbdu restriction_bdu
+                        any_bond_mvbdu
                     in
                     let () =
                       Loggers.fprintf

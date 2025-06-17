@@ -210,7 +210,6 @@ val print_guard_mvbdu_decompose :
   Cckappa_sig.kappa_handler ->
   Ckappa_sig.Views_bdu.handler ->
   Ckappa_sig.Views_bdu.mvbdu ->
-  Ckappa_sig.Views_bdu.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.Views_bdu.handler
 

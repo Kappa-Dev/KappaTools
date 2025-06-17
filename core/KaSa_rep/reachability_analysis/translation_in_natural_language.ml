@@ -1070,7 +1070,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
               (*let () = if not is_true then Loggers.fprintf log "," in*)
               let error, bdu_handler =
                 Handler.print_guard_mvbdu_decompose parameters error
-                  handler_kappa bdu_handler mvbdu restriction_bdu
+                  handler_kappa bdu_handler mvbdu
               in
               let () = Loggers.print_newline log in
               error, bdu_handler

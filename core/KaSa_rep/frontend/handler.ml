@@ -700,8 +700,7 @@ let print_formula parameters error kappa_handler formula =
   in
   error
 
-let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler mvbdu
-    restriction_bdu =
+let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler mvbdu =
   (* let () = Ckappa_sig.Views_bdu.print parameters mvbdu in *)
   (*let () =
       if with_comma then
@@ -721,7 +720,8 @@ let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler mvbdu
   match formula with
   | Logical_formulae.False ->
     Exception.warn parameters error __POS__ Exit bdu_handler
-  | Logical_formulae.True -> error, bdu_handler
+  | Logical_formulae.True ->
+        error, bdu_handler
   | Logical_formulae.OR _ | Logical_formulae.P _
   | Logical_formulae.NOT _
   | Logical_formulae.IMPLY (_, _)
