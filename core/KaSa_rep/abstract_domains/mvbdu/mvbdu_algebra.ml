@@ -773,6 +773,95 @@ let rec project_keep_only allocate memoized_fun bdu_true error parameters
       in
       error, (handler, Some (mvbdu_output : 'mvbdu)))
 
+  let rec width allocate memoized_fun error parameters
+      handler mvbdu_input  =
+    match
+      memoized_fun.Memo_sig.get parameters error handler mvbdu_input
+    with
+    | error, (handler, Some output) -> error, (handler, Some output)
+    | error, (handler, None) ->
+      let error, (handler, output) =
+        match mvbdu_input.Mvbdu_sig.value with
+          | Mvbdu_sig.Leaf true -> error, (handler, Some 1)
+          | Mvbdu_sig.Leaf false -> error, (handler, Some 0)
+          | Mvbdu_sig.Node mvbdu -> 
+            let error, (handler, b_true) =
+                width allocate memoized_fun error parameters
+                  handler mvbdu.Mvbdu_sig.branch_true 
+            in
+            let error, (handler, b_false) =
+                width allocate memoized_fun error parameters
+                  handler mvbdu.Mvbdu_sig.branch_true 
+            in
+            let error, b_true = 
+              match b_true with 
+                | Some b_true -> error, b_true 
+                | None -> Exception.warn parameters error __POS__ Exit 0
+            in 
+            let error, b_false = 
+              match b_false with 
+                | Some b_false -> error, b_false
+                | None -> Exception.warn parameters error __POS__ Exit 0
+            in 
+            error, (handler, Some (b_true + b_false))
+          in 
+      (match output with
+      | None -> error, (handler, None)
+      | Some mvbdu_output ->
+        let error, handler =
+          memoized_fun.Memo_sig.store parameters error handler
+            mvbdu_input mvbdu_output
+        in
+        error, (handler, Some (mvbdu_output : int)))
+  
+  let rec height allocate memoized_fun error parameters handler
+    (mvbdu_input : 'mvbdu) =
+  match memoized_fun.Memo_sig.get parameters error handler mvbdu_input with
+  | error, (handler, Some output) -> error, (handler, Some output)
+  | error, (handler, None) ->
+    let error, (handler, mvbdu_output) =
+      match mvbdu_input.Mvbdu_sig.value with
+      | Mvbdu_sig.Leaf _a -> error, (handler, Some 0)
+      | Mvbdu_sig.Node x ->
+        let var_ref = x.Mvbdu_sig.variable in
+        let rec aux handler error mvbdu_input_list acc =
+          match mvbdu_input_list with
+          | [] -> error, (handler, acc)
+          | t :: q ->
+            (match t.Mvbdu_sig.value with
+            | Mvbdu_sig.Node x when x.Mvbdu_sig.variable = var_ref ->
+              aux handler error
+                (x.Mvbdu_sig.branch_true :: x.Mvbdu_sig.branch_false :: q)
+                acc 
+            | Mvbdu_sig.Node _ | Mvbdu_sig.Leaf _ ->
+              let error, (handler, h_opt) = 
+                height allocate memoized_fun error parameters handler t 
+              in 
+              let error, h = 
+                match h_opt with 
+              | None -> Exception.warn parameters error __POS__ Exit 0 
+              | Some h -> error, h 
+              in 
+              let error, acc = 
+                match acc with 
+                  | None -> Exception.warn parameters error __POS__ Exit 0 
+                  | Some acc -> error, acc 
+              in
+              error, (handler, Some (max acc (1+h))))
+        in
+        aux handler error [ mvbdu_input ] None
+    in
+    (match mvbdu_output with
+    | None -> error, (handler, None)
+    | Some mvbdu_output ->
+      let error, handler =
+        memoized_fun.Memo_sig.store parameters error handler mvbdu_input
+          mvbdu_output
+      in
+      error, (handler, Some (mvbdu_output : int)))
+
+
+
 let rec project_keep_only_with_threshold allocate memoized_fun bdu_true error
     parameters handler ~threshold mvbdu_input list_input =
   match
@@ -997,6 +1086,11 @@ let recursive_not_memoize f =
 let memoize_no_fun a b c d :
     ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.unary_memoized_fun =
   recursive_memoize (fun _ -> raise Exit) a b c d
+
+
+let memoize_int_option_no_fun a b c d :
+  ('a, 'b, 'c, 'd, 'e, 'f, bool Mvbdu_sig.mvbdu, 'h, 'i, int) Memo_sig.memoized_fun =
+recursive_memoize (fun _ -> raise Exit) a b c d  
 
 let memoize_no_fun_with_threshold a b c d :
     ( 'a,

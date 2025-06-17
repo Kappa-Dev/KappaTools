@@ -100,6 +100,8 @@ type memo_tables = {
   boolean_mvbdu_snd: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_nsnd: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_clean_head: bool Mvbdu_sig.mvbdu Hash_1.t;
+  boolean_mvbdu_height: int Hash_1.t; 
+  boolean_mvbdu_width: int Hash_1.t; 
   boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
   boolean_mvbdu_keep_head_only_with_threshold: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_redefine: bool Mvbdu_sig.mvbdu Hash_2.t;
@@ -174,6 +176,7 @@ let split_memo error handler =
       "id:", x.boolean_mvbdu_identity;
       "not:", x.boolean_mvbdu_not;
       "clean_head:", x.boolean_mvbdu_clean_head;
+      
       "keep_head_only:", x.boolean_mvbdu_keep_head_only;
     ],
     [
@@ -197,6 +200,10 @@ let split_memo error handler =
       "project_onto:", x.boolean_mvbdu_project_keep_only;
       "project_away:", x.boolean_mvbdu_project_abstract_away;
     ],
+    ["width", x.boolean_mvbdu_width; 
+      "height", x.boolean_mvbdu_height; 
+      ]
+    ,
     [
       (* _ -> variables_list *)
       "variables_of:", x.boolean_mvbdu_variables_of_mvbdu;
@@ -319,6 +326,8 @@ let init_data parameters error =
   let error, mvbdu_keep_head_only_with_threshold =
     Hash_2.create parameters error (0, 0)
   in
+  let error, mvbdu_width = Hash_1.create parameters error 0 in 
+  let error, mvbdu_height = Hash_1.create parameters error 0 in 
   let error, mvbdu_and = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_or = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_xor = Hash_2.create parameters error (0, 0) in
@@ -372,6 +381,8 @@ let init_data parameters error =
       boolean_mvbdu_keep_head_only_with_threshold =
         mvbdu_keep_head_only_with_threshold;
       boolean_mvbdu_identity = id;
+      boolean_mvbdu_height = mvbdu_height ;
+      boolean_mvbdu_width = mvbdu_width ; 
       boolean_mvbdu_not = not;
       boolean_mvbdu_and = mvbdu_and;
       boolean_mvbdu_or = mvbdu_or;
@@ -1025,31 +1036,111 @@ let memo_keep_head_only_with_threshold :
     (fun parameters error _h (int, mvbdu') (b : bool Mvbdu_sig.mvbdu) ->
       Hash_2.set parameters error (int, Mvbdu_core.id_of_mvbdu mvbdu') b)
 
-let reset_handler error =
-  {
-    Memo_sig.empty_range_list = error, memo_identity;
-    Memo_sig.empty_association_list = error, memo_identity;
-    Memo_sig.empty_variables_list = error, memo_identity;
-    Memo_sig.leaf = (fun bool -> error, fun error -> error, Mvbdu_sig.Leaf bool);
-    Memo_sig.clean_head = error, memo_clean_head;
-    Memo_sig.build_false =
-      (fun _var _bound -> error, fun error -> error, Mvbdu_sig.Leaf false);
-    Memo_sig.build_true =
-      (fun var bound mvbdu_false mvbdu_true ->
-        ( error,
-          fun error ->
-            ( error,
-              if Mvbdu_core.mvbdu_equal mvbdu_true mvbdu_false then
-                mvbdu_true.Mvbdu_sig.value
-              else
-                Mvbdu_sig.Node
-                  {
-                    Mvbdu_sig.variable = var;
-                    Mvbdu_sig.upper_bound = bound;
-                    Mvbdu_sig.branch_true = mvbdu_true;
-                    Mvbdu_sig.branch_false = mvbdu_false;
-                  } ) ));
-  }
+       let memo_height =
+      Mvbdu_algebra.memoize_int_option_no_fun
+        (fun x -> x.Memo_sig.data.boolean_mvbdu_height)
+        (fun x h ->
+          {
+            h with
+            Memo_sig.data = { h.Memo_sig.data with boolean_mvbdu_height= x };
+          })
+        (fun parameters error handler mvbdu d ->
+          let a, (b:int option)  =
+            Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d
+          in
+          a, (handler, b))
+        (fun parameters error _h mvbdu ->
+          Hash_1.set parameters error (Mvbdu_core.id_of_mvbdu mvbdu))
+    
+    let height parameters error handler =
+      Mvbdu_algebra.height
+        (mvbdu_allocate parameters)
+        memo_height error parameters handler 
+    
+    let memo_height =
+      Mvbdu_algebra.memoize_int_option_no_fun
+        (fun x -> x.Memo_sig.data.boolean_mvbdu_height)
+        (fun x h ->
+          {
+            h with
+            Memo_sig.data = { h.Memo_sig.data with boolean_mvbdu_height = x };
+          })
+        (fun parameters error handler mvbdu d ->
+          match
+            Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d
+          with
+          | error, None -> height parameters error handler mvbdu
+          | error, Some x -> error, (handler, Some x))
+        (fun parameters error _h mvbdu ->
+          Hash_1.set parameters error (Mvbdu_core.id_of_mvbdu mvbdu))
+    
+          let memo_width =
+            Mvbdu_algebra.memoize_int_option_no_fun
+              (fun x -> x.Memo_sig.data.boolean_mvbdu_width)
+              (fun x h ->
+                {
+                  h with
+                  Memo_sig.data = { h.Memo_sig.data with boolean_mvbdu_width= x };
+                })
+              (fun parameters error handler mvbdu d ->
+                let a, (b:int option)  =
+                  Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d
+                in
+                a, (handler, b))
+              (fun parameters error _h mvbdu ->
+                Hash_1.set parameters error (Mvbdu_core.id_of_mvbdu mvbdu))
+          
+          let width parameters error handler =
+            Mvbdu_algebra.width
+              (mvbdu_allocate parameters)
+              memo_width error parameters handler 
+          
+          let memo_width =
+            Mvbdu_algebra.memoize_int_option_no_fun
+              (fun x -> x.Memo_sig.data.boolean_mvbdu_width)
+              (fun x h ->
+                {
+                  h with
+                  Memo_sig.data = { h.Memo_sig.data with boolean_mvbdu_width = x };
+                })
+              (fun parameters error handler mvbdu d ->
+                match
+                  Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d
+                with
+                | error, None -> width parameters error handler mvbdu
+                | error, Some x -> error, (handler, Some x))
+              (fun parameters error _h mvbdu ->
+                Hash_1.set parameters error (Mvbdu_core.id_of_mvbdu mvbdu))
+   
+      
+      let reset_handler error =
+        {
+          Memo_sig.empty_range_list = error, memo_identity;
+          Memo_sig.empty_association_list = error, memo_identity;
+          Memo_sig.empty_variables_list = error, memo_identity;
+          Memo_sig.leaf = (fun bool -> error, fun error -> error, Mvbdu_sig.Leaf bool);
+          Memo_sig.clean_head = error, memo_clean_head;
+          Memo_sig.height = error, memo_height; 
+          Memo_sig.width = error, memo_width; 
+          Memo_sig.build_false =
+            (fun _var _bound -> error, fun error -> error, Mvbdu_sig.Leaf false);
+          Memo_sig.build_true =
+            (fun var bound mvbdu_false mvbdu_true ->
+              ( error,
+                fun error ->
+                  ( error,
+                    if Mvbdu_core.mvbdu_equal mvbdu_true mvbdu_false then
+                      mvbdu_true.Mvbdu_sig.value
+                    else
+                      Mvbdu_sig.Node
+                        {
+                          Mvbdu_sig.variable = var;
+                          Mvbdu_sig.upper_bound = bound;
+                          Mvbdu_sig.branch_true = mvbdu_true;
+                          Mvbdu_sig.branch_false = mvbdu_false;
+                        } ) ));
+        }
+      
 
 let gen_bin_mvbdu_list f get set parameters error handler mvbdu_input list_input
     =
@@ -1302,6 +1393,8 @@ let length parameters error handler list =
         } ))
     error parameters handler list
 
+
+        
 let overwrite_association_lists parameters error handler list1 list2 =
   List_algebra.overwrite
     (association_list_allocate parameters)
@@ -2011,16 +2104,18 @@ let lift f a b c =
   let () = f a c in
   b
 
-let print_hash3 p error log =
-  Hash_1.print p error (lift List_algebra.print_variables_list) log
+let print_hash3 p error log = Hash_1.print p error (lift (fun _ -> print_int)) log
 
 let print_hash4 p error log =
-  Hash_2.print p error (lift List_algebra.print_variables_list) log
+  Hash_1.print p error (lift List_algebra.print_variables_list) log
 
 let print_hash5 p error log =
-  Hash_2.print p error (lift List_algebra.print_association_list) log
+  Hash_2.print p error (lift List_algebra.print_variables_list) log
 
 let print_hash6 p error log =
+  Hash_2.print p error (lift List_algebra.print_association_list) log
+
+let print_hash7 p error log =
   Hash_1.print p error
     (fun a b c ->
       let log = Remanent_parameters.get_logger a in
@@ -2034,7 +2129,7 @@ let print_hash6 p error log =
       b)
     log
 
-let print_hash7 p error log =
+let print_hash8 p error log =
   Hash_1.print p error
     (fun a b c ->
       let log = Remanent_parameters.get_logger a in
@@ -2048,7 +2143,7 @@ let print_hash7 p error log =
       b)
     log
 
-let print_hash8 p error log =
+let print_hash9 p error log =
   Hash_1.print p error
     (fun a b c ->
       let log = Remanent_parameters.get_logger a in
@@ -2073,7 +2168,7 @@ let print_hash8 p error log =
       b)
     log
 
-let print_hash9 p error log =
+let print_hash10 p error log =
   Hash_1.print p error
     (fun a b c ->
       let log = Remanent_parameters.get_logger a in
@@ -2104,7 +2199,7 @@ let print_gen log parameters error (title, print_hash, l) =
 
 let print_memo (error : Exception.exceptions_caught_and_uncaught) handler
     parameters =
-  let error, l1, l2, l3, l4, l5, l6, l7, l8, l9 = split_memo error handler in
+  let error, l1, l2, l3, l4, l5, l6, l7, l8, l9, l10 = split_memo error handler in
   let () =
     Loggers.fprintf
       (Remanent_parameters.get_logger parameters)
@@ -2140,7 +2235,12 @@ let print_memo (error : Exception.exceptions_caught_and_uncaught) handler
   let error =
     print_gen stdout parameters error ("Print Hash_9", print_hash9, l9)
   in
+  let error =
+    print_gen stdout parameters error ("Print Hash_10", print_hash10, l10)
+  in
   error
 
 let last_entry parameter handler error =
   Mvbdu_core.last_entry parameter handler error D_mvbdu_skeleton.last_entry
+
+  

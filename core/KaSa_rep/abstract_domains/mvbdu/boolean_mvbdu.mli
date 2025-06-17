@@ -52,6 +52,8 @@ type memo_tables = {
   boolean_mvbdu_snd: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_nsnd: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_clean_head: bool Mvbdu_sig.mvbdu Hash_1.t;
+  boolean_mvbdu_height: int Hash_1.t; 
+  boolean_mvbdu_width: int Hash_1.t; 
   boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
   boolean_mvbdu_keep_head_only_with_threshold: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_redefine: bool Mvbdu_sig.mvbdu Hash_2.t;
@@ -688,6 +690,22 @@ val clean_head :
   bool Mvbdu_sig.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)
+
+val width : 
+Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+ handler ->
+  bool Mvbdu_sig.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (handler * int option)
+
+val height : 
+Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  handler ->
+  bool Mvbdu_sig.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (handler * int option)
 
 val keep_head_only :
   Remanent_parameters_sig.parameters ->

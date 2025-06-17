@@ -163,6 +163,13 @@ module type Mvbdu = sig
   val mvbdu_cartesian_abstraction_with_threshold :
     (mvbdu, mvbdu list) unary_with_threshold
 
+
+    val mvbdu_width :
+    (mvbdu, int) unary 
+
+    val mvbdu_height :
+     (mvbdu, int) unary 
+    
   val build_association_list :
     ((key * value) list, hconsed_association_list) unary
 
@@ -367,6 +374,10 @@ module type Internalized_mvbdu = sig
     mvbdu -> int -> mvbdu option * mvbdu list
 
   val mvbdu_full_cartesian_decomposition : mvbdu -> mvbdu list
+
+  val mvbdu_height: mvbdu -> int 
+  val mvbdu_width: mvbdu -> int 
+
   val build_association_list : (key * value) list -> hconsed_association_list
 
   val build_sorted_association_list :
@@ -626,6 +637,13 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
       let error, a = Exception.warn parameters error pos Exit a in
       error, handler, a
 
+      let lift1_int pos f parameters handler error a =
+        match f parameters error handler a with
+        | error, (handler, Some a) -> error, handler, a
+        | error, (handler, None) ->
+          let error, a = Exception.warn parameters error pos Exit 0 in
+          error, handler, a
+
   let lift1__ _string f parameters handler error a =
     match f parameters handler error a with
     | error, (handler, a) -> error, handler, a
@@ -872,6 +890,9 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
   let print_variables_list = List_algebra.print_variables_list
   let mvbdu_clean_head = lift1_ __POS__ Boolean_mvbdu.clean_head
   let mvbdu_keep_head_only = lift1_ __POS__ Boolean_mvbdu.keep_head_only
+  let mvbdu_height = lift1_int __POS__ Boolean_mvbdu.height 
+  let mvbdu_width = lift1_int __POS__ Boolean_mvbdu.width
+  
 
   let mvbdu_keep_head_only_with_threshold =
     lift1_with_threshold __POS__ Boolean_mvbdu.keep_head_only_with_threshold
@@ -1133,6 +1154,8 @@ module Internalize (M : Mvbdu with type key = int and type value = int) :
 
   let mvbdu_id = lift_unary __POS__ M.mvbdu_id
   let mvbdu_not = lift_unary __POS__ M.mvbdu_not
+  let mvbdu_height = lift_unary __POS__ M.mvbdu_height 
+  let mvbdu_width= lift_unary __POS__ M.mvbdu_width 
   let mvbdu_unary_true _ = mvbdu_true ()
   let mvbdu_unary_false _ = mvbdu_false ()
   let mvbdu_bi_true _ _ = mvbdu_true ()
@@ -1276,6 +1299,7 @@ struct
   let mvbdu_not parameters handler error a =
     mvbdu_nand parameters handler error a a
 
+    
   let mvbdu_unary_true parameters handler error a =
     let error, handler, nota = mvbdu_not parameters handler error a in
     mvbdu_nand parameters handler error a nota
@@ -1377,6 +1401,8 @@ module Optimize_internalized
   let init = Mvbdu.init
   let is_init = Mvbdu.is_init
   let equal = Mvbdu.equal
+  let mvbdu_width a = Mvbdu.mvbdu_width a
+  let mvbdu_height a = Mvbdu.mvbdu_height a 
   let mvbdu_nand a = Mvbdu.mvbdu_nand a
   let mvbdu_not a = mvbdu_nand a a
   let mvbdu_id = Mvbdu.mvbdu_id
