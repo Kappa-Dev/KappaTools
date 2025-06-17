@@ -14,6 +14,4 @@ val print :
   'a formula ->
   'error
 
-val simplify :
-  'a formula ->
-  'a formula
+val simplify : 'a formula -> 'a formula

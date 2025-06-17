@@ -3097,9 +3097,9 @@ module Domain = struct
             (*-----------------------------------------------------------*)
             Wrapped_modules.LoggedIntMap.fold
               (fun _ mvbdu (error, (handler, list)) ->
-                  let error, handler =
-                    if local_trace || Remanent_parameters.get_trace parameters
-                    then (
+                let error, handler =
+                  if local_trace || Remanent_parameters.get_trace parameters
+                  then (
                     let () = Loggers.fprintf log "INTENSIONAL DESCRIPTION:" in
                     let () = Loggers.print_newline log in
                     let () = Ckappa_sig.Views_bdu.print parameters mvbdu in
@@ -3108,21 +3108,20 @@ module Domain = struct
                     error, handler
                   ) else
                     error, handler
-                  in
-                  let error, handler, restriction_bdu =
-                  Ckappa_sig.Views_bdu.mvbdu_true parameters handler error 
                 in
-                  let error, (handler, translation) =
-                    Translation_in_natural_language.translate parameters handler
-                      error handler_kappa
-                      (fun _ e i -> e, i)
-                      mvbdu nsites restriction_bdu
-                  in
-                  (*-------------------------------------------------------*)
-                  ( error,
-                    ( handler,
-                      (agent_string, agent_type, mvbdu, translation) :: list ) )
-                )
+                let error, handler, restriction_bdu =
+                  Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
+                in
+                let error, (handler, translation) =
+                  Translation_in_natural_language.translate parameters handler
+                    error handler_kappa
+                    (fun _ e i -> e, i)
+                    mvbdu nsites restriction_bdu
+                in
+                (*-------------------------------------------------------*)
+                ( error,
+                  ( handler,
+                    (agent_string, agent_type, mvbdu, translation) :: list ) ))
               map
               (error, (handler, list)))
           output (handler, [])
@@ -3196,9 +3195,9 @@ module Domain = struct
                       in
                       error, site_type
                   in
-                  let error, handler, restriction_bdu = 
-                  Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
-                in
+                  let error, handler, restriction_bdu =
+                    Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
+                  in
                   let error, (handler, translation) =
                     Translation_in_natural_language.translate parameters handler
                       error handler_kappa rename_site mvbdu nsites
@@ -3599,10 +3598,10 @@ module Domain = struct
         if i = 0 then
           print_bdu_update_map_cartesian_abstraction parameters handler error
             handler_kappa site_correspondence result
-         else
+        else
           print_bdu_update_map_cartesian_abstraction_with_threshold parameters
             handler error handler_kappa site_correspondence result
-            og_restriction_bdu 
+            og_restriction_bdu
       in
       let () = Loggers.print_newline log in
       let () =
@@ -3621,7 +3620,6 @@ module Domain = struct
         if i = 0 then
           print_bdu_update_map_cartesian_decomposition ~sort:true parameters
             handler error handler_kappa site_correspondence result
-            
         else
           print_bdu_update_map_cartesian_decomposition_with_threshold
             ~sort:false parameters handler error handler_kappa
@@ -4016,11 +4014,11 @@ module Domain = struct
       domain_name parameters dynamic error handler_kappa
 
   let export_views_properties_aux parameters error handler_kappa
-      site_correspondence fixpoint_result dynamic kasa_state  =
+      site_correspondence fixpoint_result dynamic kasa_state =
     (*non relational properties*)
     let error, dynamic, kasa_state =
       export_non_relation_properties parameters dynamic error handler_kappa
-        site_correspondence fixpoint_result kasa_state 
+        site_correspondence fixpoint_result kasa_state
     in
     (*relational properties*)
     let error, dynamic, kasa_state =
@@ -4059,7 +4057,6 @@ module Domain = struct
       if i = 0 then
         export_views_properties_aux parameters error handler_kappa
           site_correspondence fixpoint_result dynamic kasa_state
-
       else
         export_views_properties_aux_with_threshold parameters error
           handler_kappa site_correspondence fixpoint_result dynamic kasa_state
