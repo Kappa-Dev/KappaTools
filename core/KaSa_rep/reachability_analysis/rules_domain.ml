@@ -317,7 +317,6 @@ module Domain = struct
   let stabilize _static dynamic error = error, dynamic, ()
 
   let export static dynamic error kasa_state =
-    (*rTODO add mvbdu information?*)
     let parameters = get_parameter static in
     let hide_reverse_rule =
       Remanent_parameters.get_hide_reverse_rule_without_label_from_dead_rules
@@ -326,13 +325,16 @@ module Domain = struct
     let original = hide_reverse_rule in
     let compil = get_compil static in
     let array = get_dead_rule dynamic in
-    let error, (list, dynamic) =
+    let restriction_bdu = get_restriction_mvbdu static in
+    let kappa_handler = get_kappa_handler static in
+    let error, (dead_rules_list, conditionally_dead_rules_list, dynamic) =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
-        (fun _parameters error i mvbdu (list, dynamic) ->
-          let error, dynamic, is_false =
-            is_false_mvbdu parameters error dynamic mvbdu
+        (fun _parameters error i mvbdu
+             (dead_rules_list, conditionally_dead_rules_list, dynamic) ->
+          let error, dynamic, is_true =
+            is_true_mvbdu parameters error dynamic mvbdu restriction_bdu
           in
-          if is_false then (
+          if not is_true then (
             let error, info =
               Handler.info_of_rule ~original ~with_rates:false parameters error
                 compil i
@@ -346,12 +348,43 @@ module Domain = struct
               else
                 rule
             in
-            error, (rule :: list, dynamic)
+            let error, dynamic, is_false =
+              is_false_mvbdu parameters error dynamic mvbdu
+            in
+            if is_false then
+              ( error,
+                (rule :: dead_rules_list, conditionally_dead_rules_list, dynamic)
+              )
+            else (
+              let bdu_handler = get_mvbdu_handler dynamic in
+              let error, bdu_handler, formula =
+                Handler.mvbdu_to_formula parameters error kappa_handler
+                  bdu_handler mvbdu
+              in
+              let dynamic = set_mvbdu_handler bdu_handler dynamic in
+              (* 'a -> 'error -> 'acc -> 'error * 'b *)
+              let convert guard_p error (parameters, kappa_handler) =
+                Handler.mvbdu_var_to_string parameters kappa_handler error
+                  guard_p
+              in
+              let error, formula =
+                Logical_formulae.convert_p convert error
+                  (parameters, kappa_handler)
+                  (Logical_formulae.simplify formula)
+              in
+              ( error,
+                ( dead_rules_list,
+                  (rule, formula) :: conditionally_dead_rules_list,
+                  dynamic ) )
+            )
           ) else
-            error, (list, dynamic))
-        array ([], dynamic)
+            error, (dead_rules_list, conditionally_dead_rules_list, dynamic))
+        array ([], [], dynamic)
     in
-    error, dynamic, Remanent_state.set_dead_rules list kasa_state
+    ( error,
+      dynamic,
+      Remanent_state.set_conditionally_dead_rules conditionally_dead_rules_list
+        (Remanent_state.set_dead_rules dead_rules_list kasa_state) )
 
   (**************************************************************************)
 

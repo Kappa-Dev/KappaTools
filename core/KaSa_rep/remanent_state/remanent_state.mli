@@ -351,6 +351,14 @@ val set_dead_rules :
   ('static, 'compile) state ->
   ('static, 'compile) state
 
+val get_conditionally_dead_rules :
+  ('static, 'compile) state -> Public_data.rule_deadness_conditions option
+
+val set_conditionally_dead_rules :
+  Public_data.rule_deadness_conditions ->
+  ('static, 'compile) state ->
+  ('static, 'compile) state
+
 val get_dead_agents : ('static, 'compile) state -> dead_agents option
 
 val set_dead_agents :

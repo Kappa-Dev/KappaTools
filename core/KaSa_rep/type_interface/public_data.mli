@@ -143,9 +143,17 @@ val local_influence_map_of_json :
   * influence_map
 
 type dead_rules = rule list
+type rule_deadness_conditions = (rule * string Logical_formulae.formula) list
+(* contains the rules that are dead only for certain values of the boolean predicates *)
 
 val dead_rules_of_json : Yojson.Basic.t -> dead_rules
 val dead_rules_to_json : dead_rules -> Yojson.Basic.t
+
+val conditionally_dead_rules_of_json :
+  Yojson.Basic.t -> rule_deadness_conditions
+
+val conditionally_dead_rules_to_json :
+  rule_deadness_conditions -> Yojson.Basic.t
 
 type agent_kind = {
   agent_id: int;

@@ -14,6 +14,7 @@ let agent = "agent name"
 let contactmap = "contact map"
 let accuracy_string = "accuracy"
 let dead_rules = "dead rules"
+let conditionally_dead_rules = "conditionally dead rules"
 let dead_agents = "dead agents"
 let map = "map"
 let interface = "interface"
@@ -778,6 +779,8 @@ let local_influence_map_of_json = function
 (***************)
 
 type dead_rules = rule list
+type rule_deadness_conditions = (rule * string Logical_formulae.formula) list
+(* contains the rules that are dead only for certain values of the boolean predicates *)
 
 let dead_rules_to_json json =
   `Assoc [ dead_rules, JsonUtil.of_list rule_to_json json ]
@@ -793,6 +796,33 @@ let dead_rules_of_json = function
     raise
       (Yojson.Basic.Util.Type_error
          (JsonUtil.exn_msg_cant_import_from_json dead_rules, x))
+
+let conditionally_dead_rules_to_json json =
+  `Assoc
+    [
+      ( conditionally_dead_rules,
+        JsonUtil.of_list
+          (JsonUtil.of_pair rule_to_json
+             (Logical_formulae.formula_to_json JsonUtil.of_string))
+          json );
+    ]
+
+let conditionally_dead_rules_of_json = function
+  | `Assoc [ (s, json) ] as x when s = conditionally_dead_rules ->
+    (try
+       JsonUtil.to_list
+         (JsonUtil.to_pair json_to_rule
+            (Logical_formulae.formula_of_json
+               (JsonUtil.to_string ~error_msg:"wrong condition for dead rule")))
+         json
+     with Not_found ->
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json conditionally_dead_rules, x)))
+  | x ->
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json conditionally_dead_rules, x))
 
 (***************)
 (* dead agents *)
