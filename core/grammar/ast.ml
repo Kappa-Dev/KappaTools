@@ -1768,7 +1768,7 @@ let compil_to_json c =
     ]
 
 let compil_of_json = function
-  | `Assoc l as x when List.length l = 9 ->
+  | `Assoc l as x when List.length l = 12 ->
     let var_of_json = JsonUtil.to_string ?error_msg:None in
     (try
        let filenames =
