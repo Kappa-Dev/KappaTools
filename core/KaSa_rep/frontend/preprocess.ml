@@ -1162,27 +1162,8 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             dead_state_sites,
             dead_link_sites ) )
 
-let rec guard_param_conversion convert error guard_params g =
-  match g with
-  | LKappa.True -> error, LKappa.True
-  | LKappa.False -> error, LKappa.False
-  | LKappa.Param (p, loc) ->
-    let error, conv_p = convert p error guard_params in
-    error, LKappa.Param (conv_p, loc)
-  | LKappa.Not g1 ->
-    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
-    error, LKappa.Not conv_g1
-  | LKappa.And (g1, g2) ->
-    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
-    let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
-    error, LKappa.And (conv_g1, conv_g2)
-  | LKappa.Or (g1, g2) ->
-    let error, conv_g1 = guard_param_conversion convert error guard_params g1 in
-    let error, conv_g2 = guard_param_conversion convert error guard_params g2 in
-    error, LKappa.Or (conv_g1, conv_g2)
-
 let translate_guard parameters error handler guard =
-  let convert guard_p_name error (parameters, handler) =
+  let convert (guard_p_name, loc) error (parameters, handler) =
     let error, (bool, output) =
       Ckappa_sig.Dictionary_of_guards.allocate_bool parameters error
         Ckappa_sig.compare_unit_guard_parameter guard_p_name ()
@@ -1191,14 +1172,14 @@ let translate_guard parameters error handler guard =
     match bool, output with
     | _, None | true, _ ->
       Exception.warn parameters error __POS__ Exit
-        Ckappa_sig.dummy_guard_parameter
-    | _, Some (i, _, _, _) -> error, i
+        (Ckappa_sig.dummy_guard_parameter, loc)
+    | _, Some (i, _, _, _) -> error, (i, loc)
   in
   match guard with
   | None -> error, None
   | Some g ->
     let error, guard =
-      guard_param_conversion convert error (parameters, handler) g
+      Logical_formulae.convert_p convert error (parameters, handler) g
     in
     error, Some guard
 

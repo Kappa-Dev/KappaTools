@@ -51,13 +51,7 @@ Array.copy ra_ints)]. *)
 type rule_mixture = rule_agent list
 (** [rule_mixture] is the mixture description from the initial state of a rule *)
 
-type 'id guard =
-  | True
-  | False
-  | Param of 'id Loc.annoted
-  | Not of 'id guard
-  | And of 'id guard * 'id guard
-  | Or of 'id guard * 'id guard
+type 'id guard = 'id Loc.annoted Logical_formulae.formula
 
 type rule = {
   r_mix: rule_mixture;  (** Initial mixture state *)

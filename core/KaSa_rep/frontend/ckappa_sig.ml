@@ -1433,27 +1433,39 @@ to valid bdus where the values of the guards can only be 0 and 1. *)
 let guard_to_bdu parameters error handler_bdu guard bdu_restriction nsites =
   let rec aux error handler_bdu guard =
     match guard with
-    | LKappa.True -> Views_bdu.mvbdu_true parameters handler_bdu error
-    | LKappa.False -> Views_bdu.mvbdu_false parameters handler_bdu error
-    | LKappa.Param (a, _) ->
+    | Logical_formulae.True -> Views_bdu.mvbdu_true parameters handler_bdu error
+    | Logical_formulae.False ->
+      Views_bdu.mvbdu_false parameters handler_bdu error
+    | Logical_formulae.P (a, _) ->
       let error, handler_bdu, association_list =
         Views_bdu.build_association_list parameters handler_bdu error
           [ mvbdu_var_of_guard a nsites, dummy_state_index_true ]
       in
       Views_bdu.mvbdu_of_hconsed_asso parameters handler_bdu error
         association_list
-    | LKappa.Not g1 ->
+    | Logical_formulae.NOT g1 ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
       mvbdu_not_for_guards parameters handler_bdu error mvbdu1 bdu_restriction
-    | LKappa.And (g1, g2) ->
+    | Logical_formulae.AND (g1, g2) ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
       let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
       mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2
-    | LKappa.Or (g1, g2) ->
+    | Logical_formulae.OR (g1, g2) ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
       let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
       let error, handler, result =
         mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
+          bdu_restriction
+      in
+      error, handler, result
+    | Logical_formulae.IMPLY (g1, g2) ->
+      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
+      let error, handler_bdu, not_mvbdu1 =
+        mvbdu_not_for_guards parameters handler_bdu error mvbdu1 bdu_restriction
+      in
+      let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
+      let error, handler, result =
+        mvbdu_or_for_guards parameters handler_bdu error not_mvbdu1 mvbdu2
           bdu_restriction
       in
       error, handler, result

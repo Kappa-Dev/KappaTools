@@ -439,7 +439,7 @@ let scan_guard parameters (error, handler) guard =
   match guard with
   | None -> error, handler
   | Some guard ->
-    let guard_parameters = Ast.guard_params_list_from_guard guard in
+    let guard_parameters = Logical_formulae.get_list_of_predicates guard in
     List.fold_left
       (fun (error, handler) guardp ->
         declare_guard_p parameters error handler guardp)

@@ -877,16 +877,16 @@ let sequential_guard_p_name agent site1 site2 =
   "@sq-" ^ agent ^ "-" ^ site1 ^ "-" ^ site2
 
 let add_param_to_guard guard_opt agent site1 site2 negate loc guard_p_name =
-  let guardp = LKappa.Param (guard_p_name agent site1 site2, loc) in
+  let guardp = Logical_formulae.P (guard_p_name agent site1 site2, loc) in
   let guardp =
     if negate then
-      LKappa.Not guardp
+      Logical_formulae.NOT guardp
     else
       guardp
   in
   match guard_opt with
   | None -> Some guardp
-  | Some guard -> Some (LKappa.And (guard, guardp))
+  | Some guard -> Some (Logical_formulae.AND (guard, guardp))
 
 (**All the rules that were added because of conflicts have the same label as the original rule.
   This function changes their name to rule', rule'' and so on.*)

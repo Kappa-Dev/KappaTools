@@ -687,33 +687,25 @@ let mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu =
   Ckappa_sig.Views_bdu.mvbdu_to_formula ~cartesian_decomposition:b parameters
     bdu_handler error mvbdu
 
-let print_formula parameters error kappa_handler formula =
+let mvbdu_var_to_string parameters kappa_handler error guard_name =
   let nsites = get_nsites kappa_handler in
-  let convert_variable_to_string error guard_name =
-    match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
-    | Ckappa_sig.Guard_p guard_name ->
-      string_of_guard parameters guard_name kappa_handler error
-    | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
-  in
+  match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
+  | Ckappa_sig.Guard_p guard_name ->
+    string_of_guard parameters guard_name kappa_handler error
+  | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
+
+let print_formula parameters error kappa_handler formula =
   let error =
-    Logical_formulae.print parameters error convert_variable_to_string formula
+    Logical_formulae.print_formula
+      (Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s")
+      error
+      (mvbdu_var_to_string parameters kappa_handler)
+      formula
   in
   error
 
 let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler mvbdu
     =
-  (* let () = Ckappa_sig.Views_bdu.print parameters mvbdu in *)
-  (*let () =
-      if with_comma then
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) " if "
-    in*)
-  (*let nsites = get_nsites kappa_handler in
-    let convert_variable_to_string error guard_name =
-      match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
-      | Ckappa_sig.Guard_p guard_name ->
-        string_of_guard parameters guard_name kappa_handler error
-      | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
-    in*)
   let error, bdu_handler, formula =
     mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu
   in
@@ -732,10 +724,6 @@ let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler mvbdu
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameters) " ] "
     in
-    (* let error, bdu_handler, () =
-         Ckappa_sig.Views_bdu.print_guard_mvbdu parameters bdu_handler error mvbdu
-           convert_variable_to_string
-       in*)
     error, bdu_handler
 
 (*****************************************************************************)

@@ -1906,25 +1906,30 @@ type bool_or_error = Value of bool | Error of Loc.t
 
 let evaluate_guard_opt guard guard_param_values =
   let rec evaluate_guard = function
-    | LKappa.True -> Value true
-    | LKappa.False -> Value false
-    | LKappa.Param (p, pos) ->
+    | Logical_formulae.True -> Value true
+    | Logical_formulae.False -> Value false
+    | Logical_formulae.P (p, pos) ->
       (match Mods.StringMap.find_option p guard_param_values with
       | None -> Error pos
       | Some value -> Value value)
-    | Not guard ->
+    | Logical_formulae.NOT guard ->
       (match evaluate_guard guard with
       | Value value -> Value (not value)
       | Error pos -> Error pos)
-    | And (g1, g2) ->
+    | Logical_formulae.AND (g1, g2) ->
       (match evaluate_guard g1, evaluate_guard g2 with
       | Value v1, Value v2 -> Value (v1 && v2)
       | Value false, _ | _, Value false -> Value false
       | Error pos, _ | _, Error pos -> Error pos)
-    | Or (g1, g2) ->
+    | Logical_formulae.OR (g1, g2) ->
       (match evaluate_guard g1, evaluate_guard g2 with
       | Value v1, Value v2 -> Value (v1 || v2)
       | Value true, _ | _, Value true -> Value true
+      | Error pos, _ | _, Error pos -> Error pos)
+    | Logical_formulae.IMPLY (g1, g2) ->
+      (match evaluate_guard g1, evaluate_guard g2 with
+      | Value v1, Value v2 -> Value ((not v1) || v2)
+      | Value false, _ | _, Value true -> Value true
       | Error pos, _ | _, Error pos -> Error pos)
   in
   match guard with

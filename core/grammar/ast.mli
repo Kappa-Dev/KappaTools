@@ -194,14 +194,6 @@ val split_mixture : mixture -> mixture * mixture
 val infer_agent_signatures : parsing_compil -> parsing_compil
 (** Used when agent signatures is implicit: infer agent signatures and tokens from init, rules and perturbations *)
 
-val guard_params_list_from_guard : string LKappa.guard -> string list
-
-val get_list_of_guard_parameters :
-  (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)
-  list ->
-  string list
-(** Returns a list of all the parameters used in the guards of the rule list. *)
-
 (** {6 Printers} *)
 
 val print_counter : Format.formatter -> counter -> unit

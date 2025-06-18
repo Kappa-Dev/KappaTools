@@ -8,10 +8,10 @@
 
 let add_working_set_guard guard k loc =
   let guard_name = "@rule-" ^ string_of_int k in
-  let guard_param = LKappa.Param (guard_name, loc) in
+  let guard_param = Logical_formulae.P (guard_name, loc) in
   match guard with
   | None -> Some guard_param, guard_name
-  | Some guard -> Some (LKappa.And (guard_param, guard)), guard_name
+  | Some guard -> Some (Logical_formulae.AND (guard_param, guard)), guard_name
 
 let append_to_ast_compil rev_instr compil =
   fst

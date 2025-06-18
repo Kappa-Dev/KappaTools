@@ -504,23 +504,23 @@ rule_content:
 /*Boolean expression containing compiler parameters*/
 small_guard_bool_expr:
   | OP_PAR annoted guard_bool_expr CL_PAR annoted { $3 }
-  | TRUE annoted { LKappa.True }
-  | FALSE annoted { LKappa.False }
-  | ID annoted { LKappa.Param ($1, rhs_pos 1) }
+  | TRUE annoted { Logical_formulae.True }
+  | FALSE annoted { Logical_formulae.False }
+  | ID annoted { Logical_formulae.P ($1, rhs_pos 1) }
   | NOT annoted small_guard_bool_expr
-    { LKappa.Not $3 }
+    { Logical_formulae.NOT $3 }
   ;
 
 guard_bool_expr_no_or:
   | small_guard_bool_expr { $1 }
   | small_guard_bool_expr AND annoted guard_bool_expr_no_or
-    { LKappa.And ($1, $4)}
+    { Logical_formulae.AND ($1, $4)}
   ;
 
 guard_bool_expr:
   | guard_bool_expr_no_or { $1 }
   | guard_bool_expr_no_or OR annoted guard_bool_expr
-    { LKappa.Or ($1, $4) }
+    { Logical_formulae.OR ($1, $4) }
   ;
 
 guard:

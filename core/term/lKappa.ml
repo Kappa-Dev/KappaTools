@@ -35,14 +35,7 @@ type rule_agent = {
 }
 
 type rule_mixture = rule_agent list
-
-type 'id guard =
-  | True
-  | False
-  | Param of 'id Loc.annoted
-  | Not of 'id guard
-  | And of 'id guard * 'id guard
-  | Or of 'id guard * 'id guard
+type 'id guard = 'id Loc.annoted Logical_formulae.formula
 
 type rule = {
   r_mix: rule_mixture;
@@ -510,21 +503,28 @@ let print_rates ~noCounters sigs counters_info pr_tok pr_var f r =
 
 let rec string_of_guard g =
   match g with
-  | True -> "TRUE"
-  | False -> "FALSE"
-  | Param (i, _) -> i
-  | And (a, b) -> string_of_guard a ^ " && " ^ string_of_guard b
-  | Or (a, b) -> string_of_guard a ^ " || " ^ string_of_guard b
-  | Not a -> "[not] " ^ string_of_guard a
+  | Logical_formulae.True -> "TRUE"
+  | Logical_formulae.False -> "FALSE"
+  | Logical_formulae.P (i, _) -> i
+  | Logical_formulae.AND (a, b) ->
+    string_of_guard a ^ " && " ^ string_of_guard b
+  | Logical_formulae.OR (a, b) -> string_of_guard a ^ " || " ^ string_of_guard b
+  | Logical_formulae.NOT a -> "[not] " ^ string_of_guard a
+  | Logical_formulae.IMPLY (a, b) ->
+    string_of_guard a ^ " => " ^ string_of_guard b
 
 let rec print_guard f g =
   match g with
-  | True -> Format.fprintf f "TRUE"
-  | False -> Format.fprintf f "FALSE"
-  | Param (i, _) -> Format.fprintf f "%s" i
-  | And (a, b) -> Format.fprintf f "@[%a && %a@]" print_guard a print_guard b
-  | Or (a, b) -> Format.fprintf f "@[(%a || %a)@]" print_guard a print_guard b
-  | Not a -> Format.fprintf f "@[[not] %a@]" print_guard a
+  | Logical_formulae.True -> Format.fprintf f "TRUE"
+  | Logical_formulae.False -> Format.fprintf f "FALSE"
+  | Logical_formulae.P (i, _) -> Format.fprintf f "%s" i
+  | Logical_formulae.AND (a, b) ->
+    Format.fprintf f "@[%a && %a@]" print_guard a print_guard b
+  | Logical_formulae.OR (a, b) ->
+    Format.fprintf f "@[(%a || %a)@]" print_guard a print_guard b
+  | Logical_formulae.NOT a -> Format.fprintf f "@[[not] %a@]" print_guard a
+  | Logical_formulae.IMPLY (a, b) ->
+    Format.fprintf f "@[(%a => %a)@]" print_guard a print_guard b
 
 let print_guard f g = Format.fprintf f "/*if*/ %a /*then*/@ " print_guard g
 
@@ -652,72 +652,19 @@ let lalg_expr_of_json filenames =
     (rule_mixture_of_json filenames)
     (JsonUtil.to_int ?error_msg:None)
 
-let rec guard_to_json ~filenames (f : 'a -> Yojson.Basic.t) (g : 'id guard) :
-    Yojson.Basic.t =
-  match g with
-  | True -> `Assoc [ "type", `String "True" ]
-  | False -> `Assoc [ "type", `String "False" ]
-  | Param value ->
-    `Assoc
-      [
-        "type", `String "Param";
-        "value", Loc.yojson_of_annoted ~filenames f value;
-      ]
-  | Not g1 ->
-    `Assoc [ "type", `String "Not"; "guard", guard_to_json ~filenames f g1 ]
-  | And (g1, g2) ->
-    `Assoc
-      [
-        "type", `String "And";
-        "left", guard_to_json ~filenames f g1;
-        "right", guard_to_json ~filenames f g2;
-      ]
-  | Or (g1, g2) ->
-    `Assoc
-      [
-        "type", `String "Or";
-        "left", guard_to_json ~filenames f g1;
-        "right", guard_to_json ~filenames f g2;
-      ]
-
-let rec guard_of_json ~filenames (f : Yojson.Basic.t -> 'a)
-    (json : Yojson.Basic.t) : 'a guard =
-  match json with
-  | `Assoc fields ->
-    (match List.assoc "type" fields with
-    | `String "True" -> True
-    | `String "False" -> False
-    | `String "Param" ->
-      let value_json = List.assoc "value" fields in
-      Param (Loc.annoted_of_yojson ~filenames f value_json)
-    | `String "Not" ->
-      let guard_json = List.assoc "guard" fields in
-      Not (guard_of_json ~filenames f guard_json)
-    | `String "And" ->
-      let left_json = List.assoc "left" fields in
-      let right_json = List.assoc "right" fields in
-      And
-        ( guard_of_json ~filenames f left_json,
-          guard_of_json ~filenames f right_json )
-    | `String "Or" ->
-      let left_json = List.assoc "left" fields in
-      let right_json = List.assoc "right" fields in
-      Or
-        ( guard_of_json ~filenames f left_json,
-          guard_of_json ~filenames f right_json )
-    | `String unknown -> failwith ("Unknown guard type: " ^ unknown)
-    | _ -> raise (Yojson.Basic.Util.Type_error ("Incorrect guard", json)))
-  | _ -> raise (Yojson.Basic.Util.Type_error ("Incorrect guard", json))
-
 let string_guard_option_to_json ~filenames =
-  JsonUtil.of_option (guard_to_json ~filenames (fun s -> `String s))
+  JsonUtil.of_option
+    (Logical_formulae.formula_to_json
+       (Loc.yojson_of_annoted ~filenames JsonUtil.of_string))
 
 let string_guard_option_of_json ~filenames =
   let string_of_json = function
     | `String s -> s
     | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct string", x))
   in
-  JsonUtil.to_option (guard_of_json ~filenames string_of_json)
+  JsonUtil.to_option
+    (Logical_formulae.formula_of_json
+       (Loc.annoted_of_yojson ~filenames string_of_json))
 
 let rule_to_json ~filenames guard r =
   `Assoc
