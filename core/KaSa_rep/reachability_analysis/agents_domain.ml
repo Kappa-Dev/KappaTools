@@ -644,30 +644,60 @@ module Domain = struct
     error, dynamic, event_list'
 
   let export static dynamic error kasa_state =
-    (*rTODO add guards*)
     let parameters = get_parameter static in
     let handler = get_kappa_handler static in
     let compil = get_compil static in
     let array = get_seen_agent dynamic in
-    let error, (dynamic, list) =
+    let restriction_bdu = get_restriction_mvbdu static in
+    let kappa_handler = get_kappa_handler static in
+    let error, (dead_agents_list, conditionally_dead_agents_list, dynamic) =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
         error
-        (fun _parameters error agent mvbdu (dynamic, list) ->
-          let error, dynamic, is_false =
-            is_false_mvbdu parameters error dynamic mvbdu
+        (fun _parameters error agent mvbdu
+             (dead_agents_list, conditionally_dead_agents_list, dynamic) ->
+          let error, dynamic, is_true =
+            is_true_mvbdu parameters error dynamic mvbdu restriction_bdu
           in
-          if is_false then
-            error, (dynamic, list)
-          else (
+          if not is_true then (
             let error, info =
               Handler.info_of_agent parameters error handler compil agent
             in
             let agent = Remanent_state.info_to_agent info in
-            error, (dynamic, agent :: list)
-          ))
-        array (dynamic, [])
+            let error, dynamic, is_false =
+              is_false_mvbdu parameters error dynamic mvbdu
+            in
+            if is_false then
+              ( error,
+                ( agent :: dead_agents_list,
+                  conditionally_dead_agents_list,
+                  dynamic ) )
+            else (
+              let bdu_handler = get_mvbdu_handler dynamic in
+              let error, bdu_handler, formula =
+                Handler.mvbdu_to_formula parameters error kappa_handler
+                  bdu_handler mvbdu
+              in
+              let dynamic = set_mvbdu_handler bdu_handler dynamic in
+              let error, formula =
+                Logical_formulae.convert_p
+                  (Handler.mvbdu_var_to_string parameters kappa_handler)
+                  error
+                  (Logical_formulae.simplify formula)
+              in
+              ( error,
+                ( dead_agents_list,
+                  (agent, formula) :: conditionally_dead_agents_list,
+                  dynamic ) )
+            )
+          ) else
+            error, (dead_agents_list, conditionally_dead_agents_list, dynamic))
+        array ([], [], dynamic)
     in
-    error, dynamic, Remanent_state.set_dead_agents list kasa_state
+    ( error,
+      dynamic,
+      Remanent_state.set_conditionally_dead_agents
+        conditionally_dead_agents_list
+        (Remanent_state.set_dead_agents dead_agents_list kasa_state) )
 
   let apply_one_side_effect _static dynamic error _ _ precondition =
     error, dynamic, (precondition, [])

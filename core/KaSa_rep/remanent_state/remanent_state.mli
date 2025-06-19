@@ -364,6 +364,14 @@ val get_dead_agents : ('static, 'compile) state -> dead_agents option
 val set_dead_agents :
   dead_agents -> ('static, 'compile) state -> ('static, 'compile) state
 
+val get_conditionally_dead_agents :
+  ('static, 'compile) state -> Public_data.agent_deadness_conditions option
+
+val set_conditionally_dead_agents :
+  Public_data.agent_deadness_conditions ->
+  ('static, 'compile) state ->
+  ('static, 'compile) state
+
 val get_influence_map_map :
   ('static, 'compile) state ->
   Public_data.influence_map Public_data.AccuracyMap.t

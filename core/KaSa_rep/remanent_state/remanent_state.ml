@@ -66,6 +66,7 @@ let info_to_rule (s1, loc, direction, s2, _guard, id) =
   }
 
 type dead_agents = Public_data.dead_agents
+type agent_deadness_conditions = Public_data.agent_deadness_conditions
 type separating_transitions = Public_data.separating_transitions
 
 (******************************************************************************)
@@ -213,6 +214,7 @@ type ('static, 'dynamic) state = {
   dead_rules: dead_rules option;
   conditionally_dead_rules: rule_deadness_conditions option;
   dead_agents: dead_agents option;
+  conditionally_dead_agents: agent_deadness_conditions option;
   ode_flow: Ode_fragmentation_type.ode_frag option;
   ctmc_flow: flow option;
   errors: Exception.exceptions_caught_and_uncaught;
@@ -273,6 +275,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     dead_rules = None;
     conditionally_dead_rules = None;
     dead_agents = None;
+    conditionally_dead_agents = None;
     errors = error;
     internal_constraints_list = None;
     constraints_list = None;
@@ -652,6 +655,11 @@ let get_dead_agents state = state.dead_agents
 
 let set_dead_agents dead_agents state =
   { state with dead_agents = Some dead_agents }
+
+let get_conditionally_dead_agents state = state.conditionally_dead_agents
+
+let set_conditionally_dead_agents conditionally_dead_agents state =
+  { state with conditionally_dead_agents = Some conditionally_dead_agents }
 
 let get_subviews_info state = state.subviews_info
 

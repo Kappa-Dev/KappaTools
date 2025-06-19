@@ -12,7 +12,7 @@ val simplify : 'a formula -> 'a formula
 val print_formula :
   (string -> unit) ->
   'error ->
-  ('error -> 'a -> 'error * string) ->
+  ('a -> 'error -> 'error * string) ->
   'a formula ->
   'error
 
@@ -20,10 +20,6 @@ val formula_to_json : ('a -> Yojson.Basic.t) -> 'a formula -> Yojson.Basic.t
 val formula_of_json : (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a formula
 
 val convert_p :
-  ('a -> 'error -> 'handler -> 'error * 'b) ->
-  'error ->
-  'handler ->
-  'a formula ->
-  'error * 'b formula
+  ('a -> 'error -> 'error * 'b) -> 'error -> 'a formula -> 'error * 'b formula
 
 val get_list_of_predicates : (string * 'a) formula -> string list

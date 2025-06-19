@@ -66,7 +66,7 @@ let rec simplify f =
 let rec print_formula f_print_string error string_of formula =
   match formula with
   | P x ->
-    let error, s = string_of error x in
+    let error, s = string_of x error in
     let () = f_print_string s in
     error
   | NOT x ->
@@ -169,27 +169,27 @@ let rec formula_of_json value_of_json json =
     | _ -> raise (Yojson.Basic.Util.Type_error ("Incorrect guard", json)))
   | _ -> raise (Yojson.Basic.Util.Type_error ("Incorrect guard", json))
 
-let rec convert_p convert error guard_params g =
+let rec convert_p convert error g =
   match g with
   | True -> error, True
   | False -> error, False
   | P p ->
-    let error, conv_p = convert p error guard_params in
+    let error, conv_p = convert p error in
     error, P conv_p
   | NOT g1 ->
-    let error, conv_g1 = convert_p convert error guard_params g1 in
+    let error, conv_g1 = convert_p convert error g1 in
     error, NOT conv_g1
   | AND (g1, g2) ->
-    let error, conv_g1 = convert_p convert error guard_params g1 in
-    let error, conv_g2 = convert_p convert error guard_params g2 in
+    let error, conv_g1 = convert_p convert error g1 in
+    let error, conv_g2 = convert_p convert error g2 in
     error, AND (conv_g1, conv_g2)
   | OR (g1, g2) ->
-    let error, conv_g1 = convert_p convert error guard_params g1 in
-    let error, conv_g2 = convert_p convert error guard_params g2 in
+    let error, conv_g1 = convert_p convert error g1 in
+    let error, conv_g2 = convert_p convert error g2 in
     error, OR (conv_g1, conv_g2)
   | IMPLY (g1, g2) ->
-    let error, conv_g1 = convert_p convert error guard_params g1 in
-    let error, conv_g2 = convert_p convert error guard_params g2 in
+    let error, conv_g1 = convert_p convert error g1 in
+    let error, conv_g2 = convert_p convert error g2 in
     error, IMPLY (conv_g1, conv_g2)
 
 let merge_guards g1 g2 =

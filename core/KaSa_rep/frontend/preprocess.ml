@@ -1163,7 +1163,7 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             dead_link_sites ) )
 
 let translate_guard parameters error handler guard =
-  let convert (guard_p_name, loc) error (parameters, handler) =
+  let convert (guard_p_name, loc) error =
     let error, (bool, output) =
       Ckappa_sig.Dictionary_of_guards.allocate_bool parameters error
         Ckappa_sig.compare_unit_guard_parameter guard_p_name ()
@@ -1178,9 +1178,7 @@ let translate_guard parameters error handler guard =
   match guard with
   | None -> error, None
   | Some g ->
-    let error, guard =
-      Logical_formulae.convert_p convert error (parameters, handler) g
-    in
+    let error, guard = Logical_formulae.convert_p convert error g in
     error, Some guard
 
 let update parameters error creation lhs_opt k =

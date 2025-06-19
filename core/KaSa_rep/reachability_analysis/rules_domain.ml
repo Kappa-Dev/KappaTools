@@ -362,14 +362,10 @@ module Domain = struct
                   bdu_handler mvbdu
               in
               let dynamic = set_mvbdu_handler bdu_handler dynamic in
-              (* 'a -> 'error -> 'acc -> 'error * 'b *)
-              let convert guard_p error (parameters, kappa_handler) =
-                Handler.mvbdu_var_to_string parameters kappa_handler error
-                  guard_p
-              in
               let error, formula =
-                Logical_formulae.convert_p convert error
-                  (parameters, kappa_handler)
+                Logical_formulae.convert_p
+                  (Handler.mvbdu_var_to_string parameters kappa_handler)
+                  error
                   (Logical_formulae.simplify formula)
               in
               ( error,

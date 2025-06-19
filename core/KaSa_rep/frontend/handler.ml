@@ -687,7 +687,7 @@ let mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu =
   Ckappa_sig.Views_bdu.mvbdu_to_formula ~cartesian_decomposition:b parameters
     bdu_handler error mvbdu
 
-let mvbdu_var_to_string parameters kappa_handler error guard_name =
+let mvbdu_var_to_string parameters kappa_handler guard_name error =
   let nsites = get_nsites kappa_handler in
   match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
   | Ckappa_sig.Guard_p guard_name ->

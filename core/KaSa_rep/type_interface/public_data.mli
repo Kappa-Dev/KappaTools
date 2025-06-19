@@ -163,8 +163,18 @@ type agent_kind = {
 
 type dead_agents = agent_kind list
 
+type agent_deadness_conditions =
+  (agent_kind * string Logical_formulae.formula) list
+(* contains the agents that are dead only for certain values of the boolean predicates *)
+
 val json_to_dead_agents : Yojson.Basic.t -> dead_agents
 val json_of_dead_agents : dead_agents -> Yojson.Basic.t
+
+val conditionally_dead_agents_of_json :
+  Yojson.Basic.t -> agent_deadness_conditions
+
+val conditionally_dead_agents_to_json :
+  agent_deadness_conditions -> Yojson.Basic.t
 
 type separating_transitions = (rule * (string * string) list) list
 

@@ -507,8 +507,8 @@ val get_nr_guard_parameters :
 val mvbdu_var_to_string :
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
-  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_mvbdu_var ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
 val print_formula :
