@@ -1,16 +1,20 @@
 #!/bin/bash
 
-KASA_BINARY="../../../bin/KaSa"
-TEMP_FILE="temp_experiment.ka"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+KASA_BINARY="${SCRIPT_DIR}/../../../bin/KaSa"
+TEMP_FILE="${SCRIPT_DIR}/temp_experiment.ka"
 DEFAULT_TIMEOUT=1m
 
 # models
-MODELS_DIRECTORY="models/"
+MODELS_DIRECTORY="${SCRIPT_DIR}/models/"
 ENSEMBLE="${MODELS_DIRECTORY}ensemble.ka"
 EGFR="${MODELS_DIRECTORY}causality_05_sos.ka"
 REPRESSILATOR="${MODELS_DIRECTORY}Repressilator.ka"
 FGF="${MODELS_DIRECTORY}fgf.ka"
 SFB="${MODELS_DIRECTORY}sfb.ka"
+
+OUTPUT_DIR="${SCRIPT_DIR}/output/"
 
 # Array of models
 MODELS=("ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB")
@@ -18,9 +22,20 @@ MODELS=("ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB")
 AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
 AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
 
-# Generate a new output file name (the stderr output of time)
-mkdir -p output
+cd "${SCRIPT_DIR}/../../.."
+# Install the dependencies
+echo "Installing dependencies:"
+opam install . --update-invariant
 
+echo
+# Build Kappa
+echo "Building the project:"
+make all
+
+# Generate a new output file name (the stderr output of time)
+mkdir -p "${OUTPUT_DIR}"
+
+echo
 echo "Analyzing models: $AVAILABLE_MODELS"
 
 # Parse command-line arguments for timeout
@@ -36,7 +51,7 @@ fi
 for MODEL in "${MODELS[@]}"; do
     EXAMPLE_MODEL=${!MODEL}
 
-    OUTPUT_FILE="output/${MODEL}_experiments_output"
+    OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_experiments_output"
     i=0
     while [ -e "$OUTPUT_FILE~$i.txt" ]; do
         i=$((i + 1))
@@ -49,12 +64,11 @@ for MODEL in "${MODELS[@]}"; do
 
     echo
     echo "Processing model: $MODEL"
-# 20 25 30 40 42 50 60 70
-    for i in 00 05 10 15; do
+    for i in 00 10 20 30 40 42 50 60 70 80; do
         # If the current file contains the annotation //i for the current i, then the analysis is executed
         if grep -q "//$i" "$EXAMPLE_MODEL"; then
 
-          STDOUT_OUTPUT_FILE="output/${MODEL}_analysis_output_$i"
+          STDOUT_OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_analysis_output_$i"
           j=0
           while [ -e "$STDOUT_OUTPUT_FILE~$j.txt" ]; do
               j=$((j + 1))
@@ -71,7 +85,7 @@ for MODEL in "${MODELS[@]}"; do
 
             # Check if the program was killed by timeout
             if [ $EXIT_STATUS -eq 124 ]; then
-                echo "⚠️ Timeout occurred for $MODEL with $i rules." >> "$OUTPUT_FILE"
+                echo "⚠️ Timeout or memory overflow occurred for $MODEL with $i rules." >> "$OUTPUT_FILE"
                 break
             fi
         fi
@@ -97,7 +111,7 @@ for MODEL in "${MODELS[@]}"; do
     fi
 
     # Check for timeouts
-    if grep -qi "Timeout occurred for" "$OUTPUT_FILE"; then
+    if grep -qi "Timeout or memory overflow occurred for" "$OUTPUT_FILE"; then
         echo "⚠️ Some programs were killed by a timeout or a memory overflow."
     fi
 done
