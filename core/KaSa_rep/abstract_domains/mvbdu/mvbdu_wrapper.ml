@@ -237,14 +237,6 @@ module type Mvbdu = sig
   val parametric_conditions_of_mvbdu :
     (mvbdu, ((key * value) list * mvbdu) list) unary_with_threshold
 
-  val print_guard_mvbdu :
-    ( mvbdu,
-      Exception.exceptions_caught_and_uncaught ->
-      key ->
-      Exception.exceptions_caught_and_uncaught * string,
-      unit )
-    binary
-
   val variables_list_of_mvbdu : (mvbdu, hconsed_variables_list) unary
 
   val variables_list_of_mvbdu_with_threshold :
@@ -880,10 +872,6 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     lift1__with_threshold ~threshold __POS__
       Boolean_mvbdu.extensional_description_of_mvbdu_with_threshold parameters
       handler error mvbdu
-
-  let print_guard_mvbdu parameters handler error mvbdu variable_to_string =
-    Boolean_mvbdu.print_guard_mvbdu parameters handler error mvbdu
-      variable_to_string
 
   let print = Boolean_mvbdu.print_mvbdu
   let print_association_list = List_algebra.print_association_list

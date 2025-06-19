@@ -137,16 +137,6 @@ val extensional_description_of_mvbdu_with_threshold :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * ((int * int) list * bool Mvbdu_sig.mvbdu) list)
 
-val print_guard_mvbdu :
-  Remanent_parameters_sig.parameters ->
-  handler ->
-  Exception_without_parameter.exceptions_caught_and_uncaught ->
-  bool Mvbdu_sig.mvbdu ->
-  (Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Mvbdu_sig.variable ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * string) ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * handler * unit
-
 val to_formula :
   Remanent_parameters_sig.parameters ->
   handler ->
