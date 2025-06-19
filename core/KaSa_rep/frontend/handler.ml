@@ -709,15 +709,8 @@ let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =
     mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu
   in
   let formula = Logical_formulae.simplify formula in
-  match formula with
-  | Logical_formulae.False ->
-    Exception.warn parameters error __POS__ Exit bdu_handler
-  | Logical_formulae.True | Logical_formulae.OR _ | Logical_formulae.P _
-  | Logical_formulae.NOT _
-  | Logical_formulae.IMPLY (_, _)
-  | Logical_formulae.AND (_, _) ->
-    let error = print_formula parameters error kappa_handler formula in
-    error, bdu_handler
+  let error = print_formula parameters error kappa_handler formula in
+  error, bdu_handler
 
 (*****************************************************************************)
 
