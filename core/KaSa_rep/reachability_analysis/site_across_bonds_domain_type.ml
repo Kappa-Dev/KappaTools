@@ -443,8 +443,8 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
                         pattern
                     in
                     let error, handler =
-                      Handler.print_guard_mvbdu parameters error
-                        kappa_handler handler mvbdu
+                      Handler.print_guard_mvbdu parameters error kappa_handler
+                        handler mvbdu
                     in
                     error, handler)
                   (error, handler) pair_list
@@ -546,8 +546,8 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
                         pattern
                     in
                     let error, handler =
-                      Handler.print_guard_mvbdu parameters error
-                        kappa_handler handler mvbdu
+                      Handler.print_guard_mvbdu parameters error kappa_handler
+                        handler mvbdu
                     in
                     error, handler, true)
                   (error, handler, false) pair_list
@@ -617,8 +617,8 @@ let print_site_across_domain_mvbdu ?verbose:(_verbose = true) ?(sparse = false)
                     error, handler
                   else (
                     let () = Loggers.fprintf log " if " in
-                    Handler.print_guard_mvbdu parameters error
-                      kappa_handler handler mvbdu
+                    Handler.print_guard_mvbdu parameters error kappa_handler
+                      handler mvbdu
                   )
                 in
                 let () = Loggers.print_newline log in

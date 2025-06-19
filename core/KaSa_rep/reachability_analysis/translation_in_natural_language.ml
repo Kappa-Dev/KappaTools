@@ -1063,14 +1063,9 @@ let rec print ?beginning_of_sentence:(beggining = true)
                 Site_graphs.KaSa_site_graph.print log parameters error
                   agent_graph
               in
-              (*let error, bdu_handler, is_true =
-                  Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-                    mvbdu restriction_bdu
-                in*)
-              (*let () = if not is_true then Loggers.fprintf log "," in*)
               let error, bdu_handler =
-                Handler.print_guard_mvbdu parameters error
-                  handler_kappa bdu_handler mvbdu
+                Handler.print_guard_mvbdu parameters error handler_kappa
+                  bdu_handler mvbdu
               in
               let () = Loggers.print_newline log in
               error, bdu_handler

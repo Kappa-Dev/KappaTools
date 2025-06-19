@@ -704,8 +704,7 @@ let print_formula parameters error kappa_handler formula =
   in
   error
 
-let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
-    =
+let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =
   let error, bdu_handler, formula =
     mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu
   in
@@ -713,17 +712,11 @@ let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
   match formula with
   | Logical_formulae.False ->
     Exception.warn parameters error __POS__ Exit bdu_handler
-  | Logical_formulae.True -> error, bdu_handler
-  | Logical_formulae.OR _ | Logical_formulae.P _ | Logical_formulae.NOT _
+  | Logical_formulae.True | Logical_formulae.OR _ | Logical_formulae.P _
+  | Logical_formulae.NOT _
   | Logical_formulae.IMPLY (_, _)
   | Logical_formulae.AND (_, _) ->
-    let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) " [ if "
-    in
     let error = print_formula parameters error kappa_handler formula in
-    let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) " ] "
-    in
     error, bdu_handler
 
 (*****************************************************************************)

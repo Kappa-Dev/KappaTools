@@ -1675,7 +1675,6 @@ module Domain = struct
     in
     error, dynamic, kasa_state
 
-    
   let get_dead_rules _static _dynamic = Analyzer_headers.dummy_dead_rules
   let get_side_effects _static _dynamic = Analyzer_headers.dummy_side_effects
 end
