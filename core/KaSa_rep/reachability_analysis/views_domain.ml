@@ -806,7 +806,7 @@ module Domain = struct
             (*-----------------------------------------------------------*)
             let () = if bool then Loggers.fprintf log ")" in
             let error, bdu_handler =
-              Handler.print_guard_mvbdu_decompose parameters error kappa_handler
+              Handler.print_guard_mvbdu parameters error kappa_handler
                 bdu_handler bdu
             in
             let () = if bool then Loggers.print_newline log in

@@ -271,7 +271,7 @@ let print_guard_parameters_natural_language parameters prefix error
         "%sFor the following values of the guard parameters: \n" prefix
     in
     let error, bdu_handler =
-      Handler.print_guard_mvbdu_decompose parameters error kappa_handler
+      Handler.print_guard_mvbdu parameters error kappa_handler
         bdu_handler mvbdu
     in
     let () =
@@ -436,7 +436,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                 parameters error kappa_handler list_same
             in
             let error, bdu_handler =
-              Handler.print_guard_mvbdu_decompose parameters error kappa_handler
+              Handler.print_guard_mvbdu parameters error kappa_handler
                 bdu_handler parallel_bond_mvbdu
             in
             let () =
@@ -453,7 +453,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                     parameters error t_precondition
                 in
                 let error, bdu_handler =
-                  Handler.print_guard_mvbdu_decompose parameters error
+                  Handler.print_guard_mvbdu parameters error
                     kappa_handler bdu_handler parallel_bond_mvbdu
                 in
                 let () =
@@ -542,7 +542,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                 parameters error kappa_handler list_distinct
             in
             let error, bdu_handler =
-              Handler.print_guard_mvbdu_decompose parameters error kappa_handler
+              Handler.print_guard_mvbdu parameters error kappa_handler
                 bdu_handler non_parallel_bond_mvbdu
             in
             let () =
@@ -558,7 +558,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
                     parameters error t_precondition
                 in
                 let error, bdu_handler =
-                  Handler.print_guard_mvbdu_decompose parameters error
+                  Handler.print_guard_mvbdu parameters error
                     kappa_handler bdu_handler non_parallel_bond_mvbdu
                 in
                 let () =

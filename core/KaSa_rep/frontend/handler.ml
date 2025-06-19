@@ -704,7 +704,7 @@ let print_formula parameters error kappa_handler formula =
   in
   error
 
-let print_guard_mvbdu_decompose parameters error kappa_handler bdu_handler mvbdu
+let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
     =
   let error, bdu_handler, formula =
     mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu

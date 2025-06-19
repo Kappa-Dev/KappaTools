@@ -1590,26 +1590,6 @@ module Domain = struct
             if is_true then (
               match Remanent_parameters.get_backend_mode parameters with
               | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-                (*hyp*)
-                (*let string_version =
-                    Site_graphs.KaSa_site_graph.get_string_version
-                      t_precondition
-                  in
-                  let error, site_graph =
-                    Ckappa_site_graph.site_graph_to_list
-                      error string_version
-                  in
-                  let error, refinement =
-                    Ckappa_site_graph.site_graph_list_to_list
-                      error list_same
-                  in
-                  let lemma =
-                    {
-                      Public_data.hyp = site_graph;
-                      Public_data.refinement = refinement
-                    }
-                  in
-                  let current_list = lemma :: current_list in*)
                 (*internal constraint list*)
                 let refine = List.rev list_same in
                 let lemma_internal =
@@ -1621,24 +1601,6 @@ module Domain = struct
                 let current_list = lemma_internal :: current_list in
                 error, current_list
               | Remanent_parameters_sig.Natural_language ->
-                (*let string_version =
-                    Site_graphs.KaSa_site_graph.get_string_version
-                      t_same
-                  in
-                  let error, site_graph =
-                    Ckappa_site_graph.site_graph_to_list error
-                      string_version
-                  in
-                  (*hyp*)
-                  let error, refinement =
-                    Ckappa_site_graph.site_graph_list_to_list error list_same in
-                  let lemma =
-                    {
-                      Public_data.hyp = site_graph;
-                      Public_data.refinement = refinement
-                    }
-                  in
-                  let current_list = lemma :: current_list in*)
                 (*internal constraint list*)
                 let refine = List.rev list_same in
                 let lemma_internal =
@@ -1649,21 +1611,6 @@ module Domain = struct
             ) else if is_false then (
               match Remanent_parameters.get_backend_mode parameters with
               | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-                (*let string_version =
-                    Site_graphs.KaSa_site_graph.get_string_version
-                      t_precondition
-                  in
-                  let error, site_graph =
-                    Ckappa_site_graph.site_graph_to_list error string_version in
-                  let error, refinement =
-                    Ckappa_site_graph.site_graph_list_to_list error list_distinct in
-                  let lemma =
-                    {
-                      Public_data.hyp = site_graph;
-                      Public_data.refinement = refinement
-                    }
-                  in
-                  let current_list = lemma :: current_list in*)
                 (*internal constraint list*)
                 let refine = List.rev list_distinct in
                 let lemma_internal =
@@ -1675,22 +1622,6 @@ module Domain = struct
                 let current_list = lemma_internal :: current_list in
                 error, current_list
               | Remanent_parameters_sig.Natural_language ->
-                (*let string_version =
-                    Site_graphs.KaSa_site_graph.get_string_version
-                      t_distinct
-                  in
-                  let error, site_graph =
-                    Ckappa_site_graph.site_graph_to_list error string_version in
-                  let error, refinement =
-                    Ckappa_site_graph.site_graph_list_to_list error list_distinct in
-                  let lemma =
-                    {
-                      Public_data.hyp = site_graph;
-                      Public_data.refinement = refinement
-                    }
-                  in
-                  let current_list = lemma :: current_list in*)
-                (*internal constraint list*)
                 let refine = List.rev list_distinct in
                 let lemma_internal =
                   {
@@ -1705,21 +1636,6 @@ module Domain = struct
               | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
                 error, current_list
               | Remanent_parameters_sig.Natural_language ->
-                (*let string_version =
-                    Site_graphs.KaSa_site_graph.get_string_version
-                      t_same
-                  in
-                  let error, site_graph =
-                    Ckappa_site_graph.site_graph_to_list error string_version in
-                  let error, refinement =
-                    Ckappa_site_graph.site_graph_list_to_list error list_same in
-                  let lemma =
-                    {
-                      Public_data.hyp = site_graph;
-                      Public_data.refinement = refinement
-                    }
-                  in
-                  let current_list = lemma :: current_list in*)
                 (*internal*)
                 let refine = List.rev list_same in
                 let lemma_internal =
@@ -1727,22 +1643,6 @@ module Domain = struct
                 in
                 let current_list = lemma_internal :: current_list in
                 (*----------------------------------------------*)
-                (*let string_version =
-                    Site_graphs.KaSa_site_graph.get_string_version
-                      t_distinct
-                  in
-                  let error, site_graph =
-                    Ckappa_site_graph.site_graph_to_list error string_version in
-                  let error, refinement =
-                    Ckappa_site_graph.site_graph_list_to_list error list_distinct in
-                  let lemma =
-                    {
-                      Public_data.hyp = site_graph;
-                      Public_data.refinement = refinement
-                    }
-                  in
-                  let current_list = lemma :: current_list in*)
-                (*internal constraint list*)
                 let refine = List.rev list_distinct in
                 let lemma_internal =
                   {
@@ -1757,20 +1657,6 @@ module Domain = struct
         store_value (error, [])
       (*name of domain*)
     in
-    (*------------------------------------------------------------------*)
-    (*let constraint_list = Remanent_state.get_constraints_list kasa_state in
-      let error, constraint_list =
-        match
-          constraint_list
-        with
-        | None ->
-          Exception.warn parameters error __POS__ Exit []
-        | Some l -> error, l
-      in
-      let pair_list = (domain_name, List.rev current_list) :: constraint_list in
-      let kasa_state =
-        Remanent_state.set_constraints_list pair_list kasa_state
-      in*)
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
     let internal_constraints_list =
@@ -1789,58 +1675,7 @@ module Domain = struct
     in
     error, dynamic, kasa_state
 
-  (*let export static dynamic error kasa_state =
-    let error, dynamic, kasa_state =
-      export_internal_constraints_list static dynamic error kasa_state
-    in
-    let parameters = get_parameter static in
-    let internal_constraints_list =
-      Remanent_state.get_internal_constraints_list kasa_state
-    in
-    let error, internal_constraints_list =
-      match internal_constraints_list with
-      | None -> Exception.warn parameters error __POS__ Exit []
-      | Some l -> error, l
-    in
-    let constraint_list = Remanent_state.get_constraints_list kasa_state in
-    let error, constraint_list =
-      match constraint_list with
-      | None -> Exception.warn parameters error __POS__ Exit []
-      | Some l -> error, l
-    in
-    let error, kasa_state =
-      List.fold_left (fun (error, kasa_state) (domain_name, lemma_list) ->
-          let error, current_list =
-            List.fold_left (fun (error, current_list) lem ->
-                let hyp = Remanent_state.get_hyp lem in
-                let refine = Remanent_state.get_refinement lem in
-                let string_version =
-                  Site_graphs.KaSa_site_graph.get_string_version
-                    hyp
-                in
-                let error, site_graph =
-                  Ckappa_site_graph.site_graph_to_list error string_version
-                in
-                let error, refinement =
-                  Ckappa_site_graph.site_graph_list_to_list error refine in
-                let lemma =
-                  {Public_data.hyp = site_graph;
-                   Public_data.refinement = refinement}
-                in
-                let current_list = lemma :: current_list in
-                error, current_list
-              ) (error, []) lemma_list
-          in
-          (*----------------------------------------------------------*)
-          let pair_list =
-            (domain_name, List.rev current_list) :: constraint_list in
-          let kasa_state =
-            Remanent_state.set_constraints_list pair_list kasa_state in
-          error, kasa_state
-        ) (error, kasa_state) internal_constraints_list
-    in
-    error, dynamic, kasa_state*)
-
+    
   let get_dead_rules _static _dynamic = Analyzer_headers.dummy_dead_rules
   let get_side_effects _static _dynamic = Analyzer_headers.dummy_side_effects
 end
