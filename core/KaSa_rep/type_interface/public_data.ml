@@ -962,6 +962,14 @@ type agent =
 type 'site_graph lemma = { hyp: 'site_graph; refinement: 'site_graph list }
 type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
 
+type 'site_graph formula_lemma = {
+  pattern: 'site_graph list;
+  reachability_condition: string Logical_formulae.formula;
+}
+
+type 'site_graph poly_formula_constraints_list =
+  (string * 'site_graph formula_lemma list) list
+
 let lemma_to_json site_graph_to_json json =
   JsonUtil.of_pair ~lab1:hyp ~lab2:refinement site_graph_to_json
     (JsonUtil.of_list site_graph_to_json)

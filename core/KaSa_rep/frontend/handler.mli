@@ -504,16 +504,15 @@ val get_nsites : Cckappa_sig.kappa_handler -> Ckappa_sig.c_site_name
 val get_nr_guard_parameters :
   Cckappa_sig.kappa_handler -> Ckappa_sig.c_guard_parameter
 
-val mvbdu_var_to_string :
+val mvbdu_to_string_formula :
   Remanent_parameters_sig.parameters ->
-  Cckappa_sig.kappa_handler ->
-  Ckappa_sig.c_mvbdu_var ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * string
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+  * string Logical_formulae.formula
 
 val print_formula :
-  Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Cckappa_sig.kappa_handler ->
-  Ckappa_sig.c_mvbdu_var Logical_formulae.formula ->
-  Exception_without_parameter.exceptions_caught_and_uncaught
+  Remanent_parameters_sig.parameters -> string Logical_formulae.formula -> unit

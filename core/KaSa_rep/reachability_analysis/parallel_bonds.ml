@@ -1471,15 +1471,101 @@ module Domain = struct
 
   (***********************************************************)
 
+  let export_without_formula parameters bdu_handler error list_same t_same
+      list_distinct t_distinct t_precondition parallel_is_true parallel_is_false
+      non_parallel_is_true non_parallel_is_false current_list =
+    let build_lemma t_1 list_1 t_2 =
+      let refine = List.rev list_1 in
+      match Remanent_parameters.get_backend_mode parameters with
+      | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+        (*internal constraint list*)
+        let lemma_internal =
+          { Public_data.hyp = t_1; Public_data.refinement = refine }
+        in
+        let current_list = lemma_internal :: current_list in
+        error, bdu_handler, current_list
+      | Remanent_parameters_sig.Natural_language ->
+        (*internal constraint list*)
+        let lemma_internal =
+          { Public_data.hyp = t_2; Public_data.refinement = refine }
+        in
+        let current_list = lemma_internal :: current_list in
+        error, bdu_handler, current_list
+    in
+    if parallel_is_true && non_parallel_is_false then
+      build_lemma t_precondition list_same t_same
+    else if parallel_is_false && non_parallel_is_true then
+      build_lemma t_precondition list_distinct t_distinct
+    else if parallel_is_true && non_parallel_is_true then (
+      match Remanent_parameters.get_backend_mode parameters with
+      | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+        error, bdu_handler, current_list
+      | Remanent_parameters_sig.Natural_language ->
+        (*internal*)
+        let refine = List.rev list_same in
+        let lemma_internal =
+          { Public_data.hyp = t_same; Public_data.refinement = refine }
+        in
+        let current_list = lemma_internal :: current_list in
+        (*----------------------------------------------*)
+        let refine = List.rev list_distinct in
+        let lemma_internal =
+          { Public_data.hyp = t_distinct; Public_data.refinement = refine }
+        in
+        let current_list = lemma_internal :: current_list in
+        error, bdu_handler, current_list
+    ) else
+      error, bdu_handler, current_list
+
+  let export_with_formula parameters error kappa_handler bdu_handler
+      parallel_bond_mvbdu non_parallel_bond_mvbdu current_list parallel_is_true
+      non_parallel_is_true list_same list_distinct =
+    let build_lemma list_1 mvbdu =
+      let refine = List.rev list_1 in
+      let error, bdu_handler, formula =
+        Handler.mvbdu_to_string_formula parameters error kappa_handler
+          bdu_handler mvbdu
+      in
+      let lemma_internal =
+        {
+          Public_data.pattern = refine;
+          Public_data.reachability_condition = formula;
+        }
+      in
+      let current_list = lemma_internal :: current_list in
+      error, bdu_handler, current_list
+    in
+    if not parallel_is_true then
+      build_lemma list_same parallel_bond_mvbdu
+    else if not non_parallel_is_true then
+      build_lemma list_distinct non_parallel_bond_mvbdu
+    else
+      error, bdu_handler, current_list
+
   let export static dynamic error kasa_state =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let store_value = get_value dynamic in
     let domain_name = "Parallel bonds" in
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let restriction_bdu = get_restriction_mvbdu static in
     (*string * 'site_graph lemma list : head*)
-    let error, current_list =
+    let error, bdu_handler, current_lemma_list, current_formula_list =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
-        (fun tuple value (error, current_list) ->
+        (fun tuple value
+             (error, bdu_handler, current_lemma_list, current_formula_list) ->
+          let ( error,
+                bdu_handler,
+                parallel_bond_mvbdu,
+                non_parallel_bond_mvbdu,
+                depends_on_parameters,
+                parallel_is_true,
+                non_parallel_is_true,
+                parallel_is_false,
+                non_parallel_is_false ) =
+            Parallel_bonds_type.compute_mvbdus_and_parallel_constraints
+              parameters bdu_handler error value restriction_bdu
+          in
           let (agent, site, site', _, _), (agent'', site'', site''', _, _) =
             tuple
           in
@@ -1574,93 +1660,37 @@ module Domain = struct
           in
           (*--------------------------------------------------------*)
           if compare site site' > 0 then
-            error, current_list
-          else (
+            error, bdu_handler, current_lemma_list, current_formula_list
+          else if
             (*--------------------------------------------------*)
-            let bdu_handler = get_mvbdu_handler dynamic in
-            let restriction_bdu = get_restriction_mvbdu static in
-            let error, bdu_handler, is_false =
-              Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
-                value
+            depends_on_parameters
+          then (
+            let error, bdu_handler, current_formula_list =
+              export_with_formula parameters error kappa_handler bdu_handler
+                parallel_bond_mvbdu non_parallel_bond_mvbdu current_formula_list
+                parallel_is_true non_parallel_is_true list_same list_distinct
             in
-            let error, _bdu_handler, is_true =
-              Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-                value restriction_bdu
+            error, bdu_handler, current_lemma_list, current_formula_list
+          ) else (
+            let error, bdu_handler, current_lemma_list =
+              export_without_formula parameters bdu_handler error list_same
+                t_same list_distinct t_distinct t_precondition parallel_is_true
+                parallel_is_false non_parallel_is_true non_parallel_is_false
+                current_lemma_list
             in
-            if is_true then (
-              match Remanent_parameters.get_backend_mode parameters with
-              | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-                (*internal constraint list*)
-                let refine = List.rev list_same in
-                let lemma_internal =
-                  {
-                    Public_data.hyp = t_precondition;
-                    Public_data.refinement = refine;
-                  }
-                in
-                let current_list = lemma_internal :: current_list in
-                error, current_list
-              | Remanent_parameters_sig.Natural_language ->
-                (*internal constraint list*)
-                let refine = List.rev list_same in
-                let lemma_internal =
-                  { Public_data.hyp = t_same; Public_data.refinement = refine }
-                in
-                let current_list = lemma_internal :: current_list in
-                error, current_list
-            ) else if is_false then (
-              match Remanent_parameters.get_backend_mode parameters with
-              | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-                (*internal constraint list*)
-                let refine = List.rev list_distinct in
-                let lemma_internal =
-                  {
-                    Public_data.hyp = t_precondition;
-                    Public_data.refinement = refine;
-                  }
-                in
-                let current_list = lemma_internal :: current_list in
-                error, current_list
-              | Remanent_parameters_sig.Natural_language ->
-                let refine = List.rev list_distinct in
-                let lemma_internal =
-                  {
-                    Public_data.hyp = t_distinct;
-                    Public_data.refinement = refine;
-                  }
-                in
-                let current_list = lemma_internal :: current_list in
-                error, current_list
-            ) else (
-              match Remanent_parameters.get_backend_mode parameters with
-              | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-                error, current_list
-              | Remanent_parameters_sig.Natural_language ->
-                (*internal*)
-                let refine = List.rev list_same in
-                let lemma_internal =
-                  { Public_data.hyp = t_same; Public_data.refinement = refine }
-                in
-                let current_list = lemma_internal :: current_list in
-                (*----------------------------------------------*)
-                let refine = List.rev list_distinct in
-                let lemma_internal =
-                  {
-                    Public_data.hyp = t_distinct;
-                    Public_data.refinement = refine;
-                  }
-                in
-                let current_list = lemma_internal :: current_list in
-                error, current_list
-            )
+            error, bdu_handler, current_lemma_list, current_formula_list
           ))
-        store_value (error, [])
-      (*name of domain*)
+        store_value
+        (error, bdu_handler, [], [])
     in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
     let internal_constraints_list =
       Remanent_state.get_internal_constraints_list kasa_state
+    in
+    let internal_formula_constraints_list =
+      Remanent_state.get_internal_formula_constraints_list kasa_state
     in
     let error, internal_constraints_list =
       match internal_constraints_list with
@@ -1668,10 +1698,22 @@ module Domain = struct
       | Some l -> error, l
     in
     let pair_list =
-      (domain_name, List.rev current_list) :: internal_constraints_list
+      (domain_name, List.rev current_lemma_list) :: internal_constraints_list
     in
     let kasa_state =
       Remanent_state.set_internal_constraints_list pair_list kasa_state
+    in
+    let internal_formula_constraints_list =
+      match internal_formula_constraints_list with
+      | None -> []
+      | Some l -> l
+    in
+    let pair_list =
+      (domain_name, List.rev current_formula_list)
+      :: internal_formula_constraints_list
+    in
+    let kasa_state =
+      Remanent_state.set_internal_formula_constraints_list pair_list kasa_state
     in
     error, dynamic, kasa_state
 

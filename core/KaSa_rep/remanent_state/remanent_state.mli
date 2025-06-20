@@ -80,6 +80,9 @@ type flow =
 type internal_constraints_list =
   Site_graphs.KaSa_site_graph.t Public_data.poly_constraints_list
 
+type internal_formula_constraints_list =
+  Site_graphs.KaSa_site_graph.t Public_data.poly_formula_constraints_list
+
 type agent =
   string
   * (*agent name*)
@@ -411,6 +414,14 @@ val get_internal_constraints_list :
 
 val set_internal_constraints_list :
   internal_constraints_list ->
+  ('static, 'compile) state ->
+  ('static, 'compile) state
+
+val get_internal_formula_constraints_list :
+  ('static, 'compile) state -> internal_formula_constraints_list option
+
+val set_internal_formula_constraints_list :
+  internal_formula_constraints_list ->
   ('static, 'compile) state ->
   ('static, 'compile) state
 

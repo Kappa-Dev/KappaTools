@@ -358,16 +358,10 @@ module Domain = struct
             else (
               let bdu_handler = get_mvbdu_handler dynamic in
               let error, bdu_handler, formula =
-                Handler.mvbdu_to_formula parameters error kappa_handler
+                Handler.mvbdu_to_string_formula parameters error kappa_handler
                   bdu_handler mvbdu
               in
               let dynamic = set_mvbdu_handler bdu_handler dynamic in
-              let error, formula =
-                Logical_formulae.convert_p
-                  (Handler.mvbdu_var_to_string parameters kappa_handler)
-                  error
-                  (Logical_formulae.simplify formula)
-              in
               ( error,
                 ( dead_rules_list,
                   (rule, formula) :: conditionally_dead_rules_list,
@@ -472,13 +466,10 @@ module Domain = struct
                   in
                   let bdu_handler = get_mvbdu_handler dynamic in
                   let error, bdu_handler, f =
-                    Handler.mvbdu_to_formula parameters error kappa_handler
-                      bdu_handler mvbdu (*restriction_bdu*)
+                    Handler.mvbdu_to_string_formula parameters error
+                      kappa_handler bdu_handler mvbdu
                   in
-                  let error =
-                    Handler.print_formula parameters error kappa_handler
-                      (Logical_formulae.simplify f)
-                  in
+                  let () = Handler.print_formula parameters f in
                   let dynamic = set_mvbdu_handler bdu_handler dynamic in
                   let () =
                     Loggers.fprintf

@@ -183,6 +183,11 @@ val separating_transitions_to_json : separating_transitions -> Yojson.Basic.t
 
 type 'site_graph lemma = { hyp: 'site_graph; refinement: 'site_graph list }
 
+type 'site_graph formula_lemma = {
+  pattern: 'site_graph list;
+  reachability_condition: string Logical_formulae.formula;
+}
+
 type binding_state =
   | Free
   | Wildcard
@@ -199,6 +204,9 @@ type agent =
     list
 
 type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
+
+type 'site_graph poly_formula_constraints_list =
+  (string * 'site_graph formula_lemma list) list
 
 val lemma_to_json :
   ('site_graph -> Yojson.Basic.t) -> 'site_graph lemma -> Yojson.Basic.t

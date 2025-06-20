@@ -210,6 +210,54 @@ let mvbdu_project_abstract_away_first_variable parameters bdu_handler error
   Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler error
     mvbdu variable_list
 
+let compute_mvbdus_and_parallel_constraints parameters bdu_handler error mvbdu
+    restriction_bdu =
+  let error, bdu_handler, parallel_bond_mvbdu =
+    add_first_variable_to_mvbdu parameters bdu_handler error true mvbdu
+  in
+  let error, bdu_handler, non_parallel_bond_mvbdu =
+    add_first_variable_to_mvbdu parameters bdu_handler error false mvbdu
+  in
+  let error, bdu_handler, parallel_bond_mvbdu =
+    mvbdu_project_abstract_away_first_variable parameters bdu_handler error
+      parallel_bond_mvbdu
+  in
+  let error, bdu_handler, non_parallel_bond_mvbdu =
+    mvbdu_project_abstract_away_first_variable parameters bdu_handler error
+      non_parallel_bond_mvbdu
+  in
+  (* does the analysis result depend on the value of the boolean parameters? *)
+  let error, bdu_handler, parallel_is_true =
+    Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
+      parallel_bond_mvbdu restriction_bdu
+  in
+  let error, bdu_handler, parallel_is_false =
+    Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
+      parallel_bond_mvbdu
+  in
+  let error, bdu_handler, non_parallel_is_true =
+    Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
+      non_parallel_bond_mvbdu restriction_bdu
+  in
+  let error, bdu_handler, non_parallel_is_false =
+    Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
+      non_parallel_bond_mvbdu
+  in
+  let depends_on_parameters =
+    not
+      ((parallel_is_true || parallel_is_false)
+      && (non_parallel_is_true || non_parallel_is_false))
+  in
+  ( error,
+    bdu_handler,
+    parallel_bond_mvbdu,
+    non_parallel_bond_mvbdu,
+    depends_on_parameters,
+    parallel_is_true,
+    non_parallel_is_true,
+    parallel_is_false,
+    non_parallel_is_false )
+
 let print_without_formula parameters error kappa_handler list_site_graph
     site_graph t_precondition prefix verbose string_agent string_site
     string_site'' string_site' string_site''' string_agent'' modalite
@@ -437,41 +485,17 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
   if sparse && compare site site' > 0 then
     error, bdu_handler
   else (
-    let error, bdu_handler, parallel_bond_mvbdu =
-      add_first_variable_to_mvbdu parameters bdu_handler error true value
-    in
-    let error, bdu_handler, non_parallel_bond_mvbdu =
-      add_first_variable_to_mvbdu parameters bdu_handler error false value
-    in
-    let error, bdu_handler, parallel_bond_mvbdu =
-      mvbdu_project_abstract_away_first_variable parameters bdu_handler error
-        parallel_bond_mvbdu
-    in
-    let error, bdu_handler, non_parallel_bond_mvbdu =
-      mvbdu_project_abstract_away_first_variable parameters bdu_handler error
-        non_parallel_bond_mvbdu
-    in
-    (* does the analysis result depend on the value of the boolean parameters? *)
-    let error, bdu_handler, parallel_is_true =
-      Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-        parallel_bond_mvbdu restriction_bdu
-    in
-    let error, bdu_handler, parallel_is_false =
-      Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
-        parallel_bond_mvbdu
-    in
-    let error, bdu_handler, non_parallel_is_true =
-      Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-        non_parallel_bond_mvbdu restriction_bdu
-    in
-    let error, bdu_handler, non_parallel_is_false =
-      Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
-        non_parallel_bond_mvbdu
-    in
-    let depends_on_parameters =
-      not
-        ((parallel_is_true || parallel_is_false)
-        && (non_parallel_is_true || non_parallel_is_false))
+    let ( error,
+          bdu_handler,
+          parallel_bond_mvbdu,
+          non_parallel_bond_mvbdu,
+          depends_on_parameters,
+          parallel_is_true,
+          non_parallel_is_true,
+          parallel_is_false,
+          non_parallel_is_false ) =
+      compute_mvbdus_and_parallel_constraints parameters bdu_handler error value
+        restriction_bdu
     in
     (* printing for which values of the guards all double bonds are parallel *)
     let error, bdu_handler =

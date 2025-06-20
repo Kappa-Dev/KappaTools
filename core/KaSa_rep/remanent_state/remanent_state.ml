@@ -161,6 +161,9 @@ type flow =
 type internal_constraints_list =
   Site_graphs.KaSa_site_graph.t Public_data.poly_constraints_list
 
+type internal_formula_constraints_list =
+  Site_graphs.KaSa_site_graph.t Public_data.poly_formula_constraints_list
+
 (*******************************************************************)
 type symmetric_sites = Symmetries.symmetries option
 (*******************************************************************)
@@ -219,6 +222,7 @@ type ('static, 'dynamic) state = {
   ctmc_flow: flow option;
   errors: Exception.exceptions_caught_and_uncaught;
   internal_constraints_list: internal_constraints_list option;
+  internal_formula_constraints_list: internal_formula_constraints_list option;
   constraints_list: constraints_list option;
   symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
   separating_transitions: separating_transitions option;
@@ -278,6 +282,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     conditionally_dead_agents = None;
     errors = error;
     internal_constraints_list = None;
+    internal_formula_constraints_list = None;
     constraints_list = None;
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
@@ -679,8 +684,14 @@ let get_log_info state = state.log_info
 let set_log_info log state = { state with log_info = log }
 let get_internal_constraints_list state = state.internal_constraints_list
 
+let get_internal_formula_constraints_list state =
+  state.internal_formula_constraints_list
+
 let set_internal_constraints_list list state =
   { state with internal_constraints_list = Some list }
+
+let set_internal_formula_constraints_list list state =
+  { state with internal_formula_constraints_list = Some list }
 
 let get_constraints_list state = state.constraints_list
 

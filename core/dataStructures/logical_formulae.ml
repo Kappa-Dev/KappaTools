@@ -63,46 +63,35 @@ let rec simplify f =
       AND (x, y))
   | True | False | P _ -> f
 
-let rec print_formula f_print_string error string_of formula =
+let rec print_formula f_print_string formula =
   match formula with
-  | P x ->
-    let error, s = string_of x error in
-    let () = f_print_string s in
-    error
+  | P x -> f_print_string x
   | NOT x ->
     let () = f_print_string "~" in
-    print_arg f_print_string error string_of False x
+    print_arg f_print_string False x
   | OR (x1, x2) ->
-    let error = print_arg f_print_string error string_of (OR (P (), P ())) x1 in
+    let () = print_arg f_print_string (OR (P (), P ())) x1 in
     let () = f_print_string ".or." in
-    print_arg f_print_string error string_of (OR (P (), P ())) x2
+    print_arg f_print_string (OR (P (), P ())) x2
   | AND (x1, x2) ->
-    let error =
-      print_arg f_print_string error string_of (AND (P (), P ())) x1
-    in
+    let () = print_arg f_print_string (AND (P (), P ())) x1 in
     let () = f_print_string ".and." in
-    print_arg f_print_string error string_of (AND (P (), P ())) x2
+    print_arg f_print_string (AND (P (), P ())) x2
   | IMPLY (x1, x2) ->
-    let error = print_arg f_print_string error string_of False x1 in
+    let () = print_arg f_print_string False x1 in
     let () = f_print_string "=>" in
-    print_arg f_print_string error string_of False x2
-  | True ->
-    let () = f_print_string ".T." in
-    error
-  | False ->
-    let () = f_print_string ".F." in
-    error
+    print_arg f_print_string False x2
+  | True -> f_print_string ".T."
+  | False -> f_print_string ".F."
 
-and print_arg f_print_string error string_of scheme formula =
+and print_arg f_print_string scheme formula =
   match formula, scheme with
-  | (P _ | True | False), _ ->
-    print_formula f_print_string error string_of formula
-  | OR (_, _), OR (_, _) -> print_formula f_print_string error string_of formula
-  | AND (_, _), AND (_, _) ->
-    print_formula f_print_string error string_of formula
+  | (P _ | True | False), _ -> print_formula f_print_string formula
+  | OR (_, _), OR (_, _) -> print_formula f_print_string formula
+  | AND (_, _), AND (_, _) -> print_formula f_print_string formula
   | (NOT _ | OR (_, _) | AND (_, _) | IMPLY (_, _)), _ ->
     let () = f_print_string "(" in
-    let error = print_formula f_print_string error string_of formula in
+    let error = print_formula f_print_string formula in
     let () = f_print_string ")" in
     error
 

@@ -694,22 +694,29 @@ let mvbdu_var_to_string parameters kappa_handler guard_name error =
     string_of_guard parameters guard_name kappa_handler error
   | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
 
-let print_formula parameters error kappa_handler formula =
-  let error =
-    Logical_formulae.print_formula
-      (Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s")
-      error
-      (mvbdu_var_to_string parameters kappa_handler)
-      formula
-  in
-  error
-
-let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =
+let mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu =
   let error, bdu_handler, formula =
     mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu
   in
+  let error, formula =
+    Logical_formulae.convert_p
+      (mvbdu_var_to_string parameters kappa_handler)
+      error
+      (Logical_formulae.simplify formula)
+  in
+  error, bdu_handler, formula
+
+let print_formula parameters formula =
+  Logical_formulae.print_formula
+    (Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s")
+    formula
+
+let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =
+  let error, bdu_handler, formula =
+    mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu
+  in
   let formula = Logical_formulae.simplify formula in
-  let error = print_formula parameters error kappa_handler formula in
+  let () = print_formula parameters formula in
   error, bdu_handler
 
 (*****************************************************************************)
