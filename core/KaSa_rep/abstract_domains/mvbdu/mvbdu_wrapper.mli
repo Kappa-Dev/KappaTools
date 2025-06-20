@@ -165,9 +165,9 @@ module type Mvbdu = sig
   val mvbdu_cartesian_abstraction_with_threshold :
     (mvbdu, mvbdu list) unary_with_threshold
 
-  val mvbdu_width : (mvbdu, int) unary 
-  val mvbdu_height : (mvbdu, int) unary 
-  
+  val mvbdu_width : (mvbdu, int) unary
+  val mvbdu_height : (mvbdu, int) unary
+
   val build_association_list :
     ((key * value) list, hconsed_association_list) unary
 
@@ -364,9 +364,8 @@ module type Internalized_mvbdu = sig
     mvbdu -> int -> mvbdu option * mvbdu list
 
   val mvbdu_full_cartesian_decomposition : mvbdu -> mvbdu list
-
-  val mvbdu_height: mvbdu -> int 
-  val mvbdu_width: mvbdu -> int 
+  val mvbdu_height : mvbdu -> int
+  val mvbdu_width : mvbdu -> int
   val build_association_list : (key * value) list -> hconsed_association_list
 
   val build_sorted_association_list :
