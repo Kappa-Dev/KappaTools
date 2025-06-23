@@ -1790,7 +1790,7 @@ module Domain = struct
               in
               let error, handler, depends_on_parameters =
                 Site_across_bonds_domain_type.depends_on_parameters parameters
-                  handler error pair_list restriction_bdu
+                  kappa_handler handler error pair_list restriction_bdu
               in
               match Remanent_parameters.get_backend_mode parameters with
               | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
