@@ -6,6 +6,14 @@ val print_internal_pattern :
   Remanent_state.internal_constraints_list ->
   Exception.exceptions_caught_and_uncaught
 
+val print_internal_pattern_with_formula :
+  ?logger:Loggers.t ->
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Remanent_state.internal_formula_constraints_list ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+
 val site_graph_to_list :
   Exception.exceptions_caught_and_uncaught ->
   ((string
@@ -44,5 +52,5 @@ val internal_pair_list_to_list :
   Ckappa_sig.c_site_name ->
   Site_graphs.KaSa_site_graph.agent_id ->
   Ckappa_sig.c_site_name ->
-  (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list list ->
+  ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list * 'a) list ->
   Exception.exceptions_caught_and_uncaught * Site_graphs.KaSa_site_graph.t list

@@ -1895,9 +1895,10 @@ functor
     (*constraints_list*)
     (****************************************************************)
 
-    let compute_internal_constraints_list _show_title state =
+    let compute_internal_constraints_list get_internal_constraints_list
+        _show_title state =
       let state, _ = get_reachability_analysis state in
-      match Remanent_state.get_internal_constraints_list state with
+      match get_internal_constraints_list state with
       | None ->
         let error = Remanent_state.get_errors state in
         let parameters = Remanent_state.get_parameters state in
@@ -1910,7 +1911,15 @@ functor
       get_gen ~do_we_show_title:title_only_in_kasa
         ~log_title:"Extract refinement lemmas"
         Remanent_state.get_internal_constraints_list
-        compute_internal_constraints_list
+        (compute_internal_constraints_list
+           Remanent_state.get_internal_constraints_list)
+
+    let get_internal_formula_constraints_list =
+      get_gen ~do_we_show_title:title_only_in_kasa
+        ~log_title:"Extract refinement lemmas with formulas"
+        Remanent_state.get_internal_formula_constraints_list
+        (compute_internal_constraints_list
+           Remanent_state.get_internal_formula_constraints_list)
 
     let compute_constraints_list _show_title state =
       let error = Remanent_state.get_errors state in
@@ -1959,6 +1968,9 @@ functor
 
     let output_internal_constraints_list ?logger state =
       let state, constraints_list = get_internal_constraints_list state in
+      let state, formula_constraints_list =
+        get_internal_formula_constraints_list state
+      in
       let parameters = Remanent_state.get_parameters state in
       let error = Remanent_state.get_errors state in
       let state, kappa_handler = get_handler state in
@@ -1966,6 +1978,10 @@ functor
       let error =
         Ckappa_site_graph.print_internal_pattern ?logger parameters error
           kappa_handler constraints_list
+      in
+      let error =
+        Ckappa_site_graph.print_internal_pattern_with_formula ?logger parameters
+          error kappa_handler formula_constraints_list
       in
       let state = Remanent_state.set_errors error state in
       state

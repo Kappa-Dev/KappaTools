@@ -90,6 +90,61 @@ let print_internal_pattern ?logger parameters error kappa_handler list =
   in
   error
 
+let print_internal_pattern_with_formula_aux ?logger parameters error
+    _kappa_handler internal_formula_constraints_list =
+  let logger =
+    match logger with
+    | None -> Remanent_parameters.get_logger parameters
+    | Some a -> a
+  in
+  let domain_name, lemma_list = internal_formula_constraints_list in
+  let () =
+    Loggers.fprintf logger
+      "------------------------------------------------------------\n";
+    Loggers.fprintf logger
+      "* Export %s to JSon (internal formula_constraints_list):\n" domain_name;
+    Loggers.fprintf logger
+      "------------------------------------------------------------\n"
+  in
+  List.fold_left
+    (fun error lemma ->
+      let pattern = Public_data.get_pattern lemma in
+      let formula = Public_data.get_reachability_condition lemma in
+      let error =
+        Site_graphs.KaSa_site_graph.print logger parameters error pattern
+      in
+      let () = Loggers.fprintf logger " => " in
+      let () = Handler.print_formula parameters formula in
+      let () = Loggers.print_newline logger in
+      error)
+    error lemma_list
+
+let print_internal_pattern_with_formula ?logger parameters error kappa_handler
+    list =
+  if List.length list > 0 then (
+    let logger' =
+      match logger with
+      | None -> Remanent_parameters.get_logger parameters
+      | Some a -> a
+    in
+    let error =
+      List.fold_left
+        (fun error (name, pattern) ->
+          if List.length pattern > 0 then (
+            let error =
+              print_internal_pattern_with_formula_aux ?logger parameters error
+                kappa_handler (name, pattern)
+            in
+            let () = Loggers.print_newline logger' in
+            error
+          ) else
+            error)
+        error list
+    in
+    error
+  ) else
+    error
+
 (***************************************************************************)
 
 let print_for_list logger parameter error t =
@@ -214,7 +269,7 @@ let _pair_list_to_list parameters error kappa_handler pattern agent_id1
 let internal_pair_list_to_list parameters error kappa_handler pattern agent_id1
     site_type1' agent_id2 site_type2' pair_list =
   List.fold_left
-    (fun (error, current_list) l ->
+    (fun (error, current_list) (l, _) ->
       match l with
       | [ (siteone, state1); (sitetwo, state2) ]
         when siteone == Ckappa_sig.fst_site && sitetwo == Ckappa_sig.snd_site ->
