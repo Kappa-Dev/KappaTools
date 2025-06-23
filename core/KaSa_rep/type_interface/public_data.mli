@@ -184,7 +184,7 @@ val separating_transitions_to_json : separating_transitions -> Yojson.Basic.t
 type 'site_graph lemma = { hyp: 'site_graph; refinement: 'site_graph list }
 
 type 'site_graph formula_lemma = {
-  pattern: 'site_graph list;
+  pattern: 'site_graph;
   reachability_condition: string Logical_formulae.formula;
 }
 
@@ -232,6 +232,8 @@ val lemmas_list_of_json :
 
 val get_hyp : 'site_graph lemma -> 'site_graph
 val get_refinement : 'site_graph lemma -> 'site_graph list
+val get_pattern : 'site_graph formula_lemma -> 'site_graph
+val get_reachability_condition : 'site_graph formula_lemma -> string Logical_formulae.formula
 
 val string_of_binding_type :
   ?binding_type_symbol:string ->

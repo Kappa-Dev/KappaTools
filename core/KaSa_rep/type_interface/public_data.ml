@@ -963,7 +963,7 @@ type 'site_graph lemma = { hyp: 'site_graph; refinement: 'site_graph list }
 type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
 
 type 'site_graph formula_lemma = {
-  pattern: 'site_graph list;
+  pattern: 'site_graph;
   reachability_condition: string Logical_formulae.formula;
 }
 
@@ -986,6 +986,8 @@ let lemma_of_json site_graph_of_json json =
 
 let get_hyp h = h.hyp
 let get_refinement r = r.refinement
+let get_pattern h = h.pattern
+let get_reachability_condition r = r.reachability_condition
 let free = ""
 let wildcard = "?"
 let bound = "!_"

@@ -1519,16 +1519,15 @@ module Domain = struct
 
   let export_with_formula parameters error kappa_handler bdu_handler
       parallel_bond_mvbdu non_parallel_bond_mvbdu current_list parallel_is_true
-      non_parallel_is_true list_same list_distinct =
-    let build_lemma list_1 mvbdu =
-      let refine = List.rev list_1 in
+      non_parallel_is_true t_same t_distinct =
+    let build_lemma t_1 mvbdu =
       let error, bdu_handler, formula =
         Handler.mvbdu_to_string_formula parameters error kappa_handler
           bdu_handler mvbdu
       in
       let lemma_internal =
         {
-          Public_data.pattern = refine;
+          Public_data.pattern = t_1;
           Public_data.reachability_condition = formula;
         }
       in
@@ -1536,9 +1535,9 @@ module Domain = struct
       error, bdu_handler, current_list
     in
     if not parallel_is_true then
-      build_lemma list_same parallel_bond_mvbdu
+      build_lemma t_same parallel_bond_mvbdu
     else if not non_parallel_is_true then
-      build_lemma list_distinct non_parallel_bond_mvbdu
+      build_lemma t_distinct non_parallel_bond_mvbdu
     else
       error, bdu_handler, current_list
 
@@ -1668,7 +1667,7 @@ module Domain = struct
             let error, bdu_handler, current_formula_list =
               export_with_formula parameters error kappa_handler bdu_handler
                 parallel_bond_mvbdu non_parallel_bond_mvbdu current_formula_list
-                parallel_is_true non_parallel_is_true list_same list_distinct
+                parallel_is_true non_parallel_is_true t_same t_distinct
             in
             error, bdu_handler, current_lemma_list, current_formula_list
           ) else (
