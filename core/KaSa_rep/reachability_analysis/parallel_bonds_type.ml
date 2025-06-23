@@ -347,7 +347,7 @@ let print_with_formula parameters bdu_handler error kappa_handler mvbdu
           parameters error site_graph
       in
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) " if "
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) " only if "
       in
       Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
     )
