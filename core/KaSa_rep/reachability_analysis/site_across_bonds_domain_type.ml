@@ -486,19 +486,19 @@ let print_site_across_domain_natural_language parameters error kappa_handler
 
 let depends_on_parameters parameters handler error pair_list restriction_bdu =
   let rec aux handler error pair_list =
-            match pair_list with
-            | (_, mvbdu) :: tail ->
-              let error, handler, b =
-                Ckappa_sig.mvbdu_is_true_for_guards parameters handler error
-                  mvbdu restriction_bdu
-              in
-              if b then
-                aux handler error tail
-              else
-                error, handler, true
-            | [] -> error, handler, false
-          in
-          aux handler error pair_list
+    match pair_list with
+    | (_, mvbdu) :: tail ->
+      let error, handler, b =
+        Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
+          restriction_bdu
+      in
+      if b then
+        aux handler error tail
+      else
+        error, handler, true
+    | [] -> error, handler, false
+  in
+  aux handler error pair_list
 
 let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
     ?(final_result = false) ?dump_any:(_dump_any = false) parameters error
@@ -544,7 +544,9 @@ let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
           Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
             error ~threshold mvbdu
         in
-        let error, handler, depends_on_parameters = depends_on_parameters parameters handler error pair_list restriction_bdu 
+        let error, handler, depends_on_parameters =
+          depends_on_parameters parameters handler error pair_list
+            restriction_bdu
         in
         (*----------------------------------------------------*)
         match Remanent_parameters.get_backend_mode parameters with
@@ -615,8 +617,8 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
       let parameter =
         Remanent_parameters.update_prefix parameter "                "
       in
-      print_site_across_domain ~verbose:false ~dump_any:true parameter
-        error kappa_handler handler pair mvbdu restriction_mvbdu
+      print_site_across_domain ~verbose:false ~dump_any:true parameter error
+        kappa_handler handler pair mvbdu restriction_mvbdu
     ) else
       error, handler
   in
@@ -673,8 +675,8 @@ let add_link_and_check parameter error bdu_false handler kappa_handler bool
           else
             dump_title ()
         in
-        print_site_across_domain ~verbose:false ~dump_any:true parameter
-          error kappa_handler handler x mvbdu restriction_mvbdu
+        print_site_across_domain ~verbose:false ~dump_any:true parameter error
+          kappa_handler handler x mvbdu restriction_mvbdu
       ) else
         error, handler
     in
