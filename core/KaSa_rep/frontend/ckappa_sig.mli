@@ -1,5 +1,5 @@
 (**
- * Ckappa_sig.ml
+ * ckappa_sig.ml
  * openkappa
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *

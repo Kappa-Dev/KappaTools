@@ -421,7 +421,7 @@ let rec scan_mixture parameters remanent mixture =
     scan_mixture parameters remanent mixture
 
 let scan_token parameters remanent _alg =
-  (*TODO*)
+  (*TO DO*)
   match Remanent_parameters.get_called_from parameters with
   | Remanent_parameters_sig.KaSa ->
     let error, remanent = remanent in
