@@ -638,8 +638,8 @@ let translate parameters handler error kappa_handler
 let rec print ?beginning_of_sentence:(beggining = true)
     ?(prompt_agent_type = true) ?(html_mode = false)
     ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa
-    (bdu_handler : Ckappa_sig.Views_bdu.handler) restriction_bdu error
-    agent_string agent_type agent_id translation t =
+    bdu_handler restriction_bdu error agent_string agent_type agent_id
+    translation t =
   let tab =
     if html_mode then
       "<PRE>         </PRE>"
@@ -1026,14 +1026,6 @@ let rec print ?beginning_of_sentence:(beggining = true)
       in
       error, bdu_handler
     | Valuations_with_guards valuations ->
-      (*let error = Site_graphs.KaSa_site_graph.print log parameters error t in
-        let () = Loggers.fprintf log " => " in
-        let should_use_bracket =
-          match valuations with
-          | [] | [ _ ] -> false
-          | _ :: _ -> true
-        in*)
-      (*let () = if should_use_bracket then Loggers.fprintf log "[ " in*)
       let error, bdu_handler =
         List.fold_left
           (fun (error, bdu_handler) (sites, mvbdu) ->
@@ -1063,9 +1055,21 @@ let rec print ?beginning_of_sentence:(beggining = true)
                 Site_graphs.KaSa_site_graph.print log parameters error
                   agent_graph
               in
+              let error, bdu_handler, is_true =
+                Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
+                  mvbdu restriction_bdu
+              in
               let error, bdu_handler =
-                Handler.print_guard_mvbdu parameters error handler_kappa
-                  bdu_handler mvbdu
+                if not is_true then (
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger parameters)
+                      " => "
+                  in
+                  Handler.print_guard_mvbdu parameters error handler_kappa
+                    bdu_handler mvbdu
+                ) else
+                  error, bdu_handler
               in
               let () = Loggers.print_newline log in
               error, bdu_handler

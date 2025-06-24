@@ -717,7 +717,7 @@ module Domain = struct
     error, handler, bdu_guard_renamed
 
   let dump_view_diff static dynamic error (agent_type, cv_id) bdu_old bdu_union
-      =
+      restriction_bdu =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let site_correspondence = get_site_correspondence_array static in
@@ -805,9 +805,21 @@ module Domain = struct
             in
             (*-----------------------------------------------------------*)
             let () = if bool then Loggers.fprintf log ")" in
+            let error, bdu_handler, is_true =
+              Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
+                bdu restriction_bdu
+            in
             let error, bdu_handler =
-              Handler.print_guard_mvbdu parameters error kappa_handler
-                bdu_handler bdu
+              if not is_true then (
+                let () =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger parameters)
+                    " => "
+                in
+                Handler.print_guard_mvbdu parameters error kappa_handler
+                  bdu_handler bdu
+              ) else
+                error, bdu_handler
             in
             let () = if bool then Loggers.print_newline log in
             error, bdu_handler)
@@ -874,7 +886,7 @@ module Domain = struct
         in
         let error, dynamic =
           dump_view_diff static dynamic error (agent_type, cv_id) bdu_old
-            bdu_union
+            bdu_union restriction_bdu
         in
         let error, store =
           Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
