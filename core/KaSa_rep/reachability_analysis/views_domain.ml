@@ -3177,7 +3177,7 @@ module Domain = struct
 
   let print_bdu_update_map_gen_decomposition decomposition ~sort ~smash
       ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
-      handler_kappa site_correspondence result restriction_bdu with_threshold =
+      handler_kappa with_threshold site_correspondence result restriction_bdu =
     let error, handler, list =
       stabilise_bdu_update_map_gen_decomposition decomposition ~smash
         ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
@@ -3228,9 +3228,10 @@ module Domain = struct
 
   let print_bdu_update_map_cartesian_abstraction parameters handler error
       handler_kappa with_threshold =
-    print_bdu_update_map_gen_decomposition ~sort:true ~smash:false
-      ~show_dep_with_dimmension_higher_than:1 mvbdu_cartesian_abstraction
-      parameters handler error handler_kappa with_threshold
+    print_bdu_update_map_gen_decomposition ~sort:true
+      ~smash:(not with_threshold) ~show_dep_with_dimmension_higher_than:1
+      mvbdu_cartesian_abstraction parameters handler error handler_kappa
+      with_threshold
 
   (*****************************************************************)
   (*Print for relational properties*)
@@ -3247,7 +3248,7 @@ module Domain = struct
 
   let print_bdu_update_map_cartesian_decomposition parameters handler error
       handler_kappa with_threshold =
-    print_bdu_update_map_gen_decomposition ~smash:true
+    print_bdu_update_map_gen_decomposition ~smash:(not with_threshold)
       ~show_dep_with_dimmension_higher_than:
         (if
            Remanent_parameters
@@ -3352,12 +3353,8 @@ module Domain = struct
       let () = Loggers.print_newline log in
       let og_restriction_bdu = get_restriction_mvbdu static in
       let error, handler =
-        if i = 0 then
-          print_bdu_update_map_cartesian_abstraction parameters handler error
-            handler_kappa site_correspondence result og_restriction_bdu false
-        else
-          print_bdu_update_map_cartesian_abstraction parameters handler error
-            handler_kappa site_correspondence result og_restriction_bdu true
+        print_bdu_update_map_cartesian_abstraction parameters handler error
+          handler_kappa (i > 0) site_correspondence result og_restriction_bdu
       in
       let () = Loggers.print_newline log in
       let () =
@@ -3373,14 +3370,9 @@ module Domain = struct
       in
       let () = Loggers.print_newline log in
       let error, handler =
-        if i = 0 then
-          print_bdu_update_map_cartesian_decomposition ~sort:true parameters
-            handler error handler_kappa site_correspondence result
-            og_restriction_bdu false
-        else
-          print_bdu_update_map_cartesian_decomposition ~sort:false parameters
-            handler error handler_kappa site_correspondence result
-            og_restriction_bdu true
+        print_bdu_update_map_cartesian_decomposition ~sort:true parameters
+          handler error handler_kappa (i > 0) site_correspondence result
+          og_restriction_bdu
       in
       error, handler
     ) else
@@ -3698,7 +3690,7 @@ module Domain = struct
   let export_relation_properties parameters dynamic error handler_kappa
       restriction_bdu with_threshold =
     let domain_name = "Views domain - relational properties" in
-    export_relation_properties_aux ~sort:(not with_threshold) ~smash:false
+    export_relation_properties_aux ~sort:false ~smash:(not with_threshold)
       ~show_dep_with_dimmension_higher_than:
         (if
            Remanent_parameters
