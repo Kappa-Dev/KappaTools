@@ -73,13 +73,18 @@ val convert_views_internal_constraints_list :
   show_dep_with_dimmension_higher_than:int ->
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
   Exception.exceptions_caught_and_uncaught ->
   string ->
   Ckappa_sig.c_agent_name ->
   token ->
   Site_graphs.KaSa_site_graph.t Public_data.lemma list ->
-  Exception.exceptions_caught_and_uncaught
+  Site_graphs.KaSa_site_graph.t Public_data.formula_lemma list ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
   * Site_graphs.KaSa_site_graph.t Public_data.lemma list
+  * Site_graphs.KaSa_site_graph.t Public_data.formula_lemma list
 
 (*show_dep_with_dimmension_higher_than:int ->
   Remanent_parameters_sig.parameters ->

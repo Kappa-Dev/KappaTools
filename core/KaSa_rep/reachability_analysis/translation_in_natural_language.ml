@@ -1026,6 +1026,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
       in
       error, bdu_handler
     | Valuations_with_guards valuations ->
+      let () = Loggers.print_newline log in
       let error, bdu_handler =
         List.fold_left
           (fun (error, bdu_handler) (sites, mvbdu) ->
@@ -1405,8 +1406,10 @@ let rec convert_views_internal_constraints_list_aux
   error, current_list
 
 let convert_views_internal_constraints_list
-    ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa error
-    agent_string agent_type translation current_list =
+    ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa
+    bdu_handler error agent_string agent_type translation current_list
+    current_formula_list restriction_bdu =
+  let nsites = Handler.get_nsites handler_kappa in
   let t = Site_graphs.KaSa_site_graph.empty in
   let error', agent_id, t =
     Site_graphs.KaSa_site_graph.add_agent parameters error handler_kappa
@@ -1415,18 +1418,81 @@ let convert_views_internal_constraints_list
   let error =
     Exception.check_point Exception.warn parameters error error' __POS__ Exit
   in
-  let error, t =
+  let error, bdu_handler, current_list, current_formula_list =
     match translation with
     | Range (site, _) ->
-      Site_graphs.KaSa_site_graph.add_site_or_guard parameters error
-        handler_kappa agent_id site t
-    | Equiv _ | Imply _ | Partition _ | No_known_translation _
-    | Valuations_with_guards _ ->
-      error, t
+      let error, t =
+        Site_graphs.KaSa_site_graph.add_site_or_guard parameters error
+          handler_kappa agent_id site t
+      in
+      let error, current_list =
+        convert_views_internal_constraints_list_aux
+          ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa
+          error agent_string agent_type agent_id translation t current_list
+      in
+      error, bdu_handler, current_list, current_formula_list
+    | Equiv _ | Imply _ | Partition _ | No_known_translation _ ->
+      let error, current_list =
+        convert_views_internal_constraints_list_aux
+          ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa
+          error agent_string agent_type agent_id translation t current_list
+      in
+      error, bdu_handler, current_list, current_formula_list
+    | Valuations_with_guards list ->
+      let error, bdu_handler, current_formula_list =
+        List.fold_left
+          (fun (error, bdu_handler, current_formula_list) (sites, mvbdu) ->
+            let error, agent_graph, n =
+              List.fold_left
+                (fun (error, agent_graph, n) (site, state) ->
+                  let error, agent_graph =
+                    Site_graphs.KaSa_site_graph.add_site_or_guard parameters
+                      error handler_kappa agent_id site agent_graph
+                  in
+                  let error, agent_graph =
+                    Site_graphs.KaSa_site_graph.add_state_or_guard parameters
+                      error handler_kappa agent_id site state agent_graph
+                  in
+                  let n =
+                    match
+                      Ckappa_sig.site_or_guard_p_of_mvbdu_var site nsites
+                    with
+                    | Site _ -> n + 1
+                    | Guard_p _ -> n
+                  in
+                  error, agent_graph, n)
+                (error, t, 0) sites
+            in
+            if n >= dim_min then (
+              let error, bdu_handler, is_true =
+                Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
+                  mvbdu restriction_bdu
+              in
+              let error, bdu_handler, current_formula_list =
+                if not is_true then (
+                  let error, bdu_handler, formula =
+                    Handler.mvbdu_to_string_formula parameters error
+                      handler_kappa bdu_handler mvbdu
+                  in
+                  let formula_lemma =
+                    {
+                      Public_data.pattern = agent_graph;
+                      Public_data.reachability_condition = formula;
+                    }
+                  in
+                  error, bdu_handler, formula_lemma :: current_formula_list
+                ) else
+                  error, bdu_handler, current_formula_list
+              in
+              error, bdu_handler, current_formula_list
+            ) else
+              error, bdu_handler, current_formula_list)
+          (error, bdu_handler, current_formula_list)
+          list
+      in
+      error, bdu_handler, current_list, current_formula_list
   in
-  convert_views_internal_constraints_list_aux
-    ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa error
-    agent_string agent_type agent_id translation t current_list
+  error, bdu_handler, current_list, current_formula_list
 
 (*****************************************************************************)
 

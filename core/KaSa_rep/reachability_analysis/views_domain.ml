@@ -2952,8 +2952,7 @@ module Domain = struct
       result error
 
   (**************************************************************************)
-
-  let smash_map_with_threshold decomposition ~threshold
+  let smash_map decomposition ?threshold
       ~show_dep_with_dimmension_higher_than:_dim_min parameters handler error
       handler_kappa (*store_new_index_pair_map*) site_correspondence result =
     let nsites = Handler.get_nsites handler_kappa in
@@ -2966,70 +2965,8 @@ module Domain = struct
     Covering_classes_type.AgentCV_map_and_set.Map.fold
       (fun (agent_type, cv_id) bdu (error, handler, output) ->
         let error, handler, list =
-          decomposition parameters handler error ~threshold bdu
+          decomposition parameters handler error ?threshold bdu
         in
-        let error, (_, map2) =
-          get_list_of_sites_correspondence_map parameters error agent_type cv_id
-            site_correspondence
-        in
-        List.fold_left
-          (fun (error, handler, output) bdu ->
-            (* rename bdu to the original variable names *)
-            let error, handler, renamed_mvbdu =
-              rename_bdu_to_original_names parameters error handler bdu map2
-                nsites
-            in
-            let error =
-              Exception.check_point Exception.warn parameters error error'
-                __POS__ Exit
-            in
-            let error, handler, hconsed_vars =
-              Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters handler
-                error renamed_mvbdu
-            in
-            let error, cv_map_opt =
-              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif
-              .unsafe_get parameters error agent_type output
-            in
-            let error, cv_map =
-              match cv_map_opt with
-              | None -> error, Wrapped_modules.LoggedIntMap.empty
-              | Some map -> error, map
-            in
-            let error, handler, cv_map' =
-              Ckappa_sig.Views_bdu.store_by_variables_list
-                Wrapped_modules.LoggedIntMap.find_default_without_logs
-                Wrapped_modules.LoggedIntMap.add_or_overwrite mvbdu_true
-                Ckappa_sig.mvbdu_and_for_guards parameters handler error
-                hconsed_vars renamed_mvbdu cv_map
-            in
-            let error, output =
-              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
-                parameters error agent_type cv_map' output
-            in
-            error, handler, output)
-          (error, handler, output) list)
-      result
-      (let error, agent_map =
-         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
-           parameters error 0
-       in
-       error, handler, agent_map)
-
-  let smash_map decomposition ~show_dep_with_dimmension_higher_than:_dim_min
-      parameters handler error handler_kappa
-      (*store_new_index_pair_map*)
-        site_correspondence result =
-    let nsites = Handler.get_nsites handler_kappa in
-    let error', handler, mvbdu_true =
-      Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
-    in
-    let error =
-      Exception.check_point Exception.warn parameters error error' __POS__ Exit
-    in
-    Covering_classes_type.AgentCV_map_and_set.Map.fold
-      (fun (agent_type, cv_id) bdu (error, handler, output) ->
-        let error, handler, list = decomposition parameters handler error bdu in
         let error, (_, map2) =
           get_list_of_sites_correspondence_map parameters error agent_type cv_id
             site_correspondence
@@ -3082,162 +3019,18 @@ module Domain = struct
 
   let stabilise_bdu_update_map_gen_decomposition decomposition ~smash
       ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
-      handler_kappa site_correspondence result =
+      handler_kappa site_correspondence result restriction_bdu with_threshold =
     let nsites = Handler.get_nsites handler_kappa in
     let log = Remanent_parameters.get_logger parameters in
+    let threshold =
+      if with_threshold then
+        Some (Ckappa_sig.int_of_site_name nsites - 1)
+      else
+        None
+    in
     if smash then (
       let error', handler, output =
-        smash_map decomposition ~show_dep_with_dimmension_higher_than:dim_min
-          parameters handler error handler_kappa site_correspondence result
-      in
-      let error =
-        Exception.check_point Exception.warn parameters error error' __POS__
-          Exit
-      in
-      let error, (handler, list) =
-        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
-          parameters error
-          (fun parameters error agent_type map (handler, list) ->
-            let error, agent_string =
-              try
-                Handler.string_of_agent parameters error handler_kappa
-                  agent_type
-              with _ ->
-                Exception.warn parameters error __POS__ Exit
-                  (Ckappa_sig.string_of_agent_name agent_type)
-            in
-            (*-----------------------------------------------------------*)
-            Wrapped_modules.LoggedIntMap.fold
-              (fun _ mvbdu (error, (handler, list)) ->
-                let error, handler =
-                  if local_trace || Remanent_parameters.get_trace parameters
-                  then (
-                    let () = Loggers.fprintf log "INTENSIONAL DESCRIPTION:" in
-                    let () = Loggers.print_newline log in
-                    let () = Ckappa_sig.Views_bdu.print parameters mvbdu in
-                    let () = Loggers.fprintf log "EXTENSIONAL DESCRIPTION:" in
-                    let () = Loggers.print_newline log in
-                    error, handler
-                  ) else
-                    error, handler
-                in
-                let error, handler, restriction_bdu =
-                  Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
-                in
-                let error, (handler, translation) =
-                  Translation_in_natural_language.translate parameters handler
-                    error handler_kappa
-                    (fun _ e i -> e, i)
-                    mvbdu nsites restriction_bdu
-                in
-                (*-------------------------------------------------------*)
-                ( error,
-                  ( handler,
-                    (agent_string, agent_type, mvbdu, translation) :: list ) ))
-              map
-              (error, (handler, list)))
-          output (handler, [])
-      in
-      error, handler, List.rev list
-    ) else (
-      let error, (handler, list) =
-        Covering_classes_type.AgentCV_map_and_set.Map.fold
-          (fun (agent_type, cv_id) bdu_update (error, (handler, list)) ->
-            let error, agent_string =
-              try
-                Handler.string_of_agent parameters error handler_kappa
-                  agent_type
-              with _ ->
-                Exception.warn parameters error __POS__ Exit
-                  (Ckappa_sig.string_of_agent_name agent_type)
-            in
-            (*-----------------------------------------------------------*)
-            let () =
-              if local_trace || Remanent_parameters.get_trace parameters then (
-                let () =
-                  Loggers.fprintf log "agent_type:%i:%s:cv_id:%i"
-                    (Ckappa_sig.int_of_agent_name agent_type)
-                    agent_string
-                    (Covering_classes_type.int_of_cv_id cv_id)
-                in
-                Loggers.print_newline log
-              )
-            in
-            (*------------------------------------------------------------*)
-            let error, (_, map2) =
-              get_list_of_sites_correspondence_map parameters error agent_type
-                cv_id site_correspondence
-            in
-            (*-----------------------------------------------------------*)
-            let error, handler, list' =
-              decomposition parameters handler error bdu_update
-            in
-            (*-----------------------------------------------------------*)
-            let error, (handler, list) =
-              List.fold_left
-                (fun (error, (handler, list)) mvbdu ->
-                  let error, handler =
-                    if local_trace || Remanent_parameters.get_trace parameters
-                    then (
-                      let () = Loggers.fprintf log "INTENSIONAL DESCRIPTION:" in
-                      let () = Loggers.print_newline log in
-                      let () = Ckappa_sig.Views_bdu.print parameters mvbdu in
-                      let () = Loggers.fprintf log "EXTENSIONAL DESCRIPTION:" in
-                      let () = Loggers.print_newline log in
-                      error, handler
-                    ) else
-                      error, handler
-                  in
-                  let rename_site parameters error site_type =
-                    match
-                      Ckappa_sig.site_or_guard_p_of_mvbdu_var site_type nsites
-                    with
-                    | Ckappa_sig.Guard_p _ -> error, site_type
-                    | Ckappa_sig.Site _ ->
-                      let error, site_type =
-                        match
-                          Ckappa_sig.Mvbdu_var_nearly_Inf_Int_storage_Imperatif
-                          .get parameters error site_type map2
-                        with
-                        | error, None ->
-                          Exception.warn parameters error __POS__ Exit
-                            (Ckappa_sig.mvbdu_var_of_site
-                               Ckappa_sig.dummy_site_name_minus1)
-                        | error, Some i -> error, Ckappa_sig.mvbdu_var_of_site i
-                      in
-                      error, site_type
-                  in
-                  let error, handler, restriction_bdu =
-                    Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
-                  in
-                  let error, (handler, translation) =
-                    Translation_in_natural_language.translate parameters handler
-                      error handler_kappa rename_site mvbdu nsites
-                      restriction_bdu
-                  in
-                  (*----------------------------------------------------*)
-                  ( error,
-                    ( handler,
-                      (agent_string, agent_type, mvbdu, translation) :: list ) ))
-                (error, (handler, list))
-                list'
-            in
-            error, (handler, list))
-          result
-          (error, (handler, []))
-      in
-      error, handler, List.rev list
-    )
-
-  let stabilise_bdu_update_map_gen_decomposition_with_threshold decomposition
-      ~smash ~show_dep_with_dimmension_higher_than:dim_min parameters handler
-      error handler_kappa site_correspondence result restriction_bdu =
-    let nsites = Handler.get_nsites handler_kappa in
-    let log = Remanent_parameters.get_logger parameters in
-    let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
-    if smash then (
-      let error', handler, output =
-        smash_map_with_threshold decomposition ~threshold
+        smash_map decomposition ?threshold
           ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
           handler_kappa site_correspondence result
       in
@@ -3264,7 +3057,7 @@ module Domain = struct
                   Ckappa_sig.mvbdu_is_true_for_guards parameters handler error
                     mvbdu restriction_bdu
                 in
-                if is_true then
+                if is_true && with_threshold then
                   error, (handler, list)
                 else (
                   let error, handler =
@@ -3326,7 +3119,7 @@ module Domain = struct
             in
             (*-----------------------------------------------------------*)
             let error, handler, list' =
-              decomposition parameters handler error ~threshold bdu_update
+              decomposition parameters handler error ?threshold bdu_update
             in
             (*-----------------------------------------------------------*)
             let error, (handler, list) =
@@ -3384,54 +3177,11 @@ module Domain = struct
 
   let print_bdu_update_map_gen_decomposition decomposition ~sort ~smash
       ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
-      handler_kappa site_correspondence result =
+      handler_kappa site_correspondence result restriction_bdu with_threshold =
     let error, handler, list =
       stabilise_bdu_update_map_gen_decomposition decomposition ~smash
         ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
-        handler_kappa site_correspondence result
-    in
-    let error, list =
-      if sort then
-        Tools_kasa.sort_list
-          (fun parameters error (agent_string, agent_id, _, translation) ->
-            match translation with
-            | Translation_in_natural_language.Range (x, _) ->
-              let error, x =
-                Handler.string_of_site_or_guard_contact_map parameters error
-                  handler_kappa agent_id x
-              in
-              error, (agent_string, x)
-            | Translation_in_natural_language.Valuations_with_guards _
-            | Translation_in_natural_language.Equiv _
-            | Translation_in_natural_language.No_known_translation _
-            | Translation_in_natural_language.Partition _
-            | Translation_in_natural_language.Imply _ ->
-              error, (agent_string, ""))
-          parameters error list
-      else
-        error, list
-    in
-    let error, handler, restriction_bdu =
-      Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
-    in
-    let error, handler =
-      List.fold_left
-        (fun (error, handler) (agent_string, agent_type, _, translation) ->
-          Translation_in_natural_language.print
-            ~show_dep_with_dimmension_higher_than:dim_min parameters
-            handler_kappa handler restriction_bdu error agent_string agent_type
-            translation)
-        (error, handler) list
-    in
-    error, handler
-
-  let print_bdu_update_map_gen_decomposition_with_threshold decomposition ~sort
-      ~smash ~show_dep_with_dimmension_higher_than:dim_min parameters handler
-      error handler_kappa site_correspondence result restriction_bdu =
-    let error, handler, list =
-      stabilise_bdu_update_map_gen_decomposition_with_threshold decomposition
-        ~smash ~show_dep_with_dimmension_higher_than:dim_min parameters handler
-        error handler_kappa site_correspondence result restriction_bdu
+        handler_kappa site_correspondence result restriction_bdu with_threshold
     in
     let error, list =
       if sort then
@@ -3467,26 +3217,36 @@ module Domain = struct
 
   (****************************************************************)
   (*Print for NON-Relational properties*)
+  let mvbdu_cartesian_abstraction parameters bdu_handler error ?threshold bdu =
+    match threshold with
+    | None ->
+      Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction parameters bdu_handler
+        error bdu
+    | Some threshold ->
+      Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction_with_threshold parameters
+        bdu_handler error ~threshold bdu
 
   let print_bdu_update_map_cartesian_abstraction parameters handler error
-      handler_kappa =
-    print_bdu_update_map_gen_decomposition ~sort:true ~smash:true
-      ~show_dep_with_dimmension_higher_than:1
-      Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction parameters handler error
-      handler_kappa
-
-  let print_bdu_update_map_cartesian_abstraction_with_threshold parameters
-      handler error handler_kappa =
-    print_bdu_update_map_gen_decomposition_with_threshold ~sort:true
-      ~smash:false ~show_dep_with_dimmension_higher_than:1
-      Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction_with_threshold parameters
-      handler error handler_kappa
+      handler_kappa with_threshold =
+    print_bdu_update_map_gen_decomposition ~sort:true ~smash:false
+      ~show_dep_with_dimmension_higher_than:1 mvbdu_cartesian_abstraction
+      parameters handler error handler_kappa with_threshold
 
   (*****************************************************************)
   (*Print for relational properties*)
 
+  let mvbdu_full_cartesian_decomposition parameters bdu_handler error ?threshold
+      bdu =
+    match threshold with
+    | None ->
+      Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition parameters
+        bdu_handler error bdu
+    | Some threshold ->
+      Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition_with_threshold
+        parameters bdu_handler error ~threshold bdu
+
   let print_bdu_update_map_cartesian_decomposition parameters handler error
-      handler_kappa =
+      handler_kappa with_threshold =
     print_bdu_update_map_gen_decomposition ~smash:true
       ~show_dep_with_dimmension_higher_than:
         (if
@@ -3496,22 +3256,8 @@ module Domain = struct
            2
          else
            1)
-      Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition parameters handler
-      error handler_kappa
-
-  let print_bdu_update_map_cartesian_decomposition_with_threshold parameters
-      handler error handler_kappa =
-    print_bdu_update_map_gen_decomposition_with_threshold ~smash:false
-      ~show_dep_with_dimmension_higher_than:
-        (if
-           Remanent_parameters
-           .get_hide_one_d_relations_from_cartesian_decomposition parameters
-         then
-           2
-         else
-           1)
-      Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition_with_threshold
-      parameters handler error handler_kappa
+      mvbdu_full_cartesian_decomposition parameters handler error handler_kappa
+      with_threshold
 
   (*****************************************************************)
   let print_separating_edges parameters handler error compil _handler_kappa list
@@ -3561,8 +3307,7 @@ module Domain = struct
     error, handler
 
   let print_result_fixpoint_aux parameters handler error handler_kappa
-      (*store_new_index_pair_map*)
-        site_correspondence result static =
+      site_correspondence result static =
     let log = Remanent_parameters.get_logger parameters in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
       let error =
@@ -3609,11 +3354,10 @@ module Domain = struct
       let error, handler =
         if i = 0 then
           print_bdu_update_map_cartesian_abstraction parameters handler error
-            handler_kappa site_correspondence result
+            handler_kappa site_correspondence result og_restriction_bdu false
         else
-          print_bdu_update_map_cartesian_abstraction_with_threshold parameters
-            handler error handler_kappa site_correspondence result
-            og_restriction_bdu
+          print_bdu_update_map_cartesian_abstraction parameters handler error
+            handler_kappa site_correspondence result og_restriction_bdu true
       in
       let () = Loggers.print_newline log in
       let () =
@@ -3632,10 +3376,11 @@ module Domain = struct
         if i = 0 then
           print_bdu_update_map_cartesian_decomposition ~sort:true parameters
             handler error handler_kappa site_correspondence result
+            og_restriction_bdu false
         else
-          print_bdu_update_map_cartesian_decomposition_with_threshold
-            ~sort:false parameters handler error handler_kappa
-            site_correspondence result og_restriction_bdu
+          print_bdu_update_map_cartesian_decomposition ~sort:false parameters
+            handler error handler_kappa site_correspondence result
+            og_restriction_bdu true
       in
       error, handler
     ) else
@@ -3694,11 +3439,14 @@ module Domain = struct
         let handler = get_mvbdu_handler dynamic in
         let compil = get_compil static in
         let site_correspondence = get_site_correspondence_array static in
+        let f _parameters handler error ?threshold a =
+          let _ = threshold in
+          error, handler, [ a ]
+        in
         let error, handler, output =
-          smash_map
-            (fun _parameters handler error a -> error, handler, [ a ])
-            parameters handler error ~show_dep_with_dimmension_higher_than:1
-            handler_kappa site_correspondence
+          smash_map f parameters handler error
+            ~show_dep_with_dimmension_higher_than:1 handler_kappa
+            site_correspondence
             (get_fixpoint_result dynamic)
         in
         let error, log_info, handler, bridges, transition_systems_length =
@@ -3861,96 +3609,38 @@ module Domain = struct
 
   let export_relation_properties_aux ~sort ~smash
       ~show_dep_with_dimmension_higher_than:dim_min decomposition domain_name
-      parameters dynamic error handler_kappa site_correspondence fixpoint_result
-      kasa_state =
-    let handler = get_mvbdu_handler dynamic in
+      parameters dynamic error handler_kappa restriction_bdu with_threshold
+      site_correspondence fixpoint_result kasa_state =
+    let bdu_handler = get_mvbdu_handler dynamic in
     (*convert result to list*)
-    let error', handler, list =
+    let error', bdu_handler, list =
       stabilise_bdu_update_map_gen_decomposition decomposition ~smash
-        ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
-        handler_kappa site_correspondence fixpoint_result
-    in
-    let error =
-      Exception.check_point Exception.warn parameters error error' __POS__ Exit
-    in
-    (*store the information for relational properties*)
-    let error', current_list =
-      List.fold_left
-        (fun (error, current_list) (agent_string, agent_type, _, translation) ->
-          let error', current_list =
-            Translation_in_natural_language
-            .convert_views_internal_constraints_list
-              ~show_dep_with_dimmension_higher_than:dim_min parameters
-              handler_kappa error agent_string agent_type translation
-              current_list
-          in
-          let error =
-            Exception.check_point Exception.warn parameters error error' __POS__
-              Exit
-          in
-          error, current_list)
-        (error, []) list
-    in
-    let error =
-      Exception.check_point Exception.warn parameters error error' __POS__ Exit
-    in
-    (*------------------------------------------------------------------*)
-    let internal_constraints_list =
-      Remanent_state.get_internal_constraints_list kasa_state
-    in
-    let error, internal_constraints_list =
-      match internal_constraints_list with
-      | None -> Exception.warn parameters error __POS__ Exit []
-      | Some l -> error, l
-    in
-    let error, current_list =
-      if sort then
-        Tools_kasa.sort_list
-          (fun parameters error lemma ->
-            Site_graphs.KaSa_site_graph.to_string parameters error
-              lemma.Public_data.hyp)
-          parameters error current_list
-      else
-        error, current_list
-    in
-    let pair_list = (domain_name, current_list) :: internal_constraints_list in
-    let kasa_state =
-      Remanent_state.set_internal_constraints_list pair_list kasa_state
-    in
-    let dynamic = set_mvbdu_handler handler dynamic in
-    error, dynamic, kasa_state
-
-  let export_relation_properties_aux_with_threshold ~sort ~smash
-      ~show_dep_with_dimmension_higher_than:dim_min decomposition domain_name
-      parameters dynamic error handler_kappa site_correspondence fixpoint_result
-      kasa_state restriction_bdu =
-    let handler = get_mvbdu_handler dynamic in
-    (*convert result to list*)
-    let error', handler, list =
-      stabilise_bdu_update_map_gen_decomposition_with_threshold decomposition
-        ~smash ~show_dep_with_dimmension_higher_than:dim_min parameters handler
+        ~show_dep_with_dimmension_higher_than:dim_min parameters bdu_handler
         error handler_kappa site_correspondence fixpoint_result restriction_bdu
+        with_threshold
     in
     let error =
       Exception.check_point Exception.warn parameters error error' __POS__ Exit
     in
     (*store the information for relational properties*)
-    let error', current_list =
+    let error', bdu_handler, current_list, current_formula_list =
       List.fold_left
-        (fun (error, current_list) (agent_string, agent_type, _, translation) ->
-          let error', current_list =
+        (fun (error, bdu_handler, current_list, current_formula_list)
+             (agent_string, agent_type, _, translation) ->
+          let error', bdu_handler, current_list, current_formula_list =
             Translation_in_natural_language
             .convert_views_internal_constraints_list
               ~show_dep_with_dimmension_higher_than:dim_min parameters
-              handler_kappa error agent_string agent_type translation
-              current_list
+              handler_kappa bdu_handler error agent_string agent_type
+              translation current_list current_formula_list restriction_bdu
           in
           let error =
             Exception.check_point Exception.warn parameters error error' __POS__
               Exit
           in
-          error, current_list)
-        (error, []) list
+          error, bdu_handler, current_list, current_formula_list)
+        (error, bdu_handler, [], [])
+        list
     in
     let error =
       Exception.check_point Exception.warn parameters error error' __POS__ Exit
@@ -3978,12 +3668,37 @@ module Domain = struct
     let kasa_state =
       Remanent_state.set_internal_constraints_list pair_list kasa_state
     in
-    let dynamic = set_mvbdu_handler handler dynamic in
+    let internal_formula_constraints_list =
+      Remanent_state.get_internal_formula_constraints_list kasa_state
+    in
+    let internal_formula_constraints_list =
+      match internal_formula_constraints_list with
+      | None -> []
+      | Some l -> l
+    in
+    let error, current_formula_list =
+      if sort then
+        Tools_kasa.sort_list
+          (fun parameters error lemma ->
+            Site_graphs.KaSa_site_graph.to_string parameters error
+              lemma.Public_data.pattern)
+          parameters error current_formula_list
+      else
+        error, current_formula_list
+    in
+    let pair_list =
+      (domain_name, current_formula_list) :: internal_formula_constraints_list
+    in
+    let kasa_state =
+      Remanent_state.set_internal_formula_constraints_list pair_list kasa_state
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, kasa_state
 
-  let export_relation_properties parameters dynamic error handler_kappa =
+  let export_relation_properties parameters dynamic error handler_kappa
+      restriction_bdu with_threshold =
     let domain_name = "Views domain - relational properties" in
-    export_relation_properties_aux ~sort:false ~smash:true
+    export_relation_properties_aux ~sort:(not with_threshold) ~smash:false
       ~show_dep_with_dimmension_higher_than:
         (if
            Remanent_parameters
@@ -3992,66 +3707,30 @@ module Domain = struct
            2
          else
            1)
-      Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition domain_name
-      parameters dynamic error handler_kappa
+      mvbdu_full_cartesian_decomposition domain_name parameters dynamic error
+      handler_kappa restriction_bdu with_threshold
 
-  let export_relation_properties_with_threshold parameters dynamic error
-      handler_kappa =
-    let domain_name = "Views domain - relational properties" in
-    export_relation_properties_aux_with_threshold ~sort:false ~smash:false
-      ~show_dep_with_dimmension_higher_than:
-        (if
-           Remanent_parameters
-           .get_hide_one_d_relations_from_cartesian_decomposition parameters
-         then
-           2
-         else
-           1)
-      Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition_with_threshold
-      domain_name parameters dynamic error handler_kappa
-
-  let export_non_relation_properties parameters dynamic error handler_kappa =
+  let export_non_relation_properties parameters dynamic error handler_kappa
+      restriction_bdu with_threshold =
     let domain_name = "Views domain - non relational properties" in
-    export_relation_properties_aux ~sort:true ~smash:true
-      ~show_dep_with_dimmension_higher_than:1
-      Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction domain_name parameters
-      dynamic error handler_kappa
+    export_relation_properties_aux ~sort:true ~smash:(not with_threshold)
+      ~show_dep_with_dimmension_higher_than:1 mvbdu_cartesian_abstraction
+      domain_name parameters dynamic error handler_kappa restriction_bdu
+      with_threshold
 
-  let export_non_relation_properties_with_threshold parameters dynamic error
-      handler_kappa =
-    let domain_name = "Views domain - non relational properties" in
-    export_relation_properties_aux_with_threshold ~sort:true ~smash:false
-      ~show_dep_with_dimmension_higher_than:1
-      Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction_with_threshold
-      domain_name parameters dynamic error handler_kappa
-
-  let export_views_properties_aux parameters error handler_kappa
-      site_correspondence fixpoint_result dynamic kasa_state =
+  let export_views_properties_aux parameters error handler_kappa restriction_bdu
+      site_correspondence fixpoint_result dynamic kasa_state with_threshold =
     (*non relational properties*)
     let error, dynamic, kasa_state =
       export_non_relation_properties parameters dynamic error handler_kappa
-        site_correspondence fixpoint_result kasa_state
+        restriction_bdu with_threshold site_correspondence fixpoint_result
+        kasa_state
     in
     (*relational properties*)
     let error, dynamic, kasa_state =
       export_relation_properties parameters dynamic error handler_kappa
-        site_correspondence fixpoint_result kasa_state
-    in
-    error, dynamic, kasa_state
-
-  let export_views_properties_aux_with_threshold parameters error handler_kappa
-      site_correspondence fixpoint_result dynamic kasa_state restriction_bdu =
-    (*non relational properties*)
-    let error, dynamic, kasa_state =
-      export_non_relation_properties_with_threshold parameters dynamic error
-        handler_kappa site_correspondence fixpoint_result kasa_state
-        restriction_bdu
-    in
-    (*relational properties*)
-    let error, dynamic, kasa_state =
-      export_relation_properties_with_threshold parameters dynamic error
-        handler_kappa site_correspondence fixpoint_result kasa_state
-        restriction_bdu
+        restriction_bdu with_threshold site_correspondence fixpoint_result
+        kasa_state
     in
     error, dynamic, kasa_state
 
@@ -4068,11 +3747,12 @@ module Domain = struct
     let error, dynamic, kasa_state =
       if i = 0 then
         export_views_properties_aux parameters error handler_kappa
-          site_correspondence fixpoint_result dynamic kasa_state
+          og_restriction_bdu site_correspondence fixpoint_result dynamic
+          kasa_state false
       else
-        export_views_properties_aux_with_threshold parameters error
-          handler_kappa site_correspondence fixpoint_result dynamic kasa_state
-          og_restriction_bdu
+        export_views_properties_aux parameters error handler_kappa
+          og_restriction_bdu site_correspondence fixpoint_result dynamic
+          kasa_state true
     in
     error, dynamic, kasa_state
 
@@ -4146,7 +3826,7 @@ module Domain = struct
     let result = get_fixpoint_result dynamic in
     let site_correspondence = get_site_correspondence_array static in
     let error, handler, ranges =
-      smash_map Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
+      smash_map mvbdu_cartesian_abstraction
         ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
         handler_kappa site_correspondence result
     in
