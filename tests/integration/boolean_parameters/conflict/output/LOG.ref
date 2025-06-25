@@ -1,0 +1,91 @@
+Parsing example_conflict.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "example_conflict.ka", line 12, characters 0-21: could be applied if P.
+rule ~namef (File "example_conflict.ka", line 13, characters 0-31:) could be applied if P.
+rule File "example_conflict.ka", line 14, characters 0-50: could be applied if P.and.(~@co-A-x-y).and.x.and.y.
+rule File "example_conflict.ka", line 14, characters 0-50: could be applied if P.and.@co-A-x-y.and.x.and.y.
+rule File "example_conflict.ka", line 15, characters 0-50: could be applied if (B.or.C).and.P.and.(~@co-A-x-y).
+rule File "example_conflict.ka", line 15, characters 0-50: could be applied if (B.or.C).and.P.and.@co-A-x-y.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+A can occur in the model if P.
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+
+A(x[x.A]) => P.and.x.and.y
+A(x[.]) => P
+
+
+A(y[y.A]) => (B.or.C).and.P
+A(y[.]) => P
+
+
+A(x{p}) => P
+A(x{u}) => P
+
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+A(x[x.A],y[.]) => P.and.x.and.y
+A(x[x.A],y[y.A]) => (B.or.C).and.P.and.(~@co-A-x-y).and.x.and.y
+A(x[.],y[.]) => P
+A(x[.],y[y.A]) => (B.or.C).and.P
+
+
+
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+
+A(x[1],y[y.A]),A(x[1],y[.]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
+A(x[1],y[y.A]),A(x[1],y[y.A]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
+A(x[1],y[.]),A(x[1],y[.]) => P.and.x.and.y
+A(x[1],y[.]),A(x[1],y[y.A]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
+
+A(x[x.A],y[1]),A(x[.],y[1]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
+A(x[x.A],y[1]),A(x[x.A],y[1]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
+A(x[.],y[1]),A(x[.],y[1]) => (B.or.C).and.P
+A(x[.],y[1]),A(x[x.A],y[1]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+execution finished without any exception
+Parsing example_conflict.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -interventions
+	 -observables
+	 -update_domain construction
+	 6 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (0 agents)
+Done
++ Command line to rerun is: 'KaSim' 'example_conflict.ka' '-l' '2000' '-d' 'output' '-p' '20' '-syntax' '4' '-seed' '858703540'
+______________________________________________________________________
+######################################################################
+Simulation ended
+76.80% of event loops were productive. Null event cause:
+	Clashing instance: 100.00%
