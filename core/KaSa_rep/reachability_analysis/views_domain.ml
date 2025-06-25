@@ -699,7 +699,8 @@ module Domain = struct
                 parameters error var map2
             in
             (match renamed with
-            | None -> error, renaming_list
+            | None ->  Exception.warn parameters error __POS__ Exit
+                renaming_list
             | Some renamed ->
               ( error,
                 (var, Ckappa_sig.mvbdu_var_of_site renamed) :: renaming_list )))
@@ -746,11 +747,6 @@ module Domain = struct
         get_list_of_sites_correspondence_map parameters error agent_type cv_id
           site_correspondence
       in
-      (*rename bdu to the original indexes*)
-      let error, bdu_handler, bdu_diff =
-        rename_bdu_to_original_names parameters error bdu_handler bdu_diff map2
-          nsites
-      in
       (*-------------------------------------------------------------------*)
       let log = Remanent_parameters.get_logger parameters in
       let error, dynamic =
@@ -765,6 +761,11 @@ module Domain = struct
           error, dynamic
         ) else
           error, dynamic
+      in
+      (*rename bdu to the original indexes*)
+      let error, bdu_handler, bdu_diff =
+        rename_bdu_to_original_names parameters error bdu_handler bdu_diff map2
+          nsites
       in
       (*----------------------------------------------------*)
       let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
