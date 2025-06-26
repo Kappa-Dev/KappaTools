@@ -888,30 +888,20 @@ let add_param_to_guard guard_opt agent site1 site2 negate loc guard_p_name =
   | None -> Some guardp
   | Some guard -> Some (Logical_formulae.AND (guard, guardp))
 
-(**All the rules that were added because of conflicts have the same label as the original rule.
-  This function changes their name to rule', rule'' and so on.*)
-let rename_rules rules =
-  match rules with
-  | [] -> rules
-  | (rule_string_opt, _, _) :: _ ->
-    (match rule_string_opt with
-    | None -> rules
-    | Some _ ->
-      List.mapi
-        (fun i (rule_string_opt, guard, rule) ->
-          match rule_string_opt with
-          | None -> rule_string_opt, guard, rule
-          | Some (rule_string, p) ->
-            Some (rule_string ^ String.make i '\'', p), guard, rule)
-        rules)
-
 let add_rules_with_conflicts_and_sequential parameters error rule conflicts
-    sequential_bonds =
-  let add_rules error add_site_to_rule guard_p_name inital_rules modifications =
+    sequential_bonds index_conflict index_seq =
+  let rename_rule rule_string_opt suffix i =
+    let suffix = "\'" ^ suffix ^ "_" ^ string_of_int i in
+    match rule_string_opt with
+    | None -> Some (suffix, Loc.dummy)
+    | Some (rule_string, p) -> Some (rule_string ^ suffix, p)
+  in
+  let add_rules error add_site_to_rule guard_p_name inital_rules modifications
+      suffix i =
     List.fold_left
-      (fun (error, rules) ((agent, _), (site1, _), (site2, _)) ->
+      (fun (error, rules, i) ((agent, _), (site1, _), (site2, _)) ->
         List.fold_left
-          (fun (error, rules) (id, guard, (rule, p)) ->
+          (fun (error, rules, i) (id, guard, (rule, p)) ->
             let error, new_rule, was_changed, is_not_allowed =
               add_site_to_rule parameters error agent site1 site2 rule
             in
@@ -919,29 +909,30 @@ let add_rules_with_conflicts_and_sequential parameters error rule conflicts
               add_param_to_guard guard agent site1 site2 true p guard_p_name
             in
             if is_not_allowed then
-              error, (id, guard_og_rule, (rule, p)) :: rules
+              error, (id, guard_og_rule, (rule, p)) :: rules, i
             else if was_changed then (
               let guard_new_rule =
                 add_param_to_guard guard agent site1 site2 false p guard_p_name
               in
               ( error,
                 (id, guard_og_rule, (rule, p))
-                :: (id, guard_new_rule, (new_rule, p))
-                :: rules )
+                :: (rename_rule id suffix i, guard_new_rule, (new_rule, p))
+                :: rules,
+                i + 1 )
             ) else
-              error, (id, guard, (rule, p)) :: rules)
-          (error, []) rules)
-      (error, inital_rules) modifications
+              error, (id, guard, (rule, p)) :: rules, i)
+          (error, [], i) rules)
+      (error, inital_rules, i) modifications
   in
-  let error, new_rules =
+  let error, new_rules, index_conflict =
     add_rules error add_conflict_site_to_rule conflicts_guard_p_name [ rule ]
-      conflicts
+      conflicts "conflict" index_conflict
   in
-  let error, new_rules =
+  let error, new_rules, index_sequential =
     add_rules error add_sequential_site_to_rule sequential_guard_p_name
-      new_rules sequential_bonds
+      new_rules sequential_bonds "seq_bond" index_seq
   in
-  error, rename_rules new_rules
+  error, new_rules, index_conflict, index_sequential
 (*------------------------------------------------------------*)
 
 let translate_compil parameters error
@@ -1200,23 +1191,25 @@ let translate_compil parameters error
         error, ((alarm, b', List.rev m', o'), p) :: list, rules_rev')
       (error, [], rules_rev) compil.Ast.perturbations
   in
-  let error, rules_rev =
+  let error, rules_rev, _, _ =
     List.fold_left
-      (fun (error, list) (rule_string, guard, (rule, p)) ->
-        let error, rules_with_conflicts =
+      (fun (error, list, index_conflict, index_seq)
+           (rule_string, guard, (rule, p)) ->
+        let error, rules_with_conflicts, index_conflict, index_seq =
           add_rules_with_conflicts_and_sequential parameters error
             (rule_string, guard, (rule, p))
-            compil.Ast.conflicts compil.Ast.sequential_bonds
+            compil.Ast.conflicts compil.Ast.sequential_bonds index_conflict
+            index_seq
         in
-        error, rules_with_conflicts @ list)
-      (error, []) rules_rev
+        error, rules_with_conflicts @ list, index_conflict, index_seq)
+      (error, [], 0, 0) (List.rev rules_rev)
   in
   ( error,
     {
       Ast.filenames = compil.Ast.filenames;
       Ast.variables = List.rev var_rev;
       Ast.signatures = List.rev signatures_rev;
-      Ast.rules = rules_rev;
+      Ast.rules = List.rev rules_rev;
       Ast.observables = List.rev observables_rev;
       Ast.init = List.rev init_rev;
       Ast.perturbations = List.rev perturbations_rev;

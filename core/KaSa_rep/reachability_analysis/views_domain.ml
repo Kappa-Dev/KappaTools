@@ -699,8 +699,7 @@ module Domain = struct
                 parameters error var map2
             in
             (match renamed with
-            | None ->  Exception.warn parameters error __POS__ Exit
-                renaming_list
+            | None -> Exception.warn parameters error __POS__ Exit renaming_list
             | Some renamed ->
               ( error,
                 (var, Ckappa_sig.mvbdu_var_of_site renamed) :: renaming_list )))
