@@ -262,18 +262,45 @@ let print_without_formula parameters error kappa_handler list_site_graph
     site_graph t_precondition prefix verbose string_agent string_site
     string_site'' string_site' string_site''' string_agent'' modalite
     sites_adjectve =
-  match Remanent_parameters.get_backend_mode parameters with
-  | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-    let error =
+  let error =
+    match Remanent_parameters.get_backend_mode parameters with
+    | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+      let error =
+        if verbose then (
+          (*print hyp*)
+          let error =
+            Site_graphs.KaSa_site_graph.print
+              (Remanent_parameters.get_logger parameters)
+              parameters error t_precondition
+          in
+          let () =
+            Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
+          in
+          error
+        ) else (
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameters)
+              "%s" prefix
+          in
+          error
+        )
+      in
+      (*print the list of refinement*)
+      Site_graphs.KaSa_site_graph.print_list
+        (Remanent_parameters.get_logger parameters)
+        parameters error kappa_handler list_site_graph
+    | Remanent_parameters_sig.Natural_language ->
       if verbose then (
-        (*print hyp*)
-        let error =
-          Site_graphs.KaSa_site_graph.print
-            (Remanent_parameters.get_logger parameters)
-            parameters error t_precondition
-        in
         let () =
-          Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "%sWhen the agent %s has its site %s bound to the site %s of a %s, \
+             and its site %s bound to the site %s of a %s, then both instances \
+             of %s %s %s."
+            prefix string_agent string_site string_site'' string_agent''
+            string_site' string_site''' string_agent'' string_agent'' modalite
+            sites_adjectve
         in
         error
       ) else (
@@ -282,75 +309,61 @@ let print_without_formula parameters error kappa_handler list_site_graph
             (Remanent_parameters.get_logger parameters)
             "%s" prefix
         in
-        error
-      )
-    in
-    (*print the list of refinement*)
-    Site_graphs.KaSa_site_graph.print_list
-      (Remanent_parameters.get_logger parameters)
-      parameters error kappa_handler list_site_graph
-  | Remanent_parameters_sig.Natural_language ->
-    if verbose then (
-      let () =
-        Loggers.fprintf
+        Site_graphs.KaSa_site_graph.print
           (Remanent_parameters.get_logger parameters)
-          "%sWhen the agent %s has its site %s bound to the site %s of a %s, \
-           and its site %s bound to the site %s of a %s, then both instances \
-           of %s %s %s."
-          prefix string_agent string_site string_site'' string_agent''
-          string_site' string_site''' string_agent'' string_agent'' modalite
-          sites_adjectve
-      in
-      error
-    ) else (
-      let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" prefix
-      in
-      Site_graphs.KaSa_site_graph.print
-        (Remanent_parameters.get_logger parameters)
-        parameters error site_graph
-    )
+          parameters error site_graph
+      )
+  in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+  error
 
 let print_with_formula parameters bdu_handler error kappa_handler mvbdu
     list_site_graph site_graph prefix verbose string_agent string_site
     string_site'' string_site' string_site''' string_agent'' sites_adjectve =
-  match Remanent_parameters.get_backend_mode parameters with
-  | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-    let error =
-      Site_graphs.KaSa_site_graph.print_list
-        (Remanent_parameters.get_logger parameters)
-        parameters error kappa_handler list_site_graph
-    in
-    let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
-    in
-    Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
-  | Remanent_parameters_sig.Natural_language ->
-    if verbose then (
-      let () =
-        Loggers.fprintf
-          (Remanent_parameters.get_logger parameters)
-          "%sThe agent %s can have its site %s bound to the site %s of a %s, \
-           and its site %s bound to the site %s of %s %s, only if: "
-          prefix string_agent string_site string_site'' string_agent''
-          string_site' string_site''' sites_adjectve string_agent''
-      in
-      let error, bdu_handler =
-        Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler
-          mvbdu
-      in
-      error, bdu_handler
-    ) else (
+  let error, handler =
+    match Remanent_parameters.get_backend_mode parameters with
+    | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
       let error =
-        Site_graphs.KaSa_site_graph.print
+        Site_graphs.KaSa_site_graph.print_list
           (Remanent_parameters.get_logger parameters)
-          parameters error site_graph
+          parameters error kappa_handler list_site_graph
       in
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) " only if "
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
       in
       Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
-    )
+    | Remanent_parameters_sig.Natural_language ->
+      if verbose then (
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "%sThe agent %s can have its site %s bound to the site %s of a %s, \
+             and its site %s bound to the site %s of %s %s, only if: "
+            prefix string_agent string_site string_site'' string_agent''
+            string_site' string_site''' sites_adjectve string_agent''
+        in
+        let error, bdu_handler =
+          Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler
+            mvbdu
+        in
+        error, bdu_handler
+      ) else (
+        let error =
+          Site_graphs.KaSa_site_graph.print
+            (Remanent_parameters.get_logger parameters)
+            parameters error site_graph
+        in
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            " only if "
+        in
+        Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler
+          mvbdu
+      )
+  in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+  error, handler
 
 let print_any_bond parameters error prefix dump_any verbose string_agent
     string_site string_site'' string_site' string_site''' string_agent'' t_same
@@ -387,6 +400,7 @@ let print_any_bond parameters error prefix dump_any verbose string_agent
     else
       error
   in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   error
 
 let print_parallel_constraint ?(verbose = true) ?(sparse = false)
@@ -543,9 +557,6 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
         in
         error, bdu_handler
       )
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
     in
     let error =
       (* printing for which values of the guards the double bonds can be both parallel and non-parallel *)
