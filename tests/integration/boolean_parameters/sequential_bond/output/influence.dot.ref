@@ -1,0 +1,33 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa example_sequential_bond.ka --output-directory output -syntax 4
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"0:.->A(x{u})" [shape=box fillcolor="#87ceeb" style=filled];
+"1:A(x{u})->A(x{p})" [shape=box fillcolor="#87ceeb" style=filled];
+"2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"3:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"4:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"5:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" [shape=box fillcolor="#87ceeb" style=filled];
+
+"Ap" [shape=ellipse fillcolor="#98fb98" style=filled];
+"0:.->A(x{u})" -> "1:A(x{u})->A(x{p})" [label="[0->0]" color="green"];
+"0:.->A(x{u})" -> "2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [label="[0->0];[0->1]" color="green"];
+"0:.->A(x{u})" -> "3:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [label="[0->0];[0->1]" color="green"];
+"1:A(x{u})->A(x{p})" -> "Ap" [label="[0->0]" color="green"];
+"2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" -> "4:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" -> "5:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" -> "2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"3:A(y[.]),A(y[.])->A(y[1]),A(y[1])" -> "3:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"3:A(y[.]),A(y[.])->A(y[1]),A(y[1])" -> "4:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"3:A(y[.]),A(y[.])->A(y[1]),A(y[1])" -> "5:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"4:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" -> "3:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"4:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" -> "4:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"4:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" -> "5:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"5:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" -> "3:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"5:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" -> "4:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"5:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" -> "5:A(x[_],y[.]),A(x[_],y[.])->A(x[_],y[1]),A(x[_],y[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+}
