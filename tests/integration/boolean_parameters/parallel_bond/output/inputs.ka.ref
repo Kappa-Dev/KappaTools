@@ -1,0 +1,25 @@
+%def: "seed" "858703540"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "3"
+%def: "progressBarSize" "70"
+%def: "progressBarSymbol" "#"
+%def: "plotPeriod" "20" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: A(x[x.A] y[y.A] z)
+
+%var:/*0*/ 'Trimer' |A(x[1] y[2]), A(x[1] y[2])|
+%plot: [T]
+%plot: Trimer
+
+A(x[.] y[./1]), A(x[.] y[./1]) @ 1
+A(x[./1] y[.]), A(x[./1] y[.]) @ 1
+/*if*/ [not] P /*then*/ A(x[./1]), A(x[./1]) @ 1
+/*if*/ [not] P /*then*/ A(y[./1]), A(y[./1]) @ 1
+A(x[1/.]), A(x[1/.]) @ 1
+A(y[1/.]), A(y[1/.]) @ 1
+
+
+%init: 100 A(x[.] y[.] z[.])
+
+%mod: [E] = 724201 do $STOP;
