@@ -1,7 +1,5 @@
-#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (v4.1.3.1-187-g0b1b6abee-dirty))
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Analysis launched at 2025/06/27 09:46:09 (GMT+2) on Margherita
 #Command line is: KaSa example_double_bonds2.ka --output-directory output --debugging-mode -syntax 4
 #
 #This file contains the description of the influence map in dot.

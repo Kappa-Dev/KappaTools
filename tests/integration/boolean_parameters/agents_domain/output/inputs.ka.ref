@@ -6,17 +6,17 @@
 %def: "plotPeriod" "20" "t.u."
 %def: "outputFileName" "data.csv"
 
-%agent: A(x{u p}[x.A] y[y.A])
+%agent: A(x{u p})
+%agent: B(x{u p})
 
-%var:/*0*/ 'Ap' |A(x{p})|
+%var:/*0*/ 'Au' |A(x{u})|
+%var:/*1*/ 'Bu' |B(x{u})|
 %plot: [T]
-%plot: Ap
+%plot: Au
+%plot: Bu
 
-#[ P ] A(x{u}[.] y[.])+ @ 1
-'~namef' A(x{u/p}[#]) @ 1
-#[ x && y ] A(x[./1]), A(x[./1]) @ 1
-
+#[ (P1 || P2) ] B(x{u}[.])+ @ 1
 
 
 
-%mod: [E] = 5235 do $STOP;
+%mod: [E] = 1962 do $STOP;

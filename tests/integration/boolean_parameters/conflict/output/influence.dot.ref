@@ -8,28 +8,28 @@
 digraph G{
 "0:.->A(x{u})" [shape=box fillcolor="#87ceeb" style=filled];
 "~namef" [shape=box fillcolor="#87ceeb" style=filled];
-"2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
-"3:A(y[.],x[.]),A(y[.],x[.])->A(y[.],x[1]),A(y[.],x[1])" [shape=box fillcolor="#87ceeb" style=filled];
-"4:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [shape=box fillcolor="#87ceeb" style=filled];
-"5:A(x[.],y[.]),A(x[.],y[.])->A(x[.],y[1]),A(x[.],y[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"'conflict_0" [shape=box fillcolor="#87ceeb" style=filled];
+"3:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"'conflict_1" [shape=box fillcolor="#87ceeb" style=filled];
+"5:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [shape=box fillcolor="#87ceeb" style=filled];
 
 "Ap" [shape=ellipse fillcolor="#98fb98" style=filled];
 "0:.->A(x{u})" -> "~namef" [label="[0->0]" color="green"];
-"0:.->A(x{u})" -> "2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [label="[0->0];[0->1]" color="green"];
-"0:.->A(x{u})" -> "3:A(y[.],x[.]),A(y[.],x[.])->A(y[.],x[1]),A(y[.],x[1])" [label="[0->0];[0->1]" color="green"];
-"0:.->A(x{u})" -> "4:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [label="[0->0];[0->1]" color="green"];
-"0:.->A(x{u})" -> "5:A(x[.],y[.]),A(x[.],y[.])->A(x[.],y[1]),A(x[.],y[1])" [label="[0->0];[0->1]" color="green"];
+"0:.->A(x{u})" -> "'conflict_0" [label="[0->0];[0->1]" color="green"];
+"0:.->A(x{u})" -> "3:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [label="[0->0];[0->1]" color="green"];
+"0:.->A(x{u})" -> "'conflict_1" [label="[0->0];[0->1]" color="green"];
+"0:.->A(x{u})" -> "5:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [label="[0->0];[0->1]" color="green"];
 "~namef" -> "Ap" [label="[0->0]" color="green"];
-"2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" -> "2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
-"2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" -> "3:A(y[.],x[.]),A(y[.],x[.])->A(y[.],x[1]),A(y[.],x[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
-"2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" -> "5:A(x[.],y[.]),A(x[.],y[.])->A(x[.],y[1]),A(x[.],y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
-"3:A(y[.],x[.]),A(y[.],x[.])->A(y[.],x[1]),A(y[.],x[1])" -> "2:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
-"3:A(y[.],x[.]),A(y[.],x[.])->A(y[.],x[1]),A(y[.],x[1])" -> "3:A(y[.],x[.]),A(y[.],x[.])->A(y[.],x[1]),A(y[.],x[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
-"3:A(y[.],x[.]),A(y[.],x[.])->A(y[.],x[1]),A(y[.],x[1])" -> "5:A(x[.],y[.]),A(x[.],y[.])->A(x[.],y[1]),A(x[.],y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
-"4:A(y[.]),A(y[.])->A(y[1]),A(y[1])" -> "3:A(y[.],x[.]),A(y[.],x[.])->A(y[.],x[1]),A(y[.],x[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
-"4:A(y[.]),A(y[.])->A(y[1]),A(y[1])" -> "4:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
-"4:A(y[.]),A(y[.])->A(y[1]),A(y[1])" -> "5:A(x[.],y[.]),A(x[.],y[.])->A(x[.],y[1]),A(x[.],y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
-"5:A(x[.],y[.]),A(x[.],y[.])->A(x[.],y[1]),A(x[.],y[1])" -> "3:A(y[.],x[.]),A(y[.],x[.])->A(y[.],x[1]),A(y[.],x[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
-"5:A(x[.],y[.]),A(x[.],y[.])->A(x[.],y[1]),A(x[.],y[1])" -> "4:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
-"5:A(x[.],y[.]),A(x[.],y[.])->A(x[.],y[1]),A(x[.],y[1])" -> "5:A(x[.],y[.]),A(x[.],y[.])->A(x[.],y[1]),A(x[.],y[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"'conflict_0" -> "'conflict_0" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"'conflict_0" -> "3:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"'conflict_0" -> "'conflict_1" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"3:A(x[.]),A(x[.])->A(x[1]),A(x[1])" -> "'conflict_0" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"3:A(x[.]),A(x[.])->A(x[1]),A(x[1])" -> "3:A(x[.]),A(x[.])->A(x[1]),A(x[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"3:A(x[.]),A(x[.])->A(x[1]),A(x[1])" -> "'conflict_1" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"'conflict_1" -> "'conflict_0" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"'conflict_1" -> "'conflict_1" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"'conflict_1" -> "5:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"5:A(y[.]),A(y[.])->A(y[1]),A(y[1])" -> "'conflict_0" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"5:A(y[.]),A(y[.])->A(y[1]),A(y[1])" -> "'conflict_1" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"5:A(y[.]),A(y[.])->A(y[1]),A(y[1])" -> "5:A(y[.]),A(y[.])->A(y[1]),A(y[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
 }
