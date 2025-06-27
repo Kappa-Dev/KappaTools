@@ -9,8 +9,8 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
+rule 'seq_bond_0 (File "example_sequential_bond.ka", line 10, characters 0-40:) could be applied if @sq-A-x-y.
 rule File "example_sequential_bond.ka", line 10, characters 0-40: could be applied if ~@sq-A-x-y.
-rule File "example_sequential_bond.ka", line 10, characters 0-40: could be applied if @sq-A-x-y.
 ------------------------------------------------------------
 every agent may occur in the model
 

@@ -11,10 +11,10 @@ Reachability analysis...
 ------------------------------------------------------------
 rule File "example_conflict.ka", line 12, characters 0-21: could be applied if P.
 rule ~namef (File "example_conflict.ka", line 13, characters 0-31:) could be applied if P.
+rule 'conflict_0 (File "example_conflict.ka", line 14, characters 0-50:) could be applied if P.and.@co-A-x-y.and.x.and.y.
 rule File "example_conflict.ka", line 14, characters 0-50: could be applied if P.and.(~@co-A-x-y).and.x.and.y.
-rule File "example_conflict.ka", line 14, characters 0-50: could be applied if P.and.@co-A-x-y.and.x.and.y.
+rule 'conflict_1 (File "example_conflict.ka", line 15, characters 0-50:) could be applied if (B.or.C).and.P.and.@co-A-x-y.
 rule File "example_conflict.ka", line 15, characters 0-50: could be applied if (B.or.C).and.P.and.(~@co-A-x-y).
-rule File "example_conflict.ka", line 15, characters 0-50: could be applied if (B.or.C).and.P.and.@co-A-x-y.
 
 ------------------------------------------------------------
 * There are some non creatable agents 
