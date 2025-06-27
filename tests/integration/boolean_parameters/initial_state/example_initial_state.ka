@@ -1,0 +1,16 @@
+// Define agents
+%agent: A(x,y)
+%agent: B(y)
+%agent: C(x)
+// global boolean parameter
+%guard_param: test1 [true]
+%guard_param: test2 [true]
+%guard_param: test3 [false]
+
+// Initial conditions
+%init: #[test1 && test2] 100 A(),B(),C()
+%init: #[test3] 100 A(x[1]), C(x[1])
+
+'name 1' A(x[.]), C(x[.]) <-> A(x[1]), C(x[1]) @ 1,1
+A(x[.],y[.]), B(y[.]) <-> A(x[.],y[1]), B(y[1]) @ 1,1
+'name 3' A(y[.]), B(y[.]) <-> A(y[1]), B(y[1]) @ 1,1
