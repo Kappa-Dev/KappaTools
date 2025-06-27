@@ -1026,7 +1026,6 @@ let rec print ?beginning_of_sentence:(beggining = true)
       in
       error, bdu_handler
     | Valuations_with_guards valuations ->
-      let () = Loggers.print_newline log in
       let error, bdu_handler =
         List.fold_left
           (fun (error, bdu_handler) (sites, mvbdu) ->
@@ -1079,7 +1078,6 @@ let rec print ?beginning_of_sentence:(beggining = true)
           (error, bdu_handler) valuations
       in
       (*let () = if should_use_bracket then Loggers.fprintf log " ]" in*)
-      let () = Loggers.print_newline log in
       error, bdu_handler
     | No_known_translation list ->
       (match Remanent_parameters.get_backend_mode parameters with
