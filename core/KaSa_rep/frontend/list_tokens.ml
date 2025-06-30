@@ -432,7 +432,7 @@ let scan_token parameters remanent _alg =
     remanent
 
 let scan_alg _parameters remanent _alg =
-  (*TODO*)
+  (*TO DO*)
   remanent
 
 let scan_guard parameters (error, handler) guard =

@@ -563,19 +563,6 @@ let covering_classes parameters error handler cc_compil =
   in
   error, result
 
-(* let add_guards parameters error store_covering_classes =
-   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
-       error
-       (fun parameters error agent_type remanent store_result ->
-         let store_dic =
-           Dictionary_of_List_sites_or_guard.fold
-           (fun cv_id _)
-           remanent.store_dic
-         in(*TODO change site to Site site and add all parameters*)
-         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set parameters error agent_type {remanent with store_dic} store_result
-        )
-        store_covering_classes Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.empty *)
-
 let init_predicate_covering_classes parameters error =
   let error, init_covering_classes =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create

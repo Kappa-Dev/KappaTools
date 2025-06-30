@@ -886,14 +886,14 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=38
+Id=47
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=37
+  Id=46
    Node(site_type:1<1)
-    Id=36
+    Id=45
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -929,7 +929,7 @@ Id=38
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=39
+Id=50
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -944,12 +944,12 @@ Id=39
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=34
+  Id=43
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -965,14 +965,14 @@ A(y) => [ A(y[.]) v A(y[x.A]) v A(y[y.A]) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=45
+Id=55
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=44
+  Id=54
    Node(site_type:0<1)
-    Id=39
+    Id=50
      Node(site_type:1<0)
       Id=0
        Leaf False 
@@ -985,7 +985,7 @@ Id=45
         Id=0
          Leaf False 
 
-    Id=43
+    Id=41
      Node(site_type:0<3)
       Id=3
        Node(site_type:1<0)
@@ -1016,7 +1016,7 @@ A(x[x.A],y) => A(x[x.A],y[.])
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=39
+Id=50
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1031,12 +1031,12 @@ Id=39
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=34
+  Id=43
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1046,14 +1046,14 @@ Id=40
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=45
+Id=55
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=44
+  Id=54
    Node(site_type:0<1)
-    Id=39
+    Id=50
      Node(site_type:1<0)
       Id=0
        Leaf False 
@@ -1066,7 +1066,7 @@ Id=45
         Id=0
          Leaf False 
 
-    Id=43
+    Id=41
      Node(site_type:0<3)
       Id=3
        Node(site_type:1<0)
