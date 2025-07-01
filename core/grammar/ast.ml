@@ -1727,9 +1727,8 @@ let compil_to_json c =
              (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
       ( "guard_param_values",
-        JsonUtil.of_list
-          (JsonUtil.of_pair JsonUtil.of_string JsonUtil.of_bool)
-          (Mods.StringMap.bindings c.guard_param_values) );
+        Mods.StringMap.to_json JsonUtil.of_string JsonUtil.of_bool
+          c.guard_param_values);
       ( "conflicts",
         JsonUtil.of_list
           (JsonUtil.of_triple
