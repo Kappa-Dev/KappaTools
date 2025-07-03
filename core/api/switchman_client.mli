@@ -38,6 +38,12 @@ object
     Result_util.t
     Lwt.t
 
+  method get_formula_constraints_list :
+    ( (string * Public_data.agent list Public_data.formula_lemma list) list,
+      Result_util.message list )
+    Result_util.t
+    Lwt.t
+
   method get_contact_map :
     Public_data.accuracy_level option ->
     (Yojson.Basic.t, Result_util.message list) Result_util.t Lwt.t

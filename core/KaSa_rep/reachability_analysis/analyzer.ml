@@ -212,6 +212,9 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     let kasa_state =
       Remanent_state.set_internal_constraints_list [] kasa_state
     in
+    let kasa_state =
+      Remanent_state.set_internal_formula_constraints_list [] kasa_state
+    in
     let error, dynamic, kasa_state =
       Domain.export static dynamic error kasa_state
     in
@@ -225,6 +228,19 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       | None -> kasa_state
       | Some l ->
         Remanent_state.set_internal_constraints_list (List.rev l) kasa_state
+    in
+    let kasa_state =
+      match Remanent_state.get_formula_constraints_list kasa_state with
+      | None -> kasa_state
+      | Some l ->
+        Remanent_state.set_formula_constraints_list (List.rev l) kasa_state
+    in
+    let kasa_state =
+      match Remanent_state.get_internal_formula_constraints_list kasa_state with
+      | None -> kasa_state
+      | Some l ->
+        Remanent_state.set_internal_formula_constraints_list (List.rev l)
+          kasa_state
     in
     error, dynamic, kasa_state
 

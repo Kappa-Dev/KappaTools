@@ -30,9 +30,13 @@ let sitenodeid = "node_id"
 let sitenodesites = "node_sites"
 let hyp = "site graph"
 let refinement = "site graph list"
+let pattern = "pattern"
+let reachability_condition = "formula"
 let domain_name = "domain name"
 let refinements_list = "refinements list"
+let formula_list = "formula list"
 let refinement_lemmas = "refinement lemmas"
+let formula_lemmas = "formula lemmas"
 let rule_id = "id"
 let agent_id = "id"
 let label = "label"
@@ -984,6 +988,21 @@ let lemma_of_json site_graph_of_json json =
   in
   { hyp = a; refinement = b }
 
+let formula_lemma_to_json site_graph_to_json formula_lemma =
+  JsonUtil.of_pair ~lab1:pattern ~lab2:reachability_condition site_graph_to_json
+    (Logical_formulae.formula_to_json JsonUtil.of_string)
+    (formula_lemma.pattern, formula_lemma.reachability_condition)
+
+let formula_lemma_of_json site_graph_of_json json =
+  let a, b =
+    JsonUtil.to_pair ~lab1:pattern ~lab2:reachability_condition
+      ~error_msg:"formula lemma" site_graph_of_json
+      (Logical_formulae.formula_of_json
+         (JsonUtil.to_string ~error_msg:"boolean parameter"))
+      json
+  in
+  { pattern = a; reachability_condition = b }
+
 let get_hyp h = h.hyp
 let get_refinement r = r.refinement
 let get_pattern h = h.pattern
@@ -1094,17 +1113,26 @@ let agent_gen_of_json interface_of_json =
     (JsonUtil.to_string ~error_msg:"agent name")
     interface_of_json
 
-let poly_constraints_list_of_json site_graph_of_json =
+let poly_constraints_list_of_json list_name lab2 lemma_of_json
+    site_graph_of_json =
   JsonUtil.to_list
-    (JsonUtil.to_pair ~error_msg:"constraints list" ~lab1:domain_name
-       ~lab2:refinements_list
+    (JsonUtil.to_pair ~error_msg:list_name ~lab1:domain_name ~lab2
        (JsonUtil.to_string ~error_msg:"abstract domain")
        (JsonUtil.to_list (lemma_of_json site_graph_of_json)))
 
-let lemmas_list_of_json_gen interface_of_json = function
+let poly_formula_constraints_list_of_json site_graph_of_json =
+  poly_constraints_list_of_json "formula constraints list" formula_list
+    formula_lemma_of_json site_graph_of_json
+
+let poly_constraints_list_of_json site_graph_of_json =
+  poly_constraints_list_of_json "constraints list" refinements_list
+    lemma_of_json site_graph_of_json
+
+let lemmas_list_of_json_gen lab list_name poly_constraints_list_of_json
+    interface_of_json = function
   | `Assoc l as x ->
     (try
-       let json = List.assoc refinement_lemmas l in
+       let json = List.assoc lab l in
        poly_constraints_list_of_json
          (JsonUtil.to_list ~error_msg:"site graph"
             (agent_gen_of_json interface_of_json))
@@ -1112,11 +1140,22 @@ let lemmas_list_of_json_gen interface_of_json = function
      with _ ->
        raise
          (Yojson.Basic.Util.Type_error
-            (JsonUtil.exn_msg_cant_import_from_json "refinement lemmas list", x)))
+            (JsonUtil.exn_msg_cant_import_from_json list_name, x)))
   | x ->
     raise
       (Yojson.Basic.Util.Type_error
-         (JsonUtil.exn_msg_cant_import_from_json "refinement lemmas list", x))
+         (JsonUtil.exn_msg_cant_import_from_json list_name, x))
+
+let formula_lemmas_list_of_json_gen interface_of_json =
+  lemmas_list_of_json_gen formula_lemmas "formula refinement lemmas list"
+    poly_formula_constraints_list_of_json interface_of_json
+
+let formula_lemmas_list_of_json json =
+  formula_lemmas_list_of_json_gen interface_light_of_json json
+
+let lemmas_list_of_json_gen interface_of_json =
+  lemmas_list_of_json_gen refinement_lemmas "refinement lemmas list"
+    poly_constraints_list_of_json interface_of_json
 
 let lemmas_list_of_json json =
   lemmas_list_of_json_gen interface_light_of_json json
@@ -1125,21 +1164,29 @@ let agent_gen_to_json interface_to_json =
   JsonUtil.of_pair ~lab1:agent ~lab2:interface JsonUtil.of_string
     interface_to_json
 
-let poly_constraints_list_to_json site_graph_to_json constraints =
+let poly_constraints_list_to_json lab2 to_json site_graph_to_json constraints =
   JsonUtil.of_list
-    (JsonUtil.of_pair ~lab1:domain_name ~lab2:refinements_list
-       JsonUtil.of_string
-       (JsonUtil.of_list (lemma_to_json site_graph_to_json)))
+    (JsonUtil.of_pair ~lab1:domain_name ~lab2 JsonUtil.of_string
+       (JsonUtil.of_list (to_json site_graph_to_json)))
     constraints
 
-let lemmas_list_to_json_gen interface_to_json constraints =
+let lemmas_list_to_json_gen lab2 to_json interface_to_json constraints =
   `Assoc
     [
       ( refinement_lemmas,
-        poly_constraints_list_to_json
+        poly_constraints_list_to_json lab2 to_json
           (JsonUtil.of_list (agent_gen_to_json interface_to_json))
           constraints );
     ]
+
+let formula_lemmas_list_to_json_gen interface_to_json =
+  lemmas_list_to_json_gen formula_list formula_lemma_to_json interface_to_json
+
+let formula_lemmas_list_to_json constraints =
+  formula_lemmas_list_to_json_gen interface_light_to_json constraints
+
+let lemmas_list_to_json_gen interface_to_json =
+  lemmas_list_to_json_gen refinements_list lemma_to_json interface_to_json
 
 let lemmas_list_to_json constraints =
   lemmas_list_to_json_gen interface_light_to_json constraints

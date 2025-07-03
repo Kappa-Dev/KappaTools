@@ -190,6 +190,13 @@ let on_message post text =
     let state, out = get_constraints_list !gState in
     let () = gState := state in
     send_response post id out
+  | Some
+      ( id,
+        (`List [ `String "FORMULA_CONSTRAINTS" ] | `String "FORMULA_CONSTRAINTS")
+      ) ->
+    let state, out = get_formula_constraints_list !gState in
+    let () = gState := state in
+    send_response post id out
   | Some (id, `List [ `String "POLYMERS"; acc_cm ]) ->
     let accuracy_level_cm = Public_data.accuracy_of_json acc_cm in
     let state, out =

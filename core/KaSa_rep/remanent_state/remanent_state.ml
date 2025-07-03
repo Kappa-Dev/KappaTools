@@ -121,11 +121,20 @@ type agent = string * (* agent name *)
 
 type constraints_list = agent list Public_data.poly_constraints_list
 
+type formula_constraints_list =
+  agent list Public_data.poly_formula_constraints_list
+
 let lemmas_list_of_json json =
   Public_data.lemmas_list_of_json_gen interface_of_json json
 
 let lemmas_list_to_json l =
   Public_data.lemmas_list_to_json_gen interface_to_json l
+
+let formula_lemmas_list_of_json json =
+  Public_data.formula_lemmas_list_of_json_gen interface_of_json json
+
+let formula_lemmas_list_to_json l =
+  Public_data.formula_lemmas_list_to_json_gen interface_to_json l
 
 (******************************************************************************)
 (******************************************************************************)
@@ -224,6 +233,7 @@ type ('static, 'dynamic) state = {
   internal_constraints_list: internal_constraints_list option;
   internal_formula_constraints_list: internal_formula_constraints_list option;
   constraints_list: constraints_list option;
+  formula_constraints_list: formula_constraints_list option;
   symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
   separating_transitions: separating_transitions option;
   transition_system_length: int list option;
@@ -284,6 +294,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     internal_constraints_list = None;
     internal_formula_constraints_list = None;
     constraints_list = None;
+    formula_constraints_list = None;
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
     transition_system_length = None;
@@ -330,6 +341,7 @@ let get_contact_map_map state = state.contact_map
 let get_pos_of_rules_and_vars state = state.pos_of_rules_and_vars
 let get_influence_map_map state = state.influence_map
 let get_constraints_list state = state.constraints_list
+let get_formula_constraints_list state = state.formula_constraints_list
 
 let set_pos_of_rules_and_vars l state =
   { state with pos_of_rules_and_vars = Some l }
@@ -424,6 +436,12 @@ let add_refinements_lemmas_to_json state l =
   | Some constraints ->
     (Public_data.refinement_lemmas, lemmas_list_to_json constraints) :: l
 
+let add_formula_lemmas_to_json state l =
+  match get_formula_constraints_list state with
+  | None -> l
+  | Some constraints ->
+    (Public_data.formula_lemmas, formula_lemmas_list_to_json constraints) :: l
+
 let get_separating_transitions state = state.separating_transitions
 
 let set_separating_transitions l state =
@@ -445,6 +463,7 @@ let to_json state =
   let l = [] in
   let l = add_errors state l in
   let l = add_refinements_lemmas_to_json state l in
+  let l = add_formula_lemmas_to_json state l in
   let l = add_dead_rules_to_json state l in
   let l = add_conditionally_dead_rules_to_json state l in
   let l = add_influence_map_to_json state l in
@@ -694,9 +713,13 @@ let set_internal_formula_constraints_list list state =
   { state with internal_formula_constraints_list = Some list }
 
 let get_constraints_list state = state.constraints_list
+let get_formula_constraints_list state = state.formula_constraints_list
 
 let set_constraints_list list state =
   { state with constraints_list = Some list }
+
+let set_formula_constraints_list list state =
+  { state with formula_constraints_list = Some list }
 
 let get_symmetries accuracy state =
   Public_data.AccuracyMap.find_option accuracy state.symmetric_sites

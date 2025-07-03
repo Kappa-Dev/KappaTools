@@ -22,6 +22,9 @@ module type Type = sig
   type bidirectional_influence_map
   type internal_constraints_list = Remanent_state.internal_constraints_list
 
+  type internal_formula_constraints_list =
+    Remanent_state.internal_formula_constraints_list
+
   val empty_constraints_list : internal_constraints_list
 
   type handler = Cckappa_sig.kappa_handler
@@ -82,6 +85,10 @@ module type Type = sig
 
   val get_reachability_analysis : state -> state * reachability_analysis
   val get_constraints_list : state -> state * internal_constraints_list
+
+  val get_formula_constraints_list :
+    state -> state * internal_formula_constraints_list
+
   val get_ctmc_flow : state -> state * ctmc_flow
   val get_ode_flow : state -> state * ode_flow
 
@@ -145,6 +152,7 @@ functor
     let get_local_influence_map = get_local_internal_influence_map
     let get_scc_decomposition = get_internal_scc_decomposition
     let get_constraints_list = get_internal_constraints_list
+    let get_formula_constraints_list = get_internal_formula_constraints_list
     let output_internal_contact_map = output_internal_contact_map
     let output_influence_map = output_internal_influence_map
     let output_local_influence_map = output_local_internal_influence_map
