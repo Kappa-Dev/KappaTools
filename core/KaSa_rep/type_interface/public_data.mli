@@ -143,8 +143,9 @@ val local_influence_map_of_json :
   * refined_influence_node option
   * influence_map
 
+type 'a formula = 'a Logical_formulae.formula
 type dead_rules = rule list
-type rule_deadness_conditions = (rule * string Logical_formulae.formula) list
+type rule_deadness_conditions = (rule * string formula) list
 (* contains the rules that are dead only for certain values of the boolean predicates *)
 
 val dead_rules_of_json : Yojson.Basic.t -> dead_rules
@@ -163,9 +164,7 @@ type agent_kind = {
 }
 
 type dead_agents = agent_kind list
-
-type agent_deadness_conditions =
-  (agent_kind * string Logical_formulae.formula) list
+type agent_deadness_conditions = (agent_kind * string formula) list
 (* contains the agents that are dead only for certain values of the boolean predicates *)
 
 val json_to_dead_agents : Yojson.Basic.t -> dead_agents
@@ -186,7 +185,7 @@ type 'site_graph lemma = { hyp: 'site_graph; refinement: 'site_graph list }
 
 type 'site_graph formula_lemma = {
   pattern: 'site_graph;
-  reachability_condition: string Logical_formulae.formula;
+  reachability_condition: string formula;
 }
 
 type binding_state =
@@ -253,12 +252,11 @@ val formula_lemmas_list_to_json :
 val formula_lemmas_list_of_json :
   Yojson.Basic.t -> (string * agent list formula_lemma list) list
 
+val print_formula : 'a -> (string -> 'a -> 'a) -> string formula -> 'a
 val get_hyp : 'site_graph lemma -> 'site_graph
 val get_refinement : 'site_graph lemma -> 'site_graph list
 val get_pattern : 'site_graph formula_lemma -> 'site_graph
-
-val get_reachability_condition :
-  'site_graph formula_lemma -> string Logical_formulae.formula
+val get_reachability_condition : 'site_graph formula_lemma -> string formula
 
 val string_of_binding_type :
   ?binding_type_symbol:string ->

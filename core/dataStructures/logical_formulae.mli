@@ -8,7 +8,7 @@ type 'a formula =
   | True
 
 val simplify : 'a formula -> 'a formula
-val print_formula : (string -> unit) -> string formula -> unit
+val print_formula : 'a -> (string -> 'a -> 'a) -> string formula -> 'a
 val formula_to_json : ('a -> Yojson.Basic.t) -> 'a formula -> Yojson.Basic.t
 val formula_of_json : (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a formula
 

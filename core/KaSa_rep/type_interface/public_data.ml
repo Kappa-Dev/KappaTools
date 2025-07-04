@@ -360,6 +360,8 @@ let scc_of_json = function
 (* dead rules *)
 (**************)
 
+type 'a formula = 'a Logical_formulae.formula
+
 type rule_direction =
   | Direct_rule
   | Reverse_rule
@@ -784,7 +786,7 @@ let local_influence_map_of_json = function
 (***************)
 
 type dead_rules = rule list
-type rule_deadness_conditions = (rule * string Logical_formulae.formula) list
+type rule_deadness_conditions = (rule * string formula) list
 (* contains the rules that are dead only for certain values of the boolean predicates *)
 
 let dead_rules_to_json json =
@@ -875,9 +877,7 @@ let agent_kind_to_json agent_kind =
     ]
 
 type dead_agents = agent_kind list
-
-type agent_deadness_conditions =
-  (agent_kind * string Logical_formulae.formula) list
+type agent_deadness_conditions = (agent_kind * string formula) list
 (* contains the agents that are dead only for certain values of the boolean predicates *)
 
 let json_of_dead_agents json =
@@ -968,7 +968,7 @@ type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
 
 type 'site_graph formula_lemma = {
   pattern: 'site_graph;
-  reachability_condition: string Logical_formulae.formula;
+  reachability_condition: string formula;
 }
 
 type 'site_graph poly_formula_constraints_list =
@@ -1170,23 +1170,27 @@ let poly_constraints_list_to_json lab2 to_json site_graph_to_json constraints =
        (JsonUtil.of_list (to_json site_graph_to_json)))
     constraints
 
-let lemmas_list_to_json_gen lab2 to_json interface_to_json constraints =
+let lemmas_list_to_json_gen lab lab2 to_json interface_to_json constraints =
   `Assoc
     [
-      ( refinement_lemmas,
+      ( lab,
         poly_constraints_list_to_json lab2 to_json
           (JsonUtil.of_list (agent_gen_to_json interface_to_json))
           constraints );
     ]
 
 let formula_lemmas_list_to_json_gen interface_to_json =
-  lemmas_list_to_json_gen formula_list formula_lemma_to_json interface_to_json
+  lemmas_list_to_json_gen formula_lemmas formula_list formula_lemma_to_json
+    interface_to_json
 
 let formula_lemmas_list_to_json constraints =
   formula_lemmas_list_to_json_gen interface_light_to_json constraints
 
 let lemmas_list_to_json_gen interface_to_json =
-  lemmas_list_to_json_gen refinements_list lemma_to_json interface_to_json
+  lemmas_list_to_json_gen refinement_lemmas refinements_list lemma_to_json
+    interface_to_json
 
 let lemmas_list_to_json constraints =
   lemmas_list_to_json_gen interface_light_to_json constraints
+
+let print_formula = Logical_formulae.print_formula

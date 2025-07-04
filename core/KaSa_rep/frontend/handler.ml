@@ -707,8 +707,9 @@ let mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu =
   error, bdu_handler, formula
 
 let print_formula parameters formula =
-  Logical_formulae.print_formula
-    (Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s")
+  Logical_formulae.print_formula ()
+    (fun s _ ->
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" s)
     formula
 
 let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =

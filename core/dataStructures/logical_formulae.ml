@@ -63,37 +63,37 @@ let rec simplify f =
       AND (x, y))
   | True | False | P _ -> f
 
-let rec print_formula f_print_string formula =
+let rec print_formula acc f_print_string formula =
   match formula with
-  | P x -> f_print_string x
+  | P x -> f_print_string x acc
   | NOT x ->
-    let () = f_print_string "~" in
-    print_arg f_print_string False x
+    let acc = f_print_string "~" acc in
+    print_arg acc f_print_string False x
   | OR (x1, x2) ->
-    let () = print_arg f_print_string (OR (P (), P ())) x1 in
-    let () = f_print_string ".or." in
-    print_arg f_print_string (OR (P (), P ())) x2
+    let acc = print_arg acc f_print_string (OR (P (), P ())) x1 in
+    let acc = f_print_string ".or." acc in
+    print_arg acc f_print_string (OR (P (), P ())) x2
   | AND (x1, x2) ->
-    let () = print_arg f_print_string (AND (P (), P ())) x1 in
-    let () = f_print_string ".and." in
-    print_arg f_print_string (AND (P (), P ())) x2
+    let acc = print_arg acc f_print_string (AND (P (), P ())) x1 in
+    let acc = f_print_string ".and." acc in
+    print_arg acc f_print_string (AND (P (), P ())) x2
   | IMPLY (x1, x2) ->
-    let () = print_arg f_print_string False x1 in
-    let () = f_print_string "=>" in
-    print_arg f_print_string False x2
-  | True -> f_print_string ".T."
-  | False -> f_print_string ".F."
+    let acc = print_arg acc f_print_string False x1 in
+    let acc = f_print_string "=>" acc in
+    print_arg acc f_print_string False x2
+  | True -> f_print_string ".T." acc
+  | False -> f_print_string ".F." acc
 
-and print_arg f_print_string scheme formula =
+and print_arg acc f_print_string scheme formula =
   match formula, scheme with
-  | (P _ | True | False), _ -> print_formula f_print_string formula
-  | OR (_, _), OR (_, _) -> print_formula f_print_string formula
-  | AND (_, _), AND (_, _) -> print_formula f_print_string formula
+  | (P _ | True | False), _ -> print_formula acc f_print_string formula
+  | OR (_, _), OR (_, _) -> print_formula acc f_print_string formula
+  | AND (_, _), AND (_, _) -> print_formula acc f_print_string formula
   | (NOT _ | OR (_, _) | AND (_, _) | IMPLY (_, _)), _ ->
-    let () = f_print_string "(" in
-    let error = print_formula f_print_string formula in
-    let () = f_print_string ")" in
-    error
+    let acc = f_print_string "(" acc in
+    let acc = print_formula acc f_print_string formula in
+    let acc = f_print_string ")" acc in
+    acc
 
 let rec formula_to_json value_to_json g =
   match g with

@@ -113,6 +113,9 @@ let print_site_graph agent_list list =
          true, print_agent agent list)
        (false, list) (List.rev agent_list))
 
+let print_formula formula list =
+  List.rev (Public_data.print_formula [] print_string formula) @ list
+
 let print_exceptions_caught_and_uncaught mh =
   let uncaught = Exception_without_parameter.get_uncaught_exception_list mh in
   let caught = Exception_without_parameter.get_caught_exception_list mh in
