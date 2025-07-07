@@ -22,7 +22,7 @@ type token =
       * (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
   | Partition of
       (Ckappa_sig.c_mvbdu_var * (Ckappa_sig.c_state * token list) list)
-  | Valuations_with_guards of
+  | Range_with_valuations of
       ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list
       * Ckappa_sig.Views_bdu.mvbdu)
       list

@@ -3194,7 +3194,7 @@ module Domain = struct
                   handler_kappa agent_id x
               in
               error, (agent_string, x)
-            | Translation_in_natural_language.Valuations_with_guards _
+            | Translation_in_natural_language.Range_with_valuations _
             | Translation_in_natural_language.Equiv _
             | Translation_in_natural_language.No_known_translation _
             | Translation_in_natural_language.Partition _

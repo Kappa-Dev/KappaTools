@@ -25,7 +25,8 @@ type token =
       * (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
   | Partition of
       (Ckappa_sig.c_mvbdu_var * (Ckappa_sig.c_state * token list) list)
-  | Valuations_with_guards of
+  | Range_with_valuations of
+  Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state list *
       ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list
       * Ckappa_sig.Views_bdu.mvbdu)
       list
@@ -511,7 +512,7 @@ let translate parameters handler error kappa_handler
       (List.rev list)
   in
   if not all_mvbdu_are_true then
-    error, (handler, Valuations_with_guards list_with_mvbdu)
+    error, (handler, Range_with_valuations list_with_mvbdu)
   else if Remanent_parameters.get_post_processing parameters then (
     let error, handler, vars =
       Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters handler error
@@ -1025,7 +1026,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
           (error, bdu_handler) list
       in
       error, bdu_handler
-    | Valuations_with_guards valuations ->
+    | Range_with_valuations valuations ->
       let error, bdu_handler =
         List.fold_left
           (fun (error, bdu_handler) (sites, mvbdu) ->
@@ -1360,7 +1361,7 @@ let rec convert_views_internal_constraints_list_aux
           (error, current_list) list
       in
       error, current_list
-    | Valuations_with_guards _ -> error, current_list
+    | Range_with_valuations _ -> error, current_list
     | No_known_translation list ->
       (match Remanent_parameters.get_backend_mode parameters with
       | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
@@ -1436,7 +1437,7 @@ let convert_views_internal_constraints_list
           error agent_string agent_type agent_id translation t current_list
       in
       error, bdu_handler, current_list
-    | Valuations_with_guards list ->
+    | Range_with_valuations list ->
       let error, bdu_handler, current_list =
         List.fold_left
           (fun (error, bdu_handler, current_list) (sites, mvbdu) ->
