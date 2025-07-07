@@ -34,10 +34,6 @@ let main () =
   let _ = Public_data.dead_rules_of_json dr in
   let state, constraints = Export_to_json.get_constraints_list state in
   let _ = Remanent_state.lemmas_list_of_json constraints in
-  let state, formula_constraints =
-    Export_to_json.get_formula_constraints_list state
-  in
-  let _ = Remanent_state.formula_lemmas_list_of_json formula_constraints in
   let errors = Export_to_json.get_errors state in
   let error_json = Exception_without_parameter.to_json errors in
   let json = Export_to_json.to_json state in

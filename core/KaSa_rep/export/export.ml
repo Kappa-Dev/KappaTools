@@ -49,9 +49,6 @@ functor
     type handler = Cckappa_sig.kappa_handler
     type internal_constraints_list = Remanent_state.internal_constraints_list
 
-    type internal_formula_constraints_list =
-      Remanent_state.internal_formula_constraints_list
-
     module AgentProj =
       Map_wrapper.Proj
         (Ckappa_sig.Agent_map_and_set)
@@ -1917,13 +1914,6 @@ functor
         (compute_internal_constraints_list
            Remanent_state.get_internal_constraints_list)
 
-    let get_internal_formula_constraints_list =
-      get_gen ~do_we_show_title:title_only_in_kasa
-        ~log_title:"Extract refinement lemmas with formulas"
-        Remanent_state.get_internal_formula_constraints_list
-        (compute_internal_constraints_list
-           Remanent_state.get_internal_formula_constraints_list)
-
     let compute_constraints_list _show_title state =
       let error = Remanent_state.get_errors state in
       let state, internal_constraints_list =
@@ -1935,19 +1925,45 @@ functor
             let error, current_list =
               List.fold_left
                 (fun (error, current_list) lem ->
-                  let hyp = Public_data.get_hyp lem in
-                  let refine = Public_data.get_refinement lem in
-                  let string_version =
-                    Site_graphs.KaSa_site_graph.get_string_version hyp
-                  in
-                  let error, site_graph =
-                    Ckappa_site_graph.site_graph_to_list error string_version
-                  in
-                  let error, refinement =
-                    Ckappa_site_graph.site_graph_list_to_list error refine
-                  in
-                  let lemma =
-                    { Public_data.hyp = site_graph; Public_data.refinement }
+                  let error, lemma =
+                    match lem with
+                    | Public_data.Refinement lem ->
+                      let hyp = Public_data.get_hyp lem in
+                      let refine = Public_data.get_refinement lem in
+                      let string_version =
+                        Site_graphs.KaSa_site_graph.get_string_version hyp
+                      in
+                      let error, site_graph =
+                        Ckappa_site_graph.site_graph_to_list error
+                          string_version
+                      in
+                      let error, refinement =
+                        Ckappa_site_graph.site_graph_list_to_list error refine
+                      in
+                      ( error,
+                        Public_data.Refinement
+                          {
+                            Public_data.hyp = site_graph;
+                            Public_data.refinement;
+                          } )
+                    | Public_data.Formula lem ->
+                      let pattern = Public_data.get_pattern lem in
+                      let reachability_condition =
+                        Public_data.get_reachability_condition lem
+                      in
+                      let string_version =
+                        Site_graphs.KaSa_site_graph.get_string_version pattern
+                      in
+                      let error, site_graph =
+                        Ckappa_site_graph.site_graph_to_list error
+                          string_version
+                      in
+                      ( error,
+                        Public_data.Formula
+                          {
+                            Public_data.pattern = site_graph;
+                            Public_data.reachability_condition;
+                          } )
                   in
                   let current_list = lemma :: current_list in
                   error, current_list)
@@ -1964,67 +1980,13 @@ functor
       let state = Remanent_state.set_errors error state in
       state, constraints_list
 
-    let compute_formula_constraints_list _show_title state =
-      let error = Remanent_state.get_errors state in
-      let state, internal_formula_constraints_list =
-        get_internal_formula_constraints_list state
-      in
-      let error, formula_constraints_list =
-        List.fold_left
-          (fun (error, constraints_list) (domain_name, lemma_list) ->
-            let error, current_list =
-              List.fold_left
-                (fun (error, current_list) lem ->
-                  let pattern = Public_data.get_pattern lem in
-                  let reachability_condition =
-                    Public_data.get_reachability_condition lem
-                  in
-                  let string_version =
-                    Site_graphs.KaSa_site_graph.get_string_version pattern
-                  in
-                  let error, site_graph =
-                    Ckappa_site_graph.site_graph_to_list error string_version
-                  in
-                  let lemma =
-                    {
-                      Public_data.pattern = site_graph;
-                      Public_data.reachability_condition;
-                    }
-                  in
-                  let current_list = lemma :: current_list in
-                  error, current_list)
-                (error, []) lemma_list
-            in
-            (*------------------------------------------------------*)
-            let pair_list =
-              (domain_name, List.rev current_list) :: constraints_list
-            in
-            error, pair_list)
-          (error, []) internal_formula_constraints_list
-      in
-      let state =
-        Remanent_state.set_formula_constraints_list formula_constraints_list
-          state
-      in
-      let state = Remanent_state.set_errors error state in
-      state, formula_constraints_list
-
     let get_constraints_list =
       get_gen ~do_we_show_title:title_only_in_kasa
         ~log_title:"translate refinement lemmas"
         Remanent_state.get_constraints_list compute_constraints_list
 
-    let get_formula_constraints_list =
-      get_gen ~do_we_show_title:title_only_in_kasa
-        ~log_title:"translate constraints with a formula"
-        Remanent_state.get_formula_constraints_list
-        compute_formula_constraints_list
-
     let output_internal_constraints_list ?logger state =
       let state, constraints_list = get_internal_constraints_list state in
-      let state, formula_constraints_list =
-        get_internal_formula_constraints_list state
-      in
       let parameters = Remanent_state.get_parameters state in
       let error = Remanent_state.get_errors state in
       let state, kappa_handler = get_handler state in
@@ -2033,20 +1995,12 @@ functor
         Ckappa_site_graph.print_internal_pattern ?logger parameters error
           kappa_handler constraints_list
       in
-      let error =
-        Ckappa_site_graph.print_internal_pattern_with_formula ?logger parameters
-          error kappa_handler formula_constraints_list
-      in
       let state = Remanent_state.set_errors error state in
       state
 
     let get_constraints_list_to_json state =
       let state, constraints_list = get_constraints_list state in
       state, Remanent_state.lemmas_list_to_json constraints_list
-
-    let get_formula_constraints_list_to_json state =
-      let state, constraints_list = get_formula_constraints_list state in
-      state, Remanent_state.formula_lemmas_list_to_json constraints_list
 
     (*********************************************************)
     (*Symmetries*)

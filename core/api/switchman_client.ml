@@ -37,9 +37,6 @@ type _ handle =
   | Transitions_kasa : (Public_data.rule * (string * string) list) list handle
   | Constraints_kasa
       : (string * Public_data.agent list Public_data.lemma list) list handle
-  | Formula_constraints_kasa
-      : (string * Public_data.agent list Public_data.formula_lemma list) list
-        handle
   | Polymers_kasa
       : (Public_data.accuracy_level
         * Public_data.accuracy_level
@@ -137,10 +134,6 @@ let receive mailbox x =
              let json = read_result Yojson.Basic.read_json p lb in
              Lwt.wakeup thread
                (Result_util.map Public_data.lemmas_list_of_json json)
-           | B (Formula_constraints_kasa, thread) ->
-             let json = read_result Yojson.Basic.read_json p lb in
-             Lwt.wakeup thread
-               (Result_util.map Public_data.formula_lemmas_list_of_json json)
            | B (Polymers_kasa, thread) ->
              let json = read_result Yojson.Basic.read_json p lb in
              Lwt.wakeup thread (Result_util.map Public_data.scc_of_json json)
@@ -392,11 +385,6 @@ class virtual new_client ~is_running ~post mailbox =
       self#message Constraints_kasa (fun b ->
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "CONSTRAINTS") ])
-
-    method get_formula_constraints_list =
-      self#message Formula_constraints_kasa (fun b ->
-          JsonUtil.write_sequence b
-            [ (fun b -> Yojson.Basic.write_string b "FORMULA_CONSTRAINTS") ])
 
     method get_potential_polymers accuracy_cm accuracy_scc =
       self#message Polymers_kasa (fun b ->

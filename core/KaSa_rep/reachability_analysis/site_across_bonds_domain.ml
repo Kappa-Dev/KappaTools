@@ -1731,10 +1731,11 @@ module Domain = struct
               (error, pattern) l
           in
           let new_constraint =
-            {
-              Public_data.pattern;
-              Public_data.reachability_condition = formula;
-            }
+            Public_data.Formula
+              {
+                Public_data.pattern;
+                Public_data.reachability_condition = formula;
+              }
           in
           let formula_constraints_list =
             new_constraint :: formula_constraints_list
@@ -1752,9 +1753,9 @@ module Domain = struct
     let domain_name = "Connected agents" in
     let restriction_bdu = get_restriction_mvbdu static in
     let nsites = Handler.get_nsites kappa_handler in
-    let error, (handler, current_list, current_formula_list) =
+    let error, (handler, current_list) =
       Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
-        (fun tuple mvbdu (error, (handler, current_list, current_formula_list)) ->
+        (fun tuple mvbdu (error, (handler, current_list)) ->
           let ( (agent_type1, site_type1, site_type1', _),
                 (agent_type2, site_type2, site_type2', _) ) =
             tuple
@@ -1765,7 +1766,7 @@ module Domain = struct
           in
           (*this test remove the relation: B.A*)
           if compare (agent1, site1, site1') (agent2, site2, site2') > 0 then
-            error, (handler, current_list, current_formula_list)
+            error, (handler, current_list)
           else (
             (*this test remove the relation when their states are not the
               same: for instance: A(x~p), B(x~u)*)
@@ -1780,7 +1781,7 @@ module Domain = struct
                 error, handler, false
             in
             if non_relational then
-              error, (handler, current_list, current_formula_list)
+              error, (handler, current_list)
             else (
               (*----------------------------------------------------*)
               let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
@@ -1814,10 +1815,8 @@ module Domain = struct
                       nsites kappa_handler agent_id1 site_type1' agent_id2
                       site_type2' pattern pair_list
                   in
-                  let current_formula_list =
-                    new_constraints @ current_formula_list
-                  in
-                  error, (handler, current_list, current_formula_list)
+                  let current_list = new_constraints @ current_list in
+                  error, (handler, current_list)
                 ) else (
                   (*---------------------------------------------------*)
                   (*internal constraint list*)
@@ -1827,21 +1826,22 @@ module Domain = struct
                       agent_id2 site_type2' pair_list
                   in
                   let lemma_internal =
-                    {
-                      Public_data.hyp = pattern;
-                      Public_data.refinement = refine;
-                    }
+                    Public_data.Refinement
+                      {
+                        Public_data.hyp = pattern;
+                        Public_data.refinement = refine;
+                      }
                   in
                   let current_list = lemma_internal :: current_list in
                   (*---------------------------------------------------*)
-                  error, (handler, current_list, current_formula_list)
+                  error, (handler, current_list)
                 )
               | Remanent_parameters_sig.Natural_language ->
-                error, (handler, current_list, current_formula_list)
+                error, (handler, current_list)
             )
           ))
         store_value
-        (error, (handler, [], []))
+        (error, (handler, []))
     in
     (*------------------------------------------------------------------*)
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -1860,21 +1860,6 @@ module Domain = struct
     in
     let kasa_state =
       Remanent_state.set_internal_constraints_list pair_list kasa_state
-    in
-    let internal_formula_constraints_list =
-      Remanent_state.get_internal_formula_constraints_list kasa_state
-    in
-    let internal_formula_constraints_list =
-      match internal_formula_constraints_list with
-      | None -> []
-      | Some l -> l
-    in
-    let pair_list =
-      (domain_name, List.rev current_formula_list)
-      :: internal_formula_constraints_list
-    in
-    let kasa_state =
-      Remanent_state.set_internal_formula_constraints_list pair_list kasa_state
     in
     error, dynamic, kasa_state
 

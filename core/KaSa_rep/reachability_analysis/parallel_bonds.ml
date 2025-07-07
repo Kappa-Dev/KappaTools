@@ -1480,14 +1480,16 @@ module Domain = struct
       | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
         (*internal constraint list*)
         let lemma_internal =
-          { Public_data.hyp = t_1; Public_data.refinement = refine }
+          Public_data.Refinement
+            { Public_data.hyp = t_1; Public_data.refinement = refine }
         in
         let current_list = lemma_internal :: current_list in
         error, bdu_handler, current_list
       | Remanent_parameters_sig.Natural_language ->
         (*internal constraint list*)
         let lemma_internal =
-          { Public_data.hyp = t_2; Public_data.refinement = refine }
+          Public_data.Refinement
+            { Public_data.hyp = t_2; Public_data.refinement = refine }
         in
         let current_list = lemma_internal :: current_list in
         error, bdu_handler, current_list
@@ -1504,13 +1506,15 @@ module Domain = struct
         (*internal*)
         let refine = List.rev list_same in
         let lemma_internal =
-          { Public_data.hyp = t_same; Public_data.refinement = refine }
+          Public_data.Refinement
+            { Public_data.hyp = t_same; Public_data.refinement = refine }
         in
         let current_list = lemma_internal :: current_list in
         (*----------------------------------------------*)
         let refine = List.rev list_distinct in
         let lemma_internal =
-          { Public_data.hyp = t_distinct; Public_data.refinement = refine }
+          Public_data.Refinement
+            { Public_data.hyp = t_distinct; Public_data.refinement = refine }
         in
         let current_list = lemma_internal :: current_list in
         error, bdu_handler, current_list
@@ -1526,10 +1530,11 @@ module Domain = struct
           bdu_handler mvbdu
       in
       let lemma_internal =
-        {
-          Public_data.pattern = t_1;
-          Public_data.reachability_condition = formula;
-        }
+        Public_data.Formula
+          {
+            Public_data.pattern = t_1;
+            Public_data.reachability_condition = formula;
+          }
       in
       let current_list = lemma_internal :: current_list in
       error, bdu_handler, current_list
@@ -1549,10 +1554,9 @@ module Domain = struct
     let bdu_handler = get_mvbdu_handler dynamic in
     let restriction_bdu = get_restriction_mvbdu static in
     (*string * 'site_graph lemma list : head*)
-    let error, bdu_handler, current_lemma_list, current_formula_list =
+    let error, bdu_handler, current_lemma_list =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
-        (fun tuple value
-             (error, bdu_handler, current_lemma_list, current_formula_list) ->
+        (fun tuple value (error, bdu_handler, current_lemma_list) ->
           let ( error,
                 bdu_handler,
                 parallel_bond_mvbdu,
@@ -1659,17 +1663,17 @@ module Domain = struct
           in
           (*--------------------------------------------------------*)
           if compare site site' > 0 then
-            error, bdu_handler, current_lemma_list, current_formula_list
+            error, bdu_handler, current_lemma_list
           else if
             (*--------------------------------------------------*)
             depends_on_parameters
           then (
-            let error, bdu_handler, current_formula_list =
+            let error, bdu_handler, current_lemma_list =
               export_with_formula parameters error kappa_handler bdu_handler
-                parallel_bond_mvbdu non_parallel_bond_mvbdu current_formula_list
+                parallel_bond_mvbdu non_parallel_bond_mvbdu current_lemma_list
                 parallel_is_true non_parallel_is_true t_same t_distinct
             in
-            error, bdu_handler, current_lemma_list, current_formula_list
+            error, bdu_handler, current_lemma_list
           ) else (
             let error, bdu_handler, current_lemma_list =
               export_without_formula parameters bdu_handler error list_same
@@ -1677,19 +1681,15 @@ module Domain = struct
                 parallel_is_false non_parallel_is_true non_parallel_is_false
                 current_lemma_list
             in
-            error, bdu_handler, current_lemma_list, current_formula_list
+            error, bdu_handler, current_lemma_list
           ))
-        store_value
-        (error, bdu_handler, [], [])
+        store_value (error, bdu_handler, [])
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
     let internal_constraints_list =
       Remanent_state.get_internal_constraints_list kasa_state
-    in
-    let internal_formula_constraints_list =
-      Remanent_state.get_internal_formula_constraints_list kasa_state
     in
     let error, internal_constraints_list =
       match internal_constraints_list with
@@ -1701,18 +1701,6 @@ module Domain = struct
     in
     let kasa_state =
       Remanent_state.set_internal_constraints_list pair_list kasa_state
-    in
-    let internal_formula_constraints_list =
-      match internal_formula_constraints_list with
-      | None -> []
-      | Some l -> l
-    in
-    let pair_list =
-      (domain_name, List.rev current_formula_list)
-      :: internal_formula_constraints_list
-    in
-    let kasa_state =
-      Remanent_state.set_internal_formula_constraints_list pair_list kasa_state
     in
     error, dynamic, kasa_state
 

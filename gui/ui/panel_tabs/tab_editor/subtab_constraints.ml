@@ -8,7 +8,6 @@
 
 module Html = Tyxml_js.Html5
 open Lwt.Infix
-open Lwt.Syntax
 
 let navli () = ReactiveData.RList.empty
 let tab_is_active, set_tab_is_active = React.S.create false
@@ -22,72 +21,57 @@ let tab_was_active = ref false
 *)
 
 let content () =
+  let print_refinement_constraint lemma list =
+    let hyp = Public_data.get_hyp lemma in
+    let conclusion = Public_data.get_refinement lemma in
+    let list =
+      match conclusion with
+      | [ site_graph ] ->
+        Html_utility.print_site_graph site_graph
+          (Html_utility.print_newline list)
+      | _ :: _ | [] ->
+        let list = Html_utility.print_newline list in
+        let list = Html_utility.print_string " ]" list in
+        let list =
+          snd
+            (List.fold_left
+               (fun (bool, list) a ->
+                 let list =
+                   if bool then
+                     Html_utility.print_string " v " list
+                   else
+                     list
+                 in
+                 let list = Html_utility.print_site_graph a list in
+                 true, list)
+               (false, list) (List.rev conclusion))
+        in
+        let list = Html_utility.print_string "[ " list in
+        list
+    in
+    let list = Html_utility.print_string "  =>  " list in
+    let list = Html_utility.print_site_graph hyp list in
+    list
+  in
+  let print_formula_constraint lemma list =
+    let list = Html_utility.print_newline list in
+    let pattern = Public_data.get_pattern lemma in
+    let formula = Public_data.get_reachability_condition lemma in
+    let list = Html_utility.print_formula formula list in
+    let list = Html_utility.print_string "  =>  " list in
+    let list = Html_utility.print_site_graph pattern list in
+    list
+  in
   let add_constraints constraints =
     List.fold_left
       (fun panels (a, b) ->
-        (*match b with
-           | [] -> panels
-             | _ :: _ ->*)
         let texts =
           List.fold_left
             (fun list lemma ->
-              let hyp = Public_data.get_hyp lemma in
-              let conclusion = Public_data.get_refinement lemma in
-              let list =
-                match conclusion with
-                | [ site_graph ] ->
-                  Html_utility.print_site_graph site_graph
-                    (Html_utility.print_newline list)
-                | _ :: _ | [] ->
-                  let list = Html_utility.print_newline list in
-                  let list = Html_utility.print_string " ]" list in
-                  let list =
-                    snd
-                      (List.fold_left
-                         (fun (bool, list) a ->
-                           let list =
-                             if bool then
-                               Html_utility.print_string " v " list
-                             else
-                               list
-                           in
-                           let list = Html_utility.print_site_graph a list in
-                           true, list)
-                         (false, list) (List.rev conclusion))
-                  in
-                  let list = Html_utility.print_string "[ " list in
-                  list
-              in
-              let list = Html_utility.print_string "  =>  " list in
-              let list = Html_utility.print_site_graph hyp list in
-              list)
-            [] (List.rev b)
-        in
-        let title =
-          Html.div ~a:[ Html.a_class [ "panel-heading" ] ] [ Html.txt a ]
-        in
-        let content =
-          Html.div ~a:[ Html.a_class [ "panel-body"; "panel-pre" ] ] texts
-        in
-        Html.div
-          ~a:[ Html.a_class [ "panel"; "panel-default" ] ]
-          [ title; content ]
-        :: panels)
-      [] constraints
-  in
-  let add_formula_constraints constraints =
-    List.fold_left
-      (fun panels (a, b) ->
-        let texts =
-          List.fold_left
-            (fun list lemma ->
-              let list = Html_utility.print_newline list in
-              let pattern = Public_data.get_pattern lemma in
-              let formula = Public_data.get_reachability_condition lemma in
-              let list = Html_utility.print_formula formula list in
-              let list = Html_utility.print_string "  =>  " list in
-              let list = Html_utility.print_site_graph pattern list in
-              list)
+              match lemma with
+              | Public_data.Refinement lemma ->
+                print_refinement_constraint lemma list
+              | Public_data.Formula lemma -> print_formula_constraint lemma list)
             [] (List.rev b)
         in
         let title =
@@ -129,16 +113,8 @@ let content () =
   let constraints_div =
     State_project.on_project_change_async ~on:tab_is_active ()
       (React.S.const ()) [] (fun (manager : Api.concrete_manager) () ->
-        let* out =
-          manager#get_constraints_list
-          >|= Result_util.fold ~ok:add_constraints ~error:print_error_message
-        in
-        let* out_formulas =
-          manager#get_formula_constraints_list
-          >|= Result_util.fold ~ok:add_formula_constraints
-                ~error:print_error_message
-        in
-        Lwt.return (out @ out_formulas))
+        manager#get_constraints_list
+        >|= Result_util.fold ~ok:add_constraints ~error:print_error_message)
   in
   [
     Tyxml_js.R.Html5.div

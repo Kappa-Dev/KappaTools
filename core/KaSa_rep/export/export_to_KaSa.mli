@@ -20,10 +20,6 @@ module type Type = sig
   type contact_map = Public_data.contact_map
   type internal_influence_map = Remanent_state.internal_influence_map
   type internal_constraints_list = Remanent_state.internal_constraints_list
-
-  type internal_formula_constraints_list =
-    Remanent_state.internal_formula_constraints_list
-
   type bidirectional_influence_map
 
   val empty_constraints_list : internal_constraints_list
@@ -83,10 +79,6 @@ module type Type = sig
 
   val get_reachability_analysis : state -> state * reachability_analysis
   val get_constraints_list : state -> state * internal_constraints_list
-
-  val get_formula_constraints_list :
-    state -> state * internal_formula_constraints_list
-
   val get_ctmc_flow : state -> state * ctmc_flow
   val get_ode_flow : state -> state * ode_flow
 

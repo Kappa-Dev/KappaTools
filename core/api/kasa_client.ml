@@ -214,13 +214,6 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
               Public_data.lemmas_list_of_json x |> Result_util.ok |> Lwt.return)
 
-    method get_formula_constraints_list =
-      let request = `List [ `String "FORMULA_CONSTRAINTS" ] in
-      self#message request
-      >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
-              Public_data.formula_lemmas_list_of_json x
-              |> Result_util.ok |> Lwt.return)
-
     method get_potential_polymers accuracy_cm accuracy_scc =
       let request =
         `List

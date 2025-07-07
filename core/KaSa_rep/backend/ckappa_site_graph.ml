@@ -32,43 +32,59 @@ let print_internal_pattern_aux ?logger parameters error _kappa_handler
       "------------------------------------------------------------\n"
   in
   List.fold_left
-    (fun (error, _) lemma ->
-      let hyp = Public_data.get_hyp lemma in
-      let refinement = Public_data.get_refinement lemma in
-      let error =
-        Site_graphs.KaSa_site_graph.print logger parameters error hyp
-      in
-      let () = Loggers.fprintf logger "=> [" in
-      let error, b =
-        match refinement with
-        | [] -> error, false
-        | [ hyp ] ->
-          Site_graphs.KaSa_site_graph.print logger parameters error hyp, false
-        | _ :: _ as l ->
-          List.fold_left
-            (fun (error, bool) hyp ->
-              let () =
-                Loggers.print_newline
-                  (Remanent_parameters.get_logger parameters)
-              in
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  (if bool then
-                     "\t\tv "
-                   else
-                     "\t\t  ")
-              in
-              let error =
-                Site_graphs.KaSa_site_graph.print logger parameters error hyp
-              in
-              error, true)
-            (error, false) (List.rev l)
-      in
-      let () = Loggers.fprintf logger "]" in
-      let () = Loggers.print_newline logger in
-      error, b)
-    (error, false) lemma_list
+    (fun error lemma ->
+      match lemma with
+      | Public_data.Refinement lemma ->
+        let hyp = Public_data.get_hyp lemma in
+        let refinement = Public_data.get_refinement lemma in
+        let error =
+          Site_graphs.KaSa_site_graph.print logger parameters error hyp
+        in
+        let () = Loggers.fprintf logger "=> [" in
+        let error =
+          match refinement with
+          | [] -> error
+          | [ hyp ] ->
+            Site_graphs.KaSa_site_graph.print logger parameters error hyp
+          | _ :: _ as l ->
+            let error, _ =
+              List.fold_left
+                (fun (error, bool) hyp ->
+                  let () =
+                    Loggers.print_newline
+                      (Remanent_parameters.get_logger parameters)
+                  in
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger parameters)
+                      (if bool then
+                         "\t\tv "
+                       else
+                         "\t\t  ")
+                  in
+                  let error =
+                    Site_graphs.KaSa_site_graph.print logger parameters error
+                      hyp
+                  in
+                  error, true)
+                (error, false) (List.rev l)
+            in
+            error
+        in
+        let () = Loggers.fprintf logger "]" in
+        let () = Loggers.print_newline logger in
+        error
+      | Public_data.Formula lemma ->
+        let pattern = Public_data.get_pattern lemma in
+        let formula = Public_data.get_reachability_condition lemma in
+        let error =
+          Site_graphs.KaSa_site_graph.print logger parameters error pattern
+        in
+        let () = Loggers.fprintf logger " => " in
+        let () = Handler.print_formula parameters formula in
+        let () = Loggers.print_newline logger in
+        error)
+    error lemma_list
 
 (*print the information as the output of non relational properties*)
 let print_internal_pattern ?logger parameters error kappa_handler list =
@@ -80,7 +96,7 @@ let print_internal_pattern ?logger parameters error kappa_handler list =
   let error =
     List.fold_left
       (fun error pattern ->
-        let error, _ =
+        let error =
           print_internal_pattern_aux ?logger parameters error kappa_handler
             pattern
         in
@@ -89,61 +105,6 @@ let print_internal_pattern ?logger parameters error kappa_handler list =
       error list
   in
   error
-
-let print_internal_pattern_with_formula_aux ?logger parameters error
-    _kappa_handler internal_formula_constraints_list =
-  let logger =
-    match logger with
-    | None -> Remanent_parameters.get_logger parameters
-    | Some a -> a
-  in
-  let domain_name, lemma_list = internal_formula_constraints_list in
-  let () =
-    Loggers.fprintf logger
-      "------------------------------------------------------------\n";
-    Loggers.fprintf logger
-      "* Export %s to JSon (internal formula_constraints_list):\n" domain_name;
-    Loggers.fprintf logger
-      "------------------------------------------------------------\n"
-  in
-  List.fold_left
-    (fun error lemma ->
-      let pattern = Public_data.get_pattern lemma in
-      let formula = Public_data.get_reachability_condition lemma in
-      let error =
-        Site_graphs.KaSa_site_graph.print logger parameters error pattern
-      in
-      let () = Loggers.fprintf logger " => " in
-      let () = Handler.print_formula parameters formula in
-      let () = Loggers.print_newline logger in
-      error)
-    error lemma_list
-
-let print_internal_pattern_with_formula ?logger parameters error kappa_handler
-    list =
-  if List.length list > 0 then (
-    let logger' =
-      match logger with
-      | None -> Remanent_parameters.get_logger parameters
-      | Some a -> a
-    in
-    let error =
-      List.fold_left
-        (fun error (name, pattern) ->
-          if List.length pattern > 0 then (
-            let error =
-              print_internal_pattern_with_formula_aux ?logger parameters error
-                kappa_handler (name, pattern)
-            in
-            let () = Loggers.print_newline logger' in
-            error
-          ) else
-            error)
-        error list
-    in
-    error
-  ) else
-    error
 
 (***************************************************************************)
 

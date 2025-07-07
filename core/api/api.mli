@@ -149,10 +149,6 @@ class type manager_static_analysis = object
   method get_constraints_list :
     (string * Public_data.agent list Public_data.lemma list) list result Lwt.t
 
-  method get_formula_constraints_list :
-    (string * Public_data.agent list Public_data.formula_lemma list) list result
-    Lwt.t
-
   method get_potential_polymers :
     Public_data.accuracy_level option ->
     Public_data.accuracy_level option ->

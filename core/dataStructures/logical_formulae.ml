@@ -97,29 +97,34 @@ and print_arg acc f_print_string scheme formula =
 
 let rec formula_to_json value_to_json g =
   match g with
-  | True -> `Assoc [ "type", `String "True" ]
-  | False -> `Assoc [ "type", `String "False" ]
-  | P value -> `Assoc [ "type", `String "Param"; "value", value_to_json value ]
+  | True -> `Assoc [ "type", JsonUtil.of_string "True" ]
+  | False -> `Assoc [ "type", JsonUtil.of_string "False" ]
+  | P value ->
+    `Assoc [ "type", JsonUtil.of_string "Param"; "value", value_to_json value ]
   | NOT g1 ->
-    `Assoc [ "type", `String "Not"; "guard", formula_to_json value_to_json g1 ]
+    `Assoc
+      [
+        "type", JsonUtil.of_string "Not";
+        "guard", formula_to_json value_to_json g1;
+      ]
   | AND (g1, g2) ->
     `Assoc
       [
-        "type", `String "And";
+        "type", JsonUtil.of_string "And";
         "left", formula_to_json value_to_json g1;
         "right", formula_to_json value_to_json g2;
       ]
   | OR (g1, g2) ->
     `Assoc
       [
-        "type", `String "Or";
+        "type", JsonUtil.of_string "Or";
         "left", formula_to_json value_to_json g1;
         "right", formula_to_json value_to_json g2;
       ]
   | IMPLY (g1, g2) ->
     `Assoc
       [
-        "type", `String "Imply";
+        "type", JsonUtil.of_string "Imply";
         "left", formula_to_json value_to_json g1;
         "right", formula_to_json value_to_json g2;
       ]
@@ -127,35 +132,36 @@ let rec formula_to_json value_to_json g =
 let rec formula_of_json value_of_json json =
   match json with
   | `Assoc fields ->
-    (match List.assoc "type" fields with
-    | `String "True" -> True
-    | `String "False" -> False
-    | `String "Param" ->
-      let value_json = List.assoc "value" fields in
-      P (value_of_json value_json)
-    | `String "Not" ->
-      let guard_json = List.assoc "guard" fields in
-      NOT (formula_of_json value_of_json guard_json)
-    | `String "And" ->
-      let left_json = List.assoc "left" fields in
-      let right_json = List.assoc "right" fields in
-      AND
-        ( formula_of_json value_of_json left_json,
-          formula_of_json value_of_json right_json )
-    | `String "Or" ->
-      let left_json = List.assoc "left" fields in
-      let right_json = List.assoc "right" fields in
-      OR
-        ( formula_of_json value_of_json left_json,
-          formula_of_json value_of_json right_json )
-    | `String "Imply" ->
-      let left_json = List.assoc "left" fields in
-      let right_json = List.assoc "right" fields in
-      IMPLY
-        ( formula_of_json value_of_json left_json,
-          formula_of_json value_of_json right_json )
-    | `String unknown -> failwith ("Unknown guard type: " ^ unknown)
-    | _ -> raise (Yojson.Basic.Util.Type_error ("Incorrect guard", json)))
+    (try
+       match List.assoc "type" fields with
+       | `String "True" -> True
+       | `String "False" -> False
+       | `String "Param" ->
+         let value_json = List.assoc "value" fields in
+         P (value_of_json value_json)
+       | `String "Not" ->
+         let guard_json = List.assoc "guard" fields in
+         NOT (formula_of_json value_of_json guard_json)
+       | `String "And" ->
+         let left_json = List.assoc "left" fields in
+         let right_json = List.assoc "right" fields in
+         AND
+           ( formula_of_json value_of_json left_json,
+             formula_of_json value_of_json right_json )
+       | `String "Or" ->
+         let left_json = List.assoc "left" fields in
+         let right_json = List.assoc "right" fields in
+         OR
+           ( formula_of_json value_of_json left_json,
+             formula_of_json value_of_json right_json )
+       | `String "Imply" ->
+         let left_json = List.assoc "left" fields in
+         let right_json = List.assoc "right" fields in
+         IMPLY
+           ( formula_of_json value_of_json left_json,
+             formula_of_json value_of_json right_json )
+       | _ -> raise (Yojson.Basic.Util.Type_error ("Incorrect guard", json))
+     with _ -> raise (Yojson.Basic.Util.Type_error ("Incorrect guard", json)))
   | _ -> raise (Yojson.Basic.Util.Type_error ("Incorrect guard", json))
 
 let rec convert_p convert error g =

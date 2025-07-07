@@ -1109,7 +1109,8 @@ functor
                   __POS__ Exit
               in
               ( error,
-                { Public_data.hyp = t; Public_data.refinement = [ t' ] }
+                Public_data.Refinement
+                  { Public_data.hyp = t; Public_data.refinement = [ t' ] }
                 :: current_list ))
           counters_set (error, current_list)
       in

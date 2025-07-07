@@ -3615,24 +3615,23 @@ module Domain = struct
       Exception.check_point Exception.warn parameters error error' __POS__ Exit
     in
     (*store the information for relational properties*)
-    let error', bdu_handler, current_list, current_formula_list =
+    let error', bdu_handler, current_list =
       List.fold_left
-        (fun (error, bdu_handler, current_list, current_formula_list)
+        (fun (error, bdu_handler, current_list)
              (agent_string, agent_type, _, translation) ->
-          let error', bdu_handler, current_list, current_formula_list =
+          let error', bdu_handler, current_list =
             Translation_in_natural_language
             .convert_views_internal_constraints_list
               ~show_dep_with_dimmension_higher_than:dim_min parameters
               handler_kappa bdu_handler error agent_string agent_type
-              translation current_list current_formula_list restriction_bdu
+              translation current_list restriction_bdu
           in
           let error =
             Exception.check_point Exception.warn parameters error error' __POS__
               Exit
           in
-          error, bdu_handler, current_list, current_formula_list)
-        (error, bdu_handler, [], [])
-        list
+          error, bdu_handler, current_list)
+        (error, bdu_handler, []) list
     in
     let error =
       Exception.check_point Exception.warn parameters error error' __POS__ Exit
@@ -3650,8 +3649,12 @@ module Domain = struct
       if sort then
         Tools_kasa.sort_list
           (fun parameters error lemma ->
-            Site_graphs.KaSa_site_graph.to_string parameters error
-              lemma.Public_data.hyp)
+            let hyp =
+              match lemma with
+              | Public_data.Refinement lemma -> Public_data.get_hyp lemma
+              | Public_data.Formula lemma -> Public_data.get_pattern lemma
+            in
+            Site_graphs.KaSa_site_graph.to_string parameters error hyp)
           parameters error current_list
       else
         error, current_list
@@ -3659,30 +3662,6 @@ module Domain = struct
     let pair_list = (domain_name, current_list) :: internal_constraints_list in
     let kasa_state =
       Remanent_state.set_internal_constraints_list pair_list kasa_state
-    in
-    let internal_formula_constraints_list =
-      Remanent_state.get_internal_formula_constraints_list kasa_state
-    in
-    let internal_formula_constraints_list =
-      match internal_formula_constraints_list with
-      | None -> []
-      | Some l -> l
-    in
-    let error, current_formula_list =
-      if sort then
-        Tools_kasa.sort_list
-          (fun parameters error lemma ->
-            Site_graphs.KaSa_site_graph.to_string parameters error
-              lemma.Public_data.pattern)
-          parameters error current_formula_list
-      else
-        error, current_formula_list
-    in
-    let pair_list =
-      (domain_name, current_formula_list) :: internal_formula_constraints_list
-    in
-    let kasa_state =
-      Remanent_state.set_internal_formula_constraints_list pair_list kasa_state
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, kasa_state

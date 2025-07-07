@@ -1249,7 +1249,10 @@ let rec convert_views_internal_constraints_list_aux
                 error, t' :: c_list)
               (error, []) state_list
           in
-          let lemma = { Public_data.hyp = t; Public_data.refinement } in
+          let lemma =
+            Public_data.Refinement
+              { Public_data.hyp = t; Public_data.refinement }
+          in
           let current_list = lemma :: current_list in
           let error =
             Exception.check_point Exception.warn parameters error error''
@@ -1289,7 +1292,8 @@ let rec convert_views_internal_constraints_list_aux
           in
           (*--------------------------------------------------*)
           let lemma =
-            { Public_data.hyp = t'; Public_data.refinement = [ t'' ] }
+            Public_data.Refinement
+              { Public_data.hyp = t'; Public_data.refinement = [ t'' ] }
           in
           let current_list = lemma :: current_list in
           error, List.rev current_list
@@ -1319,12 +1323,8 @@ let rec convert_views_internal_constraints_list_aux
           in
           (*--------------------------------------------------*)
           let lemma =
-            {
-              (*Remanent_state.hyp = site_graph ;
-                Remanent_state.refinement = [site_graph']*)
-              Public_data.hyp = t;
-              Public_data.refinement = [ t' ];
-            }
+            Public_data.Refinement
+              { Public_data.hyp = t; Public_data.refinement = [ t' ] }
           in
           let current_list = lemma :: current_list in
           error, List.rev current_list
@@ -1356,9 +1356,6 @@ let rec convert_views_internal_constraints_list_aux
               Exception.check_point Exception.warn parameters error error''
                 __POS__ Exit
             in
-            (*let _ =
-                Loggers.fprintf (Remanent_parameters.get_logger parameters) "test1\n"
-              in*)
             error, current_list)
           (error, current_list) list
       in
@@ -1394,7 +1391,10 @@ let rec convert_views_internal_constraints_list_aux
               __POS__ Exit
           in
           (*----------------------------------------*)
-          let lemma = { Public_data.hyp = t; Public_data.refinement } in
+          let lemma =
+            Public_data.Refinement
+              { Public_data.hyp = t; Public_data.refinement }
+          in
           let current_list = lemma :: current_list in
           error, current_list
         in
@@ -1406,7 +1406,7 @@ let rec convert_views_internal_constraints_list_aux
 let convert_views_internal_constraints_list
     ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa
     bdu_handler error agent_string agent_type translation current_list
-    current_formula_list restriction_bdu =
+    restriction_bdu =
   let nsites = Handler.get_nsites handler_kappa in
   let t = Site_graphs.KaSa_site_graph.empty in
   let error', agent_id, t =
@@ -1416,7 +1416,7 @@ let convert_views_internal_constraints_list
   let error =
     Exception.check_point Exception.warn parameters error error' __POS__ Exit
   in
-  let error, bdu_handler, current_list, current_formula_list =
+  let error, bdu_handler, current_list =
     match translation with
     | Range (site, _) ->
       let error, t =
@@ -1428,18 +1428,18 @@ let convert_views_internal_constraints_list
           ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa
           error agent_string agent_type agent_id translation t current_list
       in
-      error, bdu_handler, current_list, current_formula_list
+      error, bdu_handler, current_list
     | Equiv _ | Imply _ | Partition _ | No_known_translation _ ->
       let error, current_list =
         convert_views_internal_constraints_list_aux
           ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa
           error agent_string agent_type agent_id translation t current_list
       in
-      error, bdu_handler, current_list, current_formula_list
+      error, bdu_handler, current_list
     | Valuations_with_guards list ->
-      let error, bdu_handler, current_formula_list =
+      let error, bdu_handler, current_list =
         List.fold_left
-          (fun (error, bdu_handler, current_formula_list) (sites, mvbdu) ->
+          (fun (error, bdu_handler, current_list) (sites, mvbdu) ->
             let error, agent_graph, n =
               List.fold_left
                 (fun (error, agent_graph, n) (site, state) ->
@@ -1466,31 +1466,32 @@ let convert_views_internal_constraints_list
                 Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
                   mvbdu restriction_bdu
               in
-              let error, bdu_handler, current_formula_list =
+              let error, bdu_handler, current_list =
                 if not is_true then (
                   let error, bdu_handler, formula =
                     Handler.mvbdu_to_string_formula parameters error
                       handler_kappa bdu_handler mvbdu
                   in
                   let formula_lemma =
-                    {
-                      Public_data.pattern = agent_graph;
-                      Public_data.reachability_condition = formula;
-                    }
+                    Public_data.Formula
+                      {
+                        Public_data.pattern = agent_graph;
+                        Public_data.reachability_condition = formula;
+                      }
                   in
-                  error, bdu_handler, formula_lemma :: current_formula_list
+                  error, bdu_handler, formula_lemma :: current_list
                 ) else
-                  error, bdu_handler, current_formula_list
+                  error, bdu_handler, current_list
               in
-              error, bdu_handler, current_formula_list
+              error, bdu_handler, current_list
             ) else
-              error, bdu_handler, current_formula_list)
-          (error, bdu_handler, current_formula_list)
+              error, bdu_handler, current_list)
+          (error, bdu_handler, current_list)
           list
       in
-      error, bdu_handler, current_list, current_formula_list
+      error, bdu_handler, current_list
   in
-  error, bdu_handler, current_list, current_formula_list
+  error, bdu_handler, current_list
 
 (*****************************************************************************)
 

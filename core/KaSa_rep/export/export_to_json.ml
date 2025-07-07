@@ -60,7 +60,6 @@ module type Type = sig
   val get_dead_agents : state -> state * Yojson.Basic.t
   val get_separating_transitions : state -> state * Yojson.Basic.t
   val get_constraints_list : state -> state * Yojson.Basic.t
-  val get_formula_constraints_list : state -> state * Yojson.Basic.t
 
   val get_errors :
     state -> Exception_without_parameter.exceptions_caught_and_uncaught
@@ -205,9 +204,6 @@ functor
       state, Public_data.separating_transitions_to_json separating_transitions
 
     let get_constraints_list state = get_constraints_list_to_json state
-
-    let get_formula_constraints_list state =
-      get_formula_constraints_list_to_json state
 
     let get_errors_json state =
       let error = get_errors state in

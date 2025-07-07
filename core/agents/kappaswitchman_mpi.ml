@@ -40,9 +40,6 @@ type _ handle =
   | Transitions_kasa : (Public_data.rule * (string * string) list) list handle
   | Constraints_kasa
       : (string * Public_data.agent list Public_data.lemma list) list handle
-  | Formula_constraints_kasa
-      : (string * Public_data.agent list Public_data.formula_lemma list) list
-        handle
   | Polymers_kasa
       : (Public_data.accuracy_level
         * Public_data.accuracy_level
@@ -266,9 +263,6 @@ let on_message exec_command message_delimiter =
                      | "CONSTRAINTS" ->
                        manager#get_constraints_list >>= fun out ->
                        Lwt.return (B (Constraints_kasa, msg_id, out))
-                     | "FORMULA_CONSTRAINTS" ->
-                       manager#get_formula_constraints_list >>= fun out ->
-                       Lwt.return (B (Formula_constraints_kasa, msg_id, out))
                      | "POLYMERS" ->
                        let acc_cm =
                          JsonUtil.read_next_item Yojson.Basic.read_json st b
@@ -463,12 +457,6 @@ let on_message exec_command message_delimiter =
             reply post
               (fun b n ->
                 Yojson.Basic.write_json b (Public_data.lemmas_list_to_json n))
-              msg_id x
-          | B (Formula_constraints_kasa, msg_id, x) ->
-            reply post
-              (fun b n ->
-                Yojson.Basic.write_json b
-                  (Public_data.formula_lemmas_list_to_json n))
               msg_id x
           | B (Polymers_kasa, msg_id, x) ->
             reply post

@@ -80,9 +80,6 @@ type flow =
 type internal_constraints_list =
   Site_graphs.KaSa_site_graph.t Public_data.poly_constraints_list
 
-type internal_formula_constraints_list =
-  Site_graphs.KaSa_site_graph.t Public_data.poly_formula_constraints_list
-
 type agent =
   string
   * (*agent name*)
@@ -93,13 +90,8 @@ type agent =
 
 type constraints_list = agent list Public_data.poly_constraints_list
 
-type formula_constraints_list =
-  agent list Public_data.poly_formula_constraints_list
-
 val lemmas_list_to_json : constraints_list -> Yojson.Basic.t
 val lemmas_list_of_json : Yojson.Basic.t -> constraints_list
-val formula_lemmas_list_to_json : formula_constraints_list -> Yojson.Basic.t
-val formula_lemmas_list_of_json : Yojson.Basic.t -> formula_constraints_list
 (*******************************************************************)
 
 type symmetric_sites = Symmetries.symmetries option
@@ -421,26 +413,10 @@ val set_internal_constraints_list :
   ('static, 'compile) state ->
   ('static, 'compile) state
 
-val get_internal_formula_constraints_list :
-  ('static, 'compile) state -> internal_formula_constraints_list option
-
-val set_internal_formula_constraints_list :
-  internal_formula_constraints_list ->
-  ('static, 'compile) state ->
-  ('static, 'compile) state
-
 val get_constraints_list : ('static, 'compile) state -> constraints_list option
-
-val get_formula_constraints_list :
-  ('static, 'compile) state -> formula_constraints_list option
 
 val set_constraints_list :
   constraints_list -> ('static, 'compile) state -> ('static, 'compile) state
-
-val set_formula_constraints_list :
-  formula_constraints_list ->
-  ('static, 'compile) state ->
-  ('static, 'compile) state
 
 val get_symmetries :
   Public_data.accuracy_level ->

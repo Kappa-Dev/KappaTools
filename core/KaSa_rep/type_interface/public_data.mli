@@ -13,7 +13,6 @@ val counter : string
 val domain_name : string
 val refinements_list : string
 val refinement_lemmas : string
-val formula_lemmas : string
 val free : string
 val bound : string
 val wildcard : string
@@ -181,12 +180,19 @@ type separating_transitions = (rule * (string * string) list) list
 val separating_transitions_of_json : Yojson.Basic.t -> separating_transitions
 val separating_transitions_to_json : separating_transitions -> Yojson.Basic.t
 
-type 'site_graph lemma = { hyp: 'site_graph; refinement: 'site_graph list }
+type 'site_graph refinement_lemma = {
+  hyp: 'site_graph;
+  refinement: 'site_graph list;
+}
 
 type 'site_graph formula_lemma = {
   pattern: 'site_graph;
   reachability_condition: string formula;
 }
+
+type 'site_graph lemma =
+  | Refinement of 'site_graph refinement_lemma
+  | Formula of 'site_graph formula_lemma
 
 type binding_state =
   | Free
@@ -205,14 +211,15 @@ type agent =
 
 type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
 
-type 'site_graph poly_formula_constraints_list =
-  (string * 'site_graph formula_lemma list) list
+val refinement_lemma_to_json :
+  ('site_graph -> Yojson.Basic.t) ->
+  'site_graph refinement_lemma ->
+  Yojson.Basic.t
 
-val lemma_to_json :
-  ('site_graph -> Yojson.Basic.t) -> 'site_graph lemma -> Yojson.Basic.t
-
-val lemma_of_json :
-  (Yojson.Basic.t -> 'site_graph) -> Yojson.Basic.t -> 'site_graph lemma
+val refinement_lemma_of_json :
+  (Yojson.Basic.t -> 'site_graph) ->
+  Yojson.Basic.t ->
+  'site_graph refinement_lemma
 
 val formula_lemma_to_json :
   ('site_graph -> Yojson.Basic.t) -> 'site_graph formula_lemma -> Yojson.Basic.t
@@ -230,31 +237,15 @@ val lemmas_list_of_json_gen :
   Yojson.Basic.t ->
   (string * (string * 'a) list lemma list) list
 
-val formula_lemmas_list_to_json_gen :
-  ('a -> Yojson.Basic.t) ->
-  (string * (string * 'a) list formula_lemma list) list ->
-  Yojson.Basic.t
-
-val formula_lemmas_list_of_json_gen :
-  (Yojson.Basic.t -> 'a) ->
-  Yojson.Basic.t ->
-  (string * (string * 'a) list formula_lemma list) list
-
 val lemmas_list_to_json :
   (string * agent list lemma list) list -> Yojson.Basic.t
 
 val lemmas_list_of_json :
   Yojson.Basic.t -> (string * agent list lemma list) list
 
-val formula_lemmas_list_to_json :
-  (string * agent list formula_lemma list) list -> Yojson.Basic.t
-
-val formula_lemmas_list_of_json :
-  Yojson.Basic.t -> (string * agent list formula_lemma list) list
-
 val print_formula : 'a -> (string -> 'a -> 'a) -> string formula -> 'a
-val get_hyp : 'site_graph lemma -> 'site_graph
-val get_refinement : 'site_graph lemma -> 'site_graph list
+val get_hyp : 'site_graph refinement_lemma -> 'site_graph
+val get_refinement : 'site_graph refinement_lemma -> 'site_graph list
 val get_pattern : 'site_graph formula_lemma -> 'site_graph
 val get_reachability_condition : 'site_graph formula_lemma -> string formula
 
