@@ -1814,21 +1814,30 @@ Id=253
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x[.],y[y.A])
-A(x[x.A],y[y.A]) => P.or.Q.or.R
-A(x[.],y[.])
-A(x[x.A],y[.])
+A() =>
+   [
+	  A(x[.],y[y.A])
+	v A(x[x.A],y[y.A])[ only if P.or.Q.or.R ]
+	v A(x[.],y[.])
+	v A(x[x.A],y[.])
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-
-A(x[x.A],y[1]),A(x[.],y[1]) => Q.or.R
-A(x[x.A],y[1]),A(x[x.A],y[1]) => P.or.Q.or.R
-A(x[.],y[1]),A(x[x.A],y[1]) => Q.or.R
-
-A(x[1],y[y.A]),A(x[1],y[.]) => Q.or.R
-A(x[1],y[y.A]),A(x[1],y[y.A]) => P.or.Q.or.R
-A(x[1],y[.]),A(x[1],y[y.A]) => Q.or.R
+A(y[1]),A(y[1]) => 
+	[
+		  A(x[x.A],y[1]),A(x[.],y[1])[ only if Q.or.R ]
+		v A(x[x.A],y[1]),A(x[x.A],y[1])[ only if P.or.Q.or.R ]
+		v A(x[.],y[1]),A(x[.],y[1])
+		v A(x[.],y[1]),A(x[x.A],y[1])[ only if Q.or.R ]
+	]
+A(x[1]),A(x[1]) => 
+	[
+		  A(x[1],y[y.A]),A(x[1],y[.])[ only if Q.or.R ]
+		v A(x[1],y[y.A]),A(x[1],y[y.A])[ only if P.or.Q.or.R ]
+		v A(x[1],y[.]),A(x[1],y[.])
+		v A(x[1],y[.]),A(x[1],y[y.A])[ only if Q.or.R ]
+	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
@@ -2117,37 +2126,35 @@ A(y)=> [
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+A()=> [
+		  A(x[.],y[y.A])
+		v A(x[x.A],y[y.A])[ only if P.or.Q.or.R ]
+		v A(x[.],y[.])
+		v A(x[x.A],y[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
+A(y[1]),A(y[1])=> [
+		  A(x[x.A],y[1]),A(x[.],y[1])[ only if Q.or.R ]
+		v A(x[x.A],y[1]),A(x[x.A],y[1])[ only if P.or.Q.or.R ]
+		v A(x[.],y[1]),A(x[.],y[1])
+		v A(x[.],y[1]),A(x[x.A],y[1])[ only if Q.or.R ]]
+A(x[1]),A(x[1])=> [
+		  A(x[1],y[y.A]),A(x[1],y[.])[ only if Q.or.R ]
+		v A(x[1],y[y.A]),A(x[1],y[y.A])[ only if P.or.Q.or.R ]
+		v A(x[1],y[.]),A(x[1],y[.])
+		v A(x[1],y[.]),A(x[1],y[y.A])[ only if Q.or.R ]]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
+A(x[x.A],y[y.A])=> [
+		  A(x[2],y[1]),A(x[2],y[1])[ only if P.or.R ]
+		v A(x[2],y[1]),A(y[1]),A(x[2])[ only if Q.or.R ]]
 
 ------------------------------------------------------------
 * Export Counters to JSon (internal constraints_list):
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-A(x[2],y[1]),A(x[2],y[1]) => P.or.R
-
-------------------------------------------------------------
-* Export Connected agents to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-A(x[x.A],y[1]),A(x[.],y[1]) => Q.or.R
-A(x[x.A],y[1]),A(x[x.A],y[1]) => P.or.Q.or.R
-A(x[.],y[1]),A(x[x.A],y[1]) => Q.or.R
-A(x[1],y[y.A]),A(x[1],y[.]) => Q.or.R
-A(x[1],y[y.A]),A(x[1],y[y.A]) => P.or.Q.or.R
-A(x[1],y[.]),A(x[1],y[y.A]) => Q.or.R
-
-------------------------------------------------------------
-* Export Views domain - relational properties to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-A(x[x.A],y[y.A]) => P.or.Q.or.R
 
 execution finished without any exception

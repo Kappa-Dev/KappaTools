@@ -398,8 +398,8 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x{u}) => P1.and.P2
-B(x{u}) => P1.or.P2
+A(x) => A(x{u})[ only if P1.and.P2 ]
+B(x) => B(x{u})[ only if P1.or.P2 ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -677,6 +677,8 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+A(x)=> [A(x{u})[ only if P1.and.P2 ]]
+B(x)=> [B(x{u})[ only if P1.or.P2 ]]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
@@ -693,12 +695,6 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Counters to JSon (internal constraints_list):
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Views domain - non relational properties to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-A(x{u}) => P1.and.P2
-B(x{u}) => P1.or.P2
 
 execution finished without any exception
 Parsing example_agents_params.ka...

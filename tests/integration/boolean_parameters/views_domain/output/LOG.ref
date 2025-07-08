@@ -1622,14 +1622,10 @@ Id=169
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(z[t.E]) => ~P
-A(z[.])
 A(x) => [ A(x[.]) v A(x[t.E]) ]
 A(y) => [ A(y[.]) v A(y[t.E]) ]
-E(t[z.A]) => ~P
-E(t[y.A])
-E(t[x.A])
-E(t[.])
+A(z) => [ A(z[.]) v A(z[t.E])[ only if ~P ] ]
+E(t) => [ E(t[.]) v E(t[x.A]) v E(t[y.A]) v E(t[z.A])[ only if ~P ] ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1791,10 +1787,13 @@ Id=169
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x[t.E],y[.])
-A(x[t.E],y[t.E]) => ~P
-A(x[.],y[.])
-A(x[.],y[t.E])
+A() =>
+   [
+	  A(x[t.E],y[.])
+	v A(x[t.E],y[t.E])[ only if ~P ]
+	v A(x[.],y[.])
+	v A(x[.],y[t.E])
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -2102,10 +2101,23 @@ A(x)=> [
 A(y)=> [
 		  A(y[.])
 		v A(y[t.E])]
+A(z)=> [
+		  A(z[.])
+		v A(z[t.E])[ only if ~P ]]
+E(t)=> [
+		  E(t[.])
+		v E(t[x.A])
+		v E(t[y.A])
+		v E(t[z.A])[ only if ~P ]]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+A()=> [
+		  A(x[t.E],y[.])
+		v A(x[t.E],y[t.E])[ only if ~P ]
+		v A(x[.],y[.])
+		v A(x[.],y[t.E])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
@@ -2118,17 +2130,6 @@ A(y)=> [
 ------------------------------------------------------------
 * Export Counters to JSon (internal constraints_list):
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Views domain - relational properties to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-A(x[t.E],y[t.E]) => ~P
-
-------------------------------------------------------------
-* Export Views domain - non relational properties to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-A(z[t.E]) => ~P
-E(t[z.A]) => ~P
 
 execution finished without any exception
 Parsing example_views.ka...

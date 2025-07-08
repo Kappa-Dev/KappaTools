@@ -2923,16 +2923,12 @@ Id=133
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(a[z.C]) => P
-A(a[x.B])
-A(a[.])
+A(a) => [ A(a[.]) v A(a[x.B]) v A(a[z.C])[ only if P ] ]
 A(b) => [ A(b{u}) v A(b{p}) ]
 B(x) => [ B(x[.]) v B(x[a.A]) ]
 B(y) => [ B(y{u}) v B(y{p}) ]
-C(k{p}) => ((~J).or.Q).and.P
-C(k{u})
-C(z[a.A]) => P
-C(z[.])
+C(k) => [ C(k{u}) v C(k{p})[ only if ((~J).or.Q).and.P ] ]
+C(z) => [ C(z[.]) v C(z[a.A])[ only if P ] ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -3430,17 +3426,23 @@ Id=198
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(a[.],b{p}) => P.and.J.and.Q
-A(a[x.B],b{p})
-A(a[z.C],b{p}) => P.and.J.and.Q
-A(a[.],b{u})
-A(a[x.B],b{u})
-A(a[z.C],b{u}) => P
+A() =>
+   [
+	  A(a[.],b{p})[ only if P.and.J.and.Q ]
+	v A(a[x.B],b{p})
+	v A(a[z.C],b{p})[ only if P.and.J.and.Q ]
+	v A(a[.],b{u})
+	v A(a[x.B],b{u})
+	v A(a[z.C],b{u})[ only if P ]
+   ]
 B(y{p}) => B(x[a.A],y{p})
-C(k{p},z[.]) => ((~J).or.Q).and.P
-C(k{p},z[a.A]) => P.and.J.and.Q
-C(k{u},z[.])
-C(k{u},z[a.A]) => P
+C() =>
+   [
+	  C(k{p},z[.])[ only if ((~J).or.Q).and.P ]
+	v C(k{p},z[a.A])[ only if P.and.J.and.Q ]
+	v C(k{u},z[.])
+	v C(k{u},z[a.A])[ only if P ]
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -3450,11 +3452,13 @@ A(a[1]),B(x[1]) =>
 		v A(a[1],b{p}),B(x[1],y{p})
 		v A(a[1],b{u}),B(x[1],y{u})
 	]
-
-A(a[1],b{p}),C(k{u},z[1]) => P
-A(a[1],b{p}),C(k{p},z[1]) => P.and.J.and.Q
-A(a[1],b{u}),C(k{u},z[1]) => P
-A(a[1],b{u}),C(k{p},z[1]) => P.and.J.and.Q
+A(a[1]),C(z[1]) => 
+	[
+		  A(a[1],b{p}),C(k{u},z[1])[ only if P ]
+		v A(a[1],b{p}),C(k{p},z[1])[ only if P.and.J.and.Q ]
+		v A(a[1],b{u}),C(k{u},z[1])[ only if P ]
+		v A(a[1],b{u}),C(k{p},z[1])[ only if P.and.J.and.Q ]
+	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
@@ -4350,6 +4354,10 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+A(a)=> [
+		  A(a[.])
+		v A(a[x.B])
+		v A(a[z.C])[ only if P ]]
 A(b)=> [
 		  A(b{u})
 		v A(b{p})]
@@ -4359,10 +4367,28 @@ B(x)=> [
 B(y)=> [
 		  B(y{u})
 		v B(y{p})]
+C(k)=> [
+		  C(k{u})
+		v C(k{p})[ only if ((~J).or.Q).and.P ]]
+C(z)=> [
+		  C(z[.])
+		v C(z[a.A])[ only if P ]]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+C()=> [
+		  C(k{p},z[.])[ only if ((~J).or.Q).and.P ]
+		v C(k{p},z[a.A])[ only if P.and.J.and.Q ]
+		v C(k{u},z[.])
+		v C(k{u},z[a.A])[ only if P ]]
+A()=> [
+		  A(a[.],b{p})[ only if P.and.J.and.Q ]
+		v A(a[x.B],b{p})
+		v A(a[z.C],b{p})[ only if P.and.J.and.Q ]
+		v A(a[.],b{u})
+		v A(a[x.B],b{u})
+		v A(a[z.C],b{u})[ only if P ]]
 B(y{p})=> [B(x[a.A],y{p})]
 
 ------------------------------------------------------------
@@ -4372,6 +4398,11 @@ A(a[1]),B(x[1])=> [
 		  A(a[1],b{p}),B(x[1],y{u})
 		v A(a[1],b{p}),B(x[1],y{p})
 		v A(a[1],b{u}),B(x[1],y{u})]
+A(a[1]),C(z[1])=> [
+		  A(a[1],b{p}),C(k{u},z[1])[ only if P ]
+		v A(a[1],b{p}),C(k{p},z[1])[ only if P.and.J.and.Q ]
+		v A(a[1],b{u}),C(k{u},z[1])[ only if P ]
+		v A(a[1],b{u}),C(k{p},z[1])[ only if P.and.J.and.Q ]]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
@@ -4380,30 +4411,5 @@ A(a[1]),B(x[1])=> [
 ------------------------------------------------------------
 * Export Counters to JSon (internal constraints_list):
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Connected agents to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-A(a[1],b{p}),C(k{u},z[1]) => P
-A(a[1],b{p}),C(k{p},z[1]) => P.and.J.and.Q
-A(a[1],b{u}),C(k{u},z[1]) => P
-A(a[1],b{u}),C(k{p},z[1]) => P.and.J.and.Q
-
-------------------------------------------------------------
-* Export Views domain - relational properties to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-C(k{u},z[a.A]) => P
-C(k{p},z[a.A]) => P.and.J.and.Q
-C(k{p},z[.]) => ((~J).or.Q).and.P
-A(a[z.C],b{u}) => P
-A(a[z.C],b{p}) => P.and.J.and.Q
-A(a[.],b{p}) => P.and.J.and.Q
-
-------------------------------------------------------------
-* Export Views domain - non relational properties to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-A(a[z.C]) => P
-C(k{p}) => ((~J).or.Q).and.P
-C(z[a.A]) => P
 
 execution finished without any exception

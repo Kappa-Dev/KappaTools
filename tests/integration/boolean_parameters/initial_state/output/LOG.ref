@@ -1867,14 +1867,10 @@ Id=150
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x[x.C]) => (test1.or.test3).and.((~test1).or.test2.or.test3)
-A(x[.]) => (test1.or.test3).and.((~test1).or.test2.or.test3)
-A(y[y.B]) => test1.and.test2
-A(y[.]) => (test1.or.test3).and.((~test1).or.test2.or.test3)
-B(y[y.A]) => test1.and.test2
-B(y[.]) => test1.and.test2
-C(x[x.A]) => (test1.or.test3).and.((~test1).or.test2.or.test3)
-C(x[.]) => (test1.or.test3).and.((~test1).or.test2.or.test3)
+A(x) => [ A(x[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ] v A(x[x.C])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ] ]
+A(y) => [ A(y[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ] v A(y[y.B])[ only if test1.and.test2 ] ]
+B(y) => [ B(y[.])[ only if test1.and.test2 ] v B(y[y.A])[ only if test1.and.test2 ] ]
+C(x) => [ C(x[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ] v C(x[x.A])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ] ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -2905,6 +2901,18 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+A(x)=> [
+		  A(x[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ]
+		v A(x[x.C])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ]]
+A(y)=> [
+		  A(y[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ]
+		v A(y[y.B])[ only if test1.and.test2 ]]
+B(y)=> [
+		  B(y[.])[ only if test1.and.test2 ]
+		v B(y[y.A])[ only if test1.and.test2 ]]
+C(x)=> [
+		  C(x[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ]
+		v C(x[x.A])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ]]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
@@ -2921,18 +2929,6 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Counters to JSon (internal constraints_list):
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Views domain - non relational properties to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-A(x[.]) => (test1.or.test3).and.((~test1).or.test2.or.test3)
-A(x[x.C]) => (test1.or.test3).and.((~test1).or.test2.or.test3)
-A(y[.]) => (test1.or.test3).and.((~test1).or.test2.or.test3)
-A(y[y.B]) => test1.and.test2
-B(y[.]) => test1.and.test2
-B(y[y.A]) => test1.and.test2
-C(x[.]) => (test1.or.test3).and.((~test1).or.test2.or.test3)
-C(x[x.A]) => (test1.or.test3).and.((~test1).or.test2.or.test3)
 
 execution finished without any exception
 Parsing example_initial_state.ka...

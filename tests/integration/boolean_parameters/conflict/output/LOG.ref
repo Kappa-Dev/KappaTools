@@ -24,33 +24,37 @@ A can occur in the model if P.
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A(x[x.A]) => P.and.x.and.y
-A(x[.]) => P
-A(y[y.A]) => (B.or.C).and.P
-A(y[.]) => P
-A(x{p}) => P
-A(x{u}) => P
+A(x) => [ A(x[.])[ only if P ] v A(x[x.A])[ only if P.and.x.and.y ] ]
+A(x) => [ A(x{u})[ only if P ] v A(x{p})[ only if P ] ]
+A(y) => [ A(y[.])[ only if P ] v A(y[y.A])[ only if (B.or.C).and.P ] ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-A(x[x.A],y[.]) => P.and.x.and.y
-A(x[x.A],y[y.A]) => (B.or.C).and.P.and.(~@co-A-x-y).and.x.and.y
-A(x[.],y[.]) => P
-A(x[.],y[y.A]) => (B.or.C).and.P
+A() =>
+   [
+	  A(x[x.A],y[.])[ only if P.and.x.and.y ]
+	v A(x[x.A],y[y.A])[ only if (B.or.C).and.P.and.(~@co-A-x-y).and.x.and.y ]
+	v A(x[.],y[.])[ only if P ]
+	v A(x[.],y[y.A])[ only if (B.or.C).and.P ]
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-
-A(x[1],y[y.A]),A(x[1],y[.]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
-A(x[1],y[y.A]),A(x[1],y[y.A]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
-A(x[1],y[.]),A(x[1],y[.]) => P.and.x.and.y
-A(x[1],y[.]),A(x[1],y[y.A]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
-
-A(x[x.A],y[1]),A(x[.],y[1]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
-A(x[x.A],y[1]),A(x[x.A],y[1]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
-A(x[.],y[1]),A(x[.],y[1]) => (B.or.C).and.P
-A(x[.],y[1]),A(x[x.A],y[1]) => (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y)
+A(x[1]),A(x[1]) => 
+	[
+		  A(x[1],y[y.A]),A(x[1],y[.])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
+		v A(x[1],y[y.A]),A(x[1],y[y.A])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
+		v A(x[1],y[.]),A(x[1],y[.])[ only if P.and.x.and.y ]
+		v A(x[1],y[.]),A(x[1],y[y.A])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
+	]
+A(y[1]),A(y[1]) => 
+	[
+		  A(x[x.A],y[1]),A(x[.],y[1])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
+		v A(x[x.A],y[1]),A(x[x.A],y[1])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
+		v A(x[.],y[1]),A(x[.],y[1])[ only if (B.or.C).and.P ]
+		v A(x[.],y[1]),A(x[x.A],y[1])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
+	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------

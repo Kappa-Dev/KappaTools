@@ -1197,15 +1197,13 @@ A(y)=> [
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
+A(x[x.A],y[y.A])=> [
+		  A(x[2],y[1]),A(x[2],y[1])
+		v A(x[2],y[1]),A(y[1]),A(x[2])[ only if ~P ]]
 
 ------------------------------------------------------------
 * Export Counters to JSon (internal constraints_list):
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal formula_constraints_list):
-------------------------------------------------------------
-A(x[2],y[1]),A(y[1]),A(x[2]) => ~P
 
 execution finished without any exception
 Parsing example_double_bonds.ka...
