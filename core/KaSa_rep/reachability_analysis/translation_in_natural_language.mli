@@ -13,7 +13,9 @@
  * under the terms of the GNU Library General Public License *)
 
 type token =
-  | Range of Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state list
+  | Range of
+      Ckappa_sig.c_mvbdu_var
+      * (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu option) list
   | Equiv of
       (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
       * (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
@@ -22,12 +24,10 @@ type token =
       * (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
   | Partition of
       (Ckappa_sig.c_mvbdu_var * (Ckappa_sig.c_state * token list) list)
-  | Range_with_valuations of
-      ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list
-      * Ckappa_sig.Views_bdu.mvbdu)
-      list
   | No_known_translation of
-      (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list list
+      ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list
+      * Ckappa_sig.Views_bdu.mvbdu option)
+      list
 
 type rename_sites =
   Remanent_parameters_sig.parameters ->
@@ -79,7 +79,6 @@ val convert_views_internal_constraints_list :
   Ckappa_sig.c_agent_name ->
   token ->
   Site_graphs.KaSa_site_graph.t Public_data.lemma list ->
-  Ckappa_sig.Views_bdu.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.Views_bdu.handler
   * Site_graphs.KaSa_site_graph.t Public_data.lemma list

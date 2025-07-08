@@ -706,6 +706,16 @@ let mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu =
   in
   error, bdu_handler, formula
 
+let mvbdu_to_string_formula_option parameters error kappa_handler bdu_handler
+    mvbdu =
+  match mvbdu with
+  | None -> error, bdu_handler, None
+  | Some mvbdu ->
+    let error, handler, bdu_handler =
+      mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu
+    in
+    error, handler, Some bdu_handler
+
 let print_formula parameters formula =
   Logical_formulae.print_formula ()
     (fun s _ ->
@@ -719,6 +729,19 @@ let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =
   let formula = Logical_formulae.simplify formula in
   let () = print_formula parameters formula in
   error, bdu_handler
+
+let print_guard_option parameters error kappa_handler bdu_handler mvbdu =
+  match mvbdu with
+  | None -> error, bdu_handler
+  | Some mvbdu ->
+    let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "[ only if "
+    in
+    let error, bdu_handler =
+      print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
+    in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) " ]" in
+    error, bdu_handler
 
 (*****************************************************************************)
 

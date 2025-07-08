@@ -25,24 +25,32 @@ val site_graph_to_list :
 
 val site_graph_list_to_list :
   Exception.exceptions_caught_and_uncaught ->
-  Site_graphs.KaSa_site_graph.t list ->
+  (Site_graphs.KaSa_site_graph.t * 'a) list ->
   Exception.exceptions_caught_and_uncaught
-  * (string
-    * (string option
-      * Site_graphs.KaSa_site_graph.binding_state option
-      * (int option * int option) option)
-      Wrapped_modules.LoggedStringMap.t)
-    list
+  * ((string
+     * (string option
+       * Site_graphs.KaSa_site_graph.binding_state option
+       * (int option * int option) option)
+       Wrapped_modules.LoggedStringMap.t)
+     list
+    * 'a)
     list
 
 val internal_pair_list_to_list :
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->
+  Ckappa_sig.Views_bdu.handler ->
   Cckappa_sig.kappa_handler ->
   Site_graphs.KaSa_site_graph.t ->
   Site_graphs.KaSa_site_graph.agent_id ->
   Ckappa_sig.c_site_name ->
   Site_graphs.KaSa_site_graph.agent_id ->
   Ckappa_sig.c_site_name ->
-  ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list * 'a) list ->
-  Exception.exceptions_caught_and_uncaught * Site_graphs.KaSa_site_graph.t list
+  ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list
+  * Ckappa_sig.Views_bdu.mvbdu)
+  list ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (Ckappa_sig.Views_bdu.handler
+    * (Site_graphs.KaSa_site_graph.t * string Logical_formulae.formula option)
+      list)

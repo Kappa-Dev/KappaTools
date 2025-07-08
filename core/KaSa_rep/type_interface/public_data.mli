@@ -180,19 +180,10 @@ type separating_transitions = (rule * (string * string) list) list
 val separating_transitions_of_json : Yojson.Basic.t -> separating_transitions
 val separating_transitions_to_json : separating_transitions -> Yojson.Basic.t
 
-type 'site_graph refinement_lemma = {
+type 'site_graph lemma = {
   hyp: 'site_graph;
-  refinement: 'site_graph list;
+  refinement: ('site_graph * string formula option) list;
 }
-
-type 'site_graph formula_lemma = {
-  pattern: 'site_graph;
-  reachability_condition: string formula;
-}
-
-type 'site_graph lemma =
-  | Refinement of 'site_graph refinement_lemma
-  | Formula of 'site_graph formula_lemma
 
 type binding_state =
   | Free
@@ -211,21 +202,11 @@ type agent =
 
 type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
 
-val refinement_lemma_to_json :
-  ('site_graph -> Yojson.Basic.t) ->
-  'site_graph refinement_lemma ->
-  Yojson.Basic.t
+val lemma_to_json :
+  ('site_graph -> Yojson.Basic.t) -> 'site_graph lemma -> Yojson.Basic.t
 
-val refinement_lemma_of_json :
-  (Yojson.Basic.t -> 'site_graph) ->
-  Yojson.Basic.t ->
-  'site_graph refinement_lemma
-
-val formula_lemma_to_json :
-  ('site_graph -> Yojson.Basic.t) -> 'site_graph formula_lemma -> Yojson.Basic.t
-
-val formula_lemma_of_json :
-  (Yojson.Basic.t -> 'site_graph) -> Yojson.Basic.t -> 'site_graph formula_lemma
+val lemma_of_json :
+  (Yojson.Basic.t -> 'site_graph) -> Yojson.Basic.t -> 'site_graph lemma
 
 val lemmas_list_to_json_gen :
   ('a -> Yojson.Basic.t) ->
@@ -244,10 +225,11 @@ val lemmas_list_of_json :
   Yojson.Basic.t -> (string * agent list lemma list) list
 
 val print_formula : 'a -> (string -> 'a -> 'a) -> string formula -> 'a
-val get_hyp : 'site_graph refinement_lemma -> 'site_graph
-val get_refinement : 'site_graph refinement_lemma -> 'site_graph list
-val get_pattern : 'site_graph formula_lemma -> 'site_graph
-val get_reachability_condition : 'site_graph formula_lemma -> string formula
+val get_hyp : 'site_graph lemma -> 'site_graph
+
+val get_refinement :
+  'site_graph lemma ->
+  ('site_graph * string Logical_formulae.formula option) list
 
 val string_of_binding_type :
   ?binding_type_symbol:string ->

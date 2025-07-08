@@ -16,7 +16,9 @@ let trace = false
 let _ = trace
 
 type token =
-  | Range of Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state list
+  | Range of
+      Ckappa_sig.c_mvbdu_var
+      * (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu option) list
   | Equiv of
       (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
       * (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
@@ -25,13 +27,10 @@ type token =
       * (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state)
   | Partition of
       (Ckappa_sig.c_mvbdu_var * (Ckappa_sig.c_state * token list) list)
-  | Range_with_valuations of
-  Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state list *
-      ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list
-      * Ckappa_sig.Views_bdu.mvbdu)
-      list
   | No_known_translation of
-      (Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list list
+      ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list
+      * Ckappa_sig.Views_bdu.mvbdu option)
+      list
 
 type rename_sites =
   Remanent_parameters_sig.parameters ->
@@ -227,10 +226,10 @@ let try_partitioning parameters handler error handler_kappa
                               match q with
                               | [] -> error, Some (a, output)
                               | [ (c, d) ] :: q when c = a ->
-                                aux4 q (d :: output)
+                                aux4 q ((d, None) :: output)
                               | _ -> error, None
                             in
-                            aux4 q [ b ]
+                            aux4 q [ b, None ]
                         in
                         match var_list_opt with
                         | None ->
@@ -430,10 +429,10 @@ let try_partitioning parameters handler error handler_kappa
                               match q with
                               | [] -> error, Some (a, output)
                               | [ (c, d) ] :: q when c = a ->
-                                aux4 q (d :: output)
+                                aux4 q ((d, None) :: output)
                               | _ -> error, None
                             in
-                            aux4 q [ b ]
+                            aux4 q [ b, None ]
                         in
                         match var_list_opt with
                         | None ->
@@ -489,12 +488,15 @@ let translate parameters handler error kappa_handler
     List.fold_left
       (fun (error, handler, list, list_with_mvbdu, all_mvbdu_are_true)
            (elt1, mvbdu) ->
-        let error, handler, all_mvbdu_are_true =
-          if all_mvbdu_are_true then
-            Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
-              restriction_bdu
+        let error, handler, mvbdu_is_true =
+          Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
+            restriction_bdu
+        in
+        let mvbdu_opt =
+          if mvbdu_is_true then
+            None
           else
-            error, handler, false
+            Some mvbdu
         in
         let error, elt1 =
           List.fold_left
@@ -506,14 +508,12 @@ let translate parameters handler error kappa_handler
         ( error,
           handler,
           elt1 :: list,
-          (elt1, mvbdu) :: list_with_mvbdu,
-          all_mvbdu_are_true ))
+          (elt1, mvbdu_opt) :: list_with_mvbdu,
+          all_mvbdu_are_true && mvbdu_is_true ))
       (error, handler, [], [], true)
       (List.rev list)
   in
-  if not all_mvbdu_are_true then
-    error, (handler, Range_with_valuations list_with_mvbdu)
-  else if Remanent_parameters.get_post_processing parameters then (
+  if Remanent_parameters.get_post_processing parameters then (
     let error, handler, vars =
       Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameters handler error
         mvbdu
@@ -526,7 +526,7 @@ let translate parameters handler error kappa_handler
       List.fold_left
         (fun (error, list) elt ->
           let error, elt = rename_site_inverse parameters error elt in
-          (* keep only the sites and not the guards, because the guards are contained in the mvbdu and all mvbdus are true *)
+          (* keep only the sites and not the guards, because the guards are contained in the mvbdu *)
           match Ckappa_sig.site_or_guard_p_of_mvbdu_var elt nsites with
           | Site _ -> error, elt :: list
           | Guard_p _ -> error, list)
@@ -534,27 +534,28 @@ let translate parameters handler error kappa_handler
     in
     match var_list with
     | [] ->
-      error, (handler, No_known_translation list)
+      error, (handler, No_known_translation list_with_mvbdu)
       (* indirectly checks if the mvbdu is true *)
     | [ x ] ->
-      let error, list =
+      let error, list_with_mvbdu =
         List.fold_left
-          (fun (error, list) elt ->
+          (fun (error, list) (elt, mvbdu) ->
             match elt with
-            | [ (a, b) ] when a = x -> error, b :: list
+            | [ (a, b) ] when a = x -> error, (b, mvbdu) :: list
             | _ -> Exception.warn parameters error __POS__ Exit list)
-          (error, []) list
+          (error, []) list_with_mvbdu
       in
-      error, (handler, Range (x, list))
+      error, (handler, Range (x, list_with_mvbdu))
     | [ _; _ ] ->
       (match list with
       | [] | [ _ ] ->
         Exception.warn parameters error __POS__ Exit
-          (handler, No_known_translation list)
+          (handler, No_known_translation list_with_mvbdu)
       | [
        [ (site1, state1); (site2, state2) ];
        [ (site1', state1'); (site2', state2') ];
-      ] ->
+      ]
+        when all_mvbdu_are_true ->
         if site1 = site1' && site2 = site2' then
           if state1 > state1' then
             error, (handler, Equiv ((site1, state1), (site2, state2)))
@@ -562,12 +563,13 @@ let translate parameters handler error kappa_handler
             error, (handler, Equiv ((site1, state1'), (site2, state2')))
         else
           Exception.warn parameters error __POS__ Exit
-            (handler, No_known_translation list)
+            (handler, No_known_translation list_with_mvbdu)
       | [
        [ (site1, state1); (site2, state2) ];
        [ (site1', state1'); (site2', state2') ];
        [ (site1'', state1''); (site2'', state2'') ];
-      ] ->
+      ]
+        when all_mvbdu_are_true ->
         if
           site1 = site1' && site1 = site1'' && site2 = site2' && site2 = site2''
         then
@@ -611,28 +613,30 @@ let translate parameters handler error kappa_handler
                           state2'' ),
                       (site1, state1') ) ) )
           else
-            error, (handler, No_known_translation list)
+            error, (handler, No_known_translation list_with_mvbdu)
         else
           Exception.warn parameters error __POS__ Exit
-            (handler, No_known_translation list)
-      | _ ->
+            (handler, No_known_translation list_with_mvbdu)
+      | _ when all_mvbdu_are_true ->
         let error, handler, output =
           try_partitioning parameters handler error kappa_handler
             rename_site_inverse mvbdu
         in
         (match output with
-        | None -> error, (handler, No_known_translation list)
-        | Some (var, l) -> error, (handler, Partition (var, l))))
-    | _ ->
+        | None -> error, (handler, No_known_translation list_with_mvbdu)
+        | Some (var, l) -> error, (handler, Partition (var, l)))
+      | _ -> error, (handler, No_known_translation list_with_mvbdu))
+    | _ when all_mvbdu_are_true ->
       let error, handler, output =
         try_partitioning parameters handler error kappa_handler
           rename_site_inverse mvbdu
       in
       (match output with
-      | None -> error, (handler, No_known_translation list)
+      | None -> error, (handler, No_known_translation list_with_mvbdu)
       | Some (var, l) -> error, (handler, Partition (var, l)))
+    | _ -> error, (handler, No_known_translation list_with_mvbdu)
   ) else
-    error, (handler, No_known_translation list)
+    error, (handler, No_known_translation list_with_mvbdu)
 
 (*****************************************************************************)
 
@@ -697,6 +701,18 @@ let rec print ?beginning_of_sentence:(beggining = true)
   in
   let log = Remanent_parameters.get_logger parameters in
   let nsites = Handler.get_nsites handler_kappa in
+  let print_mvbdu_natural_language error bdu_handler mvbdu =
+    match mvbdu with
+    | None -> error, bdu_handler
+    | Some mvbdu ->
+      let () = Loggers.fprintf log " (only if " in
+      let error, bdu_handler =
+        Handler.print_guard_mvbdu parameters error handler_kappa bdu_handler
+          mvbdu
+      in
+      let () = Loggers.fprintf log ")" in
+      error, bdu_handler
+  in
   let error, bdu_handler =
     match translation with
     | Range (site_type, state_list) ->
@@ -717,9 +733,9 @@ let rec print ?beginning_of_sentence:(beggining = true)
             | _ :: _ -> true
           in
           let () = if should_use_bracket then Loggers.fprintf log "[ " in
-          let error, _bool =
+          let error, bdu_handler, _bool =
             List.fold_left
-              (fun (error, bool) state ->
+              (fun (error, bdu_handler, bool) (state, mvbdu) ->
                 let () = if bool then Loggers.fprintf log " v " in
                 let error, t =
                   Site_graphs.KaSa_site_graph.add_state_or_guard parameters
@@ -728,8 +744,13 @@ let rec print ?beginning_of_sentence:(beggining = true)
                 let error =
                   Site_graphs.KaSa_site_graph.print log parameters error t
                 in
-                error, true)
-              (error, false) state_list
+                let error, bdu_handler =
+                  Handler.print_guard_option parameters error handler_kappa
+                    bdu_handler mvbdu
+                in
+                error, bdu_handler, true)
+              (error, bdu_handler, false)
+              state_list
           in
           let () = if should_use_bracket then Loggers.fprintf log " ]" in
           let () = Loggers.print_newline log in
@@ -743,10 +764,10 @@ let rec print ?beginning_of_sentence:(beggining = true)
             Exception.check_point Exception.warn parameters error error' __POS__
               Exit
           in
-          let rec aux list error =
+          let rec aux list error bdu_handler =
             match list with
-            | [] -> Exception.warn parameters error __POS__ Exit ()
-            | [ state ] ->
+            | [] -> Exception.warn parameters error __POS__ Exit bdu_handler
+            | [ (state, mvbdu) ] ->
               let error', state_string =
                 Handler.string_of_state_fully_deciphered_with_guard parameters
                   error handler_kappa agent_type site_type state
@@ -755,8 +776,13 @@ let rec print ?beginning_of_sentence:(beggining = true)
                 Exception.check_point Exception.warn parameters error error'
                   __POS__ Exit
               in
-              error, Loggers.fprintf log " and %s.%s" state_string endofline
-            | state :: tail ->
+              let () = Loggers.fprintf log " and %s" state_string in
+              let error, bdu_handler =
+                print_mvbdu_natural_language error bdu_handler mvbdu
+              in
+              let () = Loggers.fprintf log ".%s" endofline in
+              error, bdu_handler
+            | (state, mvbdu) :: tail ->
               let error', state_string =
                 Handler.string_of_state_fully_deciphered_with_guard parameters
                   error handler_kappa agent_type site_type state
@@ -765,13 +791,17 @@ let rec print ?beginning_of_sentence:(beggining = true)
                 Exception.check_point Exception.warn parameters error error'
                   __POS__ Exit
               in
-              let () = Loggers.fprintf log " %s," state_string in
-              aux tail error
+              let () = Loggers.fprintf log " %s" state_string in
+              let error, bdu_handler =
+                print_mvbdu_natural_language error bdu_handler mvbdu
+              in
+              let () = Loggers.fprintf log "," in
+              aux tail error bdu_handler
           in
-          let error, () =
+          let error, bdu_handler =
             match state_list with
-            | [] -> Exception.warn parameters error __POS__ Exit ()
-            | [ state ] ->
+            | [] -> Exception.warn parameters error __POS__ Exit bdu_handler
+            | [ (state, mvbdu) ] ->
               let error', state_string =
                 Handler.string_of_state_fully_deciphered_with_guard parameters
                   error handler_kappa agent_type site_type state
@@ -780,12 +810,27 @@ let rec print ?beginning_of_sentence:(beggining = true)
                 Exception.check_point Exception.warn parameters error error'
                   __POS__ Exit
               in
-              ( error,
-                Loggers.fprintf log "%s%s %sis always %s.%s"
-                  (Remanent_parameters.get_prefix parameters)
-                  (cap site_string) (in_agent agent_string) state_string
-                  endofline )
-            | [ state1; state2 ] ->
+              let error, bdu_handler =
+                match mvbdu with
+                | None ->
+                  let () =
+                    Loggers.fprintf log "%s%s %sis always %s"
+                      (Remanent_parameters.get_prefix parameters)
+                      (cap site_string) (in_agent agent_string) state_string
+                  in
+                  error, bdu_handler
+                | Some mvbdu ->
+                  let () =
+                    Loggers.fprintf log "%s%s %scan only be %s but only if "
+                      (Remanent_parameters.get_prefix parameters)
+                      (cap site_string) (in_agent agent_string) state_string
+                  in
+                  Handler.print_guard_mvbdu parameters error handler_kappa
+                    bdu_handler mvbdu
+              in
+              let () = Loggers.fprintf log ".%s" endofline in
+              error, bdu_handler
+            | [ (state1, mvbdu1); (state2, mvbdu2) ] ->
               let error', state_string1 =
                 Handler.string_of_state_fully_deciphered_with_guard parameters
                   error handler_kappa agent_type site_type state1
@@ -802,18 +847,29 @@ let rec print ?beginning_of_sentence:(beggining = true)
                 Exception.check_point Exception.warn parameters error error'
                   __POS__ Exit
               in
-              ( error,
-                Loggers.fprintf log "%s%s %sranges over %s and %s.%s"
+              let () =
+                Loggers.fprintf log "%s%s %sranges over %s"
                   (Remanent_parameters.get_prefix parameters)
                   (cap site_string) (in_agent agent_string) state_string1
-                  state_string2 endofline )
+              in
+              let error, bdu_handler =
+                print_mvbdu_natural_language error bdu_handler mvbdu1
+              in
+              let () =
+                Loggers.fprintf log "\n             and %s" state_string2
+              in
+              let error, bdu_handler =
+                print_mvbdu_natural_language error bdu_handler mvbdu2
+              in
+              let () = Loggers.fprintf log ".%s" endofline in
+              error, bdu_handler
             | list ->
               let () =
                 Loggers.fprintf log "%s%s %sranges over"
                   (Remanent_parameters.get_prefix parameters)
                   (cap site_string) (in_agent agent_string)
               in
-              aux list error
+              aux list error bdu_handler
           in
           error, bdu_handler
       ) else
@@ -1026,60 +1082,6 @@ let rec print ?beginning_of_sentence:(beggining = true)
           (error, bdu_handler) list
       in
       error, bdu_handler
-    | Range_with_valuations valuations ->
-      let error, bdu_handler =
-        List.fold_left
-          (fun (error, bdu_handler) (sites, mvbdu) ->
-            let error, agent_graph, n =
-              List.fold_left
-                (fun (error, agent_graph, n) (site, state) ->
-                  let error, agent_graph =
-                    Site_graphs.KaSa_site_graph.add_site_or_guard parameters
-                      error handler_kappa agent_id site agent_graph
-                  in
-                  let error, agent_graph =
-                    Site_graphs.KaSa_site_graph.add_state_or_guard parameters
-                      error handler_kappa agent_id site state agent_graph
-                  in
-                  let n =
-                    match
-                      Ckappa_sig.site_or_guard_p_of_mvbdu_var site nsites
-                    with
-                    | Site _ -> n + 1
-                    | Guard_p _ -> n
-                  in
-                  error, agent_graph, n)
-                (error, t, 0) sites
-            in
-            if n >= dim_min then (
-              let error =
-                Site_graphs.KaSa_site_graph.print log parameters error
-                  agent_graph
-              in
-              let error, bdu_handler, is_true =
-                Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-                  mvbdu restriction_bdu
-              in
-              let error, bdu_handler =
-                if not is_true then (
-                  let () =
-                    Loggers.fprintf
-                      (Remanent_parameters.get_logger parameters)
-                      " => "
-                  in
-                  Handler.print_guard_mvbdu parameters error handler_kappa
-                    bdu_handler mvbdu
-                ) else
-                  error, bdu_handler
-              in
-              let () = Loggers.print_newline log in
-              error, bdu_handler
-            ) else
-              error, bdu_handler)
-          (error, bdu_handler) valuations
-      in
-      (*let () = if should_use_bracket then Loggers.fprintf log " ]" in*)
-      error, bdu_handler
     | No_known_translation list ->
       (match Remanent_parameters.get_backend_mode parameters with
       | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
@@ -1088,9 +1090,9 @@ let rec print ?beginning_of_sentence:(beggining = true)
         let () = Loggers.fprintf log " =>\n%s[\n" prefix in
         let prefix' = prefix in
         let prefix = "\t" in
-        let error, _bool =
+        let error, bdu_handler, _bool =
           List.fold_left
-            (fun (error, bool) state_list ->
+            (fun (error, bdu_handler, bool) (state_list, mvbdu) ->
               let () =
                 Loggers.fprintf log "%s%s" prefix
                   (if bool then
@@ -1108,16 +1110,21 @@ let rec print ?beginning_of_sentence:(beggining = true)
               let error =
                 Site_graphs.KaSa_site_graph.print log parameters error t'
               in
+              let error, bdu_handler =
+                Handler.print_guard_option parameters error handler_kappa
+                  bdu_handler mvbdu
+              in
               let () = Loggers.print_newline log in
-              error, true)
-            (error, false) list
+              error, bdu_handler, true)
+            (error, bdu_handler, false)
+            list
         in
         let () = Loggers.fprintf log "%s]\n" prefix' in
         error, bdu_handler
       | Remanent_parameters_sig.Natural_language ->
         (match list with
         | [] -> error, bdu_handler
-        | head :: _ ->
+        | (head, _) :: _ ->
           let n = List.length head in
           if n >= dim_min then (
             let () =
@@ -1162,57 +1169,59 @@ let rec print ?beginning_of_sentence:(beggining = true)
             let parameters =
               Remanent_parameters.update_prefix parameters "\t"
             in
-            ( List.fold_left
-                (fun error l ->
-                  let error, bool =
-                    List.fold_left
-                      (fun (error, bool) (site_type, state) ->
-                        let site_or_guard =
-                          Ckappa_sig.site_or_guard_p_of_mvbdu_var site_type
-                            nsites
-                        in
-                        let error', site_string =
-                          match site_or_guard with
-                          | Ckappa_sig.Site s ->
-                            Handler.string_of_site parameters error
-                              handler_kappa agent_type s
-                          | Ckappa_sig.Guard_p g ->
-                            Handler.string_of_guard parameters g handler_kappa
-                              ~state error
-                        in
-                        let error =
-                          Exception.check_point Exception.warn parameters error
-                            error' __POS__ Exit
-                        in
-                        let error', state_string =
-                          Handler.string_of_state_fully_deciphered_with_guard
-                            parameters error handler_kappa agent_type site_type
-                            state
-                        in
-                        let error =
-                          Exception.check_point Exception.warn parameters error
-                            error' __POS__ Exit
-                        in
-                        (*---------------------------------------------*)
-                        let () =
-                          if bool then
-                            Loggers.fprintf log ","
-                          else
-                            Loggers.fprintf log "%s%s("
-                              (Remanent_parameters.get_prefix parameters)
-                              agent_string
-                        in
-                        let () =
-                          Loggers.fprintf log "%s%s" site_string state_string
-                        in
-                        error, true)
-                      (error, false) l
-                  in
-                  (*----------------------------------------------------*)
-                  let () = if bool then Loggers.fprintf log ")%s" endofline in
-                  error)
-                error list,
-              bdu_handler )
+            List.fold_left
+              (fun (error, bdu_handler) (l, mvbdu) ->
+                let error, bdu_handler, bool =
+                  List.fold_left
+                    (fun (error, bdu_handler, bool) (site_type, state) ->
+                      let site_or_guard =
+                        Ckappa_sig.site_or_guard_p_of_mvbdu_var site_type nsites
+                      in
+                      let error', site_string =
+                        match site_or_guard with
+                        | Ckappa_sig.Site s ->
+                          Handler.string_of_site parameters error handler_kappa
+                            agent_type s
+                        | Ckappa_sig.Guard_p g ->
+                          Handler.string_of_guard parameters g handler_kappa
+                            ~state error
+                      in
+                      let error =
+                        Exception.check_point Exception.warn parameters error
+                          error' __POS__ Exit
+                      in
+                      let error', state_string =
+                        Handler.string_of_state_fully_deciphered_with_guard
+                          parameters error handler_kappa agent_type site_type
+                          state
+                      in
+                      let error =
+                        Exception.check_point Exception.warn parameters error
+                          error' __POS__ Exit
+                      in
+                      (*---------------------------------------------*)
+                      let () =
+                        if bool then
+                          Loggers.fprintf log ","
+                        else
+                          Loggers.fprintf log "%s%s("
+                            (Remanent_parameters.get_prefix parameters)
+                            agent_string
+                      in
+                      let () =
+                        Loggers.fprintf log "%s%s" site_string state_string
+                      in
+                      let error, bdu_handler =
+                        print_mvbdu_natural_language error bdu_handler mvbdu
+                      in
+                      error, bdu_handler, true)
+                    (error, bdu_handler, false)
+                    l
+                in
+                (*----------------------------------------------------*)
+                let () = if bool then Loggers.fprintf log ")%s" endofline in
+                error, bdu_handler)
+              (error, bdu_handler) list
           ) else
             error, bdu_handler))
   in
@@ -1223,8 +1232,8 @@ let rec print ?beginning_of_sentence:(beggining = true)
 
 let rec convert_views_internal_constraints_list_aux
     ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa error
-    agent_string agent_type agent_id translation t current_list =
-  let error, current_list =
+    agent_string agent_type agent_id translation t current_list bdu_handler =
+  let error, bdu_handler, current_list =
     match translation with
     | Range (site_type, state_list) ->
       if dim_min <= 1 then (
@@ -1236,9 +1245,9 @@ let rec convert_views_internal_constraints_list_aux
             Site_graphs.KaSa_site_graph.add_site_or_guard parameters error
               handler_kappa agent_id site_type t
           in
-          let error'', refinement =
+          let error'', bdu_handler, refinement =
             List.fold_left
-              (fun (error, c_list) state ->
+              (fun (error, bdu_handler, c_list) (state, mvbdu) ->
                 let error', t' =
                   Site_graphs.KaSa_site_graph.add_state_or_guard parameters
                     error handler_kappa agent_id site_type state t
@@ -1247,29 +1256,24 @@ let rec convert_views_internal_constraints_list_aux
                   Exception.check_point Exception.warn parameters error error'
                     __POS__ Exit
                 in
-                error, t' :: c_list)
-              (error, []) state_list
+                let error, bdu_handler, formula =
+                  Handler.mvbdu_to_string_formula_option parameters error
+                    handler_kappa bdu_handler mvbdu
+                in
+                error, bdu_handler, (t', formula) :: c_list)
+              (error, bdu_handler, []) state_list
           in
-          let lemma =
-            Public_data.Refinement
-              { Public_data.hyp = t; Public_data.refinement }
-          in
+          let lemma = { Public_data.hyp = t; Public_data.refinement } in
           let current_list = lemma :: current_list in
           let error =
             Exception.check_point Exception.warn parameters error error''
               __POS__ Exit
           in
-          error, current_list
+          error, bdu_handler, current_list
         | Remanent_parameters_sig.Natural_language ->
-          (*let _ =
-              Loggers.fprintf (Remanent_parameters.get_logger parameters) "Natural_language\n"
-            in*)
-          error, current_list
+          error, bdu_handler, current_list
       ) else
-        (*let _ =
-            Loggers.fprintf (Remanent_parameters.get_logger parameters) "test\n"
-          in*)
-        error, current_list
+        error, bdu_handler, current_list
     | Equiv ((site1, state1), (site2, state2)) ->
       if dim_min <= 2 then (
         match Remanent_parameters.get_backend_mode parameters with
@@ -1293,14 +1297,14 @@ let rec convert_views_internal_constraints_list_aux
           in
           (*--------------------------------------------------*)
           let lemma =
-            Public_data.Refinement
-              { Public_data.hyp = t'; Public_data.refinement = [ t'' ] }
+            { Public_data.hyp = t'; Public_data.refinement = [ t'', None ] }
           in
           let current_list = lemma :: current_list in
-          error, List.rev current_list
-        | Remanent_parameters_sig.Natural_language -> error, current_list
+          error, bdu_handler, List.rev current_list
+        | Remanent_parameters_sig.Natural_language ->
+          error, bdu_handler, current_list
       ) else
-        error, current_list
+        error, bdu_handler, current_list
     | Imply ((site1, state1), (site2, state2)) ->
       if dim_min <= 2 then (
         match Remanent_parameters.get_backend_mode parameters with
@@ -1324,18 +1328,18 @@ let rec convert_views_internal_constraints_list_aux
           in
           (*--------------------------------------------------*)
           let lemma =
-            Public_data.Refinement
-              { Public_data.hyp = t; Public_data.refinement = [ t' ] }
+            { Public_data.hyp = t; Public_data.refinement = [ t', None ] }
           in
           let current_list = lemma :: current_list in
-          error, List.rev current_list
-        | Remanent_parameters_sig.Natural_language -> error, current_list
+          error, bdu_handler, List.rev current_list
+        | Remanent_parameters_sig.Natural_language ->
+          error, bdu_handler, current_list
       ) else
-        error, current_list
+        error, bdu_handler, current_list
     | Partition (site_type, list) ->
-      let error, current_list =
+      let error, bdu_handler, current_list =
         List.fold_left
-          (fun (error, current_list) (state, list) ->
+          (fun (error, bdu_handler, current_list) (state, list) ->
             let error', t' =
               Site_graphs.KaSa_site_graph.add_state_or_guard parameters error
                 handler_kappa agent_id site_type state t
@@ -1344,31 +1348,32 @@ let rec convert_views_internal_constraints_list_aux
               Exception.check_point Exception.warn parameters error error'
                 __POS__ Exit
             in
-            let error'', current_list =
+            let error'', bdu_handler, current_list =
               List.fold_left
-                (fun (error, current_list) token ->
+                (fun (error, bdu_handler, current_list) token ->
                   convert_views_internal_constraints_list_aux
                     ~show_dep_with_dimmension_higher_than:0 parameters
                     handler_kappa error agent_string agent_type agent_id token
-                    t' current_list)
-                (error, current_list) list
+                    t' current_list bdu_handler)
+                (error, bdu_handler, current_list)
+                list
             in
             let error =
               Exception.check_point Exception.warn parameters error error''
                 __POS__ Exit
             in
-            error, current_list)
-          (error, current_list) list
+            error, bdu_handler, current_list)
+          (error, bdu_handler, current_list)
+          list
       in
-      error, current_list
-    | Range_with_valuations _ -> error, current_list
+      error, bdu_handler, current_list
     | No_known_translation list ->
       (match Remanent_parameters.get_backend_mode parameters with
       | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-        let error, current_list =
-          let error'', refinement =
+        let error, bdu_handler, current_list =
+          let error'', bdu_handler, refinement =
             List.fold_left
-              (fun (error, current_list) state_list ->
+              (fun (error, bdu_handler, current_list) (state_list, mvbdu) ->
                 let error, t' =
                   List.fold_left
                     (fun (error, t') (site, state) ->
@@ -1383,32 +1388,32 @@ let rec convert_views_internal_constraints_list_aux
                       error, t')
                     (error, t) state_list
                 in
-                let refinement = t' :: current_list in
-                error, refinement)
-              (error, []) list
+                let error, bdu_handler, formula =
+                  Handler.mvbdu_to_string_formula_option parameters error
+                    handler_kappa bdu_handler mvbdu
+                in
+                let refinement = (t', formula) :: current_list in
+                error, bdu_handler, refinement)
+              (error, bdu_handler, []) list
           in
           let error =
             Exception.check_point Exception.warn parameters error error''
               __POS__ Exit
           in
           (*----------------------------------------*)
-          let lemma =
-            Public_data.Refinement
-              { Public_data.hyp = t; Public_data.refinement }
-          in
+          let lemma = { Public_data.hyp = t; Public_data.refinement } in
           let current_list = lemma :: current_list in
-          error, current_list
+          error, bdu_handler, current_list
         in
-        error, current_list
-      | Remanent_parameters_sig.Natural_language -> error, current_list)
+        error, bdu_handler, current_list
+      | Remanent_parameters_sig.Natural_language ->
+        error, bdu_handler, current_list)
   in
-  error, current_list
+  error, bdu_handler, current_list
 
 let convert_views_internal_constraints_list
     ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa
-    bdu_handler error agent_string agent_type translation current_list
-    restriction_bdu =
-  let nsites = Handler.get_nsites handler_kappa in
+    bdu_handler error agent_string agent_type translation current_list =
   let t = Site_graphs.KaSa_site_graph.empty in
   let error', agent_id, t =
     Site_graphs.KaSa_site_graph.add_agent parameters error handler_kappa
@@ -1424,71 +1429,19 @@ let convert_views_internal_constraints_list
         Site_graphs.KaSa_site_graph.add_site_or_guard parameters error
           handler_kappa agent_id site t
       in
-      let error, current_list =
+      let error, bdu_handler, current_list =
         convert_views_internal_constraints_list_aux
           ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa
           error agent_string agent_type agent_id translation t current_list
+          bdu_handler
       in
       error, bdu_handler, current_list
     | Equiv _ | Imply _ | Partition _ | No_known_translation _ ->
-      let error, current_list =
+      let error, bdu_handler, current_list =
         convert_views_internal_constraints_list_aux
           ~show_dep_with_dimmension_higher_than:dim_min parameters handler_kappa
           error agent_string agent_type agent_id translation t current_list
-      in
-      error, bdu_handler, current_list
-    | Range_with_valuations list ->
-      let error, bdu_handler, current_list =
-        List.fold_left
-          (fun (error, bdu_handler, current_list) (sites, mvbdu) ->
-            let error, agent_graph, n =
-              List.fold_left
-                (fun (error, agent_graph, n) (site, state) ->
-                  let error, agent_graph =
-                    Site_graphs.KaSa_site_graph.add_site_or_guard parameters
-                      error handler_kappa agent_id site agent_graph
-                  in
-                  let error, agent_graph =
-                    Site_graphs.KaSa_site_graph.add_state_or_guard parameters
-                      error handler_kappa agent_id site state agent_graph
-                  in
-                  let n =
-                    match
-                      Ckappa_sig.site_or_guard_p_of_mvbdu_var site nsites
-                    with
-                    | Site _ -> n + 1
-                    | Guard_p _ -> n
-                  in
-                  error, agent_graph, n)
-                (error, t, 0) sites
-            in
-            if n >= dim_min then (
-              let error, bdu_handler, is_true =
-                Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-                  mvbdu restriction_bdu
-              in
-              let error, bdu_handler, current_list =
-                if not is_true then (
-                  let error, bdu_handler, formula =
-                    Handler.mvbdu_to_string_formula parameters error
-                      handler_kappa bdu_handler mvbdu
-                  in
-                  let formula_lemma =
-                    Public_data.Formula
-                      {
-                        Public_data.pattern = agent_graph;
-                        Public_data.reachability_condition = formula;
-                      }
-                  in
-                  error, bdu_handler, formula_lemma :: current_list
-                ) else
-                  error, bdu_handler, current_list
-              in
-              error, bdu_handler, current_list
-            ) else
-              error, bdu_handler, current_list)
-          (error, bdu_handler, current_list)
-          list
+          bdu_handler
       in
       error, bdu_handler, current_list
   in

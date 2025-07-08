@@ -30,13 +30,9 @@ let sitenodeid = "node_id"
 let sitenodesites = "node_sites"
 let hyp = "site graph"
 let refinement = "site graph list"
-let pattern = "pattern"
-let reachability_condition = "formula"
 let domain_name = "domain name"
 let refinements_list = "refinements list"
 let refinement_lemmas = "lemmas"
-let lemma_type = "type"
-let lemma_value = "value"
 let rule_id = "id"
 let agent_id = "id"
 let label = "label"
@@ -963,90 +959,36 @@ type agent =
     * (int option * int option) option)
     list
 
-type 'site_graph refinement_lemma = {
+type 'site_graph lemma = {
   hyp: 'site_graph;
-  refinement: 'site_graph list;
+  refinement: ('site_graph * string formula option) list;
 }
-
-type 'site_graph formula_lemma = {
-  pattern: 'site_graph;
-  reachability_condition: string formula;
-}
-
-type 'site_graph lemma =
-  | Refinement of 'site_graph refinement_lemma
-  | Formula of 'site_graph formula_lemma
 
 type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
 
-let refinement_lemma_to_json site_graph_to_json json =
+let lemma_to_json site_graph_to_json json =
   JsonUtil.of_pair ~lab1:hyp ~lab2:refinement site_graph_to_json
-    (JsonUtil.of_list site_graph_to_json)
+    (JsonUtil.of_list
+       (JsonUtil.of_pair site_graph_to_json
+          (JsonUtil.of_option
+             (Logical_formulae.formula_to_json JsonUtil.of_string))))
     (json.hyp, json.refinement)
 
-let refinement_lemma_of_json site_graph_of_json json =
+let lemma_of_json site_graph_of_json json =
   let a, b =
     JsonUtil.to_pair ~lab1:hyp ~lab2:refinement ~error_msg:"lemma"
       site_graph_of_json
-      (JsonUtil.to_list ~error_msg:"refinements list" site_graph_of_json)
+      (JsonUtil.to_list ~error_msg:"refinements list"
+         (JsonUtil.to_pair site_graph_of_json
+            (JsonUtil.to_option
+               (Logical_formulae.formula_of_json
+                  (JsonUtil.to_string ~error_msg:"boolean parameter")))))
       json
   in
   { hyp = a; refinement = b }
 
-let formula_lemma_to_json site_graph_to_json formula_lemma =
-  JsonUtil.of_pair ~lab1:pattern ~lab2:reachability_condition site_graph_to_json
-    (Logical_formulae.formula_to_json JsonUtil.of_string)
-    (formula_lemma.pattern, formula_lemma.reachability_condition)
-
-let formula_lemma_of_json site_graph_of_json json =
-  let a, b =
-    JsonUtil.to_pair ~lab1:pattern ~lab2:reachability_condition
-      ~error_msg:"formula lemma" site_graph_of_json
-      (Logical_formulae.formula_of_json
-         (JsonUtil.to_string ~error_msg:"boolean parameter"))
-      json
-  in
-  { pattern = a; reachability_condition = b }
-
-let lemma_of_json site_graph_of_json =
-  let raise_error x =
-    raise
-      (Yojson.Basic.Util.Type_error
-         (JsonUtil.exn_msg_cant_import_from_json "lemma", x))
-  in
-  function
-  | `Assoc l as x ->
-    (try
-       match List.assoc lemma_type l with
-       | `String "formula lemma" ->
-         Formula
-           (formula_lemma_of_json site_graph_of_json (List.assoc lemma_value l))
-       | `String "refinement lemma" ->
-         Refinement
-           (refinement_lemma_of_json site_graph_of_json
-              (List.assoc lemma_value l))
-       | x -> raise_error x
-     with _ -> raise_error x)
-  | x -> raise_error x
-
-let lemma_to_json site_graph_to_json = function
-  | Refinement lemma ->
-    `Assoc
-      [
-        lemma_type, `String "refinement lemma";
-        lemma_value, refinement_lemma_to_json site_graph_to_json lemma;
-      ]
-  | Formula lemma ->
-    `Assoc
-      [
-        lemma_type, `String "formula lemma";
-        lemma_value, formula_lemma_to_json site_graph_to_json lemma;
-      ]
-
 let get_hyp h = h.hyp
 let get_refinement r = r.refinement
-let get_pattern h = h.pattern
-let get_reachability_condition r = r.reachability_condition
 let free = ""
 let wildcard = "?"
 let bound = "!_"

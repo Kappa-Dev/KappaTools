@@ -24,8 +24,8 @@ val print_site_graph :
   ([> `PCDATA ] as 'a) Html.elt list ->
   'a Html.elt list
 
-val print_formula :
-  string Public_data.formula ->
+val print_formula_option :
+  string Public_data.formula option ->
   ([> `PCDATA ] as 'a) Html.elt list ->
   'a Html.elt list
 

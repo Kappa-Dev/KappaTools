@@ -1687,64 +1687,6 @@ module Domain = struct
   (*EXPORT*)
   (****************************************************************)
 
-  let export_with_formula parameters error handler restriction_bdu nsites
-      kappa_handler agent_id1 site_type1' agent_id2 site_type2' pattern
-      pair_list =
-    List.fold_left
-      (fun (error, handler, formula_constraints_list) (l, mvbdu) ->
-        let error, handler, is_true =
-          Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
-            restriction_bdu
-        in
-        let error, handler, formula =
-          Handler.mvbdu_to_string_formula parameters error kappa_handler handler
-            mvbdu
-        in
-        if not is_true then (
-          let error, pattern =
-            List.fold_left
-              (fun (error, pattern) (site_or_guard, state) ->
-                let error, pattern =
-                  match
-                    Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard nsites
-                  with
-                  | Ckappa_sig.Site _ ->
-                    if site_or_guard = Ckappa_sig.fst_site then (
-                      let error, pattern =
-                        Site_graphs.KaSa_site_graph.add_state parameters error
-                          kappa_handler agent_id1 site_type1' state pattern
-                      in
-                      error, pattern
-                    ) else if site_or_guard = Ckappa_sig.snd_site then (
-                      let error, pattern =
-                        Site_graphs.KaSa_site_graph.add_state parameters error
-                          kappa_handler agent_id2 site_type2' state pattern
-                      in
-                      error, pattern
-                    ) else
-                      Exception.warn parameters error __POS__ Exit pattern
-                  | Guard_p _ ->
-                    (*this should not happen, because the guards are in the mvbdu and not in the list of variables*)
-                    Exception.warn parameters error __POS__ Exit pattern
-                in
-                error, pattern)
-              (error, pattern) l
-          in
-          let new_constraint =
-            Public_data.Formula
-              {
-                Public_data.pattern;
-                Public_data.reachability_condition = formula;
-              }
-          in
-          let formula_constraints_list =
-            new_constraint :: formula_constraints_list
-          in
-          error, handler, formula_constraints_list
-        ) else
-          error, handler, formula_constraints_list)
-      (error, handler, []) pair_list
-
   let export_aux ?(final_result = false) static dynamic error kasa_state =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
@@ -1789,10 +1731,6 @@ module Domain = struct
                 Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters
                   handler error ~threshold mvbdu
               in
-              let error, handler, depends_on_parameters =
-                Site_across_bonds_domain_type.depends_on_parameters parameters
-                  kappa_handler handler error pair_list restriction_bdu
-              in
               match Remanent_parameters.get_backend_mode parameters with
               | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
                 let pattern = Site_graphs.KaSa_site_graph.empty in
@@ -1809,33 +1747,19 @@ module Domain = struct
                     kappa_handler agent_id1 site_type1 agent_id2 site_type2
                     pattern
                 in
-                if depends_on_parameters then (
-                  let error, handler, new_constraints =
-                    export_with_formula parameters error handler restriction_bdu
-                      nsites kappa_handler agent_id1 site_type1' agent_id2
-                      site_type2' pattern pair_list
-                  in
-                  let current_list = new_constraints @ current_list in
-                  error, (handler, current_list)
-                ) else (
-                  (*---------------------------------------------------*)
-                  (*internal constraint list*)
-                  let error, refine =
-                    Ckappa_site_graph.internal_pair_list_to_list parameters
-                      error kappa_handler pattern agent_id1 site_type1'
-                      agent_id2 site_type2' pair_list
-                  in
-                  let lemma_internal =
-                    Public_data.Refinement
-                      {
-                        Public_data.hyp = pattern;
-                        Public_data.refinement = refine;
-                      }
-                  in
-                  let current_list = lemma_internal :: current_list in
-                  (*---------------------------------------------------*)
-                  error, (handler, current_list)
-                )
+                (*---------------------------------------------------*)
+                (*internal constraint list*)
+                let error, (handler, refine) =
+                  Ckappa_site_graph.internal_pair_list_to_list parameters error
+                    handler kappa_handler pattern agent_id1 site_type1'
+                    agent_id2 site_type2' pair_list restriction_bdu
+                in
+                let lemma_internal =
+                  { Public_data.hyp = pattern; Public_data.refinement = refine }
+                in
+                let current_list = lemma_internal :: current_list in
+                (*---------------------------------------------------*)
+                error, (handler, current_list)
               | Remanent_parameters_sig.Natural_language ->
                 error, (handler, current_list)
             )

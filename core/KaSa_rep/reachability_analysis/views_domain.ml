@@ -3194,7 +3194,6 @@ module Domain = struct
                   handler_kappa agent_id x
               in
               error, (agent_string, x)
-            | Translation_in_natural_language.Range_with_valuations _
             | Translation_in_natural_language.Equiv _
             | Translation_in_natural_language.No_known_translation _
             | Translation_in_natural_language.Partition _
@@ -3624,7 +3623,7 @@ module Domain = struct
             .convert_views_internal_constraints_list
               ~show_dep_with_dimmension_higher_than:dim_min parameters
               handler_kappa bdu_handler error agent_string agent_type
-              translation current_list restriction_bdu
+              translation current_list
           in
           let error =
             Exception.check_point Exception.warn parameters error error' __POS__
@@ -3649,12 +3648,8 @@ module Domain = struct
       if sort then
         Tools_kasa.sort_list
           (fun parameters error lemma ->
-            let hyp =
-              match lemma with
-              | Public_data.Refinement lemma -> Public_data.get_hyp lemma
-              | Public_data.Formula lemma -> Public_data.get_pattern lemma
-            in
-            Site_graphs.KaSa_site_graph.to_string parameters error hyp)
+            Site_graphs.KaSa_site_graph.to_string parameters error
+              (Public_data.get_hyp lemma))
           parameters error current_list
       else
         error, current_list

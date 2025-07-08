@@ -1471,82 +1471,86 @@ module Domain = struct
 
   (***********************************************************)
 
-  let export_without_formula parameters bdu_handler error list_same t_same
-      list_distinct t_distinct t_precondition parallel_is_true parallel_is_false
+  let export_without_formula parameters list_same t_same list_distinct
+      t_distinct t_precondition parallel_is_true parallel_is_false
       non_parallel_is_true non_parallel_is_false current_list =
-    let build_lemma t_1 list_1 t_2 =
-      let refine = List.rev list_1 in
+    let build_lemma t_1 list_1 t_2 current_list =
+      let refine = List.rev_map (fun t -> t, None) list_1 in
       match Remanent_parameters.get_backend_mode parameters with
       | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
         (*internal constraint list*)
         let lemma_internal =
-          Public_data.Refinement
-            { Public_data.hyp = t_1; Public_data.refinement = refine }
+          { Public_data.hyp = t_1; Public_data.refinement = refine }
         in
         let current_list = lemma_internal :: current_list in
-        error, bdu_handler, current_list
+        current_list
       | Remanent_parameters_sig.Natural_language ->
         (*internal constraint list*)
         let lemma_internal =
-          Public_data.Refinement
-            { Public_data.hyp = t_2; Public_data.refinement = refine }
+          { Public_data.hyp = t_2; Public_data.refinement = refine }
         in
         let current_list = lemma_internal :: current_list in
-        error, bdu_handler, current_list
+        current_list
     in
     if parallel_is_true && non_parallel_is_false then
-      build_lemma t_precondition list_same t_same
+      build_lemma t_precondition list_same t_same current_list
     else if parallel_is_false && non_parallel_is_true then
-      build_lemma t_precondition list_distinct t_distinct
+      build_lemma t_precondition list_distinct t_distinct current_list
     else if parallel_is_true && non_parallel_is_true then (
       match Remanent_parameters.get_backend_mode parameters with
       | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-        error, bdu_handler, current_list
+        current_list
       | Remanent_parameters_sig.Natural_language ->
         (*internal*)
-        let refine = List.rev list_same in
+        let refine = List.rev_map (fun t -> t, None) list_same in
         let lemma_internal =
-          Public_data.Refinement
-            { Public_data.hyp = t_same; Public_data.refinement = refine }
+          { Public_data.hyp = t_same; Public_data.refinement = refine }
         in
         let current_list = lemma_internal :: current_list in
         (*----------------------------------------------*)
-        let refine = List.rev list_distinct in
+        let refine = List.rev_map (fun t -> t, None) list_distinct in
         let lemma_internal =
-          Public_data.Refinement
-            { Public_data.hyp = t_distinct; Public_data.refinement = refine }
+          { Public_data.hyp = t_distinct; Public_data.refinement = refine }
         in
         let current_list = lemma_internal :: current_list in
-        error, bdu_handler, current_list
+        current_list
     ) else
-      error, bdu_handler, current_list
+      current_list
 
   let export_with_formula parameters error kappa_handler bdu_handler
       parallel_bond_mvbdu non_parallel_bond_mvbdu current_list parallel_is_true
-      non_parallel_is_true t_same t_distinct =
-    let build_lemma t_1 mvbdu =
-      let error, bdu_handler, formula =
-        Handler.mvbdu_to_string_formula parameters error kappa_handler
-          bdu_handler mvbdu
-      in
+      non_parallel_is_true t_same t_distinct t_precondition =
+    let build_lemma t_1 refine current_list =
       let lemma_internal =
-        Public_data.Formula
-          {
-            Public_data.pattern = t_1;
-            Public_data.reachability_condition = formula;
-          }
+        { Public_data.hyp = t_1; Public_data.refinement = refine }
       in
       let current_list = lemma_internal :: current_list in
-      error, bdu_handler, current_list
+      current_list
     in
-    if not parallel_is_true then
-      build_lemma t_same parallel_bond_mvbdu
-    else if not non_parallel_is_true then
-      build_lemma t_distinct non_parallel_bond_mvbdu
-    else
-      error, bdu_handler, current_list
+    let error, bdu_handler, parallel_bonds_formula =
+      Handler.mvbdu_to_string_formula parameters error kappa_handler bdu_handler
+        parallel_bond_mvbdu
+    in
+    let error, bdu_handler, non_parallel_bond_formula =
+      Handler.mvbdu_to_string_formula parameters error kappa_handler bdu_handler
+        non_parallel_bond_mvbdu
+    in
+    let patterns =
+      if not parallel_is_true then
+        [ t_same, Some parallel_bonds_formula ]
+      else
+        [ t_same, None ]
+    in
+    let patterns =
+      if not non_parallel_is_true then
+        (t_distinct, Some non_parallel_bond_formula) :: patterns
+      else
+        (t_distinct, None) :: patterns
+    in
+    error, bdu_handler, build_lemma t_precondition patterns current_list
 
   let export static dynamic error kasa_state =
+    let _ = static in
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let store_value = get_value dynamic in
@@ -1667,19 +1671,16 @@ module Domain = struct
           else if
             (*--------------------------------------------------*)
             depends_on_parameters
-          then (
-            let error, bdu_handler, current_lemma_list =
-              export_with_formula parameters error kappa_handler bdu_handler
-                parallel_bond_mvbdu non_parallel_bond_mvbdu current_lemma_list
-                parallel_is_true non_parallel_is_true t_same t_distinct
-            in
-            error, bdu_handler, current_lemma_list
-          ) else (
-            let error, bdu_handler, current_lemma_list =
-              export_without_formula parameters bdu_handler error list_same
-                t_same list_distinct t_distinct t_precondition parallel_is_true
-                parallel_is_false non_parallel_is_true non_parallel_is_false
-                current_lemma_list
+          then
+            export_with_formula parameters error kappa_handler bdu_handler
+              parallel_bond_mvbdu non_parallel_bond_mvbdu current_lemma_list
+              parallel_is_true non_parallel_is_true t_same t_distinct
+              t_precondition
+          else (
+            let current_lemma_list =
+              export_without_formula parameters list_same t_same list_distinct
+                t_distinct t_precondition parallel_is_true parallel_is_false
+                non_parallel_is_true non_parallel_is_false current_lemma_list
             in
             error, bdu_handler, current_lemma_list
           ))

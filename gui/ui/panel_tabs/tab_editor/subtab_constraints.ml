@@ -26,22 +26,26 @@ let content () =
     let conclusion = Public_data.get_refinement lemma in
     let list =
       match conclusion with
-      | [ site_graph ] ->
-        Html_utility.print_site_graph site_graph
-          (Html_utility.print_newline list)
+      | [ (site_graph, formula) ] ->
+        let list =
+          Html_utility.print_site_graph site_graph
+            (Html_utility.print_newline list)
+        in
+        Html_utility.print_formula_option formula list
       | _ :: _ | [] ->
         let list = Html_utility.print_newline list in
         let list = Html_utility.print_string " ]" list in
         let list =
           snd
             (List.fold_left
-               (fun (bool, list) a ->
+               (fun (bool, list) (a, formula) ->
                  let list =
                    if bool then
                      Html_utility.print_string " v " list
                    else
                      list
                  in
+                 let list = Html_utility.print_formula_option formula list in
                  let list = Html_utility.print_site_graph a list in
                  true, list)
                (false, list) (List.rev conclusion))
@@ -53,25 +57,12 @@ let content () =
     let list = Html_utility.print_site_graph hyp list in
     list
   in
-  let print_formula_constraint lemma list =
-    let list = Html_utility.print_newline list in
-    let pattern = Public_data.get_pattern lemma in
-    let formula = Public_data.get_reachability_condition lemma in
-    let list = Html_utility.print_formula formula list in
-    let list = Html_utility.print_string "  =>  " list in
-    let list = Html_utility.print_site_graph pattern list in
-    list
-  in
   let add_constraints constraints =
     List.fold_left
       (fun panels (a, b) ->
         let texts =
           List.fold_left
-            (fun list lemma ->
-              match lemma with
-              | Public_data.Refinement lemma ->
-                print_refinement_constraint lemma list
-              | Public_data.Formula lemma -> print_formula_constraint lemma list)
+            (fun list lemma -> print_refinement_constraint lemma list)
             [] (List.rev b)
         in
         let title =

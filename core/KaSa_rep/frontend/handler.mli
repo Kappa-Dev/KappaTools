@@ -213,6 +213,15 @@ val print_guard_mvbdu :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.Views_bdu.handler
 
+val print_guard_option :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.Views_bdu.mvbdu option ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+
 val print_labels :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -503,6 +512,16 @@ val mvbdu_to_string_formula :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.Views_bdu.handler
   * string Logical_formulae.formula
+
+val mvbdu_to_string_formula_option :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.Views_bdu.mvbdu option ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+  * string Logical_formulae.formula option
 
 val print_formula :
   Remanent_parameters_sig.parameters -> string Logical_formulae.formula -> unit

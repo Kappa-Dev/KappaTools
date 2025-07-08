@@ -1926,44 +1926,19 @@ functor
               List.fold_left
                 (fun (error, current_list) lem ->
                   let error, lemma =
-                    match lem with
-                    | Public_data.Refinement lem ->
-                      let hyp = Public_data.get_hyp lem in
-                      let refine = Public_data.get_refinement lem in
-                      let string_version =
-                        Site_graphs.KaSa_site_graph.get_string_version hyp
-                      in
-                      let error, site_graph =
-                        Ckappa_site_graph.site_graph_to_list error
-                          string_version
-                      in
-                      let error, refinement =
-                        Ckappa_site_graph.site_graph_list_to_list error refine
-                      in
-                      ( error,
-                        Public_data.Refinement
-                          {
-                            Public_data.hyp = site_graph;
-                            Public_data.refinement;
-                          } )
-                    | Public_data.Formula lem ->
-                      let pattern = Public_data.get_pattern lem in
-                      let reachability_condition =
-                        Public_data.get_reachability_condition lem
-                      in
-                      let string_version =
-                        Site_graphs.KaSa_site_graph.get_string_version pattern
-                      in
-                      let error, site_graph =
-                        Ckappa_site_graph.site_graph_to_list error
-                          string_version
-                      in
-                      ( error,
-                        Public_data.Formula
-                          {
-                            Public_data.pattern = site_graph;
-                            Public_data.reachability_condition;
-                          } )
+                    let hyp = Public_data.get_hyp lem in
+                    let refine = Public_data.get_refinement lem in
+                    let string_version =
+                      Site_graphs.KaSa_site_graph.get_string_version hyp
+                    in
+                    let error, site_graph =
+                      Ckappa_site_graph.site_graph_to_list error string_version
+                    in
+                    let error, refinement =
+                      Ckappa_site_graph.site_graph_list_to_list error refine
+                    in
+                    ( error,
+                      { Public_data.hyp = site_graph; Public_data.refinement } )
                   in
                   let current_list = lemma :: current_list in
                   error, current_list)
