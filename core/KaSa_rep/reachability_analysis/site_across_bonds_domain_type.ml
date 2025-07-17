@@ -318,7 +318,8 @@ let print_guard_mvbdu parameters error handler kappa_handler mvbdu
     error, handler
   else (
     let error, handler =
-      Handler.print_guard_option parameters error kappa_handler handler (Some mvbdu)
+      Handler.print_guard_option parameters error kappa_handler handler
+        (Some mvbdu)
     in
     error, handler
   )
