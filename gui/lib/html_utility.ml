@@ -144,3 +144,5 @@ let print_exceptions_caught_and_uncaught mh =
                (Format.asprintf "%a" Exception_without_parameter.pp_uncaught x);
            ])
        uncaught)
+
+let print_rule _rule list = print_string "" list (*TODO*)

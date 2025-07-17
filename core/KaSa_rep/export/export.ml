@@ -1857,6 +1857,21 @@ functor
         (*  ~dump:dump_raw_internal_contact_map *)
         Remanent_state.get_dead_rules compute_dead_rules
 
+    let compute_conditionally_dead_rules _show_title state =
+      let state, _ = get_reachability_analysis state in
+      match Remanent_state.get_conditionally_dead_rules state with
+      | Some l -> state, l
+      | None -> assert false
+
+    let get_conditionally_dead_rules =
+      get_gen ~do_we_show_title:title_only_in_kasa
+        ~log_title:
+          "Detecting for which valuations of the boolean parameters each rule \
+           may be triggered during simulations"
+        (*  ~dump:dump_raw_internal_contact_map *)
+        Remanent_state.get_conditionally_dead_rules
+        compute_conditionally_dead_rules
+
     let compute_separating_transitions _show_title state =
       let parameters = get_parameters state in
       let parameters' =
@@ -1890,6 +1905,21 @@ functor
         ~log_title:"Detecting which agents may occur during simulations"
         (*  ~dump:dump_raw_internal_contact_map *)
         Remanent_state.get_dead_agents compute_dead_agents
+
+    let compute_conditionally_dead_agents _show_title state =
+      let state, _ = get_reachability_analysis state in
+      match Remanent_state.get_conditionally_dead_agents state with
+      | Some map -> state, map
+      | None -> assert false
+
+    let get_conditionally_dead_agents =
+      get_gen ~do_we_show_title:title_only_in_kasa
+        ~log_title:
+          "Detecting for which valuations of the boolean parameters each agent \
+           may occur during simulations"
+        (*  ~dump:dump_raw_internal_contact_map *)
+        Remanent_state.get_conditionally_dead_agents
+        compute_conditionally_dead_agents
 
     (****************************************************************)
     (*constraints_list*)

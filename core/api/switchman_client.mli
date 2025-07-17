@@ -48,6 +48,18 @@ object
   method get_dead_rules :
     (Public_data.rule list, Result_util.message list) Result_util.t Lwt.t
 
+  method get_conditionally_dead_agents :
+    ( Public_data.agent_deadness_conditions,
+      Result_util.message list )
+    Result_util.t
+    Lwt.t
+
+  method get_conditionally_dead_rules :
+    ( Public_data.rule_deadness_conditions,
+      Result_util.message list )
+    Result_util.t
+    Lwt.t
+
   method get_influence_map_node_at :
     filename:string ->
     Loc.position ->

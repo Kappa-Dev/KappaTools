@@ -37,6 +37,8 @@ type _ handle =
         handle
   | Rules_kasa : Public_data.rule list handle
   | Agents_kasa : Public_data.dead_agents handle
+  | Rules_kasa_with_conditions : Public_data.rule_deadness_conditions handle
+  | Agents_kasa_with_conditions : Public_data.agent_deadness_conditions handle
   | Transitions_kasa : (Public_data.rule * (string * string) list) list handle
   | Constraints_kasa
       : (string * Public_data.agent list Public_data.lemma list) list handle
@@ -253,9 +255,15 @@ let on_message exec_command message_delimiter =
                      | "DEAD_RULES" ->
                        manager#get_dead_rules >>= fun out ->
                        Lwt.return (B (Rules_kasa, msg_id, out))
+                     | "CONDITIONALLY_DEAD_RULES" ->
+                       manager#get_conditionally_dead_rules >>= fun out ->
+                       Lwt.return (B (Rules_kasa_with_conditions, msg_id, out))
                      | "DEAD_AGENTS" ->
                        manager#get_dead_agents >>= fun out ->
                        Lwt.return (B (Agents_kasa, msg_id, out))
+                     | "CONDITIONALLY_DEAD_AGENTS" ->
+                       manager#get_conditionally_dead_agents >>= fun out ->
+                       Lwt.return (B (Agents_kasa_with_conditions, msg_id, out))
                      | "NON_WEAKLY_REVERSIBLE_TRANSITIONS" ->
                        manager#get_non_weakly_reversible_transitions
                        >>= fun out ->
@@ -446,6 +454,18 @@ let on_message exec_command message_delimiter =
             reply post
               (fun b n ->
                 Yojson.Basic.write_json b (Public_data.json_of_dead_agents n))
+              msg_id x
+          | B (Rules_kasa_with_conditions, msg_id, x) ->
+            reply post
+              (fun b n ->
+                Yojson.Basic.write_json b
+                  (Public_data.conditionally_dead_rules_to_json n))
+              msg_id x
+          | B (Agents_kasa_with_conditions, msg_id, x) ->
+            reply post
+              (fun b n ->
+                Yojson.Basic.write_json b
+                  (Public_data.conditionally_dead_agents_to_json n))
               msg_id x
           | B (Transitions_kasa, msg_id, x) ->
             reply post

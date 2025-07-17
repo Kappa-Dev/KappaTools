@@ -181,6 +181,20 @@ let on_message post text =
     send_response post id agents
   | Some
       ( id,
+        ( `List [ `String "CONDITIONALLY_DEAD_RULES" ]
+        | `String "CONDITIONALLY_DEAD_RULES" ) ) ->
+    let state, rules = get_conditionally_dead_rules !gState in
+    let () = gState := state in
+    send_response post id rules
+  | Some
+      ( id,
+        ( `List [ `String "CONDITIONALLY_DEAD_AGENTS" ]
+        | `String "CONDITIONALLY_DEAD_AGENTS" ) ) ->
+    let state, agents = get_conditionally_dead_agents !gState in
+    let () = gState := state in
+    send_response post id agents
+  | Some
+      ( id,
         ( `List [ `String "NON_WEAKLY_REVERSIBLE_TRANSITIONS" ]
         | `String "NON_WEAKLY_REVERSIBLE_TRANSITIONS" ) ) ->
     let state, transitions = get_separating_transitions !gState in

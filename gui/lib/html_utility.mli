@@ -13,6 +13,16 @@ val print_newline : ([> `PCDATA ] as 'a) Html.elt list -> 'a Html.elt list
 val print_string :
   string Html.wrap -> ([> `PCDATA ] as 'a) Html.elt list -> 'a Html.elt list
 
+val print_agent :
+  string Html.wrap
+  * (string Html.wrap
+    * string Html.wrap option
+    * Public_data.binding_state option
+    * (int option * int option) option)
+    list ->
+  ([> `PCDATA ] as 'a) Html.elt list ->
+  'a Html.elt list
+
 val print_site_graph :
   (string Html.wrap
   * (string Html.wrap
@@ -24,6 +34,11 @@ val print_site_graph :
   ([> `PCDATA ] as 'a) Html.elt list ->
   'a Html.elt list
 
+val print_formula :
+  string Public_data.formula ->
+  ([> `PCDATA ] as 'a) Html.elt list ->
+  'a Html.elt list
+
 val print_formula_option :
   string Public_data.formula option ->
   ([> `PCDATA ] as 'a) Html.elt list ->
@@ -32,3 +47,6 @@ val print_formula_option :
 val print_exceptions_caught_and_uncaught :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   [> Html_types.p ] Html.elt list
+
+val print_rule :
+  Public_data.rule -> ([> `PCDATA ] as 'a) Html.elt list -> 'a Html.elt list
