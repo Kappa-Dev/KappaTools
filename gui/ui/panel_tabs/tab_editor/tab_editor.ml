@@ -94,14 +94,7 @@ let init_dead_rules () =
                                acc
                              else (
                                let text =
-                                 "Dead rule "
-                                 ^
-                                 if rule.Public_data.rule_label <> "" then
-                                   " '" ^ rule.Public_data.rule_label ^ "'"
-                                 else if rule.Public_data.rule_ast <> "" then
-                                   rule.Public_data.rule_ast
-                                 else
-                                   string_of_int rule.Public_data.rule_id
+                                 "Dead rule " ^ Html_utility.string_of_rule rule
                                in
                                {
                                  Result_util.severity = Logs.Warning;
@@ -138,11 +131,7 @@ let init_dead_agents () =
                            (fun acc agent ->
                              let text =
                                "Dead agent "
-                               ^
-                               if agent.Public_data.agent_ast <> "" then
-                                 agent.Public_data.agent_ast
-                               else
-                                 string_of_int agent.Public_data.agent_id
+                               ^ Html_utility.string_of_agent agent
                              in
                              List.fold_left
                                (fun acc range ->
