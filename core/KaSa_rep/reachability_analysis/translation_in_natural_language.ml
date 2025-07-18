@@ -701,18 +701,6 @@ let rec print ?beginning_of_sentence:(beggining = true)
   in
   let log = Remanent_parameters.get_logger parameters in
   let nsites = Handler.get_nsites handler_kappa in
-  let print_mvbdu_natural_language error bdu_handler mvbdu =
-    match mvbdu with
-    | None -> error, bdu_handler
-    | Some mvbdu ->
-      let () = Loggers.fprintf log " (only if " in
-      let error, bdu_handler =
-        Handler.print_guard_mvbdu parameters error handler_kappa bdu_handler
-          mvbdu
-      in
-      let () = Loggers.fprintf log ")" in
-      error, bdu_handler
-  in
   let error, bdu_handler =
     match translation with
     | Range (site_type, state_list) ->
@@ -778,7 +766,8 @@ let rec print ?beginning_of_sentence:(beggining = true)
               in
               let () = Loggers.fprintf log " and %s" state_string in
               let error, bdu_handler =
-                print_mvbdu_natural_language error bdu_handler mvbdu
+                Handler.print_guard_option parameters error handler_kappa
+                  bdu_handler mvbdu
               in
               let () = Loggers.fprintf log ".%s" endofline in
               error, bdu_handler
@@ -793,7 +782,8 @@ let rec print ?beginning_of_sentence:(beggining = true)
               in
               let () = Loggers.fprintf log " %s" state_string in
               let error, bdu_handler =
-                print_mvbdu_natural_language error bdu_handler mvbdu
+                Handler.print_guard_option parameters error handler_kappa
+                  bdu_handler mvbdu
               in
               let () = Loggers.fprintf log "," in
               aux tail error bdu_handler
@@ -853,13 +843,15 @@ let rec print ?beginning_of_sentence:(beggining = true)
                   (cap site_string) (in_agent agent_string) state_string1
               in
               let error, bdu_handler =
-                print_mvbdu_natural_language error bdu_handler mvbdu1
+                Handler.print_guard_option parameters error handler_kappa
+                  bdu_handler mvbdu1
               in
               let () =
                 Loggers.fprintf log "\n             and %s" state_string2
               in
               let error, bdu_handler =
-                print_mvbdu_natural_language error bdu_handler mvbdu2
+                Handler.print_guard_option parameters error handler_kappa
+                  bdu_handler mvbdu2
               in
               let () = Loggers.fprintf log ".%s" endofline in
               error, bdu_handler
@@ -1211,15 +1203,17 @@ let rec print ?beginning_of_sentence:(beggining = true)
                       let () =
                         Loggers.fprintf log "%s%s" site_string state_string
                       in
-                      let error, bdu_handler =
-                        print_mvbdu_natural_language error bdu_handler mvbdu
-                      in
                       error, bdu_handler, true)
                     (error, bdu_handler, false)
                     l
                 in
                 (*----------------------------------------------------*)
-                let () = if bool then Loggers.fprintf log ")%s" endofline in
+                let () = if bool then Loggers.fprintf log ")" in
+                let error, bdu_handler =
+                  Handler.print_guard_option parameters error handler_kappa
+                    bdu_handler mvbdu
+                in
+                let () = if bool then Loggers.fprintf log "%s" endofline in
                 error, bdu_handler)
               (error, bdu_handler) list
           ) else
