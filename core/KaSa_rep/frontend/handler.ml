@@ -735,7 +735,7 @@ let print_guard_option parameters error kappa_handler bdu_handler mvbdu =
   | None -> error, bdu_handler
   | Some mvbdu ->
     let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) "[ only if "
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) " [ only if "
     in
     let error, bdu_handler =
       print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu

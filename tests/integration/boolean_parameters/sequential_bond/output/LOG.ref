@@ -10,7 +10,7 @@ Reachability analysis...
 * There are some non applyable rules
 ------------------------------------------------------------
 rule 'seq_bond_0 (File "example_sequential_bond.ka", line 10, characters 0-40:) could be applied if @sq-A-x-y.
-rule File "example_sequential_bond.ka", line 10, characters 0-40: could be applied if ~@sq-A-x-y.
+rule File "example_sequential_bond.ka", line 10, characters 0-40: could be applied if .not.@sq-A-x-y.
 ------------------------------------------------------------
 every agent may occur in the model
 
@@ -29,7 +29,7 @@ A() =>
 	  A(x[x.A],y[.])
 	v A(x[x.A],y[y.A])
 	v A(x[.],y[.])
-	v A(x[.],y[y.A])[ only if ~@sq-A-x-y ]
+	v A(x[.],y[y.A]) [ only if .not.@sq-A-x-y ]
    ]
 ------------------------------------------------------------
 * Properties in connected agents
@@ -38,7 +38,7 @@ A(y[1]),A(y[1]) =>
 	[
 		  A(x[x.A],y[1]),A(x[.],y[1])
 		v A(x[x.A],y[1]),A(x[x.A],y[1])
-		v A(x[.],y[1]),A(x[.],y[1])[ only if ~@sq-A-x-y ]
+		v A(x[.],y[1]),A(x[.],y[1]) [ only if .not.@sq-A-x-y ]
 		v A(x[.],y[1]),A(x[x.A],y[1])
 	]
 ------------------------------------------------------------

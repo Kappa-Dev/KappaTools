@@ -795,7 +795,7 @@ Id=109
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x[x.C],y[.]) => test1.and.test2.and.(~test3)
+		A(x[x.C],y[.]) => test1.and.test2.and.(.not.test3)
 
 
 		Updating the views for C(x[],test1,test2,test3)
@@ -845,7 +845,7 @@ Id=120
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x[x.A]) => test1.and.test2.and.(~test3)
+		C(x[x.A]) => test1.and.test2.and.(.not.test3)
 
 
 	Applying rule name 1_op (File "example_initial_state.ka", line 14, characters 0-52:):
@@ -935,7 +935,7 @@ Id=136
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x[.],y[.]) => ((~test1).or.(~test2)).and.test3
+		A(x[.],y[.]) => ((.not.test1).or.(.not.test2)).and.test3
 
 
 		Updating the views for C(x[],test1,test2,test3)
@@ -1010,7 +1010,7 @@ Id=138
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x[.]) => ((~test1).or.(~test2)).and.test3
+		C(x[.]) => ((.not.test1).or.(.not.test2)).and.test3
 
 
 	Applying rule A(x[.] y[.]), B(y[.]) -> A(x[.] y[1]), B(y[1]) (File "example_initial_state.ka", line 15, characters 0-53:):
@@ -1251,8 +1251,8 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule name 1 (File "example_initial_state.ka", line 14, characters 0-52:) could be applied if (test1.or.test3).and.((~test1).or.test2.or.test3).
-rule name 1_op (File "example_initial_state.ka", line 14, characters 0-52:) could be applied if (test1.or.test3).and.((~test1).or.test2.or.test3).
+rule name 1 (File "example_initial_state.ka", line 14, characters 0-52:) could be applied if (test1.or.test3).and.((.not.test1).or.test2.or.test3).
+rule name 1_op (File "example_initial_state.ka", line 14, characters 0-52:) could be applied if (test1.or.test3).and.((.not.test1).or.test2.or.test3).
 rule File "example_initial_state.ka", line 15, characters 0-53: could be applied if test1.and.test2.
 rule File "example_initial_state.ka", line 15, characters 0-53: could be applied if test1.and.test2.
 rule name 3 (File "example_initial_state.ka", line 16, characters 0-52:) could be applied if test1.and.test2.
@@ -1261,9 +1261,9 @@ rule name 3_op (File "example_initial_state.ka", line 16, characters 0-52:) coul
 ------------------------------------------------------------
 * There are some non creatable agents 
 ------------------------------------------------------------
-A can occur in the model if (test1.or.test3).and.((~test1).or.test2.or.test3).
+A can occur in the model if (test1.or.test3).and.((.not.test1).or.test2.or.test3).
 B can occur in the model if test1.and.test2.
-C can occur in the model if (test1.or.test3).and.((~test1).or.test2.or.test3).
+C can occur in the model if (test1.or.test3).and.((.not.test1).or.test2.or.test3).
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -1867,10 +1867,10 @@ Id=150
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x) => [ A(x[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ] v A(x[x.C])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ] ]
-A(y) => [ A(y[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ] v A(y[y.B])[ only if test1.and.test2 ] ]
-B(y) => [ B(y[.])[ only if test1.and.test2 ] v B(y[y.A])[ only if test1.and.test2 ] ]
-C(x) => [ C(x[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ] v C(x[x.A])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ] ]
+A(x) => [ A(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ] v A(x[x.C]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ] ]
+A(y) => [ A(y[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ] v A(y[y.B]) [ only if test1.and.test2 ] ]
+B(y) => [ B(y[.]) [ only if test1.and.test2 ] v B(y[y.A]) [ only if test1.and.test2 ] ]
+C(x) => [ C(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ] v C(x[x.A]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ] ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -2902,17 +2902,17 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A(x)=> [
-		  A(x[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ]
-		v A(x[x.C])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ]]
+		  A(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+		v A(x[x.C]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]]
 A(y)=> [
-		  A(y[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ]
-		v A(y[y.B])[ only if test1.and.test2 ]]
+		  A(y[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+		v A(y[y.B]) [ only if test1.and.test2 ]]
 B(y)=> [
-		  B(y[.])[ only if test1.and.test2 ]
-		v B(y[y.A])[ only if test1.and.test2 ]]
+		  B(y[.]) [ only if test1.and.test2 ]
+		v B(y[y.A]) [ only if test1.and.test2 ]]
 C(x)=> [
-		  C(x[.])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ]
-		v C(x[x.A])[ only if (test1.or.test3).and.((~test1).or.test2.or.test3) ]]
+		  C(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+		v C(x[x.A]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

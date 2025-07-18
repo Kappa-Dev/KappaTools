@@ -25,6 +25,15 @@ let content () =
   let print_refinement_constraint lemma list =
     let hyp = Public_data.get_hyp lemma in
     let conclusion = Public_data.get_refinement lemma in
+    let contains_formula =
+      List.exists (fun (_, formula) -> Option.is_some formula) conclusion
+    in
+    let prefix =
+      if contains_formula then
+        "\n\t\t"
+      else
+        ""
+    in
     let list =
       match conclusion with
       | [ (site_graph, formula) ] ->
@@ -35,14 +44,14 @@ let content () =
         Html_utility.print_site_graph site_graph list
       | _ :: _ | [] ->
         let list = Html_utility.print_newline list in
-        let list = Html_utility.print_string " ]" list in
+        let list = Html_utility.print_string (prefix ^ " ]") list in
         let list =
           snd
             (List.fold_left
                (fun (bool, list) (a, formula) ->
                  let list =
                    if bool then
-                     Html_utility.print_string " v " list
+                     Html_utility.print_string (prefix ^ " v ") list
                    else
                      list
                  in

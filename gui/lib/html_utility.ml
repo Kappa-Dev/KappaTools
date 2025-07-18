@@ -120,9 +120,9 @@ let print_formula_option formula list =
   match formula with
   | None -> list
   | Some formula ->
-    let list = print_string "]" list in
+    let list = print_string " ]" list in
     let list = print_formula formula list in
-    print_string "[only if " list
+    print_string " [ only if " list
 
 let print_exceptions_caught_and_uncaught mh =
   let uncaught = Exception_without_parameter.get_uncaught_exception_list mh in

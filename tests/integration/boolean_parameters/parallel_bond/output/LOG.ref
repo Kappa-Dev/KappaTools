@@ -761,7 +761,7 @@ Id=78
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(y[y.A],x[x.A]) => ~P
+		A(y[y.A],x[x.A]) => .not.P
 
 
 		Updating the views for A(y[],x[],P)
@@ -908,8 +908,8 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule File "example_double_bonds.ka", line 16, characters 0-51: could be applied if ~P.
-rule File "example_double_bonds.ka", line 17, characters 0-51: could be applied if ~P.
+rule File "example_double_bonds.ka", line 16, characters 0-51: could be applied if .not.P.
+rule File "example_double_bonds.ka", line 17, characters 0-51: could be applied if .not.P.
 rule File "example_double_bonds.ka", line 20, characters 0-65: could be applied if P.
 rule File "example_double_bonds.ka", line 21, characters 0-65: could be applied if P.
 ------------------------------------------------------------
@@ -1070,7 +1070,7 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-A(x[2],y[1]),A(y[1]),A(x[2]) => ~P
+A(x[2],y[1]),A(y[1]),A(x[2]) => .not.P
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
@@ -1199,7 +1199,7 @@ A(y)=> [
 ------------------------------------------------------------
 A(x[x.A],y[y.A])=> [
 		  A(x[2],y[1]),A(x[2],y[1])
-		v A(x[2],y[1]),A(y[1]),A(x[2])[ only if ~P ]]
+		v A(x[2],y[1]),A(y[1]),A(x[2]) [ only if .not.P ]]
 
 ------------------------------------------------------------
 * Export Counters to JSon (internal constraints_list):

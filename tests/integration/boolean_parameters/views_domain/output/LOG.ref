@@ -751,7 +751,7 @@ Id=72
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x[t.E],y[.],z[.]) => ~P
+		A(x[t.E],y[.],z[.]) => .not.P
 
 
 		Updating the views for E(t[],P)
@@ -781,7 +781,7 @@ Id=80
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E(t[x.A]) => ~P
+		E(t[x.A]) => .not.P
 
 
 	Applying rule #[[not] P]A(y[.]), E(t[.]) -> A(y[1]), E(t[1]) (File "example_views.ka", line 15, characters 0-51:):
@@ -836,8 +836,8 @@ Id=89
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x[t.E],y[t.E],z[.]) => ~P
-		A(x[.],y[t.E],z[.]) => ~P
+		A(x[t.E],y[t.E],z[.]) => .not.P
+		A(x[.],y[t.E],z[.]) => .not.P
 
 
 		Updating the views for E(t[],P)
@@ -867,7 +867,7 @@ Id=101
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E(t[y.A]) => ~P
+		E(t[y.A]) => .not.P
 
 
 	Applying rule #[P]A(x[.] y[.]), E(t[.]) -> A(x[.] y[1]), E(t[1]) (File "example_views.ka", line 18, characters 0-55:):
@@ -1092,7 +1092,7 @@ Id=150
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x[t.E],y[t.E],z[t.E]) => ~P
+		A(x[t.E],y[t.E],z[t.E]) => .not.P
 
 
 		Updating the views for E(t[],P)
@@ -1122,7 +1122,7 @@ Id=167
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E(t[z.A]) => ~P
+		E(t[z.A]) => .not.P
 
 
 	Applying rule A(x[1]), E(t[1]) -> A(x[.]), E(t[.]) (File "example_views.ka", line 23, characters 0-40:):
@@ -1177,7 +1177,7 @@ Id=185
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x[.],y[t.E],z[t.E]) => ~P
+		A(x[.],y[t.E],z[t.E]) => .not.P
 
 
 		Updating the views for E(t[],P)
@@ -1234,8 +1234,8 @@ Id=210
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x[t.E],y[.],z[t.E]) => ~P
-		A(x[.],y[.],z[t.E]) => ~P
+		A(x[t.E],y[.],z[t.E]) => .not.P
+		A(x[.],y[.],z[t.E]) => .not.P
 
 
 		Updating the views for E(t[],P)
@@ -1301,12 +1301,12 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule File "example_views.ka", line 14, characters 0-51: could be applied if ~P.
-rule File "example_views.ka", line 15, characters 0-51: could be applied if ~P.
+rule File "example_views.ka", line 14, characters 0-51: could be applied if .not.P.
+rule File "example_views.ka", line 15, characters 0-51: could be applied if .not.P.
 rule File "example_views.ka", line 18, characters 0-55: could be applied if P.
 rule File "example_views.ka", line 19, characters 0-55: could be applied if P.
-rule File "example_views.ka", line 21, characters 0-64: could be applied if ~P.
-rule File "example_views.ka", line 25, characters 0-40: could be applied if ~P.
+rule File "example_views.ka", line 21, characters 0-64: could be applied if .not.P.
+rule File "example_views.ka", line 25, characters 0-40: could be applied if .not.P.
 ------------------------------------------------------------
 every agent may occur in the model
 
@@ -1624,8 +1624,8 @@ Id=169
 EXTENSIONAL DESCRIPTION:
 A(x) => [ A(x[.]) v A(x[t.E]) ]
 A(y) => [ A(y[.]) v A(y[t.E]) ]
-A(z) => [ A(z[.]) v A(z[t.E])[ only if ~P ] ]
-E(t) => [ E(t[.]) v E(t[x.A]) v E(t[y.A]) v E(t[z.A])[ only if ~P ] ]
+A(z) => [ A(z[.]) v A(z[t.E]) [ only if .not.P ] ]
+E(t) => [ E(t[.]) v E(t[x.A]) v E(t[y.A]) v E(t[z.A]) [ only if .not.P ] ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1790,7 +1790,7 @@ EXTENSIONAL DESCRIPTION:
 A() =>
    [
 	  A(x[t.E],y[.])
-	v A(x[t.E],y[t.E])[ only if ~P ]
+	v A(x[t.E],y[t.E]) [ only if .not.P ]
 	v A(x[.],y[.])
 	v A(x[.],y[t.E])
    ]
@@ -2103,19 +2103,19 @@ A(y)=> [
 		v A(y[t.E])]
 A(z)=> [
 		  A(z[.])
-		v A(z[t.E])[ only if ~P ]]
+		v A(z[t.E]) [ only if .not.P ]]
 E(t)=> [
 		  E(t[.])
 		v E(t[x.A])
 		v E(t[y.A])
-		v E(t[z.A])[ only if ~P ]]
+		v E(t[z.A]) [ only if .not.P ]]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
 		  A(x[t.E],y[.])
-		v A(x[t.E],y[t.E])[ only if ~P ]
+		v A(x[t.E],y[t.E]) [ only if .not.P ]
 		v A(x[.],y[.])
 		v A(x[.],y[t.E])]
 

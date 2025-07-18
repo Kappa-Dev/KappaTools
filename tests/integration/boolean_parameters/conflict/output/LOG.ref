@@ -12,9 +12,9 @@ Reachability analysis...
 rule File "example_conflict.ka", line 12, characters 0-21: could be applied if P.
 rule ~namef (File "example_conflict.ka", line 13, characters 0-31:) could be applied if P.
 rule 'conflict_0 (File "example_conflict.ka", line 14, characters 0-50:) could be applied if P.and.@co-A-x-y.and.x.and.y.
-rule File "example_conflict.ka", line 14, characters 0-50: could be applied if P.and.(~@co-A-x-y).and.x.and.y.
+rule File "example_conflict.ka", line 14, characters 0-50: could be applied if P.and.(.not.@co-A-x-y).and.x.and.y.
 rule 'conflict_1 (File "example_conflict.ka", line 15, characters 0-50:) could be applied if (B.or.C).and.P.and.@co-A-x-y.
-rule File "example_conflict.ka", line 15, characters 0-50: could be applied if (B.or.C).and.P.and.(~@co-A-x-y).
+rule File "example_conflict.ka", line 15, characters 0-50: could be applied if (B.or.C).and.P.and.(.not.@co-A-x-y).
 
 ------------------------------------------------------------
 * There are some non creatable agents 
@@ -24,36 +24,36 @@ A can occur in the model if P.
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A(x) => [ A(x[.])[ only if P ] v A(x[x.A])[ only if P.and.x.and.y ] ]
-A(x) => [ A(x{u})[ only if P ] v A(x{p})[ only if P ] ]
-A(y) => [ A(y[.])[ only if P ] v A(y[y.A])[ only if (B.or.C).and.P ] ]
+A(x) => [ A(x[.]) [ only if P ] v A(x[x.A]) [ only if P.and.x.and.y ] ]
+A(x) => [ A(x{u}) [ only if P ] v A(x{p}) [ only if P ] ]
+A(y) => [ A(y[.]) [ only if P ] v A(y[y.A]) [ only if (B.or.C).and.P ] ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 A() =>
    [
-	  A(x[x.A],y[.])[ only if P.and.x.and.y ]
-	v A(x[x.A],y[y.A])[ only if (B.or.C).and.P.and.(~@co-A-x-y).and.x.and.y ]
-	v A(x[.],y[.])[ only if P ]
-	v A(x[.],y[y.A])[ only if (B.or.C).and.P ]
+	  A(x[x.A],y[.]) [ only if P.and.x.and.y ]
+	v A(x[x.A],y[y.A]) [ only if (B.or.C).and.P.and.(.not.@co-A-x-y).and.x.and.y ]
+	v A(x[.],y[.]) [ only if P ]
+	v A(x[.],y[y.A]) [ only if (B.or.C).and.P ]
    ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
 A(x[1]),A(x[1]) => 
 	[
-		  A(x[1],y[y.A]),A(x[1],y[.])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
-		v A(x[1],y[y.A]),A(x[1],y[y.A])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
-		v A(x[1],y[.]),A(x[1],y[.])[ only if P.and.x.and.y ]
-		v A(x[1],y[.]),A(x[1],y[y.A])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
+		  A(x[1],y[y.A]),A(x[1],y[.]) [ only if (x.or.B.or.C).and.((.not.x).or.y.or.B.or.C).and.P.and.(.not.@co-A-x-y) ]
+		v A(x[1],y[y.A]),A(x[1],y[y.A]) [ only if (x.or.B.or.C).and.((.not.x).or.y.or.B.or.C).and.P.and.(.not.@co-A-x-y) ]
+		v A(x[1],y[.]),A(x[1],y[.]) [ only if P.and.x.and.y ]
+		v A(x[1],y[.]),A(x[1],y[y.A]) [ only if (x.or.B.or.C).and.((.not.x).or.y.or.B.or.C).and.P.and.(.not.@co-A-x-y) ]
 	]
 A(y[1]),A(y[1]) => 
 	[
-		  A(x[x.A],y[1]),A(x[.],y[1])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
-		v A(x[x.A],y[1]),A(x[x.A],y[1])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
-		v A(x[.],y[1]),A(x[.],y[1])[ only if (B.or.C).and.P ]
-		v A(x[.],y[1]),A(x[x.A],y[1])[ only if (x.or.B.or.C).and.((~x).or.y.or.B.or.C).and.P.and.(~@co-A-x-y) ]
+		  A(x[x.A],y[1]),A(x[.],y[1]) [ only if (x.or.B.or.C).and.((.not.x).or.y.or.B.or.C).and.P.and.(.not.@co-A-x-y) ]
+		v A(x[x.A],y[1]),A(x[x.A],y[1]) [ only if (x.or.B.or.C).and.((.not.x).or.y.or.B.or.C).and.P.and.(.not.@co-A-x-y) ]
+		v A(x[.],y[1]),A(x[.],y[1]) [ only if (B.or.C).and.P ]
+		v A(x[.],y[1]),A(x[x.A],y[1]) [ only if (x.or.B.or.C).and.((.not.x).or.y.or.B.or.C).and.P.and.(.not.@co-A-x-y) ]
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds

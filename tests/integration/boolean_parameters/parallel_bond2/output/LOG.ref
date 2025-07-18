@@ -1161,7 +1161,7 @@ Id=157
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(y[y.A],x[x.A]) => (~P).and.Q
+		A(y[y.A],x[x.A]) => (.not.P).and.Q
 
 
 		Updating the views for A(y[],x[],P,Q,R)
@@ -1241,7 +1241,7 @@ Id=261
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(y[y.A],x[x.A]) => (~P).and.(~Q).and.R
+		A(y[y.A],x[x.A]) => (.not.P).and.(.not.Q).and.R
 
 
 		Updating the views for A(y[],x[],P,Q,R)
@@ -1817,7 +1817,7 @@ EXTENSIONAL DESCRIPTION:
 A() =>
    [
 	  A(x[.],y[y.A])
-	v A(x[x.A],y[y.A])[ only if P.or.Q.or.R ]
+	v A(x[x.A],y[y.A]) [ only if P.or.Q.or.R ]
 	v A(x[.],y[.])
 	v A(x[x.A],y[.])
    ]
@@ -1826,17 +1826,17 @@ A() =>
 ------------------------------------------------------------
 A(y[1]),A(y[1]) => 
 	[
-		  A(x[x.A],y[1]),A(x[.],y[1])[ only if Q.or.R ]
-		v A(x[x.A],y[1]),A(x[x.A],y[1])[ only if P.or.Q.or.R ]
+		  A(x[x.A],y[1]),A(x[.],y[1]) [ only if Q.or.R ]
+		v A(x[x.A],y[1]),A(x[x.A],y[1]) [ only if P.or.Q.or.R ]
 		v A(x[.],y[1]),A(x[.],y[1])
-		v A(x[.],y[1]),A(x[x.A],y[1])[ only if Q.or.R ]
+		v A(x[.],y[1]),A(x[x.A],y[1]) [ only if Q.or.R ]
 	]
 A(x[1]),A(x[1]) => 
 	[
-		  A(x[1],y[y.A]),A(x[1],y[.])[ only if Q.or.R ]
-		v A(x[1],y[y.A]),A(x[1],y[y.A])[ only if P.or.Q.or.R ]
+		  A(x[1],y[y.A]),A(x[1],y[.]) [ only if Q.or.R ]
+		v A(x[1],y[y.A]),A(x[1],y[y.A]) [ only if P.or.Q.or.R ]
 		v A(x[1],y[.]),A(x[1],y[.])
-		v A(x[1],y[.]),A(x[1],y[y.A])[ only if Q.or.R ]
+		v A(x[1],y[.]),A(x[1],y[y.A]) [ only if Q.or.R ]
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -2128,7 +2128,7 @@ A(y)=> [
 ------------------------------------------------------------
 A()=> [
 		  A(x[.],y[y.A])
-		v A(x[x.A],y[y.A])[ only if P.or.Q.or.R ]
+		v A(x[x.A],y[y.A]) [ only if P.or.Q.or.R ]
 		v A(x[.],y[.])
 		v A(x[x.A],y[.])]
 
@@ -2136,22 +2136,22 @@ A()=> [
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 A(y[1]),A(y[1])=> [
-		  A(x[x.A],y[1]),A(x[.],y[1])[ only if Q.or.R ]
-		v A(x[x.A],y[1]),A(x[x.A],y[1])[ only if P.or.Q.or.R ]
+		  A(x[x.A],y[1]),A(x[.],y[1]) [ only if Q.or.R ]
+		v A(x[x.A],y[1]),A(x[x.A],y[1]) [ only if P.or.Q.or.R ]
 		v A(x[.],y[1]),A(x[.],y[1])
-		v A(x[.],y[1]),A(x[x.A],y[1])[ only if Q.or.R ]]
+		v A(x[.],y[1]),A(x[x.A],y[1]) [ only if Q.or.R ]]
 A(x[1]),A(x[1])=> [
-		  A(x[1],y[y.A]),A(x[1],y[.])[ only if Q.or.R ]
-		v A(x[1],y[y.A]),A(x[1],y[y.A])[ only if P.or.Q.or.R ]
+		  A(x[1],y[y.A]),A(x[1],y[.]) [ only if Q.or.R ]
+		v A(x[1],y[y.A]),A(x[1],y[y.A]) [ only if P.or.Q.or.R ]
 		v A(x[1],y[.]),A(x[1],y[.])
-		v A(x[1],y[.]),A(x[1],y[y.A])[ only if Q.or.R ]]
+		v A(x[1],y[.]),A(x[1],y[y.A]) [ only if Q.or.R ]]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 A(x[x.A],y[y.A])=> [
-		  A(x[2],y[1]),A(x[2],y[1])[ only if P.or.R ]
-		v A(x[2],y[1]),A(y[1]),A(x[2])[ only if Q.or.R ]]
+		  A(x[2],y[1]),A(x[2],y[1]) [ only if P.or.R ]
+		v A(x[2],y[1]),A(y[1]),A(x[2]) [ only if Q.or.R ]]
 
 ------------------------------------------------------------
 * Export Counters to JSon (internal constraints_list):

@@ -67,7 +67,7 @@ let rec print_formula acc f_print_string formula =
   match formula with
   | P x -> f_print_string x acc
   | NOT x ->
-    let acc = f_print_string "~" acc in
+    let acc = f_print_string ".not." acc in
     print_arg acc f_print_string False x
   | OR (x1, x2) ->
     let acc = print_arg acc f_print_string (OR (P (), P ())) x1 in

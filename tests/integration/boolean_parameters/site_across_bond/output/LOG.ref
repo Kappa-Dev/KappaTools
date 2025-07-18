@@ -1169,7 +1169,7 @@ Id=164
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(k{p},z[.]) => ((~J).or.Q).and.P
+		C(k{p},z[.]) => ((.not.J).or.Q).and.P
 
 
 	Applying rule #[J && Q]A(a[.]), C(z[.] k{p}) -> A(a[1]), C(z[1] k{p}) (File "example_site_across_bonds.ka", lines 17-18, characters 0-48:):
@@ -1566,7 +1566,7 @@ Id=305
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(b{u},a[x.B]) => (~P).or.(~Q)
+		A(b{u},a[x.B]) => (.not.P).or.(.not.Q)
 
 
 		Updating the views for B(y{},x[],P,J,Q)
@@ -1651,7 +1651,7 @@ Id=305
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(y{u},x[a.A]) => (~P).or.(~Q)
+		B(y{u},x[a.A]) => (.not.P).or.(.not.Q)
 
 
 	Applying rule A(a[1] b{u}), B(x[1] y{u}) -> A(a[1] b{p}), B(x[1] y{p}) (File "example_site_across_bonds.ka", line 12, characters 0-59:):
@@ -1756,7 +1756,7 @@ Id=339
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(b{p},a[x.B]) => (~P).or.(~J).or.(~Q)
+		A(b{p},a[x.B]) => (.not.P).or.(.not.J).or.(.not.Q)
 
 
 		Updating the views for B(y{},x[],P,J,Q)
@@ -2028,7 +2028,7 @@ EXTENSIONAL DESCRIPTION:
 * There are some non applyable rules
 ------------------------------------------------------------
 rule File "example_site_across_bonds.ka", lines 13-14, characters 0-48: could be applied if P.
-rule File "example_site_across_bonds.ka", lines 15-16, characters 0-48: could be applied if ((~J).or.Q).and.P.
+rule File "example_site_across_bonds.ka", lines 15-16, characters 0-48: could be applied if ((.not.J).or.Q).and.P.
 rule File "example_site_across_bonds.ka", lines 17-18, characters 0-48: could be applied if P.and.J.and.Q.
 rule File "example_site_across_bonds.ka", lines 19-20, characters 0-58: could be applied if P.and.J.and.Q.
 rule File "example_site_across_bonds.ka", lines 21-22, characters 0-54: could be applied if P.and.Q.
@@ -2923,12 +2923,12 @@ Id=133
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(a) => [ A(a[.]) v A(a[x.B]) v A(a[z.C])[ only if P ] ]
+A(a) => [ A(a[.]) v A(a[x.B]) v A(a[z.C]) [ only if P ] ]
 A(b) => [ A(b{u}) v A(b{p}) ]
 B(x) => [ B(x[.]) v B(x[a.A]) ]
 B(y) => [ B(y{u}) v B(y{p}) ]
-C(k) => [ C(k{u}) v C(k{p})[ only if ((~J).or.Q).and.P ] ]
-C(z) => [ C(z[.]) v C(z[a.A])[ only if P ] ]
+C(k) => [ C(k{u}) v C(k{p}) [ only if ((.not.J).or.Q).and.P ] ]
+C(z) => [ C(z[.]) v C(z[a.A]) [ only if P ] ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -3428,20 +3428,20 @@ Id=198
 EXTENSIONAL DESCRIPTION:
 A() =>
    [
-	  A(a[.],b{p})[ only if P.and.J.and.Q ]
+	  A(a[.],b{p}) [ only if P.and.J.and.Q ]
 	v A(a[x.B],b{p})
-	v A(a[z.C],b{p})[ only if P.and.J.and.Q ]
+	v A(a[z.C],b{p}) [ only if P.and.J.and.Q ]
 	v A(a[.],b{u})
 	v A(a[x.B],b{u})
-	v A(a[z.C],b{u})[ only if P ]
+	v A(a[z.C],b{u}) [ only if P ]
    ]
 B(y{p}) => B(x[a.A],y{p})
 C() =>
    [
-	  C(k{p},z[.])[ only if ((~J).or.Q).and.P ]
-	v C(k{p},z[a.A])[ only if P.and.J.and.Q ]
+	  C(k{p},z[.]) [ only if ((.not.J).or.Q).and.P ]
+	v C(k{p},z[a.A]) [ only if P.and.J.and.Q ]
 	v C(k{u},z[.])
-	v C(k{u},z[a.A])[ only if P ]
+	v C(k{u},z[a.A]) [ only if P ]
    ]
 ------------------------------------------------------------
 * Properties in connected agents
@@ -3454,10 +3454,10 @@ A(a[1]),B(x[1]) =>
 	]
 A(a[1]),C(z[1]) => 
 	[
-		  A(a[1],b{p}),C(k{u},z[1])[ only if P ]
-		v A(a[1],b{p}),C(k{p},z[1])[ only if P.and.J.and.Q ]
-		v A(a[1],b{u}),C(k{u},z[1])[ only if P ]
-		v A(a[1],b{u}),C(k{p},z[1])[ only if P.and.J.and.Q ]
+		  A(a[1],b{p}),C(k{u},z[1]) [ only if P ]
+		v A(a[1],b{p}),C(k{p},z[1]) [ only if P.and.J.and.Q ]
+		v A(a[1],b{u}),C(k{u},z[1]) [ only if P ]
+		v A(a[1],b{u}),C(k{p},z[1]) [ only if P.and.J.and.Q ]
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -4357,7 +4357,7 @@ EXTENSIONAL DESCRIPTION:
 A(a)=> [
 		  A(a[.])
 		v A(a[x.B])
-		v A(a[z.C])[ only if P ]]
+		v A(a[z.C]) [ only if P ]]
 A(b)=> [
 		  A(b{u})
 		v A(b{p})]
@@ -4369,26 +4369,26 @@ B(y)=> [
 		v B(y{p})]
 C(k)=> [
 		  C(k{u})
-		v C(k{p})[ only if ((~J).or.Q).and.P ]]
+		v C(k{p}) [ only if ((.not.J).or.Q).and.P ]]
 C(z)=> [
 		  C(z[.])
-		v C(z[a.A])[ only if P ]]
+		v C(z[a.A]) [ only if P ]]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(k{p},z[.])[ only if ((~J).or.Q).and.P ]
-		v C(k{p},z[a.A])[ only if P.and.J.and.Q ]
+		  C(k{p},z[.]) [ only if ((.not.J).or.Q).and.P ]
+		v C(k{p},z[a.A]) [ only if P.and.J.and.Q ]
 		v C(k{u},z[.])
-		v C(k{u},z[a.A])[ only if P ]]
+		v C(k{u},z[a.A]) [ only if P ]]
 A()=> [
-		  A(a[.],b{p})[ only if P.and.J.and.Q ]
+		  A(a[.],b{p}) [ only if P.and.J.and.Q ]
 		v A(a[x.B],b{p})
-		v A(a[z.C],b{p})[ only if P.and.J.and.Q ]
+		v A(a[z.C],b{p}) [ only if P.and.J.and.Q ]
 		v A(a[.],b{u})
 		v A(a[x.B],b{u})
-		v A(a[z.C],b{u})[ only if P ]]
+		v A(a[z.C],b{u}) [ only if P ]]
 B(y{p})=> [B(x[a.A],y{p})]
 
 ------------------------------------------------------------
@@ -4399,10 +4399,10 @@ A(a[1]),B(x[1])=> [
 		v A(a[1],b{p}),B(x[1],y{p})
 		v A(a[1],b{u}),B(x[1],y{u})]
 A(a[1]),C(z[1])=> [
-		  A(a[1],b{p}),C(k{u},z[1])[ only if P ]
-		v A(a[1],b{p}),C(k{p},z[1])[ only if P.and.J.and.Q ]
-		v A(a[1],b{u}),C(k{u},z[1])[ only if P ]
-		v A(a[1],b{u}),C(k{p},z[1])[ only if P.and.J.and.Q ]]
+		  A(a[1],b{p}),C(k{u},z[1]) [ only if P ]
+		v A(a[1],b{p}),C(k{p},z[1]) [ only if P.and.J.and.Q ]
+		v A(a[1],b{u}),C(k{u},z[1]) [ only if P ]
+		v A(a[1],b{u}),C(k{p},z[1]) [ only if P.and.J.and.Q ]]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

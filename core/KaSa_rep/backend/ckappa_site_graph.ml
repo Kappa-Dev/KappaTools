@@ -19,7 +19,7 @@ let print_formula_option parameters formula =
   | None -> ()
   | Some formula ->
     let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) "[ only if "
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) " [ only if "
     in
     let () = Handler.print_formula parameters formula in
     Loggers.fprintf (Remanent_parameters.get_logger parameters) " ]"
