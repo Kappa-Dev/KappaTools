@@ -1819,7 +1819,7 @@ functor
           (NamedDecls.create_from_list l)
       in
       let signature =
-        Signature.create ~counters_per_agent:[] ~size_predicate_list:[]
+        Signature.create ~counters_per_agent:[] ~size_predicate_list:([],[])
           agent_sigs
       in
       Remanent_state.set_signature signature state, signature

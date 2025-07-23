@@ -789,22 +789,22 @@ module Make (Instances : Instances_sig.S) = struct
     let size_removed, size_inserted =
       List.fold_left
         (fun (size_removed, size_inserted) update ->
+          let agent_id, id_opt = update.Connected.id in  
           let i, j =
             ( update.Connected.previous_threshold,
               update.Connected.current_threshold )
           in
-          let pos_neg = Connected.get_between_thresholds cache i j in
+          let pos_neg = Connected.get_between_thresholds cache id_opt i j in
           let rem, ins =
             ( Connected.get_negative_update pos_neg,
               Connected.get_positive_update pos_neg )
           in
-          let agent_id = update.Connected.id in
           let agent_type = Edges.get_sort agent_id edges''' in
           let agent = agent_id, agent_type in
           let size_removed =
             List.fold_left
-              (fun size_removed (t, _) ->
-                let site_name = Size_info.name_of_size_predicate t in
+              (fun size_removed (t,id, _) ->
+                let site_name = Size_info.name_of_size_predicate sigs id t in (* TO DO improve *)
                 let site_id =
                   Signature.num_of_site
                     (Loc.annot_with_dummy site_name)
@@ -815,8 +815,8 @@ module Make (Instances : Instances_sig.S) = struct
           in
           let size_inserted =
             List.fold_left
-              (fun size_inserted (t, bool) ->
-                let site_name = Size_info.name_of_size_predicate t in
+              (fun size_inserted (t,id, bool) ->
+                let site_name = Size_info.name_of_size_predicate sigs id t in
                 let _ =
                   if debug_mode then
                     Format.printf "Threshold: (%i,%i) %s -> %s @." agent_id

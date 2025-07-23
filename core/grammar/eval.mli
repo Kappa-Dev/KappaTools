@@ -61,7 +61,7 @@ val compile :
   Signature.s ->
   Counters_info.t ->
   Size_info.t ->
-  Mods.IntSet.t ->
+  Mods.IntSet.t * Mods.IntSet.t Mods.IntMap.t ->
   unit NamedDecls.t ->
   Contact_map.t ->
   ('c, 'd, LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.compil ->

@@ -210,7 +210,7 @@ module Edges (I : Interface) = struct
     missings: Mods.Int2Set.t;
     free_id: int * int list;
     cc: Connected.t;
-    thresholds: int Array.t;
+    thresholds: Size_info.previous_threshold; 
   }
 
   (** (agent,site -> binding_state; missings);
@@ -258,7 +258,7 @@ module Edges (I : Interface) = struct
         free_id = graph.free_id;
         missings = graph.missings;
         cc = Connected.copy graph.cc;
-        thresholds = Array.copy graph.thresholds;
+        thresholds = Size_info.copy_previous_threshold graph.thresholds;
       }
 
   type stats = { nb_agents: int }

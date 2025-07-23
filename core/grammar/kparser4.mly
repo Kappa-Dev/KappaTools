@@ -234,6 +234,20 @@ interface:
   | site COMMA annoted interface { $1 :: $4 }
   ;
 
+comp: 
+  | GREATER annoted {Operator.GREATER,false}
+  | GREATER annoted EQUAL annoted {Operator.GREATER,true}
+  | SMALLER annoted {Operator.SMALLER,false}
+  | SMALLER annoted EQUAL annoted {Operator.SMALLER,true}
+
+one_size_cons: 
+  | comp INT {None,($1,rhs_pos 1),($2,rhs_pos 2)}
+  | ID comp INT {Some ($1,rhs_pos 1),($2,rhs_pos 2),($3,rhs_pos 3)}
+
+size_cons: 
+  | {[]}
+  | one_size_cons size_cons {$1::$2}
+  | one_size_cons COMMA annoted size_cons {$1::$4}
 interface_sig:
     | { [] }
     | error
@@ -251,12 +265,12 @@ agent_modif:
 
 agent:
   | DOT annoted { (Ast.Absent (rhs_pos 1),end_pos 1,$2) }
-  | ID annoted OP_PAR annoted interface CL_PAR agent_modif
-    { let modif,pend,an = $7 in
-      (Ast.Present (($1,rhs_pos 1), $5, modif),pend,an) }
-  | ID annoted COLON annoted ID annoted OP_PAR annoted interface CL_PAR agent_modif
+  | ID annoted OP_BRA annoted size_cons CL_BRA OP_PAR annoted interface CL_PAR agent_modif
     { let modif,pend,an = $11 in
-      (Ast.Present (($5,rhs_pos 5), $9, modif),pend,an) }
+      (Ast.Present (($1,rhs_pos 1), $9, modif, $5),pend,an) }
+  | ID annoted COLON annoted ID annoted OP_BRA annoted size_cons CL_BRA OP_PAR annoted interface CL_PAR agent_modif
+    { let modif,pend,an = $15 in
+      (Ast.Present (($5,rhs_pos 5), $13, modif,$9),pend,an) }
   | ID annoted error
     { raise (ExceptionDefn.Syntax_Error
                (add_pos 3 ("Malformed agent '"^$1^"'"))) }
@@ -266,10 +280,10 @@ agent_sig:
     | DOT annoted { (Ast.Absent (rhs_pos 1),end_pos 1,$2) }
     | ID annoted OP_PAR annoted interface_sig CL_PAR agent_modif
       { let modif,pend,an = $7 in
-        (Ast.Present (($1,rhs_pos 1), $5, modif),pend,an) }
+        (Ast.Present (($1,rhs_pos 1), $5, modif,[]),pend,an) }
     | ID annoted COLON annoted ID annoted OP_PAR annoted interface_sig CL_PAR agent_modif
       { let modif,pend,an = $11 in
-        (Ast.Present (($5,rhs_pos 5), $9, modif),pend,an) }
+        (Ast.Present (($5,rhs_pos 5), $9, modif,[]),pend,an) }
     | ID annoted error
       { raise (ExceptionDefn.Syntax_Error
                  (add_pos 3 ("Malformed agent '"^$1^"'"))) }
@@ -509,24 +523,25 @@ alg_with_radius:
 
 
 rate:
-    | OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted OP_CUR annoted alg_with_radius CL_CUR annoted alg_expr
-    { let (b,pend,an) = $16 in (b,Some $13,pend,an,Some ($7,Loc.of_pos (start_pos 1) (end_pos 9))) }
-    | OP_CUR annoted alg_with_radius CL_CUR annoted OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted  alg_expr
-    { let (b,pend,an) = $16 in (b,Some $3,pend,an,Some ($12,Loc.of_pos (start_pos 6) (end_pos 16))) }
-    | OP_CUR annoted alg_with_radius CL_CUR annoted  alg_expr OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted
-    { let (b,pend,an) = $6 in (b,Some $3,pend,an,Some ($13,Loc.of_pos (start_pos 7) (end_pos 15)))}
+    | OP_BRA annoted size_cons CL_BRA annoted OP_CUR annoted alg_with_radius CL_CUR annoted alg_expr
+    { let (b,pend,an) = $11 in (b,Some $8,pend,an,Some ($3,Loc.of_pos (start_pos 1) (end_pos 4))) }
+    | OP_CUR annoted alg_with_radius CL_CUR annoted OP_BRA annoted size_cons CL_BRA annoted  alg_expr
+    { let (b,pend,an) = $11 in (b,Some $3,pend,an,Some ($8,Loc.of_pos (start_pos 6) (end_pos 9))) }
+    | OP_CUR annoted alg_with_radius CL_CUR annoted alg_expr OP_BRA annoted size_cons CL_BRA annoted
+    { let (b,_,_) = $6 in (b,Some $3,end_pos 10,$11,Some ($9,Loc.of_pos (start_pos 7) (end_pos 10)))}
     | OP_CUR annoted alg_with_radius CL_CUR annoted  alg_expr 
     { let (b,pend,an) = $6 in (b,Some $3,pend,an,None)}
-    | OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted
-    { let (x,_,_) = $11 in (x,Some $14,end_pos 15,$8,Some ($7,Loc.of_pos (start_pos 1) (end_pos 9))) }
-    | alg_expr OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted OP_CUR annoted alg_with_radius CL_CUR annoted
-    { let (x,_,_) = $1 in (x,Some $14,end_pos 15,$9,Some ($8,Loc.of_pos (start_pos 2) (end_pos 10))) }
-    | alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted 
-    { let (x,_,_) = $1 in (x,Some $4,end_pos 5,$6,Some ($13,Loc.of_pos (start_pos 7) (end_pos 15))) }
+    | OP_BRA annoted size_cons CL_BRA annoted alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted
+    { let (x,_,_) = $6 in (x,Some $9,end_pos 10,$11,Some ($3,Loc.of_pos (start_pos 1) (end_pos 4))) }
+    | alg_expr OP_BRA annoted size_cons CL_BRA annoted OP_CUR annoted alg_with_radius CL_CUR annoted
+    { let (x,_,_) = $1 in (x,Some $9,end_pos 10,$11,Some ($4,Loc.of_pos (start_pos 2) (end_pos 5))) }
+    | alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted OP_BRA annoted size_cons CL_BRA annoted 
+    { let (x,_,_) = $1 in (x,Some $4,end_pos 10,$11,Some ($9,Loc.of_pos (start_pos 7) (end_pos 10))) }
   | alg_expr OP_CUR annoted alg_with_radius CL_CUR annoted
     { let (x,_,_) = $1 in (x,Some $4,end_pos 5,$6,None) }
-  | OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted alg_expr { let (a,pend,an) = $11 in (a,None,pend,an,Some ($7,Loc.of_pos (start_pos 1) (end_pos 9))) }
-  | alg_expr OP_BRA annoted SMALLER annoted EQUAL annoted INT annoted CL_BRA annoted { let (a,pend,an) = $1 in (a,None,pend,an,Some ($8,Loc.of_pos (start_pos 2) (end_pos 10))) }
+  | OP_BRA annoted size_cons CL_BRA annoted alg_expr 
+    { let (a,pend,an) = $6 in (a,None,pend,an,Some ($3,Loc.of_pos (start_pos 1) (end_pos 4))) }
+  | alg_expr OP_BRA annoted size_cons CL_BRA annoted { let (a,pend,an) = $1 in (a,None,pend,an,Some ($4,Loc.of_pos (start_pos 2) (end_pos 5))) }
   | alg_expr { let (a,pend,an) = $1 in (a,None,pend,an,None) }
   ;
 

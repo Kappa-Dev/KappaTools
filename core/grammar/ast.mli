@@ -41,6 +41,7 @@ type counter = {
 
 type threshold = {
   threshold_name: string Loc.annoted;
+  threshold_agent_id: string option; 
   threshold_value: internal;
   threshold: int;
 }
@@ -52,8 +53,10 @@ type ('threshold, 'counter) site =
 
 type agent_mod = NoMod | Erase | Create
 
+type size_cons = (string Loc.annoted option * (Operator.compare_op * bool) Loc.annoted * int Loc.annoted) list 
+
 type ('threshold, 'counter) parametric_agent =
-  | Present of string Loc.annoted * ('threshold, 'counter) site list * agent_mod
+  | Present of string Loc.annoted * ('threshold, 'counter) site list * agent_mod * size_cons 
   | Absent of Loc.t
 
 type agent = (threshold, counter) parametric_agent
@@ -99,8 +102,8 @@ type rule = {
     * (mixture, string) Alg_expr.e Loc.annoted option)
     option;
       (*rate for backward rule*)
-  threshold: int Loc.annoted option;
-  threshold_op: int Loc.annoted option;
+  threshold: size_cons Loc.annoted option;
+  threshold_op: size_cons Loc.annoted option;
 }
 
 val flip_label : string -> string
@@ -178,7 +181,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
-  thresholds: int list;
+  thresholds: int list * (string * int list) list;
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
@@ -197,7 +200,7 @@ val split_mixture : mixture -> mixture * mixture
 val infer_agent_signatures : parsing_compil -> parsing_compil
 (** Used when agent signatures is implicit: infer agent signatures and tokens from init, rules and perturbations *)
 
-val compute_thresholds_list : parsing_compil -> parsing_compil * Mods.IntSet.t
+val compute_thresholds_list : parsing_compil -> parsing_compil * (Mods.IntSet.t * Mods.IntSet.t Mods.StringMap.t) 
 (** {6 Printers} *)
 
 val print_counter : Format.formatter -> counter -> unit

@@ -1,14 +1,19 @@
 type id = int
 
 (*type preupdate = {elts: Mods.IntSet.t; previous_size: int; current_size: int}*)
-type update = { id: id; previous_threshold: int; current_threshold: int }
+
+type thresholds_state = int option * int Mods.IntMap.t 
+type previous_threshold_value = int Array.t * int Array.t Array.t 
+
+type update = { id: id*id option; previous_threshold: id; current_threshold: id}
 type updates = update list
+
 
 module Blackboard = struct
   type 'a t = { array: 'a option Mods.DynArray.t; keys: id list }
 
-  let create () = { array = Mods.DynArray.create 0 None; keys = [] }
-  let copy t = { array = Mods.DynArray.copy t.array; keys = t.keys }
+  let create () = {array = Mods.DynArray.create 0 None; keys = [] }
+  let copy t = {array = Mods.DynArray.copy t.array; keys = t.keys }
   let get t i = Mods.DynArray.get t.array i
 
   let define t i j =
@@ -56,18 +61,26 @@ module Blackboard = struct
     { t with keys }, acc
 end
 
+type weight = int * int Mods.IntMap.t 
+
+let fold_weight f w a = 
+  let a = f None (fst w) a in 
+  Mods.IntMap.fold 
+    (fun agent_id -> f (Some agent_id))
+    (snd w) a 
+
 type t = {
   array: id option Mods.DynArray.t; (* its transitive closure defines the rep *)
   array_update: id option Blackboard.t; (* changes in a buffer *)
   back_trans: Mods.IntSet.t Mods.DynArray.t; (* rep to its equivalence class *)
   back_trans_update: Mods.IntSet.t Blackboard.t;
-  size: int option Mods.DynArray.t;
+  size: weight option Mods.DynArray.t;
       (* rep to the size of its equivalence class *)
-  size_update: int Blackboard.t; (* change in siez in a buffer *)
+  size_update: weight Blackboard.t; (* change in size in a buffer *)
   to_check_unbind: Mods.IntSet.t;
   split: id Blackboard.t;
-  threshold_update: Mods.IntSet.t Blackboard.t;
-  threshold_old: Mods.IntSet.t Blackboard.t;
+  threshold_update: Mods.IntIntOptSet.t Blackboard.t;
+  threshold_old: Mods.IntIntOptSet.t Blackboard.t;
 }
 
 let flush_updates t =
@@ -92,7 +105,6 @@ let flush_updates t =
         array)
       t.size_update t.size
   in
-
   {
     t with
     array;
@@ -126,11 +138,13 @@ let print f t =
   let () = Format.fprintf f "SIZE @." in
   let () =
     Mods.DynArray.iteri
-      (fun i j ->
-        Format.fprintf f "%i -> %i @." i
-          (match j with
-          | None -> 0
-          | Some j -> j))
+      (fun i j_opt ->
+        match j_opt with None -> ()
+        | Some (j,jmap) ->
+        Format.fprintf f "size: %i -> %i @." i j ;
+        Mods.IntMap.iter 
+          (fun id j -> 
+            Format.fprintf f "nb_of_%i: %i -> %i @." id i j) jmap)
       t.size
   in
   ()
@@ -158,7 +172,11 @@ let print_update f t =
   let () = Format.fprintf f "SIZE(UPDATE) @." in
   let () =
     Blackboard.fold
-      (fun i j () -> Format.fprintf f "%i -> %i @." i j)
+      (fun i (j,jmap) () -> 
+        Format.fprintf f "size: %i -> %i @." i j ;
+        Mods.IntMap.iter 
+          (fun id j -> 
+            Format.fprintf f "nb_of_%i: %i -> %i @." id i j) jmap)  
       t.size_update ()
   in
   let () = Format.fprintf f "TO CHECK UNBIND @." in
@@ -266,11 +284,21 @@ let get_new_equiv_class_rep t rep =
 
 let fresh t i =
   let array_update = Blackboard.set t.array_update i (Some (Some i)) in
-  let size_update = Blackboard.set t.size_update i (Some 1) in
+  let size_update = Blackboard.set t.size_update i (Some (1,Mods.IntMap.empty)) (* TO DO*) in
   let back_trans_update =
     Blackboard.set t.back_trans_update i (Some (Mods.IntSet.singleton i))
   in
   { t with array_update; size_update; back_trans_update }
+
+let map2 f g h m n = (* TO DO : improve data_structures *)
+ let (),rep =  Mods.IntMap.monadic_fold2 () () 
+ (fun () () i a a' b -> (),Mods.IntMap.add i (f a a') b) 
+ (fun () () i a b -> (),Mods.IntMap.add i (g a) b)
+ (fun () () i a b -> (),Mods.IntMap.add i (h a) b) m n Mods.IntMap.empty 
+  in rep 
+
+  let size_add (i,imap) (j,jmap) = 
+  (i+j,map2 (fun i j -> i+j) (fun i -> i) (fun i -> i) imap jmap)
 
 let join t i j =
   let t, repi = get_new_rep t i in
@@ -287,9 +315,9 @@ let join t i j =
         repj, repi
     in
     let size_update =
-      Blackboard.set t.size_update repi (Some (sizei + sizej))
+      Blackboard.set t.size_update repi (Some (size_add sizei sizej))
     in
-    let size_update = Blackboard.set size_update repj (Some 0) in
+    let size_update = Blackboard.set size_update repj (Some (0, Mods.IntMap.empty)) in
     let array_update = Blackboard.set t.array_update repj (Some (Some repi)) in
     let t, classi = get_new_equiv_class_rep t repi in
     let t, classj = get_new_equiv_class_rep t repj in
@@ -332,7 +360,7 @@ let scan2 i l l' =
     let l', a = scan i l' in
     a, l, l'
 
-let flush ~neighbor ~thresholds t =
+let flush ~neighbor ~(thresholds:weight->weight) t =
   let set = t.to_check_unbind in
   let l = Mods.IntSet.fold (fun i l -> (i, [ i ]) :: l) set [] in
   let rec aux to_visit to_visit_after t alias =
@@ -424,16 +452,17 @@ let flush ~neighbor ~thresholds t =
         | Some rep ->
           let rep_opt = Some (Some rep) in
           let n = Mods.IntSet.size set in
+          let map = Mods.IntMap.empty in (* to do count !!! *)
           let array_update, size_update, back_trans_update =
             Mods.IntSet.fold
               (fun j (array_update, size_update, back_trans_update) ->
                 ( Blackboard.set array_update j rep_opt,
-                  Blackboard.set size_update j (Some 0),
+                  Blackboard.set size_update j (Some (0,Mods.IntMap.empty)),
                   Blackboard.set back_trans_update j (Some Mods.IntSet.empty) ))
               set
               (t.array_update, t.size_update, t.back_trans_update)
           in
-          let size_update = Blackboard.set size_update rep (Some n) in
+          let size_update = Blackboard.set size_update rep (Some (n,map)) in
           let back_trans_update =
             Blackboard.set back_trans_update rep (Some set)
           in
@@ -442,15 +471,15 @@ let flush ~neighbor ~thresholds t =
   in
   let t, threshold_update, threshold_old =
     Blackboard.fold
-      (fun rep (set_update : Mods.IntSet.t)
-           (t, (threshold_update : Mods.IntSet.t Blackboard.t), threshold_old) ->
+      (fun rep (set_update : Mods.IntSet.t) 
+           (t, threshold_update, threshold_old) ->
         let t, new_size = get_new_size_rep t rep in
         let new_threshold = thresholds new_size in
         let t, old_size =
           if old_exists t rep then
             get_old_size t rep
           else
-            t, Some 0
+            t, Some (0, Mods.IntMap.empty) 
         in
         let t, old_set =
           if old_exists t rep then
@@ -460,23 +489,29 @@ let flush ~neighbor ~thresholds t =
         in
         let old_threshold =
           match old_size with
-          | None -> 0
+          | None -> 0, Mods.IntMap.empty
           | Some old_size -> thresholds old_size
         in
         let threshold_update =
+          fold_weight 
+            (fun agent_id_opt new_threshold threshold_update -> 
           match Blackboard.get threshold_update new_threshold with
           | None ->
-            Blackboard.define threshold_update new_threshold (Some set_update)
+            Blackboard.define threshold_update new_threshold 
+              (Some (Mods.IntSet.fold (fun i set -> Mods.IntIntOptSet.add (i, agent_id_opt) set) set_update Mods.IntIntOptSet.empty))
           | Some set ->
             Blackboard.overwrite threshold_update new_threshold
-              (Some (Mods.IntSet.union set set_update))
+            (Some (Mods.IntSet.fold (fun i set -> Mods.IntIntOptSet.add (i,agent_id_opt) set) set_update set))) new_threshold threshold_update 
         in
         let threshold_old =
-          match Blackboard.get threshold_old old_threshold with
-          | None -> Blackboard.define threshold_old old_threshold (Some old_set)
+          fold_weight 
+            (fun agent_id_opt old_threshold threshold_old ->  
+              match Blackboard.get threshold_old old_threshold with
+           | None -> Blackboard.define threshold_old old_threshold 
+                (Some (Mods.IntSet.fold (fun i -> Mods.IntIntOptSet.add (i, agent_id_opt)) old_set Mods.IntIntOptSet.empty))
           | Some set ->
             Blackboard.overwrite threshold_old old_threshold
-              (Some (Mods.IntSet.union set old_set))
+            (Some (Mods.IntSet.fold (fun i -> Mods.IntIntOptSet.add (i, agent_id_opt)) old_set set))) old_threshold threshold_old
         in
         t, threshold_update, threshold_old)
       t.back_trans_update
@@ -490,23 +525,31 @@ let flush ~neighbor ~thresholds t =
         | None -> threshold_update
         | Some a ->
           Blackboard.overwrite threshold_update threshold
-            (Some (Mods.IntSet.minus set a)))
+            (Some (Mods.IntIntOptSet.minus set a)))
       threshold_update threshold_update
   in
   let threshold_update, (t, updates) =
     Blackboard.fold_and_flush
       (fun current_threshold set (t, updates) ->
-        Mods.IntSet.fold
+        Mods.IntIntOptSet.fold
           (fun id (t, updates) ->
-            let t, previous_threshold =
-              if old_exists t id then (
-                let t, size = get_old_size t id in
+            let t, w =
+              if old_exists t (fst id) then (
+                let t, size = get_old_size t (fst id) in
                 match size with
-                | None -> t, 0
+                | None -> t, (0,Mods.IntMap.empty)
                 | Some size -> t, thresholds size
               ) else
-                t, 0
+                t, (0, Mods.IntMap.empty)
             in
+            let previous_threshold = 
+              match snd id with 
+                | None -> fst w 
+                | Some i -> 
+                  match Mods.IntMap.find_option i (snd w) with 
+                  | None -> 0 
+                  | Some i -> i 
+            in 
             t, { id; previous_threshold; current_threshold } :: updates)
           set (t, updates))
       threshold_update (t, [])
@@ -584,7 +627,20 @@ let do_it () =
 
 *)
 
-let build_threshold s =
+let map_w_array f dft w = 
+  let max_elt = 
+    match Mods.IntMap.max_elt (snd w) with 
+    | Some (m,_) -> m
+    | None -> 0 
+  in 
+  let m = 
+    Array.make (max_elt+1) dft in 
+  f (fst w), let () = Mods.IntMap.iter (fun i data -> 
+      let output = f data in 
+      Array.set m i output) (snd w) in m
+
+let build_threshold =
+  map_w_array (fun s -> 
   if Mods.IntSet.is_empty s then
     Array.make 0 0
   else (
@@ -609,9 +665,10 @@ let build_threshold s =
     in
     let () = aux 0 l 0 in
     array
-  )
+  )) [||]
 
-let compute_threshold_list_inc threshold_list i j =
+
+let compute_threshold_list_inc threshold_list id_opt i j =
   let rec aux2 thresholds acc =
     match thresholds with
     | h :: t when h <= j -> aux2 t (h :: acc)
@@ -622,21 +679,27 @@ let compute_threshold_list_inc threshold_list i j =
     | h :: t when h < i -> aux1 t
     | _ :: _ | [] -> aux2 thresholds []
   in
+  let threshold_list = 
+    match id_opt with 
+    | None -> snd (fst threshold_list)
+    | Some i -> snd (Array.get (snd threshold_list) i) 
+  in 
   aux1 threshold_list
 
 type 'a pos_neg = { negative_update: 'a list; positive_update: 'a list }
-type cache = (id * bool) pos_neg option array array * id list
+type cache = (((id * id option * bool) pos_neg option array array * id list) 
+             * (((id * id option * bool) pos_neg option array array * id list) array)) 
 
-let dummy_cache = [||], []
+let dummy_cache = ([||], []), [||]
 
-let compute_threshold_list threshold_list i j =
+let compute_threshold_list threshold_list id_opt i j =
   let b, min, max =
     if i < j then
       true, i, j
     else
       false, j, i
   in
-  let list = compute_threshold_list_inc threshold_list min max in
+  let list = compute_threshold_list_inc threshold_list id_opt min max in
   let list =
     if i = 0 || j = 0 then
       list
@@ -650,8 +713,8 @@ let compute_threshold_list threshold_list i j =
       | _ -> []
     )
   in
-  let l_true = List.rev_map (fun a -> a, true) (List.rev list) in
-  let l_false = List.rev_map (fun a -> a, false) (List.rev list) in
+  let l_true = List.rev_map (fun a -> a, id_opt, true) (List.rev list) in
+  let l_false = List.rev_map (fun a -> a, id_opt, false) (List.rev list) in
   if b then
     { negative_update = l_true; positive_update = l_false }
   else
@@ -659,27 +722,44 @@ let compute_threshold_list threshold_list i j =
 
 let get_positive_update a = a.positive_update
 let get_negative_update a = a.negative_update
-let get_matrix m i = Array.get (Array.get m i)
-let set_matrix m i = Array.set (Array.get m i)
+let get_matrix m id_opt i j = 
+  let m = 
+    match id_opt with 
+    | None -> fst (fst m)
+    | Some i ->  fst (Array.get (snd m) i)
+  in 
+  m.(i).(j)
+
+let set_matrix m id_opt i j a = 
+  let m = 
+    match id_opt with 
+    | None -> fst m 
+    | Some i ->  Array.get (snd m) i 
+  in 
+  Array.set (Array.get (fst m) i) j a 
 
 let init_between_thresholds threshold_set =
-  let threshold_list = Mods.IntSet.elements threshold_set in
-  let max =
-    match List.rev threshold_list with
-    | t :: _ -> t
-    | [] -> assert false
-  in
-  Array.init (max + 1) (fun _ -> Array.make (max + 1) None), threshold_list
+  map_w_array 
+    (fun threshold_set -> 
+      let threshold_list = Mods.IntSet.elements threshold_set in
+      let max =
+         match List.rev threshold_list with
+           | t :: _ -> t
+           | [] -> assert false
+      in
+      Array.init (max + 1) (fun _ -> Array.make (max + 1) None), threshold_list) 
+   ([||],[])
+   threshold_set 
 
-let get_between_thresholds (m, threshold_list) i j =
-  match get_matrix m i j with
+let get_between_thresholds (m:cache) id_opt i j =
+  match get_matrix m id_opt i j with
   | None ->
-    let rep = compute_threshold_list threshold_list i j in
-    let () = set_matrix m i j (Some rep) in
+    let rep = compute_threshold_list m id_opt i j in
+    let () = set_matrix m id_opt i j (Some rep) in
     rep
   | Some rep -> rep
 
-let eval_threshold array =
+let eval_threshold array  =
   let max = Array.length array in
   let f (i : id) =
     if i < max then
@@ -689,7 +769,12 @@ let eval_threshold array =
   in
   f
 
-let size_of_cc = get_old_size
+let eval_threshold array weight = 
+  eval_threshold (fst array) (fst weight), 
+  Mods.IntMap.mapi (fun i w -> 
+    eval_threshold ((snd array).(i)) w) (snd weight)
+  
+
 
 let is_connected t id id' =
   let t, rep = get_old_rep t id in
@@ -715,24 +800,50 @@ let pos_neg_of_json of_json = function
 
 let cache_of_json =
   JsonUtil.to_pair
-    (JsonUtil.to_array
-       (JsonUtil.to_array
-          (JsonUtil.to_option
-             (pos_neg_of_json
-                (JsonUtil.to_pair
-                   (JsonUtil.to_int ?error_msg:None)
-                   (JsonUtil.to_bool ?error_msg:None))))))
-    (JsonUtil.to_list (JsonUtil.to_int ?error_msg:None))
+    (JsonUtil.to_pair 
+        (JsonUtil.to_array 
+            (JsonUtil.to_array 
+              (JsonUtil.to_option (pos_neg_of_json  (JsonUtil.to_triple
+              (JsonUtil.to_int ?error_msg:None)
+              (JsonUtil.to_option (JsonUtil.to_int ?error_msg:None))
+              (JsonUtil.to_bool ?error_msg:None))))))
+        (JsonUtil.to_list  (JsonUtil.to_int ?error_msg:None)))
+  (JsonUtil.to_array 
+  (JsonUtil.to_pair 
+  (JsonUtil.to_array 
+      (JsonUtil.to_array 
+        (JsonUtil.to_option (pos_neg_of_json  (JsonUtil.to_triple
+        (JsonUtil.to_int ?error_msg:None)
+        (JsonUtil.to_option (JsonUtil.to_int ?error_msg:None))
+        (JsonUtil.to_bool ?error_msg:None))))))
+  (JsonUtil.to_list  (JsonUtil.to_int ?error_msg:None)))
+)
+  
+
+   
 
 let json_of_cache cache =
   JsonUtil.of_pair
-    (JsonUtil.of_array
-       (JsonUtil.of_array
-          (JsonUtil.of_option
-             (json_of_pos_neg
-                (JsonUtil.of_pair JsonUtil.of_int JsonUtil.of_bool)))))
-    (JsonUtil.of_list JsonUtil.of_int)
-    cache
+    (JsonUtil.of_pair 
+      (JsonUtil.of_array
+         (JsonUtil.of_array
+             (JsonUtil.of_option
+                  (json_of_pos_neg
+                     (JsonUtil.of_triple JsonUtil.of_int (JsonUtil.of_option JsonUtil.of_int) JsonUtil.of_bool)))))
+     (JsonUtil.of_list JsonUtil.of_int)
+    )
+    (JsonUtil.of_array 
+      (JsonUtil.of_pair 
+         (JsonUtil.of_array
+            (JsonUtil.of_array
+               (JsonUtil.of_option
+                  (json_of_pos_neg
+                     (JsonUtil.of_triple JsonUtil.of_int (JsonUtil.of_option JsonUtil.of_int) JsonUtil.of_bool)))))
+                     (JsonUtil.of_list JsonUtil.of_int)
+    ))
+    cache 
+    
+   
 (*
   let do_it () = 
     let s = Mods.IntSet.add 10 (Mods.IntSet.singleton 100) in 

@@ -1,6 +1,6 @@
 (library
  (name kappa_symmetries)
- (libraries kappa_parameters kappa_cli)
+ (libraries kappa_parameters kappa_cli kappa_site_graphs)
  (flags
   (:standard)
   -open

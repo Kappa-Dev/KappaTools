@@ -72,4 +72,17 @@ end)
 
 module CharSet = CharSetMap.Set
 module CharMap = CharSetMap.Map
+
+module IntIntOptSetMap = SetMap.Make (struct 
+  type t = int * int option 
+  let compare = compare 
+  let print f (a,b) = 
+    match b with 
+    | None -> Format.pp_print_int f a 
+    | Some b -> Format.fprintf f "(%i,%i)" a b 
+  end)
+
+module IntIntOptSet = IntIntOptSetMap.Set
+module IntIntOptMap = IntIntOptSetMap.Map
+
 module DynArray = DynamicArray.DynArray (LargeArray)

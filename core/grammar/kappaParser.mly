@@ -11,6 +11,10 @@
     (x,Loc.of_pos (Parsing.symbol_start_pos ()) (Parsing.symbol_end_pos ()))
   let rhs_pos i =
   Loc.of_pos (Parsing.rhs_start_pos i) (Parsing.rhs_end_pos i)
+
+  let end_pos = Parsing.rhs_end_pos
+  let start_pos = Parsing.rhs_start_pos
+
 %}
 
 %token EOF NEWLINE SEMICOLON COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR AT TYPE LAR
@@ -397,7 +401,7 @@ birate:
     | error {raise (ExceptionDefn.Syntax_Error (add_pos "rule rate expected"))}
     ;
 
-threshold: OP_CUR SMALLER EQUAL INT CL_CUR {Some (add_pos $4)} 
+threshold: OP_CUR SMALLER EQUAL INT CL_CUR {Some (add_pos [None,((Operator.SMALLER,true),(Loc.of_pos (start_pos 1) (end_pos 3))),($4,rhs_pos 4)])} 
 
 rate:
    | alg_expr OP_CUR alg_with_radius CL_CUR {($1,Some $3,None)}
@@ -441,9 +445,9 @@ pattern:
 
 non_empty_mixture:
     | ID OP_PAR interface_expression CL_PAR
-    { [[Ast.Present (($1,rhs_pos 1), $3, Ast.NoMod)]] }
+    { [[Ast.Present (($1,rhs_pos 1), $3, Ast.NoMod, [])]] }
     | ID OP_PAR interface_expression CL_PAR COMMA pattern
-    { [Ast.Present (($1,rhs_pos 1), $3, Ast.NoMod) :: $6]}
+    { [Ast.Present (($1,rhs_pos 1), $3, Ast.NoMod, []) :: $6]}
     ;
 
 mod_agent:
@@ -452,13 +456,13 @@ mod_agent:
 	| MINUS { Ast.Erase };
 
 agent_expression_sig:
-  | ID OP_PAR interface_expression_sig CL_PAR {Ast.Present (($1,rhs_pos 1), $3, Ast.NoMod)}
+  | ID OP_PAR interface_expression_sig CL_PAR {Ast.Present (($1,rhs_pos 1), $3, Ast.NoMod, [])}
   | ID error { raise (ExceptionDefn.Syntax_Error
        (add_pos ("Malformed agent '"^$1^"'")))}
 
 agent_expression:
     | mod_agent ID OP_PAR interface_expression CL_PAR
-	 {Ast.Present (($2,rhs_pos 2), $4, $1)}
+	 {Ast.Present (($2,rhs_pos 2), $4, $1, [])}
     | mod_agent ID error
 	 { raise (ExceptionDefn.Syntax_Error
 		    (add_pos ("Malformed agent '"^$2^"'")))}

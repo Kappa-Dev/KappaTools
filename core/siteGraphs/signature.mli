@@ -50,7 +50,7 @@ type s
 (* TODO See what to be kept here? *)
 val create :
   counters_per_agent:(string Loc.annoted * string Loc.annoted list) list ->
-  size_predicate_list:int list ->
+  size_predicate_list:(int list * (string * int list) list) ->
   t NamedDecls.t ->
   s
 
@@ -104,8 +104,8 @@ val inverted_counter_suffix : string
 val is_inverted_counter : string -> bool
 (** Tests if a counter is a inverted counter, and should be hidden from the user *)
 
-val n_thresholds : s -> int
-val thresholds : s -> int list
+val n_thresholds : s -> int option -> int
+val thresholds : s -> int option -> int list
 
 (** {2 I/O} *)
 

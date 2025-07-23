@@ -155,7 +155,7 @@ let prepare_counters rules =
 
   let rec prepare_lhs_rule rhs lhs =
     match rhs, lhs with
-    | Ast.Present (rna, rsites, _) :: r, Ast.Present (lna, lsites, b) :: l ->
+    | Ast.Present (rna, rsites, _, _) :: r, Ast.Present (lna, lsites, b, lcc) :: l ->
       check_syntax lsites
         (fun c -> not (Loc.v c.counter_delta = 0))
         " has a modif in the lhs";
@@ -164,7 +164,7 @@ let prepare_counters rules =
         " has a test in the rhs";
       if String.compare (Loc.v rna) (Loc.v lna) = 0 then (
         let lsites' = prepare_agent rsites lsites in
-        Ast.Present (lna, lsites', b) :: prepare_lhs_rule r l
+        Ast.Present (lna, lsites', b, lcc) :: prepare_lhs_rule r l
       ) else
         lhs
       (*TODO we stop our job here. LKappa_compiler will detect
@@ -173,7 +173,7 @@ let prepare_counters rules =
       (*created agent*)
       (* TODO Maybe some syntax check on rhs are necessary here *)
       lagent :: prepare_lhs_rule r l
-    | Ast.Absent _ :: r, (Ast.Present (_, lsites, _) as lagent) :: l ->
+    | Ast.Absent _ :: r, (Ast.Present (_, lsites, _, _) as lagent) :: l ->
       (*deleted  agent*)
       check_syntax lsites
         (fun c -> not (Loc.v c.Ast.counter_delta = 0))
@@ -211,11 +211,11 @@ let counters_signature s agents =
     List.find
       (function
         | Ast.Absent _ -> false
-        | Ast.Present (s', _, _) -> name_match s s')
+        | Ast.Present (s', _, _, _) -> name_match s s')
       agents
   with
   | Ast.Absent _ -> assert false
-  | Ast.Present (_, sites', _) ->
+  | Ast.Present (_, sites', _, _) ->
     List.fold_left
       (fun acc s ->
         match s with
@@ -263,7 +263,7 @@ let has_counters compil =
   List.exists
     (function
       | Ast.Absent _ -> false
-      | Ast.Present (_, sites, _) ->
+      | Ast.Present (_, sites, _, _) ->
         List.exists
           (function
             | Ast.Counter _ -> true
@@ -373,14 +373,14 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
   let split_for_each_counter_var_value_agent (ids : Mods.StringSet.t) :
       Ast.agent -> (Ast.agent * cvar_value list) list = function
     | Ast.Absent l -> [ Ast.Absent l, [] ]
-    | Ast.Present (agent_name, sites, modif) ->
+    | Ast.Present (agent_name, sites, modif, cc) ->
       let counter_defs = counters_signature agent_name signatures in
       let sites_for_each_counter_var_values =
         split_for_each_counter_var_value_sites ids counter_defs sites
       in
       List.map
         (fun (sites', var_values) ->
-          Ast.Present (agent_name, sites', modif), var_values)
+          Ast.Present (agent_name, sites', modif, cc), var_values)
         sites_for_each_counter_var_values
   in
   let rec split_for_each_counter_var_value_mixture (ids : Mods.StringSet.t) :
@@ -564,6 +564,7 @@ let make_counter_agent sigs (is_first, (dst, ra_erased)) (is_last, equal) i j
         ra_ints;
         ra_syntax = Some (Array.copy ra_ports, Array.copy ra_ints);
       };
+      Size_compiler.thresholds = []
   }
 
 let raw_counter_agent (is_first, first_link) (is_last, last_link) i j sigs equal
@@ -598,6 +599,7 @@ let raw_counter_agent (is_first, first_link) (is_last, last_link) i j sigs equal
         Raw_mixture.a_ports = ports;
         Raw_mixture.a_ints = internals;
       };
+    Size_compiler.thresholds = []; 
   }
 
 let rec add_incr (i : int) (first_link : int) (last_link : int)
@@ -644,14 +646,14 @@ let rec erase_incr (sigs : Signature.s) (i : int)
     if i = abs delta then (
       let before, _ = incr_.LKappa.ra_ports.(port_b) in
       incr_.LKappa.ra_ports.(port_b) <- before, LKappa.Linked link;
-      { (*incr with*) agent = incr_ } :: incr_s
+      { (*incr with*) agent = incr_ ; thresholds = incr.Size_compiler.thresholds} :: incr_s
     ) else (
       Array.iteri
         (fun i (a, _) ->
           incr.Size_compiler.agent.LKappa.ra_ports.(i) <- a, LKappa.Erased)
         incr.Size_compiler.agent.LKappa.ra_ports;
       let agent = { incr.Size_compiler.agent with LKappa.ra_erased = true } in
-      let rule_agent = { (*incr with*) Size_compiler.agent } in
+      let rule_agent = { (*incr with*) Size_compiler.agent ; thresholds = incr.Size_compiler.thresholds} in
       rule_agent :: erase_incr sigs (i + 1) incr_s delta link
     )
   | [] -> []
@@ -1040,7 +1042,7 @@ let counters_perturbations sigs ast_sigs =
   List.fold_left
     (List.fold_left (fun acc -> function
        | Ast.Absent _ -> acc
-       | Ast.Present (agent_type, sites, _) ->
+       | Ast.Present (agent_type, sites, _, _) ->
          List.fold_left
            (fun acc' site ->
              match site with

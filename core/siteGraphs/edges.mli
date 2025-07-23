@@ -13,7 +13,7 @@ module Edges_early : Edges_sig.Edges
 
 type t
 
-val empty : with_connected_components:bool -> with_thresholds:int Array.t -> t
+val empty : with_connected_components:bool -> with_thresholds:Size_info.previous_threshold -> t
 
 val copy : t -> t
 (** You'd better NOT use that on the state of a simulation *)
@@ -102,4 +102,4 @@ val build_user_snapshot :
   (int * User_graph.connected_component) list
 
 val debug_print : Format.formatter -> t -> unit
-val flush : thresholds:int Array.t -> t -> t * Connected.updates
+val flush : thresholds:Size_info.previous_threshold -> t -> t * Connected.updates

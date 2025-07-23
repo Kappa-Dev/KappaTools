@@ -163,7 +163,7 @@ let scan_agent ~get_counter_name ~get_size_predicate_name parameters k ag
     remanent =
   match ag with
   | Ast.Absent _ -> remanent
-  | Ast.Present ((name, _), intf, _modif) ->
+  | Ast.Present ((name, _), intf, _modif, _cc) ->
     fst
       (scan_interface ~get_counter_name ~get_size_predicate_name parameters k
          name intf
@@ -367,7 +367,7 @@ let translate_interface ~translate_counter parameters is_signature =
 let translate_agent ~translate_counter parameters is_signature ag remanent =
   match ag with
   | Ast.Absent _pos -> None, remanent
-  | Ast.Present ((agent_name, agent_name_pos), intf, _modif) ->
+  | Ast.Present ((agent_name, agent_name_pos), intf, _modif, _cc) ->
     let interface, remanent =
       translate_interface ~translate_counter parameters is_signature intf
         remanent
@@ -438,7 +438,7 @@ let rec translate_mixture ~translate_counter parameters mixture remanent =
 
 let support_agent = function
   | Ast.Absent _ -> None
-  | Ast.Present ((name, _), intfs, _) ->
+  | Ast.Present ((name, _), intfs, _, _ ) ->
     let list =
       let rec scan intf list =
         match intf with
@@ -726,7 +726,7 @@ let refine_agent_sig parameters error agent_set agent =
   let error, agent_set =
     match agent with
     | Ast.Absent _ -> error, agent_set
-    | Ast.Present ((name, _), _, _) ->
+    | Ast.Present ((name, _), _, _, _) ->
       check_freshness parameters error "Agent" name agent_set
   in
   let error, map =

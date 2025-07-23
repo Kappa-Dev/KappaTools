@@ -123,6 +123,7 @@ module type Map = sig
   val pop : elt -> 'a t -> 'a option * 'a t
   val merge : 'a t -> 'a t -> 'a t
   val min_elt : 'a t -> (elt * 'a) option
+  val max_elt : 'a t -> (elt * 'a) option
   val find_option : elt -> 'a t -> 'a option
   val find_default : 'a -> elt -> 'a t -> 'a
 
@@ -1698,6 +1699,12 @@ module Make (Ord : OrderedType) : S with type elt = Ord.t = struct
       | Private.Empty -> None
       | Private.Node (Private.Empty, key, data, _, _, _) -> Some (key, data)
       | Private.Node (left, _, _, _, _, _) -> min_elt left
+
+    let rec max_elt = function
+      | Private.Empty -> None
+      | Private.Node (_, key, data, Private.Empty, _, _) -> Some (key, data)
+      | Private.Node (_, _, _, right, _, _) -> max_elt right
+
 
     let rec find_option key = function
       | Private.Empty -> None
