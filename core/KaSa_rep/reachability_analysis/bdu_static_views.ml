@@ -24,7 +24,7 @@ type bdu_analysis_static_pattern = {
   store_proj_bdu_test_restriction_pattern:
     (Covering_classes_type.cv_id
     * Ckappa_sig.c_state Cckappa_sig.interval
-      Ckappa_sig.GuardSite_map_and_set.Map.t)
+      Ckappa_sig.MvbduVar_map_and_set.Map.t)
     list;
 }
 
@@ -56,7 +56,7 @@ type bdu_analysis_static = {
   site_to_renamed_site_list:
     (Covering_classes_type.cv_id * Ckappa_sig.c_mvbdu_var) list
     Ckappa_sig
-    .Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+    .Agent_type_mvbdu_var_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
     .t;
 }
 
@@ -67,7 +67,7 @@ type bdu_analysis_static = {
 let init_bdu_analysis_static parameters error =
   let error, init_site_to_renamed_site_list =
     Ckappa_sig
-    .Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+    .Agent_type_mvbdu_var_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
     .create parameters error (0, 0)
   in
   let init_bdu_analysis_static =
@@ -144,7 +144,7 @@ let add_dependency_site parameters map_new_index_forward site state
       Exception.warn parameters error __POS__ Exit Ckappa_sig.dummy_mvbdu_var
     | error, Some s -> error, s
   in
-  Ckappa_sig.GuardSite_map_and_set.Map.add parameters error site' state
+  Ckappa_sig.MvbduVar_map_and_set.Map.add parameters error site' state
     store_result
 
 let to_site_or_guard_map parameters error site_map =
@@ -191,10 +191,10 @@ let get_pair_cv_map_with_missing_association_creation parameters error agent
                 in
                 error, m
               | Ckappa_sig.Guard_p _ -> error, m)
-            set agent_interface Ckappa_sig.GuardSite_map_and_set.Map.empty
+            set agent_interface Ckappa_sig.MvbduVar_map_and_set.Map.empty
         with Exit ->
           Exception.warn parameters error __POS__ Exit
-            Ckappa_sig.GuardSite_map_and_set.Map.empty
+            Ckappa_sig.MvbduVar_map_and_set.Map.empty
       in
       let error =
         Exception.check_point Exception.warn parameters error error' __POS__
@@ -236,7 +236,7 @@ let collect_bdu_creation_restriction_map parameters handler error rule_id rule
                 List.fold_left
                   (fun (error, handler, store_result) (cv_id, map_res) ->
                     let pair_list =
-                      Ckappa_sig.GuardSite_map_and_set.Map.fold
+                      Ckappa_sig.MvbduVar_map_and_set.Map.fold
                         (fun site' state current_list ->
                           (site', state) :: current_list)
                         map_res []
@@ -334,11 +334,11 @@ let get_pair_cv_map_with_restriction_modification parameters error agent
                 map_new_index_forward
             in
             let error, map_res =
-              Ckappa_sig.GuardSite_map_and_set.Map.add parameters error site'
+              Ckappa_sig.MvbduVar_map_and_set.Map.add parameters error site'
                 state store_result
             in
             error, map_res)
-          set agent_interface Ckappa_sig.GuardSite_map_and_set.Map.empty
+          set agent_interface Ckappa_sig.MvbduVar_map_and_set.Map.empty
       in
       error, (cv_id, map_res) :: current_list)
     (error, []) triple_list
@@ -388,13 +388,13 @@ let collect_modif_list_restriction_map parameters handler error rule_id rule
         let error, handler, store_result =
           List.fold_left
             (fun (error, handler, store_result) (cv_id, map_res) ->
-              if Ckappa_sig.GuardSite_map_and_set.Map.is_empty map_res then
+              if Ckappa_sig.MvbduVar_map_and_set.Map.is_empty map_res then
                 error, handler, store_result
               else (
                 (*get a list of pair (site, state) in a map of new indexes
                   of site.*)
                 let error, pair_list =
-                  Ckappa_sig.GuardSite_map_and_set.Map.fold
+                  Ckappa_sig.MvbduVar_map_and_set.Map.fold
                     (fun site' state (error, current_list) ->
                       match state with
                       | Some state ->
@@ -450,17 +450,17 @@ let get_triple_map parameters error pair_list triple_list =
                   (Ckappa_sig.Site site) map_new_index_forward
               in
               let error, old =
-                Ckappa_sig.GuardSite_map_and_set.Map.find_default_without_logs
+                Ckappa_sig.MvbduVar_map_and_set.Map.find_default_without_logs
                   parameters error [] site' map_res
               in
               let error, map_res =
-                Ckappa_sig.GuardSite_map_and_set.Map.add_or_overwrite parameters
+                Ckappa_sig.MvbduVar_map_and_set.Map.add_or_overwrite parameters
                   error site' (state :: old) map_res
               in
               error, map_res
             ) else
               error, map_res)
-          (error, Ckappa_sig.GuardSite_map_and_set.Map.empty)
+          (error, Ckappa_sig.MvbduVar_map_and_set.Map.empty)
           pair_list
       in
       (*------------------------------------------------------*)
@@ -469,7 +469,7 @@ let get_triple_map parameters error pair_list triple_list =
           Exit
       in
       ( error,
-        Ckappa_sig.GuardSite_map_and_set.Map.fold
+        Ckappa_sig.MvbduVar_map_and_set.Map.fold
           (fun site' list_state list -> (cv_id, site', list_state) :: list)
           map_res current_list ))
     (error, []) triple_list
@@ -595,7 +595,7 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
               let error, old =
                 match
                   Ckappa_sig
-                  .Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+                  .Agent_type_mvbdu_var_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
                   .unsafe_get parameters error key output
                 with
                 | error, None -> error, []
@@ -604,10 +604,10 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
               let new_list = (cv_id, site) :: old in
               let error, output =
                 Ckappa_sig
-                .Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+                .Agent_type_mvbdu_var_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
                 .set parameters error key new_list output
               in
-              let site' = Ckappa_sig.next_guard_or_site_name site in
+              let site' = Ckappa_sig.next_mvbdu_var_name site in
               aux error site' t output
           in
           aux error Ckappa_sig.dummy_mvbdu_var_1 list output)
@@ -677,11 +677,11 @@ let get_pair_cv_map_with_restriction_views parameters error agent triple_list =
                 error Ckappa_sig.dummy_mvbdu_var site map_new_index_forward
             in
             let error, map_res =
-              Ckappa_sig.GuardSite_map_and_set.Map.add parameters error site'
+              Ckappa_sig.MvbduVar_map_and_set.Map.add parameters error site'
                 state store_result
             in
             error, map_res)
-          set agent_interface Ckappa_sig.GuardSite_map_and_set.Map.empty
+          set agent_interface Ckappa_sig.MvbduVar_map_and_set.Map.empty
       in
       let error =
         Exception.check_point Exception.warn parameters error error' __POS__
@@ -748,11 +748,11 @@ let collect_bdu_test_restriction_map parameters handler error rule_id rule
         let error, handler, store_result =
           List.fold_left
             (fun (error, handler, store_result) (cv_id, map_res) ->
-              if Ckappa_sig.GuardSite_map_and_set.Map.is_empty map_res then
+              if Ckappa_sig.MvbduVar_map_and_set.Map.is_empty map_res then
                 error, handler, store_result
               else (
                 let error, pair_list =
-                  Ckappa_sig.GuardSite_map_and_set.Map.fold
+                  Ckappa_sig.MvbduVar_map_and_set.Map.fold
                     (fun site' state (error, current_list) ->
                       let pair_list =
                         (site', (state.Cckappa_sig.min, state.Cckappa_sig.max))

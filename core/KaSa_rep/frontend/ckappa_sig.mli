@@ -57,7 +57,6 @@ val dummy_state_index_false : c_state
 val dummy_rule_id : c_rule_id
 val dummy_agent_id : c_agent_id
 val dummy_link_value : c_link_value
-val dummy_site_name_1 : c_site_name
 val dummy_site_name_2 : c_site_name
 val dummy_site_name_minus1 : c_site_name
 val next_link_value : c_link_value -> c_link_value
@@ -122,7 +121,7 @@ val next_agent_name : c_agent_name -> c_agent_name
 val next_rule_id : c_rule_id -> c_rule_id
 val next_site_name : c_site_name -> c_site_name
 val next_guard_p_name : c_guard_parameter -> c_guard_parameter
-val next_guard_or_site_name : c_mvbdu_var -> c_mvbdu_var
+val next_mvbdu_var_name : c_mvbdu_var -> c_mvbdu_var
 val next_state_index : c_state -> c_state
 val pred_site_name : c_site_name -> c_site_name
 val pred_agent_name : c_agent_name -> c_agent_name
@@ -422,7 +421,7 @@ module SiteOrGuard_map_and_set :
 
 module Site_map_and_set : Map_wrapper.S_with_logs with type elt = c_site_name
 
-module GuardSite_map_and_set :
+module MvbduVar_map_and_set :
   Map_wrapper.S_with_logs with type elt = c_mvbdu_var
 
 module GuardP_map_and_set :
@@ -538,7 +537,7 @@ module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
     with type key = c_agent_name * c_site_name
      and type dimension = int * int
 
-module Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
+module Agent_type_mvbdu_var_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
   Int_storage.Storage
     with type key = c_agent_name * c_mvbdu_var
      and type dimension = int * int

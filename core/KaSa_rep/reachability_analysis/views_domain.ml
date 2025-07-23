@@ -961,7 +961,7 @@ module Domain = struct
                   List.fold_left
                     (fun (error, (dynamic, event_list)) (cv_id, map_res) ->
                       let error, pair_list =
-                        Ckappa_sig.GuardSite_map_and_set.Map.fold
+                        Ckappa_sig.MvbduVar_map_and_set.Map.fold
                           (fun site' state (error, current_list) ->
                             let pair_list =
                               (site', (Some state, Some state)) :: current_list
@@ -2165,11 +2165,11 @@ module Domain = struct
           let error, (dynamic, list) =
             List.fold_left
               (fun (error, (dynamic, current_list)) (_cv_id, map_res) ->
-                if Ckappa_sig.GuardSite_map_and_set.Map.is_empty map_res then
+                if Ckappa_sig.MvbduVar_map_and_set.Map.is_empty map_res then
                   error, (dynamic, current_list)
                 else (
                   let error, pair_list =
-                    Ckappa_sig.GuardSite_map_and_set.Map.fold
+                    Ckappa_sig.MvbduVar_map_and_set.Map.fold
                       (fun site' state (error, current_list) ->
                         let pair_list =
                           (site', (state.Cckappa_sig.min, state.Cckappa_sig.max))
@@ -2377,12 +2377,12 @@ module Domain = struct
                 let error, dynamic, result_bdu_guard =
                   List.fold_left
                     (fun (error, dynamic, result_bdu_guard) (cv_id, map_res) ->
-                      if Ckappa_sig.GuardSite_map_and_set.Map.is_empty map_res
+                      if Ckappa_sig.MvbduVar_map_and_set.Map.is_empty map_res
                       then
                         error, dynamic, result_bdu_guard
                       else (
                         let error, pair_list =
-                          Ckappa_sig.GuardSite_map_and_set.Map.fold
+                          Ckappa_sig.MvbduVar_map_and_set.Map.fold
                             (fun site' state (error, current_list) ->
                               let pair_list =
                                 ( site',
@@ -2868,7 +2868,7 @@ module Domain = struct
     let site_to_site_list = get_site_to_renamed_site_list static in
     let error, site_list_opt =
       Ckappa_sig
-      .Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+      .Agent_type_mvbdu_var_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
       .unsafe_get parameters error (agent_name, site) site_to_site_list
     in
     let site_list =

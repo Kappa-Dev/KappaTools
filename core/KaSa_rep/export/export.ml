@@ -1868,7 +1868,6 @@ functor
         ~log_title:
           "Detecting for which valuations of the boolean parameters each rule \
            may be triggered during simulations"
-        (*  ~dump:dump_raw_internal_contact_map *)
         Remanent_state.get_conditionally_dead_rules
         compute_conditionally_dead_rules
 
@@ -1917,7 +1916,6 @@ functor
         ~log_title:
           "Detecting for which valuations of the boolean parameters each agent \
            may occur during simulations"
-        (*  ~dump:dump_raw_internal_contact_map *)
         Remanent_state.get_conditionally_dead_agents
         compute_conditionally_dead_agents
 
@@ -1955,20 +1953,19 @@ functor
             let error, current_list =
               List.fold_left
                 (fun (error, current_list) lem ->
-                  let error, lemma =
-                    let hyp = Public_data.get_hyp lem in
-                    let refine = Public_data.get_refinement lem in
-                    let string_version =
-                      Site_graphs.KaSa_site_graph.get_string_version hyp
-                    in
-                    let error, site_graph =
-                      Ckappa_site_graph.site_graph_to_list error string_version
-                    in
-                    let error, refinement =
-                      Ckappa_site_graph.site_graph_list_to_list error refine
-                    in
-                    ( error,
-                      { Public_data.hyp = site_graph; Public_data.refinement } )
+                  let hyp = Public_data.get_hyp lem in
+                  let refine = Public_data.get_refinement lem in
+                  let string_version =
+                    Site_graphs.KaSa_site_graph.get_string_version hyp
+                  in
+                  let error, site_graph =
+                    Ckappa_site_graph.site_graph_to_list error string_version
+                  in
+                  let error, refinement =
+                    Ckappa_site_graph.site_graph_list_to_list error refine
+                  in
+                  let lemma =
+                    { Public_data.hyp = site_graph; Public_data.refinement }
                   in
                   let current_list = lemma :: current_list in
                   error, current_list)

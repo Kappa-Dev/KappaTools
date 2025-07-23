@@ -217,7 +217,7 @@ let new_index_pair_map parameters error l =
         Ckappa_sig.SiteOrGuard_map_and_set.Map.add parameters error h k map1
       in
       let error, map2 =
-        Ckappa_sig.GuardSite_map_and_set.Map.add parameters error k h map2
+        Ckappa_sig.MvbduVar_map_and_set.Map.add parameters error k h map2
       in
       aux tl
         (Ckappa_sig.mvbdu_var_of_int (Ckappa_sig.int_of_mvbdu_var k + 1))
@@ -227,7 +227,7 @@ let new_index_pair_map parameters error l =
     aux l
       (Ckappa_sig.mvbdu_var_of_int 1)
       Ckappa_sig.SiteOrGuard_map_and_set.Map.empty
-      Ckappa_sig.GuardSite_map_and_set.Map.empty error
+      Ckappa_sig.MvbduVar_map_and_set.Map.empty error
   in
   let error =
     Exception.check_point Exception.warn parameters error error' __POS__ Exit

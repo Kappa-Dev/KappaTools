@@ -36,7 +36,7 @@ type c_guard_parameter = int
 type c_site_or_guard_p = Site of c_site_name | Guard_p of c_guard_parameter
 
 type c_mvbdu_var =
-  int (*the first n elements are guards, the last ones are sites*)
+  int (*the first n elements are sites, the last ones are boolean parameters*)
 
 type mixture =
   | SKIP of mixture
@@ -171,7 +171,6 @@ let dummy_state_index_true = 1
 let dummy_state_index_false = 0
 let dummy_rule_id = 0
 let dummy_agent_id = 0
-let dummy_site_name_1 = 1
 let dummy_site_name_2 = 2
 let dummy_site_name_minus1 = -1 (*REMOVE:Use in views_domain*)
 let dummy_state_index_1 = 1
@@ -180,8 +179,8 @@ let dummy_agent =
   { agent_name = ""; ag_intf = EMPTY_INTF; agent_name_pos = Loc.dummy }
 
 let dummy_link_value = 1
-let fst_site = 0
-let snd_site = 1
+let fst_site = 1
+let snd_site = 2
 let string_of_agent_name (a : c_agent_name) : string = string_of_int a
 let int_of_agent_name (a : c_agent_name) : int = a
 let agent_name_of_int (a : int) : c_agent_name = a
@@ -938,7 +937,7 @@ module GuardP_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   let print = Format.pp_print_int
 end))
 
-module GuardSite_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+module MvbduVar_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   type t = c_mvbdu_var
 
   let compare = compare
@@ -1035,7 +1034,7 @@ let next_agent_id = succ
 let next_agent_name = succ
 let next_site_name = succ
 let next_guard_p_name = succ
-let next_guard_or_site_name = succ
+let next_mvbdu_var_name = succ
 let next_state_index = succ
 let compare_rule_id = compare
 let compare_agent_id = compare
@@ -1108,7 +1107,7 @@ module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
      and type dimension = int * int =
   Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif
 
-module Agent_type_guard_or_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
+module Agent_type_mvbdu_var_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
   Int_storage.Storage
     with type key = c_agent_name * c_mvbdu_var
      and type dimension = int * int =
@@ -1392,10 +1391,10 @@ let empty_side_effects =
 (*MVBDU OF THE GUARDS*)
 (*****************************************************************************)
 
-(* bdu operations that restrict the values of the guards to 0 and 1*)
-(** Returns the disjunction of the two mvbdus but the values of each variable are restricted to the values 0 and 1.
-Used for the guard parameters, which model boolean values. *)
+(* bdu operations that restrict the values of the guard parameters to 0 and 1*)
 
+(** Returns the disjunction of the two mvbdus but the values of each variable are restricted to the values 0 and 1.
+Used for the boolean guard parameters. *)
 let mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
     bdu_restriction =
   let error, handler_bdu, or_bdu =
@@ -1427,7 +1426,7 @@ let mvbdu_is_false_for_guards parameters handler_bdu error mvbdu =
   in
   error, handler_bdu, Views_bdu.equal mvbdu mvbdu_false
 
-(**Returns the bdu representation of the guard, and a bdu that maps each guard to 1 or 0.
+(**Returns the bdu representation of the guard, and a bdu that maps each guard parameter of the guard to 1 or 0.
 This second bdu is used to restrict the bdus that are calculated by using "or" and "not"
 to valid bdus where the values of the guards can only be 0 and 1. *)
 let guard_to_bdu parameters error handler_bdu guard bdu_restriction nsites =

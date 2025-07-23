@@ -190,7 +190,7 @@ let _print_pattern ?logger parameters error _kappa_handler list =
 let site_graph_to_list error string_version =
   let error, current_list =
     Ckappa_sig.Agent_id_map_and_set.Map.fold
-      (fun _ ((agent_string, site_map), _guardmap) (error, current_list) ->
+      (fun _ ((agent_string, site_map), _) (error, current_list) ->
         (*-----------------------------------------*)
         let site_graph = (agent_string, site_map) :: current_list in
         error, site_graph)
