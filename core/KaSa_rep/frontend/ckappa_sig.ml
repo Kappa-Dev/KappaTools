@@ -247,12 +247,6 @@ let bool_of_state_index parameter error (a : c_state) =
   | 1 -> error, true
   | _ -> Exception.warn parameter error __POS__ Exit false
 
-let prefix_of_guard_state parameter error (a : c_state) =
-  match a with
-  | 0 -> error, Remanent_parameters.get_negation_guard_parameter parameter
-  | 1 -> error, ""
-  | _ -> Exception.warn parameter error __POS__ Exit ""
-
 let get_agent_shape n_sites parameters =
   Misc_sa.fetch_array (int_of_site_name n_sites)
     (Remanent_parameters.get_agent_shape_array parameters)

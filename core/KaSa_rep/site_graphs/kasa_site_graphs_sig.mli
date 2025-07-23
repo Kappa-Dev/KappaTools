@@ -11,10 +11,9 @@ module type Site_graph = sig
     | Bound_to of bond_index
 
   type string_version =
-    ((string
-     * (string option * binding_state option * (int option * int option) option)
-       Wrapped_modules.LoggedStringMap.t)
-    * string option Wrapped_modules.LoggedStringMap.t)
+    (string
+    * (string option * binding_state option * (int option * int option) option)
+      Wrapped_modules.LoggedStringMap.t)
     Ckappa_sig.Agent_id_map_and_set.Map.t
 
   val binding_state_to_json : binding_state -> Yojson.Basic.t
@@ -126,7 +125,6 @@ module type Site_graph = sig
     string ->
     (string option * binding_state option * (int option * int option) option)
     Wrapped_modules.LoggedStringMap.t ->
-    string option Wrapped_modules.LoggedStringMap.t ->
     bool ->
     Exception.exceptions_caught_and_uncaught
 

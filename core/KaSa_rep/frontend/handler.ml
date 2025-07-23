@@ -196,7 +196,7 @@ let has_no_label parameters error compiled rule_id =
       | None -> true
       | Some _ -> false) )
 
-let string_of_guard parameters guardp kappa_handler ?state error =
+let string_of_guard parameters guardp kappa_handler error =
   let guard_p_dic = kappa_handler.Cckappa_sig.guard_parameters_dic in
   let error, output =
     Ckappa_sig.Dictionary_of_guards.translate parameters error guardp
@@ -207,13 +207,7 @@ let string_of_guard parameters guardp kappa_handler ?state error =
     | None -> Exception.warn parameters error __POS__ Exit ""
     | Some (guard_param_name, (), ()) -> error, guard_param_name
   in
-  match state with
-  | None -> error, guard_param_name
-  | Some s ->
-    let error, guard_string =
-      Ckappa_sig.prefix_of_guard_state parameters error s
-    in
-    error, guard_string ^ guard_param_name
+  error, guard_param_name
 
 let info_of_rule parameters ?(with_rates = false) ?(original = false) error
     compiled (rule_id : Ckappa_sig.c_rule_id) =
@@ -621,8 +615,7 @@ let string_of_site_or_guard parameter error handler_kappa ?state
   | Ckappa_sig.Site s ->
     string_of_site parameter error handler_kappa ?state ~add_parentheses
       agent_type s
-  | Ckappa_sig.Guard_p g ->
-    string_of_guard parameter g handler_kappa ?state error
+  | Ckappa_sig.Guard_p g -> string_of_guard parameter g handler_kappa error
 
 (*this function used in views_domain*)
 let string_of_site_update_views parameter error handler_kappa agent_type

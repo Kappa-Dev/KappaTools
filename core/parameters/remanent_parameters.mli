@@ -137,7 +137,6 @@ val get_close_counterdelta : Remanent_parameters_sig.parameters -> string
 val get_counterdeltaplus_symbol : Remanent_parameters_sig.parameters -> string
 val get_counterdeltaminus_symbol : Remanent_parameters_sig.parameters -> string
 val get_counterval_symbol : Remanent_parameters_sig.parameters -> string
-val get_negation_guard_parameter : Remanent_parameters_sig.parameters -> string
 
 val get_rule_shape :
   Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape

@@ -56,17 +56,13 @@ module KaSa_site_graph = struct
     * (string option * binding_state option * (int option * int option) option)
       Wrapped_modules.LoggedStringMap.t
 
-  type guard_p = string option Wrapped_modules.LoggedStringMap.t
-  type string_version = (agent * guard_p) Ckappa_sig.Agent_id_map_and_set.Map.t
+  type string_version = agent Ckappa_sig.Agent_id_map_and_set.Map.t
 
   type t = {
     views:
       (Ckappa_sig.c_agent_name
       * (Ckappa_sig.c_state option * Ckappa_sig.c_state option)
         Ckappa_sig.Site_map_and_set.Map.t)
-      Ckappa_sig.Agent_id_map_and_set.Map.t;
-    guard_params:
-      (Ckappa_sig.c_agent_name * bool Ckappa_sig.GuardP_map_and_set.Map.t)
       Ckappa_sig.Agent_id_map_and_set.Map.t;
     fresh_agent_id: agent_id;
     fresh_bond_id: bond_index;
@@ -82,7 +78,6 @@ module KaSa_site_graph = struct
   let empty =
     {
       views = Ckappa_sig.Agent_id_map_and_set.Map.empty;
-      guard_params = Ckappa_sig.Agent_id_map_and_set.Map.empty;
       fresh_agent_id = Ckappa_sig.dummy_agent_id;
       fresh_bond_id = 1;
       bonds = Ckappa_sig.Agent_id_map_and_set.Map.empty;
@@ -100,19 +95,13 @@ module KaSa_site_graph = struct
         (agent_type, Ckappa_sig.Site_map_and_set.Map.empty)
         t.views
     in
-    let error', guard_params =
-      Ckappa_sig.Agent_id_map_and_set.Map.add parameter error' agent_id
-        (agent_type, Ckappa_sig.GuardP_map_and_set.Map.empty)
-        t.guard_params
-    in
     let error =
       Exception.check_point Exception.warn parameter error error' __POS__
         ~message:"this agent id is already used" Exit
     in
     let error', string_version =
       Ckappa_sig.Agent_id_map_and_set.Map.add parameter error agent_id
-        ( (agent_string, Wrapped_modules.LoggedStringMap.empty),
-          Wrapped_modules.LoggedStringMap.empty )
+        (agent_string, Wrapped_modules.LoggedStringMap.empty)
         t.string_version
     in
     let error =
@@ -126,7 +115,6 @@ module KaSa_site_graph = struct
         fresh_agent_id = Ckappa_sig.next_agent_id t.fresh_agent_id;
         views;
         string_version;
-        guard_params;
       } )
 
   let has_a_counter parameter error kappa_handler agent_type site =
@@ -175,10 +163,9 @@ module KaSa_site_graph = struct
       Exception.warn parameter error __POS__ ~message:"unknown agent type" Exit
         t
     | Some (agent_type, _map) ->
-      let error', ((agent_string, sitemap), guardmap) =
+      let error', (agent_string, sitemap) =
         Ckappa_sig.Agent_id_map_and_set.Map.find_default parameter error
-          ( ("", Wrapped_modules.LoggedStringMap.empty),
-            Wrapped_modules.LoggedStringMap.empty )
+          ("", Wrapped_modules.LoggedStringMap.empty)
           agent_id t.string_version
       in
       let error =
@@ -192,7 +179,7 @@ module KaSa_site_graph = struct
       let error =
         Exception.check_point Exception.warn parameter error error' __POS__ Exit
       in
-      let error, sitemap, guardmap =
+      let error, sitemap =
         match site_or_guard with
         | Ckappa_sig.Site _ ->
           let error, state_opt =
@@ -208,27 +195,16 @@ module KaSa_site_graph = struct
             Wrapped_modules.LoggedStringMap.add_or_overwrite parameter error
               site_string state sitemap
           in
-          error, sitemap, guardmap
+          error, sitemap
         | Ckappa_sig.Guard_p _ ->
-          let error, state_opt =
-            Wrapped_modules.LoggedStringMap.find_option_without_logs parameter
-              error site_string guardmap
-          in
-          let state =
-            match state_opt with
-            | None | Some None -> None
-            | Some (Some state) -> Some state
-          in
-          let error, guardmap =
-            Wrapped_modules.LoggedStringMap.add_or_overwrite parameter error
-              site_string state guardmap
-          in
-          error, sitemap, guardmap
+          Exception.warn parameter error __POS__
+            ~message:
+              "It is not possible to add a guard parameter to the site graph"
+            Exit sitemap
       in
       let error', string_version =
         Ckappa_sig.Agent_id_map_and_set.Map.overwrite parameter error agent_id
-          ((agent_string, sitemap), guardmap)
-          t.string_version
+          (agent_string, sitemap) t.string_version
       in
       let error =
         Exception.check_point Exception.warn parameter error error' __POS__ Exit
@@ -379,10 +355,9 @@ module KaSa_site_graph = struct
           | false, false, false, _ | _, false, false, None | _, true, true, _ ->
             Exception.warn parameter error __POS__ Exit (None, None, None)
         in
-        let error, ((agent_string, sitemap), guardmap) =
+        let error, (agent_string, sitemap) =
           Ckappa_sig.Agent_id_map_and_set.Map.find_default parameter error
-            ( ("", Wrapped_modules.LoggedStringMap.empty),
-              Wrapped_modules.LoggedStringMap.empty )
+            ("", Wrapped_modules.LoggedStringMap.empty)
             agent_id t.string_version
         in
         let error, (old_state, old_binding, old_counter) =
@@ -425,8 +400,7 @@ module KaSa_site_graph = struct
         in
         let error', string_version =
           Ckappa_sig.Agent_id_map_and_set.Map.overwrite parameter error agent_id
-            ((agent_string, sitemap), guardmap)
-            t.string_version
+            (agent_string, sitemap) t.string_version
         in
         let error =
           Exception.check_point Exception.warn parameter error error' __POS__
@@ -438,81 +412,16 @@ module KaSa_site_graph = struct
     add_state_interv parameter error kappa_handler agent_id site (Some state)
       (Some state) t
 
-  let add_state_of_guard parameter error kappa_handler agent_id guardp state t =
-    let error, agent_op =
-      Ckappa_sig.Agent_id_map_and_set.Map.find_option parameter error agent_id
-        t.guard_params
-    in
-    match agent_op with
-    | None ->
-      Exception.warn parameter error __POS__ ~message:"unknown agent type" Exit
-        t
-    | Some (agent_type, map) ->
-      let error, site_string =
-        Handler.string_of_guard parameter guardp kappa_handler error
-      in
-      let error, ((agent_string, sitemap), guardmap) =
-        Ckappa_sig.Agent_id_map_and_set.Map.find_default parameter error
-          ( ("", Wrapped_modules.LoggedStringMap.empty),
-            Wrapped_modules.LoggedStringMap.empty )
-          agent_id t.string_version
-      in
-      let error, state_bool =
-        Ckappa_sig.bool_of_state_index parameter error state
-      in
-      let error, state_string =
-        Ckappa_sig.prefix_of_guard_state parameter error state
-      in
-      let error, old_asso =
-        Ckappa_sig.GuardP_map_and_set.Map.find_option_without_logs parameter
-          error guardp map
-      in
-      let error, new_map =
-        match old_asso with
-        | None ->
-          let error, map =
-            Ckappa_sig.GuardP_map_and_set.Map.add parameter error guardp
-              state_bool map
-          in
-          error, map
-        | Some old_bool ->
-          if state_bool = old_bool then (
-            let error, map =
-              Ckappa_sig.GuardP_map_and_set.Map.overwrite parameter error guardp
-                state_bool map
-            in
-            let error =
-              Exception.check_point Exception.warn parameter error error __POS__
-                Exit
-            in
-            error, map
-          ) else
-            Exception.warn parameter error __POS__
-              ~message:"incompatible states" Exit map
-      in
-      let error, guard_params =
-        Ckappa_sig.Agent_id_map_and_set.Map.add_or_overwrite parameter error
-          agent_id (agent_type, new_map) t.guard_params
-      in
-      let error, guardmap =
-        Wrapped_modules.LoggedStringMap.add_or_overwrite parameter error
-          site_string (Some state_string) guardmap
-      in
-      let error, string_version =
-        Ckappa_sig.Agent_id_map_and_set.Map.overwrite parameter error agent_id
-          ((agent_string, sitemap), guardmap)
-          t.string_version
-      in
-      error, { t with guard_params; string_version }
-
   let add_state_or_guard parameter error kappa_handler agent_id site_or_guard
       state t =
     let nsites = Handler.get_nsites kappa_handler in
     match Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard nsites with
     | Ckappa_sig.Site site_name ->
       add_state parameter error kappa_handler agent_id site_name state t
-    | Ckappa_sig.Guard_p guardp ->
-      add_state_of_guard parameter error kappa_handler agent_id guardp state t
+    | Ckappa_sig.Guard_p _ ->
+      Exception.warn parameter error __POS__
+        ~message:"It is not possible to add a guard parameter to the site graph"
+        Exit t
 
   let add_counter_range parameter error kappa_handler agent_id site ?inf ?sup t
       =
@@ -561,10 +470,9 @@ module KaSa_site_graph = struct
     let error =
       Exception.check_point Exception.warn parameter error error' __POS__ Exit
     in
-    let error, ((agent_string, old_site_map), old_guardmap) =
+    let error, (agent_string, old_site_map) =
       Ckappa_sig.Agent_id_map_and_set.Map.find_default parameter error
-        ( ("", Wrapped_modules.LoggedStringMap.empty),
-          Wrapped_modules.LoggedStringMap.empty )
+        ("", Wrapped_modules.LoggedStringMap.empty)
         agent_id t.string_version
     in
     let error, site_string =
@@ -583,7 +491,7 @@ module KaSa_site_graph = struct
     in
     let error', string_version =
       Ckappa_sig.Agent_id_map_and_set.Map.overwrite parameter error agent_id
-        ((agent_string, new_site_map), old_guardmap)
+        (agent_string, new_site_map)
         t.string_version
     in
     let error =
@@ -643,7 +551,7 @@ module KaSa_site_graph = struct
       Exception.warn parameter error __POS__
         ~message:"incompatible binding states" Exit t
 
-  let print_agent logger parameter error agent_string site_map guardmap bool =
+  let print_agent logger parameter error agent_string site_map bool =
     let () =
       if bool then
         Loggers.fprintf logger "%s"
@@ -750,33 +658,14 @@ module KaSa_site_graph = struct
       Loggers.fprintf logger "%s"
         (Remanent_parameters.get_agent_close_symbol parameter)
     in
-    (*print guard parameters*)
-    let _ =
-      Wrapped_modules.LoggedStringMap.fold
-        (fun guard_string state_string_opt bool ->
-          let () =
-            if bool then
-              Loggers.fprintf logger "%s"
-                (Remanent_parameters.get_site_sep_comma_symbol parameter)
-          in
-          let () =
-            match state_string_opt with
-            | None -> ()
-            | Some state_string -> Loggers.fprintf logger "%s" state_string
-          in
-          let () = Loggers.fprintf logger "%s" guard_string in
-          true)
-        guardmap true
-    in
     error
 
   let print logger parameter error t =
     let error, _ =
       Ckappa_sig.Agent_id_map_and_set.Map.fold
-        (fun _ ((agent_string, site_map), guardmap) (error, bool) ->
+        (fun _ (agent_string, site_map) (error, bool) ->
           let error =
-            print_agent logger parameter error agent_string site_map guardmap
-              bool
+            print_agent logger parameter error agent_string site_map bool
           in
           error, true)
         t.string_version (error, false)

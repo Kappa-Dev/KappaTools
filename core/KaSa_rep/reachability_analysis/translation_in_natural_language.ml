@@ -1174,9 +1174,9 @@ let rec print ?beginning_of_sentence:(beggining = true)
                         | Ckappa_sig.Site s ->
                           Handler.string_of_site parameters error handler_kappa
                             agent_type s
-                        | Ckappa_sig.Guard_p g ->
-                          Handler.string_of_guard parameters g handler_kappa
-                            ~state error
+                        | Ckappa_sig.Guard_p _ ->
+                          Exception.warn parameters error __POS__ ~message:""
+                            Exit ""
                       in
                       let error =
                         Exception.check_point Exception.warn parameters error
