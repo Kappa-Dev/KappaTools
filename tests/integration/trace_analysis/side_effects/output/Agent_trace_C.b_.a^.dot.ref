@@ -1,12 +1,12 @@
 digraph G{
-"Init_25" [label="" style=invis width="0px" height="0px"];
-"Init_24" [label="" style=invis width="0px" height="0px"];
-"Final_24" [label="" style=invis width="0px" height="0px"];
-"Final_25" [label="" style=invis width="0px" height="0px"];
-"Node_25" [label="C(b{u},a[x.A])"];
-"Node_24" [label="C(b{u},a[x.B])"];
-"Init_25" -> "Node_25" [label=""];
-"Init_24" -> "Node_24" [label=""];
-"Node_24" -> "Final_24" [label="0"];
-"Node_25" -> "Final_25" [label="0"];
+"Init_29" [label="" style=invis width="0px" height="0px"];
+"Init_28" [label="" style=invis width="0px" height="0px"];
+"Final_28" [label="" style=invis width="0px" height="0px"];
+"Final_29" [label="" style=invis width="0px" height="0px"];
+"Node_29" [label="C(b{u},a[x.A])"];
+"Node_28" [label="C(b{u},a[x.B])"];
+"Init_29" -> "Node_29" [label=""];
+"Init_28" -> "Node_28" [label=""];
+"Node_28" -> "Final_28" [label="0"];
+"Node_29" -> "Final_29" [label="0"];
 }
