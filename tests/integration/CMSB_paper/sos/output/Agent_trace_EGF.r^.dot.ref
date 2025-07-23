@@ -1,8 +1,8 @@
 digraph G{
-"Init_40" [label="" style=invis width="0px" height="0px"];
-"Node_37" [label="EGF(r!L.EGFR)"];
-"Node_40" [label="EGF(r!)"];
-"Node_37" -> "Node_40" [label="E/R"];
-"Node_40" -> "Node_37" [label="E.R"];
-"Init_40" -> "Node_40" [label=""];
+"Init_35" [label="" style=invis width="0px" height="0px"];
+"Node_19" [label="EGF(r!L.EGFR)"];
+"Node_35" [label="EGF(r!)"];
+"Node_19" -> "Node_35" [label="E/R"];
+"Node_35" -> "Node_19" [label="E.R"];
+"Init_35" -> "Node_35" [label=""];
 }

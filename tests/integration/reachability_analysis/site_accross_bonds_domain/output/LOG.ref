@@ -620,12 +620,12 @@ EXTENSIONAL DESCRIPTION:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
-Id=61
+Id=58
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=60
+  Id=57
    Node(site_type:1<2)
     Id=31
      Node(site_type:2<1)
@@ -665,12 +665,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(t{},z[])
 
 INTENSIONAL DESCRIPTION:
-Id=75
+Id=52
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=74
+  Id=51
    Node(site_type:1<2)
     Id=5
      Node(site_type:2<0)
@@ -721,19 +721,19 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z{},t{},z[])
 
 INTENSIONAL DESCRIPTION:
-Id=81
+Id=79
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=80
+  Id=78
    Node(site_type:1<1)
-    Id=79
+    Id=77
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=78
+      Id=76
        Node(site_type:2<2)
         Id=11
          Node(site_type:3<0)
@@ -766,19 +766,19 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z{},t{},z[])
 
 INTENSIONAL DESCRIPTION:
-Id=95
+Id=91
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=94
+  Id=90
    Node(site_type:1<2)
-    Id=82
+    Id=80
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=78
+      Id=76
        Node(site_type:2<2)
         Id=11
          Node(site_type:3<0)
@@ -857,12 +857,12 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=77
+Id=70
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=76
+  Id=68
    Node(site_type:1<2)
     Id=40
      Node(site_type:2<0)
@@ -881,19 +881,19 @@ Id=77
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=101
+Id=97
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=100
+  Id=96
    Node(site_type:1<1)
-    Id=82
+    Id=80
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=78
+      Id=76
        Node(site_type:2<2)
         Id=11
          Node(site_type:3<0)
@@ -911,16 +911,16 @@ Id=101
         Id=0
          Leaf False 
 
-    Id=99
+    Id=95
      Node(site_type:1<2)
-      Id=98
+      Id=94
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=97
+        Id=93
          Node(site_type:2<2)
-          Id=96
+          Id=92
            Node(site_type:3<0)
             Id=0
              Leaf False 
@@ -944,7 +944,7 @@ Id=101
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=85
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -989,7 +989,7 @@ Id=40
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=85
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1028,7 +1028,7 @@ B(z) => [ B(z{u}) v B(z{p}) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=85
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1058,7 +1058,7 @@ Id=33
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=85
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1073,12 +1073,12 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=115
+Id=108
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=114
+  Id=107
    Node(site_type:0<1)
     Id=5
      Node(site_type:2<0)
@@ -1093,7 +1093,7 @@ Id=115
         Id=0
          Leaf False 
 
-    Id=113
+    Id=106
      Node(site_type:0<2)
       Id=40
        Node(site_type:2<0)
@@ -1129,7 +1129,7 @@ A(z[1]),B(z[1]) =>
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=85
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1174,7 +1174,7 @@ Id=40
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=85
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1204,7 +1204,7 @@ Id=33
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=85
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1234,7 +1234,7 @@ Id=33
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=85
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1249,12 +1249,12 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=115
+Id=108
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=114
+  Id=107
    Node(site_type:0<1)
     Id=5
      Node(site_type:2<0)
@@ -1269,7 +1269,7 @@ Id=115
         Id=0
          Leaf False 
 
-    Id=113
+    Id=106
      Node(site_type:0<2)
       Id=40
        Node(site_type:2<0)

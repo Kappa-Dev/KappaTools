@@ -1069,12 +1069,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],c[])
 
 INTENSIONAL DESCRIPTION:
-Id=160
+Id=87
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=159
+  Id=86
    Node(site_type:1<1)
     Id=19
      Node(site_type:2<1)
@@ -1148,7 +1148,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=158
+Id=154
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1294,7 +1294,7 @@ Id=126
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=162
+Id=157
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1369,7 +1369,7 @@ Id=59
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=167
+Id=162
  Node(site_type:3<0)
   Id=0
    Leaf False 
@@ -1410,7 +1410,7 @@ C(x2) => [ C(x2[.]) v C(x2[c.A]) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=162
+Id=157
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1455,21 +1455,21 @@ Id=43
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=235
+Id=230
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=234
+  Id=229
    Node(site_type:0<1)
-    Id=230
+    Id=225
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=229
+      Id=224
        Node(site_type:1<1)
-        Id=197
+        Id=192
          Node(site_type:2<0)
           Id=0
            Leaf False 
@@ -1495,23 +1495,23 @@ Id=235
         Id=0
          Leaf False 
 
-    Id=233
+    Id=228
      Node(site_type:0<2)
-      Id=232
+      Id=227
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=231
+        Id=226
          Node(site_type:1<1)
-          Id=196
+          Id=191
            Node(site_type:2<0)
             Id=0
              Leaf False 
 
-            Id=195
+            Id=190
              Node(site_type:2<1)
-              Id=167
+              Id=162
                Node(site_type:3<0)
                 Id=0
                  Leaf False 
@@ -1577,7 +1577,7 @@ C() =>
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=162
+Id=157
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1652,7 +1652,7 @@ Id=59
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=167
+Id=162
  Node(site_type:3<0)
   Id=0
    Leaf False 
@@ -1682,7 +1682,7 @@ Id=43
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=162
+Id=157
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1727,21 +1727,21 @@ Id=43
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=235
+Id=230
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=234
+  Id=229
    Node(site_type:0<1)
-    Id=230
+    Id=225
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=229
+      Id=224
        Node(site_type:1<1)
-        Id=197
+        Id=192
          Node(site_type:2<0)
           Id=0
            Leaf False 
@@ -1767,23 +1767,23 @@ Id=235
         Id=0
          Leaf False 
 
-    Id=233
+    Id=228
      Node(site_type:0<2)
-      Id=232
+      Id=227
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=231
+        Id=226
          Node(site_type:1<1)
-          Id=196
+          Id=191
            Node(site_type:2<0)
             Id=0
              Leaf False 
 
-            Id=195
+            Id=190
              Node(site_type:2<1)
-              Id=167
+              Id=162
                Node(site_type:3<0)
                 Id=0
                  Leaf False 

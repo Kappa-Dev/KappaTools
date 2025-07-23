@@ -680,19 +680,19 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(y[],x[],P)
 
 INTENSIONAL DESCRIPTION:
-Id=59
+Id=57
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=58
+  Id=56
    Node(site_type:1<1)
-    Id=57
+    Id=55
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=56
+      Id=54
        Node(site_type:2<2)
         Id=3
          Node(site_type:3<0)
@@ -727,19 +727,19 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(y[],x[],P)
 
 INTENSIONAL DESCRIPTION:
-Id=78
+Id=76
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=71
+  Id=69
    Node(site_type:1<2)
-    Id=70
+    Id=68
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=69
+      Id=67
        Node(site_type:2<2)
         Id=8
          Node(site_type:3<0)
@@ -783,12 +783,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(y[],x[],P)
 
 INTENSIONAL DESCRIPTION:
-Id=126
+Id=112
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=125
+  Id=111
    Node(site_type:1<2)
     Id=24
      Node(site_type:2<1)
@@ -919,19 +919,19 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=128
+Id=114
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=127
+  Id=113
    Node(site_type:1<2)
-    Id=60
+    Id=58
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=56
+      Id=54
        Node(site_type:2<2)
         Id=3
          Node(site_type:3<0)
@@ -958,12 +958,12 @@ Id=128
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=151
+Id=146
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=63
+  Id=61
    Node(site_type:1<2)
     Id=3
      Node(site_type:3<0)
@@ -983,12 +983,12 @@ Id=151
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=60
+Id=58
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=56
+  Id=54
    Node(site_type:2<2)
     Id=3
      Node(site_type:3<0)
@@ -1015,12 +1015,12 @@ A(y) => [ A(y[.]) v A(y[y.A]) ]
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=151
+Id=146
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=63
+  Id=61
    Node(site_type:1<2)
     Id=3
      Node(site_type:3<0)
@@ -1040,12 +1040,12 @@ Id=151
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=60
+Id=58
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=56
+  Id=54
    Node(site_type:2<2)
     Id=3
      Node(site_type:3<0)
@@ -1076,12 +1076,12 @@ A(x[2],y[1]),A(y[1]),A(x[2]) => .not.P
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=151
+Id=146
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=63
+  Id=61
    Node(site_type:1<2)
     Id=3
      Node(site_type:3<0)
@@ -1101,12 +1101,12 @@ Id=151
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=60
+Id=58
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=56
+  Id=54
    Node(site_type:2<2)
     Id=3
      Node(site_type:3<0)
@@ -1127,12 +1127,12 @@ Id=60
 EXTENSIONAL DESCRIPTION:
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=151
+Id=146
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=63
+  Id=61
    Node(site_type:1<2)
     Id=3
      Node(site_type:3<0)
@@ -1152,12 +1152,12 @@ Id=151
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=60
+Id=58
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=56
+  Id=54
    Node(site_type:2<2)
     Id=3
      Node(site_type:3<0)

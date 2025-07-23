@@ -1,8 +1,8 @@
 digraph G{
-"Init_55" [label="" style=invis width="0px" height="0px"];
-"Node_89" [label="SoS(S~u,PR!SH3n.Grb2)"];
-"Node_55" [label="SoS(S~u,PR!)"];
-"Node_89" -> "Node_55" [label="Grb2/SoS"];
-"Node_55" -> "Node_89" [label="Grb2.SoS"];
-"Init_55" -> "Node_55" [label=""];
+"Init_50" [label="" style=invis width="0px" height="0px"];
+"Node_86" [label="SoS(S~u,PR!SH3n.Grb2)"];
+"Node_50" [label="SoS(S~u,PR!)"];
+"Node_86" -> "Node_50" [label="Grb2/SoS"];
+"Node_50" -> "Node_86" [label="Grb2.SoS"];
+"Init_50" -> "Node_50" [label=""];
 }

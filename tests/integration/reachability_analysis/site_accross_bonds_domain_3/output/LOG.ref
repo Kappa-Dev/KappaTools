@@ -1238,12 +1238,12 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=43
+Id=42
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=42
+  Id=41
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<1)
@@ -1267,19 +1267,19 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=58
+Id=50
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=57
+  Id=49
    Node(site_type:1<2)
-    Id=56
+    Id=48
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=55
+      Id=47
        Node(site_type:2<1)
         Id=1
          Leaf True 
@@ -1296,12 +1296,12 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=43
+Id=42
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=42
+  Id=41
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<1)
@@ -1362,7 +1362,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=44
+Id=43
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1386,14 +1386,14 @@ Id=44
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=61
+Id=56
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=60
+  Id=55
    Node(site_type:1<2)
-    Id=59
+    Id=54
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1410,7 +1410,7 @@ Id=61
      Leaf False 
 
 agent_type:2:E:cv_id:0
-Id=44
+Id=43
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1434,14 +1434,14 @@ Id=44
      Leaf False 
 
 agent_type:3:F:cv_id:0
-Id=31
+Id=30
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=30
+  Id=29
    Node(site_type:1<2)
-    Id=29
+    Id=28
      Node(site_type:2<1)
       Id=0
        Leaf False 
@@ -1458,7 +1458,7 @@ Id=31
      Leaf False 
 
 agent_type:4:C:cv_id:0
-Id=39
+Id=37
  Node(site_type:1<1)
   Id=0
    Leaf False 
@@ -1472,7 +1472,7 @@ Id=39
      Leaf False 
 
 agent_type:5:D:cv_id:0
-Id=39
+Id=37
  Node(site_type:1<1)
   Id=0
    Leaf False 
@@ -1533,7 +1533,7 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=69
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -1548,7 +1548,7 @@ Id=70
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=69
+Id=68
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1563,7 +1563,7 @@ Id=69
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -1593,7 +1593,7 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=69
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -1623,7 +1623,7 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -1638,12 +1638,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=70
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=40
+  Id=38
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1653,12 +1653,12 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=70
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=40
+  Id=38
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1668,7 +1668,7 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -1683,7 +1683,7 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -1729,7 +1729,7 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=69
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -1744,7 +1744,7 @@ Id=70
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=69
+Id=68
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1759,7 +1759,7 @@ Id=69
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -1789,7 +1789,7 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=69
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -1819,7 +1819,7 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -1834,12 +1834,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=70
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=40
+  Id=38
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1849,12 +1849,12 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=70
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=40
+  Id=38
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1864,7 +1864,7 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -1879,7 +1879,7 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -1932,7 +1932,7 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=69
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -1947,7 +1947,7 @@ Id=70
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=69
+Id=68
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1962,7 +1962,7 @@ Id=69
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -1992,7 +1992,7 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=69
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -2022,7 +2022,7 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -2037,12 +2037,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=70
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=40
+  Id=38
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2052,12 +2052,12 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=70
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=40
+  Id=38
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2067,7 +2067,7 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -2082,7 +2082,7 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -2112,7 +2112,7 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=69
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -2127,7 +2127,7 @@ Id=70
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=69
+Id=68
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2142,7 +2142,7 @@ Id=69
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -2172,7 +2172,7 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=69
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -2202,7 +2202,7 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -2217,12 +2217,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=70
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=40
+  Id=38
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2232,12 +2232,12 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=70
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=40
+  Id=38
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2247,7 +2247,7 @@ Id=71
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 
@@ -2262,7 +2262,7 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=40
  Node(site_type:0<1)
   Id=0
    Leaf False 

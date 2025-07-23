@@ -843,12 +843,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(z{},z[],t[])
 
 INTENSIONAL DESCRIPTION:
-Id=67
+Id=65
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=66
+  Id=64
    Node(site_type:1<2)
     Id=45
      Node(site_type:2<1)
@@ -989,21 +989,21 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=86
+Id=80
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=85
+  Id=79
    Node(site_type:1<2)
-    Id=59
+    Id=57
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=58
+      Id=56
        Node(site_type:2<1)
-        Id=57
+        Id=55
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -1042,7 +1042,7 @@ Id=86
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=89
+Id=76
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1057,7 +1057,7 @@ Id=89
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=82
+Id=83
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1109,14 +1109,14 @@ Id=33
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=93
+Id=87
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=92
+  Id=86
    Node(site_type:1<1)
-    Id=89
+    Id=76
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1169,7 +1169,7 @@ A(t[1]),A(t[1]) =>
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=89
+Id=76
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1184,7 +1184,7 @@ Id=89
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=82
+Id=83
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1229,14 +1229,14 @@ Id=33
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=93
+Id=87
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=92
+  Id=86
    Node(site_type:1<1)
-    Id=89
+    Id=76
      Node(site_type:2<0)
       Id=0
        Leaf False 

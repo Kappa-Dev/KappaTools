@@ -658,7 +658,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=37
+Id=35
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -682,7 +682,7 @@ Id=37
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=37
+Id=35
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -710,7 +710,7 @@ Id=37
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=38
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -740,7 +740,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=38
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -778,7 +778,7 @@ B(z) => [ B(z[.]) v B(z[z.A]) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=38
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -808,7 +808,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=38
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -859,7 +859,7 @@ B(t[t.A],z[z.A]) => B(t[2],z[1]),A(t[2],z[1])
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=38
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -889,7 +889,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=38
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -919,7 +919,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=38
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -949,7 +949,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=38
  Node(site_type:1<0)
   Id=0
    Leaf False 

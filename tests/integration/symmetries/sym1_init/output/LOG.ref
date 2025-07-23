@@ -377,7 +377,7 @@ Id=12
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=38
+Id=24
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -429,7 +429,7 @@ Id=12
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=38
+Id=24
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -483,7 +483,7 @@ Id=12
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=38
+Id=24
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -528,7 +528,7 @@ Id=12
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=38
+Id=24
  Node(site_type:2<0)
   Id=0
    Leaf False 
