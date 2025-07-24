@@ -26,5 +26,3 @@ A(x[.],y[.]), A(x[.],y[.]) -> A(x[1],y[.]), A(x[1],y[.]) @ 1
 
 // Measure amount of A double bonds
 %obs: 'Trimer' |A(x[1],y[2]),A(x[1],y[2])|
-
-// Static analysis must show that P => no double bonds

@@ -62,7 +62,7 @@ type local_static_information = {
   store_sites_to_tuple:
     Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t
     Parallel_bonds_type.AgentSite_map_and_set.Map.t;
-      (*the same as the global restriction mvbdu, but it contains one additional variable at the end.*)
+      (*the same as the global restriction mvbdu, but it contains an additional "first variable" at the beginning.*)
   restriction_mvbdu: Ckappa_sig.Views_bdu.mvbdu;
 }
 

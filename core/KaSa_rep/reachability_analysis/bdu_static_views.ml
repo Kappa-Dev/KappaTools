@@ -585,7 +585,8 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
           let rec aux error site list output =
             match list with
             | [] -> error, output
-            | Ckappa_sig.Guard_p _ :: _ -> error, output
+            | Ckappa_sig.Guard_p _ :: _ ->
+              (*only sites are converted to a new index*) error, output
             | Ckappa_sig.Site h :: t ->
               let h =
                 Ckappa_sig.mvbdu_var_of_site_or_guard_p (Ckappa_sig.Site h)

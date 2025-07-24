@@ -43,12 +43,11 @@ module Domain = struct
   }
 
   (*--------------------------------------------------------------*)
-  (* One map: for each tuple: Yes mvbdu, No mvbdu
-     - Yes: for these values of the guards, when the sites x and y are bound with sites of
-      the good type, then they are bound to the same B.
-     - No: for these values of the guards, when the sites x and y are bound with sites of the good
-      type, then they are never bound to the same B.
-     - Otherwise: both cases may happen.*)
+  (* The map `store_value` maps each tuple of sites ((x,y),(a,b)) to a mvbdu whose variables are the guard parameters and an additional variable (the "first variable").
+     Given a valuation for the guard parameters:
+        - if the "first variable" must be true in order to satisfy the mvbdu: it means that when the sites x and y are bound with sites of the types a and b, then they are always bound to the same agent.
+        - if the "first variable" must be false in order to satisfy the mvbdu: it means that when when the sites x and y are bound with sites of the types a and b, then they are never bound to the same agent.
+        - if the first variable may be both true or false: both cases may happen.*)
 
   type local_dynamic_information = {
     dummy: unit;

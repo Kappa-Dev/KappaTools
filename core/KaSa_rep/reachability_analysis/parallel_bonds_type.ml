@@ -593,7 +593,6 @@ let add_value_lattice parameters error x value store_result =
     error, store_result
   )
 
-(*TODO merge with above*)
 let add_value_mvbdu parameters error x bdu_handler store_result mvbdu
     restriction_mvbdu =
   let error, bdu_handler, mvbdu_false =
@@ -607,10 +606,6 @@ let add_value_mvbdu parameters error x bdu_handler store_result mvbdu
     | error, None -> error, mvbdu_false
     | error, Some old_mvbdu -> error, old_mvbdu
   in
-  (* let error, bdu_handler, mvbdu_refined =
-     add_first_variable_to_mvbdu parameters bdu_handler error bool
-        mvbdu
-     in *)
   let error, bdu_handler, new_mvbdu =
     Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error old_mvbdu mvbdu
       restriction_mvbdu

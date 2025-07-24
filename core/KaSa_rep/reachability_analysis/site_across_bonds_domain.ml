@@ -48,9 +48,9 @@ module Domain = struct
   }
 
   (*--------------------------------------------------------------*)
-  (* Maps each such tuples (A,x,y,B,z,t) to a mvbdu with (n + 2) variables.
+  (* The map `store_value` maps each tuples (A,x,y,B,z,t) to a mvbdu with (n + 2) variables.
      The last n variables describe the boolean value of the guard parameters.
-         Tha first two variables describe the relation between the state of y and the state of t,
+         The first two variables describe the relation between the state of y and the state of t,
          when both agents are connected via x and z.
   *)
   (*--------------------------------------------------------------*)
@@ -1823,7 +1823,7 @@ module Domain = struct
         let error, handler =
           Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
             (fun (x, y) mvbdu (error, handler) ->
-              Site_across_bonds_domain_type.print_site_across_domain
+              Site_across_bonds_domain_type.print_site_across_bonds_domain
                 ~verbose:true ~sparse:true ~final_result:true ~dump_any:true
                 parameters error kappa_handler handler (x, y) mvbdu
                 restriction_bdu)

@@ -324,9 +324,9 @@ let print_guard_mvbdu parameters error handler kappa_handler mvbdu
     error, handler
   )
 
-let print_site_across_domain_raw parameters error kappa_handler handler log
-    final_result pair_list nsites agent_id1 site_type1' agent_id2 site_type2'
-    pattern restriction_bdu =
+let print_site_across_bonds_domain_raw parameters error kappa_handler handler
+    log final_result pair_list nsites agent_id1 site_type1' agent_id2
+    site_type2' pattern restriction_bdu =
   let error =
     (*do not print the precondition if it is not the final result*)
     if final_result then (
@@ -414,9 +414,10 @@ let print_site_across_domain_raw parameters error kappa_handler handler log
     in
     error, handler
 
-let print_site_across_domain_natural_language parameters error kappa_handler
-    handler log pair_list nsites prefix site1 site2 site1' agent1 site2' agent2
-    agent_type1 site_type1 agent_type2 site_type2 restriction_bdu =
+let print_site_across_bonds_domain_natural_language parameters error
+    kappa_handler handler log pair_list nsites prefix site1 site2 site1' agent1
+    site2' agent2 agent_type1 site_type1 agent_type2 site_type2 restriction_bdu
+    =
   let () =
     Loggers.fprintf log
       "%sWhenever the site %s of %s and the site %s of %s are bound together, \
@@ -468,7 +469,7 @@ let print_site_across_domain_natural_language parameters error kappa_handler
       error, handler)
     (error, handler) pair_list
 
-let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
+let print_site_across_bonds_domain ?verbose:(_verbose = true) ?(sparse = false)
     ?(final_result = false) ?dump_any:(_dump_any = false) parameters error
     kappa_handler handler tuple mvbdu restriction_bdu =
   let prefix = Remanent_parameters.get_prefix parameters in
@@ -528,11 +529,11 @@ let print_site_across_domain ?verbose:(_verbose = true) ?(sparse = false)
             Site_graphs.KaSa_site_graph.add_bond parameters error kappa_handler
               agent_id1 site_type1 agent_id2 site_type2 pattern
           in
-          print_site_across_domain_raw parameters error kappa_handler handler
-            log final_result pair_list nsites agent_id1 site_type1' agent_id2
-            site_type2' pattern restriction_bdu
+          print_site_across_bonds_domain_raw parameters error kappa_handler
+            handler log final_result pair_list nsites agent_id1 site_type1'
+            agent_id2 site_type2' pattern restriction_bdu
         | Remanent_parameters_sig.Natural_language ->
-          print_site_across_domain_natural_language parameters error
+          print_site_across_bonds_domain_natural_language parameters error
             kappa_handler handler log pair_list nsites prefix site1 site2 site1'
             agent1 site2' agent2 agent_type1 site_type1 agent_type2 site_type2
             restriction_bdu
@@ -570,8 +571,8 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
       let parameter =
         Remanent_parameters.update_prefix parameter "                "
       in
-      print_site_across_domain ~verbose:false ~dump_any:true parameter error
-        kappa_handler handler pair mvbdu restriction_mvbdu
+      print_site_across_bonds_domain ~verbose:false ~dump_any:true parameter
+        error kappa_handler handler pair mvbdu restriction_mvbdu
     ) else
       error, handler
   in
@@ -628,8 +629,8 @@ let add_link_and_check parameter error bdu_false handler kappa_handler bool
           else
             dump_title ()
         in
-        print_site_across_domain ~verbose:false ~dump_any:true parameter error
-          kappa_handler handler x mvbdu restriction_mvbdu
+        print_site_across_bonds_domain ~verbose:false ~dump_any:true parameter
+          error kappa_handler handler x mvbdu restriction_mvbdu
       ) else
         error, handler
     in
