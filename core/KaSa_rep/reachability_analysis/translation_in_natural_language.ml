@@ -522,15 +522,15 @@ let translate parameters handler error kappa_handler
       Ckappa_sig.Views_bdu.extensional_of_variables_list parameters handler
         error vars
     in
-    let error, var_list =
+    let error, var_list, guard_list =
       List.fold_left
-        (fun (error, list) elt ->
+        (fun (error, list, guard_list) elt ->
           let error, elt = rename_site_inverse parameters error elt in
           (* keep only the sites and not the guards, because the guards are contained in the mvbdu *)
           match Ckappa_sig.site_or_guard_p_of_mvbdu_var elt nsites with
-          | Site _ -> error, elt :: list
-          | Guard_p _ -> error, list)
-        (error, []) (List.rev var_list)
+          | Site _ -> error, elt :: list, guard_list
+          | Guard_p _ -> error, list, elt :: guard_list)
+        (error, [], []) (List.rev var_list)
     in
     match var_list with
     | [] ->
@@ -618,6 +618,14 @@ let translate parameters handler error kappa_handler
           Exception.warn parameters error __POS__ Exit
             (handler, No_known_translation list_with_mvbdu)
       | _ when all_mvbdu_are_true ->
+        let error, handler, guards_list_consed =
+          Ckappa_sig.Views_bdu.build_variables_list parameters handler error
+            guard_list
+        in
+        let error, handler, mvbdu =
+          Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters handler
+            error mvbdu guards_list_consed
+        in
         let error, handler, output =
           try_partitioning parameters handler error kappa_handler
             rename_site_inverse mvbdu
@@ -627,6 +635,14 @@ let translate parameters handler error kappa_handler
         | Some (var, l) -> error, (handler, Partition (var, l)))
       | _ -> error, (handler, No_known_translation list_with_mvbdu))
     | _ when all_mvbdu_are_true ->
+      let error, handler, guards_list_consed =
+        Ckappa_sig.Views_bdu.build_variables_list parameters handler error
+          guard_list
+      in
+      let error, handler, mvbdu =
+        Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters handler
+          error mvbdu guards_list_consed
+      in
       let error, handler, output =
         try_partitioning parameters handler error kappa_handler
           rename_site_inverse mvbdu
