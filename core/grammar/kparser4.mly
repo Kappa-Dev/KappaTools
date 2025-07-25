@@ -271,6 +271,12 @@ agent:
   | ID annoted COLON annoted ID annoted OP_BRA annoted size_cons CL_BRA OP_PAR annoted interface CL_PAR agent_modif
     { let modif,pend,an = $15 in
       (Ast.Present (($5,rhs_pos 5), $13, modif,$9),pend,an) }
+  | ID annoted OP_PAR annoted interface CL_PAR agent_modif
+    { let modif,pend,an = $7 in
+      (Ast.Present (($1,rhs_pos 1), $5, modif, []),pend,an) }
+  | ID annoted COLON annoted ID annoted OP_PAR annoted interface CL_PAR agent_modif
+    { let modif,pend,an = $11 in
+      (Ast.Present (($5,rhs_pos 5), $9, modif,[]),pend,an) }
   | ID annoted error
     { raise (ExceptionDefn.Syntax_Error
                (add_pos 3 ("Malformed agent '"^$1^"'"))) }
