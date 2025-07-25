@@ -745,7 +745,7 @@ let init_between_thresholds threshold_set =
       let max =
          match List.rev threshold_list with
            | t :: _ -> t
-           | [] -> assert false
+           | [] -> 0 
       in
       Array.init (max + 1) (fun _ -> Array.make (max + 1) None), threshold_list) 
    ([||],[])
