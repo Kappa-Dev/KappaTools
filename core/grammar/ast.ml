@@ -2098,7 +2098,7 @@ let infer_agent_signatures r =
   let ags, toks = sig_from_perts acc' r.perturbations in
   { r with signatures = ags; tokens = toks }
 
-let compute_thresholds_list r = (* to do *)
+let compute_thresholds_list r = 
   let acc_init = Mods.IntSet.empty, Mods.StringMap.empty in 
   let thresholds_set = thresholds_from_rules acc_init r.rules in
   let thresholds = 

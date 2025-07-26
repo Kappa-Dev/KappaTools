@@ -155,6 +155,6 @@ let compute_threshold ((op,b),i) =
   match op,b with 
     | Operator.SMALLER, true -> i 
     | Operator.SMALLER, false -> i+1  (* < i <=> <= i+1 *)
-    | Operator.GREATER, false -> i 
-    | Operator.GREATER, true -> i+1 
+    | Operator.GREATER, false -> i (* a> j <=> not (a <= j)*)
+    | Operator.GREATER, true -> i+1 (* a >= j <=> not (a <= j+1) *)
     | (Operator.DIFF | Operator.EQUAL), _ -> assert false 

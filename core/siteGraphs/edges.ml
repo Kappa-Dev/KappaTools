@@ -304,7 +304,7 @@ module Edges (I : Interface) = struct
       let () = Mods.DynArray.set tables.connect h al in
       let () = Mods.DynArray.set tables.state h ai in
       let () = Mods.DynArray.set tables.sort h (Some ty) in
-      let cc = Connected.create graph.cc h in
+      let cc = Connected.create graph.cc h ty in
       let thresholds = graph.thresholds in
       let () =
         match tables.connected_component with

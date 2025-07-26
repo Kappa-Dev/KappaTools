@@ -38,14 +38,15 @@ let add_test_in_rule_agent sigs (agent : LKappa.rule_agent) (t_agent_name,(cmp,_
   in
   let int = 
     match fst cmp with 
-    | Operator.SMALLER -> Size_info.get_internal_state_true agent_id t_agent_id t sigs 
-    | Operator.GREATER -> Size_info.get_internal_state_false agent_id t_agent_id t sigs
+    | Operator.SMALLER -> 
+     t_agent_id t sigs 
+    | Operator.GREATER -> 
+     t_agent_id t sigs
     | Operator.EQUAL | Operator.DIFF -> assert false 
   in
   let () =
     Array.set agent.LKappa.ra_ints site (LKappa.I_VAL_CHANGED (int, int))
   in
-
   agent
 
 let compile_size_predicates_in_rule_agent (sigs : Signature.s)
@@ -139,5 +140,5 @@ let annotate_created_size_predicates _sigs ((_agent_name, _) as _agent_type)
     _counter_list _add_link_contact_map ra _lcc =
   { agent = ra ; thresholds = [] }
 
-let compute_between_thresholds_matrix thresholds =
-  Connected.init_between_thresholds thresholds
+let compute_between_thresholds_matrix int thresholds =
+  Connected.init_between_thresholds int thresholds

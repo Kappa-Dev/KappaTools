@@ -282,9 +282,9 @@ let get_new_equiv_class_rep t rep =
   | None -> t, Mods.DynArray.get t.back_trans rep
   | Some s -> t, s
 
-let fresh t i =
+let fresh t i id =
   let array_update = Blackboard.set t.array_update i (Some (Some i)) in
-  let size_update = Blackboard.set t.size_update i (Some (1,Mods.IntMap.empty)) (* TO DO*) in
+  let size_update = Blackboard.set t.size_update i (Some (1,Mods.IntMap.add id 1 Mods.IntMap.empty))  in
   let back_trans_update =
     Blackboard.set t.back_trans_update i (Some (Mods.IntSet.singleton i))
   in
@@ -627,20 +627,16 @@ let do_it () =
 
 *)
 
-let map_w_array f dft w = 
-  let max_elt = 
-    match Mods.IntMap.max_elt (snd w) with 
-    | Some (m,_) -> m
-    | None -> 0 
-  in 
+let map_w_array max_elt f dft w = 
   let m = 
     Array.make (max_elt+1) dft in 
   f (fst w), let () = Mods.IntMap.iter (fun i data -> 
       let output = f data in 
-      Array.set m i output) (snd w) in m
+      try Array.set m i output with 
+      | _ -> Format.printf "Problème line 638 %i" i) (snd w) in m
 
-let build_threshold =
-  map_w_array (fun s -> 
+let build_threshold n =
+  map_w_array n (fun s -> 
   if Mods.IntSet.is_empty s then
     Array.make 0 0
   else (
@@ -651,7 +647,7 @@ let build_threshold =
       | [] -> assert false
     in
     let l = List.rev l in
-    let array = Array.make max 0 in
+    let array = Array.make (max+1) 0 in
     let rec aux k acc current =
       if k = max then
         ()
@@ -682,7 +678,11 @@ let compute_threshold_list_inc threshold_list id_opt i j =
   let threshold_list = 
     match id_opt with 
     | None -> snd (fst threshold_list)
-    | Some i -> snd (Array.get (snd threshold_list) i) 
+    | Some i -> snd (
+    try   
+    Array.get (snd threshold_list) i
+  with 
+  | _ -> (Format.printf "Problème line 685 %i" i; assert false)) 
   in 
   aux1 threshold_list
 
@@ -690,6 +690,7 @@ type 'a pos_neg = { negative_update: 'a list; positive_update: 'a list }
 type cache = (((id * id option * bool) pos_neg option array array * id list) 
              * (((id * id option * bool) pos_neg option array array * id list) array)) 
 
+             let empty_pos_neg = { negative_update= []; positive_update= [] }
 let dummy_cache = ([||], []), [||]
 
 let compute_threshold_list threshold_list id_opt i j =
@@ -726,7 +727,8 @@ let get_matrix m id_opt i j =
   let m = 
     match id_opt with 
     | None -> fst (fst m)
-    | Some i ->  fst (Array.get (snd m) i)
+    | Some i ->  
+      fst (Array.get (snd m) i)
   in 
   m.(i).(j)
 
@@ -737,9 +739,9 @@ let set_matrix m id_opt i j a =
     | Some i ->  Array.get (snd m) i 
   in 
   Array.set (Array.get (fst m) i) j a 
-
-let init_between_thresholds threshold_set =
-  map_w_array 
+  
+let init_between_thresholds n threshold_set =
+ map_w_array n 
     (fun threshold_set -> 
       let threshold_list = Mods.IntSet.elements threshold_set in
       let max =
@@ -750,8 +752,9 @@ let init_between_thresholds threshold_set =
       Array.init (max + 1) (fun _ -> Array.make (max + 1) None), threshold_list) 
    ([||],[])
    threshold_set 
-
+ 
 let get_between_thresholds (m:cache) id_opt i j =
+  if i = j then  empty_pos_neg else 
   match get_matrix m id_opt i j with
   | None ->
     let rep = compute_threshold_list m id_opt i j in
@@ -761,11 +764,12 @@ let get_between_thresholds (m:cache) id_opt i j =
 
 let eval_threshold array  =
   let max = Array.length array in
+  if max = 0 then (fun _ -> 0) else 
   let f (i : id) =
     if i < max then
       array.(i)
     else
-      max
+      array.(max-1)
   in
   f
 
