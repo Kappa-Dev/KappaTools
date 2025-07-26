@@ -39,9 +39,9 @@ let add_test_in_rule_agent sigs (agent : LKappa.rule_agent) (t_agent_name,(cmp,_
   let int = 
     match fst cmp with 
     | Operator.SMALLER -> 
-     t_agent_id t sigs 
+      Size_info.get_internal_state_true agent_id t_agent_id t sigs 
     | Operator.GREATER -> 
-     t_agent_id t sigs
+      Size_info.get_internal_state_false agent_id t_agent_id t sigs
     | Operator.EQUAL | Operator.DIFF -> assert false 
   in
   let () =
