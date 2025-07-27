@@ -1256,7 +1256,7 @@ module Make (Instances : Instances_sig.S) = struct
       let () =
         if debug_mode then (
           let roots = Tools.array_rev_of_list rev_roots in
-          Format.printf "@[On roots:@ @[%a@]@]@."
+          Format.printf "@[On roots A:@ @[%a@]@]@."
             (Pp.array Pp.space (fun _ -> Format.pp_print_int))
             roots
         )

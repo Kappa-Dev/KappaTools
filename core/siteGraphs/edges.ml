@@ -380,10 +380,45 @@ module Edges (I : Interface) = struct
         },
         out )
 
+  let iter_neighbors f ag graph =
+    match graph.tables with
+      | None -> assert false
+      | Some tables ->
+        let ag_table = Mods.DynArray.get tables.connect ag in
+        Array.iter
+          (function
+            | None -> ()
+            | Some s -> f (fst s))
+          ag_table
+      
+  let fold_neighbors_safe f ag tables acc = 
+    let ag_table = Mods.DynArray.get tables.connect ag in
+    Array.fold_right 
+      (fun target acc -> 
+          match target with 
+          | None -> acc
+          | Some s -> f (fst s) acc)
+      ag_table acc 
+      
+  let _fold_neighbors f ag graph acc = 
+    match graph.tables with
+    | None -> assert false
+    | Some tables -> fold_neighbors_safe f ag tables acc 
+  
+  let build_neighbors_safe tables = 
+    (fun i -> fold_neighbors_safe (fun a acc -> (fst a)::acc) i tables []) 
+          
+  let build_neighbors graph = 
+    match graph.tables with 
+      | None -> assert false 
+      | Some g -> build_neighbors_safe g 
+          
+      
   let remove_agent ag graph =
     match graph.tables with
     | None -> assert false
     | Some tables ->
+      let neighbor = build_neighbors_safe tables ag in
       let () = graph.tables <- None in
       let () = Mods.DynArray.set tables.connect ag [||] in
       let () = Mods.DynArray.set tables.state ag [||] in
@@ -393,8 +428,6 @@ module Edges (I : Interface) = struct
         | None -> ()
         | Some ccs -> Mods.DynArray.set ccs ag None
       in
-      let neighbor = [] in
-      (* TO DO to which agen ag is conected *)
       let cc =
         Connected.degrade
           ~neighbor:(fun ag' ->
@@ -574,17 +607,6 @@ module Edges (I : Interface) = struct
     | None -> assert false
     | Some tables -> (Mods.DynArray.get tables.connect ag).(s)
 
-  let iter_neighbors f ag graph =
-    match graph.tables with
-    | None -> assert false
-    | Some tables ->
-      let ag_table = Mods.DynArray.get tables.connect ag in
-      Array.iter
-        (function
-          | None -> ()
-          | Some s -> f (fst s))
-        ag_table
-
   let all_agents_where f graph =
     match graph.tables with
     | None -> assert false
@@ -601,8 +623,7 @@ module Edges (I : Interface) = struct
 
   let flush ~thresholds graph =
     if I.early then (
-      let neighbor _ = [] in
-      (* TO DO *)
+      let neighbor = build_neighbors graph in 
       let thresholds = Connected.eval_threshold thresholds in
       let cc, updates = Connected.flush ~neighbor ~thresholds graph.cc in
       { graph with cc }, updates
