@@ -13,7 +13,7 @@ let add_working_set_guard guard k loc =
   | None -> Some guard_param, guard_name
   | Some guard -> Some (Logical_formulae.AND (guard_param, guard)), guard_name
 
-let append_to_ast_compil rev_instr compil =
+let append_to_ast_compil (nr_working_set_rules, rev_instr) compil =
   fst
   @@ List.fold_left
        (fun (r, k) -> function
@@ -30,7 +30,7 @@ let append_to_ast_compil rev_instr compil =
                    Mods.StringMap.add new_guard_p_name true
                      r.Ast.guard_param_values;
                },
-               k + 1 )
+               k - 1 )
            ) else
              ( { r with Ast.rules = (label, guard, (rule, loc)) :: r.Ast.rules },
                k )
@@ -86,4 +86,5 @@ let append_to_ast_compil rev_instr compil =
                  (agent, site1, site2) :: r.Ast.sequential_bonds;
              },
              k ))
-       (compil, 0) (List.rev rev_instr)
+       (compil, nr_working_set_rules - 1)
+       (List.rev rev_instr)

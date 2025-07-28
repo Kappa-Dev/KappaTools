@@ -7,4 +7,4 @@
 (******************************************************************************)
 
 val append_to_ast_compil :
-  Ast.parsing_instruction list -> Ast.parsing_compil -> Ast.parsing_compil
+  int * Ast.parsing_instruction list -> Ast.parsing_compil -> Ast.parsing_compil

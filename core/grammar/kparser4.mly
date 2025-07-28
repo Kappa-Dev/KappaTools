@@ -15,10 +15,16 @@
   let end_pos = Parsing.rhs_end_pos
   let start_pos = Parsing.rhs_start_pos
 
+  let nr_working_set_rules = ref 0
+  let inc_working_set_rules () = nr_working_set_rules := !nr_working_set_rules + 1
+
   let internal_memory = ref []
   let add x = internal_memory := x :: !internal_memory
   let output () =
-    let o = List.rev !internal_memory in let () = internal_memory := [] in o
+    let o = (!nr_working_set_rules, List.rev !internal_memory) in 
+    let () = internal_memory := [] in 
+    let () = nr_working_set_rules := 0 in 
+    o
 %}
 
 %token EOF COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR OP_BRA CL_BRA AT SEMICOLON
@@ -35,7 +41,7 @@
 %token <string> SPACE COMMENT
 
 %start model
-%type <Ast.parsing_instruction list> model
+%type <int * Ast.parsing_instruction list> model
 
 %start interactive_command
 %type <(Ast.mixture,Ast.mixture,string,Ast.rule) Ast.command> interactive_command
@@ -812,10 +818,13 @@ perturbation_declaration:
           ($1,None,e,post) }
   ;
 
+working_set_rule:
+  | LABEL annoted rule 
+    {let guard, rule = $3 in add (Ast.RULE (Some ($1, rhs_pos 1), guard, rule, true)); inc_working_set_rules () }
+  | rule { let guard, rule = $1 in add (Ast.RULE (None, guard, rule, true)); inc_working_set_rules () }
+
 working_set:
-  | LABEL annoted rule working_set
-    { add (let guard, rule = $3 in Ast.RULE(Some ($1, rhs_pos 1),guard, rule, true)) }
-  | rule working_set { let guard,rule = $1 in add (Ast.RULE (None, guard, rule, true)) }
+  | working_set_rule working_set { }
   | { }
 
 sentence:

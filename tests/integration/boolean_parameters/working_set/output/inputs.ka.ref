@@ -12,12 +12,12 @@
 %plot: [T]
 %plot: Ap
 
-'binding x' #[ @rule-2 ] A(x[./1]), A(x[./1]) @ 1
-'phosphorization' #[ @rule-1 ] A(x{u/p}[#]) @ 1
 'create A' #[ @rule-0 && A && B ] A(x{u}[.] y[.])+ @ 1
+'phosphorization' #[ @rule-1 ] A(x{u/p}[#]) @ 1
+'binding x' #[ @rule-2 ] A(x[./1]), A(x[./1]) @ 1
 'binding y' A(y[./1]), A(y[./1]) @ 1
 
 
 
 
-%mod: [E] = 5754 do $STOP;
+%mod: [E] = 6047 do $STOP;
