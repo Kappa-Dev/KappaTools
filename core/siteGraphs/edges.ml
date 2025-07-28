@@ -413,7 +413,6 @@ module Edges (I : Interface) = struct
       | None -> assert false 
       | Some g -> build_neighbors_safe g 
           
-      
   let remove_agent ag graph =
     match graph.tables with
     | None -> assert false
@@ -624,8 +623,9 @@ module Edges (I : Interface) = struct
   let flush ~thresholds graph =
     if I.early then (
       let neighbor = build_neighbors graph in 
+      let agtype ag  = get_sort ag graph in 
       let thresholds = Connected.eval_threshold thresholds in
-      let cc, updates = Connected.flush ~neighbor ~thresholds graph.cc in
+      let cc, updates = Connected.flush ~neighbor ~agtype ~thresholds graph.cc in
       { graph with cc }, updates
     ) else
       graph, []

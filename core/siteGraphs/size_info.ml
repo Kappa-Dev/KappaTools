@@ -153,8 +153,8 @@ let get_internal_state_false agent_id id_opt threshold sigs =
   
 let compute_threshold ((op,b),i) = 
   match op,b with 
-    | Operator.SMALLER, true -> i 
-    | Operator.SMALLER, false -> i+1  (* < i <=> <= i+1 *)
-    | Operator.GREATER, false -> i (* a> j <=> not (a <= j)*)
-    | Operator.GREATER, true -> i+1 (* a >= j <=> not (a <= j+1) *)
+    | Operator.SMALLER, true -> i+1
+    | Operator.SMALLER, false -> i  (* < i <=> <= i-1 *)
+    | Operator.GREATER, false -> i+1 (* a> j <=> not (a <= j)*)
+    | Operator.GREATER, true -> i (* a >= j <=> not (a <= j) *)
     | (Operator.DIFF | Operator.EQUAL), _ -> assert false 

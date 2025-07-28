@@ -360,7 +360,16 @@ let scan2 i l l' =
     let l', a = scan i l' in
     a, l, l'
 
-let flush ~neighbor ~(thresholds:weight->weight) t =
+let unify_weight w_new w_old =  
+  fst w_new, 
+  snd (Mods.IntMap.map2_with_logs (fun () () _ _ _ -> ()) 
+         () () 
+         (fun () () j -> (), j)
+         (fun () () _ -> (), 0)
+         (fun () () j _ -> (), j)
+         (snd (w_new)) (snd (w_old)))
+
+let flush ~neighbor ~agtype ~(thresholds:weight->weight) t =
   let set = t.to_check_unbind in
   let l = Mods.IntSet.fold (fun i l -> (i, [ i ]) :: l) set [] in
   let rec aux to_visit to_visit_after t alias =
@@ -379,7 +388,7 @@ let flush ~neighbor ~(thresholds:weight->weight) t =
         (* already seen, nothing to do *)
         aux tail' ((i, tail) :: to_visit_after) t alias
       | Some i' ->
-        (* seen in another equialent class -> merge *)
+        (* seen in another equivalent class -> merge *)
         merge (i, tail) i' tail' to_visit_after t ((i, i') :: alias))
   and merge (i, l1) j to_visit to_visit_after t alias =
     let lj_opt, to_visit, to_visit_after = scan2 j to_visit to_visit_after in
@@ -452,7 +461,15 @@ let flush ~neighbor ~(thresholds:weight->weight) t =
         | Some rep ->
           let rep_opt = Some (Some rep) in
           let n = Mods.IntSet.size set in
-          let map = Mods.IntMap.empty in (* to do count !!! *)
+          let map = 
+            Mods.IntSet.fold 
+              (fun i map -> 
+                let t = agtype i in
+                Mods.IntMap.add t  
+                  (match Mods.IntMap.find_option t map with 
+                    | Some i -> i+1 
+                    | None -> 1) map)
+               set Mods.IntMap.empty  in 
           let array_update, size_update, back_trans_update =
             Mods.IntSet.fold
               (fun j (array_update, size_update, back_trans_update) ->
@@ -492,6 +509,9 @@ let flush ~neighbor ~(thresholds:weight->weight) t =
           | None -> 0, Mods.IntMap.empty
           | Some old_size -> thresholds old_size
         in
+        let new_threshold = 
+          unify_weight new_threshold old_threshold 
+        in 
         let threshold_update =
           fold_weight 
             (fun agent_id_opt new_threshold threshold_update -> 
@@ -517,7 +537,6 @@ let flush ~neighbor ~(thresholds:weight->weight) t =
       t.back_trans_update
       (t, t.threshold_update, t.threshold_old)
   in
-
   let threshold_update =
     Blackboard.fold
       (fun threshold set threshold_update ->
@@ -554,9 +573,7 @@ let flush ~neighbor ~(thresholds:weight->weight) t =
           set (t, updates))
       threshold_update (t, [])
   in
-  let threshold_old, () =
-    Blackboard.fold_and_flush (fun _ _ () -> ()) threshold_old ()
-  in
+  
   let to_check_unbind = Mods.IntSet.empty in
   let t = { t with to_check_unbind; threshold_update; threshold_old } in
   flush_updates t, updates
@@ -649,7 +666,7 @@ let build_threshold n =
     let l = List.rev l in
     let array = Array.make (max+1) 0 in
     let rec aux k acc current =
-      if k = max then
+      if k = max+1 then
         ()
       else (
         match acc with
@@ -778,7 +795,33 @@ let eval_threshold array weight =
   Mods.IntMap.mapi (fun i w -> 
     eval_threshold ((snd array).(i)) w) (snd weight)
   
+(*let log_array t = 
+  Format.printf "ARRAY : @."; 
+  Format.printf "Size: "; 
+  Array.iter (Format.printf "%i " ) (fst t); 
+  Format.printf "@." ;
+  Array.iteri
+    (fun i j -> 
+      (Format.printf "Agent_type %i: @." i ); 
+    Array.iter (Format.printf "%i " ) j; 
+    Format.printf "@." ; ) 
+    (snd t) 
 
+let log_threshold t = 
+  Format.printf "Thresholds-Diff : @."; 
+  Format.printf "Size: %i @." (fst t); 
+  Mods.IntMap.iter
+    (fun i j -> (Format.printf "Agent_type %i: %i @." i j)) (snd t) 
+
+let eval_threshold array weight = 
+  let () = Format.printf "ARRAY: @." in 
+  let () = log_array array in 
+  let () = Format.printf "BEFORE: @." in
+  let () = log_threshold weight in 
+  let w = eval_threshold array weight in 
+  let () = Format.printf "AFTER: @." in
+  let () = log_threshold w in 
+  w *)
 
 let is_connected t id id' =
   let t, rep = get_old_rep t id in

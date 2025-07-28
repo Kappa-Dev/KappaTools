@@ -19,7 +19,8 @@ val unbind : t -> id -> id -> t
 val degrade : neighbor:(id -> id list) -> t -> id -> t
 
 val flush :
-  neighbor:(id -> id list) -> thresholds:(weight -> weight) -> t -> t * updates
+  neighbor:(id -> id list) -> 
+  agtype:(id -> int) -> thresholds:(weight -> weight) -> t -> t * updates
 
 val print_all : Format.formatter -> t -> unit
 val print : Format.formatter -> t -> unit
