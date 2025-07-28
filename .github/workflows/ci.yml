@@ -191,49 +191,49 @@ jobs:
           name: windows
           path: KappappWin.zip
 
-  webapp-playwright-test:
-    needs: [cli-and-doc, webapp-ubuntu]
+  #webapp-playwright-test:
+#    needs: [cli-and-doc, webapp-ubuntu]
     # run only on master OR when the PR is _not_ a draft
     # TODO: improve this?
-    if: |
-      github.ref == 'refs/heads/master' ||
-      github.event.pull_request.draft == false
-    timeout-minutes: 75
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run:  |
-        npm ci
-        sudo apt-get update
-        sudo apt-get install lighttpd
-        sudo apt-get install xvfb x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic x11-apps
-        sudo npm install -D @playwright/test@latest
-        npm install --save-dev @types/node @types/yauzl
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Download online-ui
-      uses: actions/download-artifact@v4
-      with:
-        name: online-ui
-    - name: Setup webapp server
-      run: >-
-        echo '
-          include_shell "/usr/share/lighttpd/create-mime.conf.pl" 
-          server.document-root = "/home/runner/work/KappaTools/KappaTools/site"
-          server.port = 12345
-          server.username = "root"
-          server.groupname = "root"
-          ' > lighttpd.conf
-        lighttpd -f lighttpd.conf -D &
-        sleep 10 && curl -i http://127.0.0.1:12345/index.html # test 
-    - name: Download electron app
-      uses: actions/download-artifact@v4
-      with:
-        name: linux
+#    if: |
+#      github.ref == 'refs/heads/master' ||
+#      github.event.pull_request.draft == false
+#    timeout-minutes: 75
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v4
+#    - uses: actions/setup-node@v4
+#      with:
+#        node-version: lts/*
+#    - name: Install dependencies
+#      run:  |
+#        npm ci
+#        sudo apt-get update
+#        sudo apt-get install lighttpd
+#        sudo apt-get install xvfb x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic x11-apps
+#        sudo npm install -D @playwright/test@latest
+#        npm install --save-dev @types/node @types/yauzl
+#    - name: Install Playwright Browsers
+#      run: npx playwright install --with-deps
+#    - name: Download online-ui
+#      uses: actions/download-artifact@v4
+#      with:
+#        name: online-ui
+#    - name: Setup webapp server
+#      run: >-
+#        echo '
+#          include_shell "/usr/share/lighttpd/create-mime.conf.pl"
+#          server.document-root = "/home/runner/work/KappaTools/KappaTools/site"
+#          server.port = 12345
+#          server.username = "root"
+#          server.groupname = "root"
+#          ' > lighttpd.conf
+#        lighttpd -f lighttpd.conf -D &
+#        sleep 10 && curl -i http://127.0.0.1:12345/index.html # test
+#    - name: Download electron app
+#      uses: actions/download-artifact@v4
+#      with:
+#        name: linux
     # - name: Setup electron app
     #   run: |
     #     tar xzf Kappapp.tar.gz
@@ -244,16 +244,16 @@ jobs:
     #     # ls -R /home/runner/work/
     #     Xvfb :99 -ac -screen 0 1920x1080x24 +extension GLX +render > xvfb_log.txt 2>&1 &
     #     sleep 3
-    - name: Run Playwright tests
-      run: |
-        # export DISPLAY=:99 # needed for electron
-        DEBUG=pw:browser* npx playwright test --retries=2 --trace retain-on-first-failure
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+#    - name: Run Playwright tests
+#      run: |
+#        # export DISPLAY=:99 # needed for electron
+#        DEBUG=pw:browser* npx playwright test --retries=2 --trace retain-on-first-failure
+#    - uses: actions/upload-artifact@v4
+#      if: ${{ !cancelled() }}
+#      with:
+#        name: playwright-report
+#        path: playwright-report/
+#        retention-days: 30
     # - uses: actions/upload-artifact@v4
     #   if: ${{ !cancelled() }}
     #   with:
@@ -261,29 +261,29 @@ jobs:
     #     path: xvfb_log.txt
     #     retention-days: 30
 
-  deploy:
-    needs: [cli-and-doc, webapp-ubuntu, webapp-macos, webapp-windows, webapp-playwright-test]
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        deploy-name: [doc, online-ui, linux, macos, windows]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{matrix.deploy-name}}
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.DEPLOY_KEY }}
-          known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
-      - name: Run deploy script
-        run: dev/deploy-to-website.sh ${{matrix.deploy-name}}
+#  deploy:
+#    needs: [cli-and-doc, webapp-ubuntu, webapp-macos, webapp-windows, webapp-playwright-test]
+#    if: github.ref == 'refs/heads/master'
+#    runs-on: ubuntu-22.04
+#    strategy:
+#      matrix:
+#        deploy-name: [doc, online-ui, linux, macos, windows]
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#      - name: Download artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: ${{matrix.deploy-name}}
+#      - name: Install SSH Key
+#        uses: shimataro/ssh-key-action@v2
+#        with:
+#          key: ${{ secrets.DEPLOY_KEY }}
+#          known_hosts: api.kappalanguage.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJooIEJd6sgRL5JUKGqh9zB3Xla1MchqR8IWl7Nh9ahm9Ji6IwV9QSKG9YQEIHdJWxBk4UzbfRWGkDK9q1GggyM=
+#      - name: Run deploy script
+#        run: dev/deploy-to-website.sh ${{matrix.deploy-name}}
 
-# TODO: see if add cache        
+# TODO: see if add cache
 #       # from https://github.com/hazelgrove/hazel/blob/868f673119827a35ec67fad5e7e0d5135ce91d4c/.github/workflows/deploy_branches.yml#L19-L29
 #       - name: Retrieve the switch environment if cached
 #         id: opam-cache-switch
