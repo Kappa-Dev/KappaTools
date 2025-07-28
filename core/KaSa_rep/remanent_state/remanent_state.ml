@@ -42,6 +42,7 @@ let stateslist = "states list"
 let interface = "interface"
 let contactmap = "contact map"
 let dead_rules = "dead rules"
+let conditionally_dead_rules = "conditionally dead rules"
 let contactmaps = "contact maps"
 let influencemaps = "influence maps"
 let separating_transitions = "separating transitions"
@@ -52,8 +53,9 @@ let accuracy_scc = "accuracy scc"
 let scc = "scc"
 
 type dead_rules = Public_data.dead_rules
+type rule_deadness_conditions = Public_data.rule_deadness_conditions
 
-let info_to_rule (s1, loc, direction, s2, id) =
+let info_to_rule (s1, loc, direction, s2, _guard, id) =
   {
     Public_data.rule_id = Ckappa_sig.int_of_rule_id id;
     Public_data.rule_position = loc;
@@ -64,6 +66,7 @@ let info_to_rule (s1, loc, direction, s2, id) =
   }
 
 type dead_agents = Public_data.dead_agents
+type agent_deadness_conditions = Public_data.agent_deadness_conditions
 type separating_transitions = Public_data.separating_transitions
 
 (******************************************************************************)
@@ -209,7 +212,9 @@ type ('static, 'dynamic) state = {
   reachability_state: ('static, 'dynamic) reachability_result option;
   subviews_info: subviews_info option;
   dead_rules: dead_rules option;
+  conditionally_dead_rules: rule_deadness_conditions option;
   dead_agents: dead_agents option;
+  conditionally_dead_agents: agent_deadness_conditions option;
   ode_flow: Ode_fragmentation_type.ode_frag option;
   ctmc_flow: flow option;
   errors: Exception.exceptions_caught_and_uncaught;
@@ -268,7 +273,9 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     reachability_state = None;
     subviews_info = None;
     dead_rules = None;
+    conditionally_dead_rules = None;
     dead_agents = None;
+    conditionally_dead_agents = None;
     errors = error;
     internal_constraints_list = None;
     constraints_list = None;
@@ -398,7 +405,15 @@ let add_dead_rules_to_json state l =
   | None -> l
   | Some rules -> (dead_rules, Public_data.dead_rules_to_json rules) :: l
 
-let add_refinements_lemmas_to_json state l =
+let add_conditionally_dead_rules_to_json state l =
+  match state.conditionally_dead_rules with
+  | None -> l
+  | Some rules ->
+    ( conditionally_dead_rules,
+      Public_data.conditionally_dead_rules_to_json rules )
+    :: l
+
+let add_lemmas_to_json state l =
   match get_constraints_list state with
   | None -> l
   | Some constraints ->
@@ -424,8 +439,9 @@ let set_transition_system_length l state =
 let to_json state =
   let l = [] in
   let l = add_errors state l in
-  let l = add_refinements_lemmas_to_json state l in
+  let l = add_lemmas_to_json state l in
   let l = add_dead_rules_to_json state l in
+  let l = add_conditionally_dead_rules_to_json state l in
   let l = add_influence_map_to_json state l in
   let l = add_contact_map_to_json state l in
   let l = add_scc_map_to_json state l in
@@ -630,10 +646,20 @@ let get_dead_rules state = state.dead_rules
 let set_dead_rules dead_rules state =
   { state with dead_rules = Some dead_rules }
 
+let get_conditionally_dead_rules state = state.conditionally_dead_rules
+
+let set_conditionally_dead_rules conditionally_dead_rules state =
+  { state with conditionally_dead_rules = Some conditionally_dead_rules }
+
 let get_dead_agents state = state.dead_agents
 
 let set_dead_agents dead_agents state =
   { state with dead_agents = Some dead_agents }
+
+let get_conditionally_dead_agents state = state.conditionally_dead_agents
+
+let set_conditionally_dead_agents conditionally_dead_agents state =
+  { state with conditionally_dead_agents = Some conditionally_dead_agents }
 
 let get_subviews_info state = state.subviews_info
 

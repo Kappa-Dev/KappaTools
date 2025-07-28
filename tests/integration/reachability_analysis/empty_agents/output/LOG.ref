@@ -276,12 +276,12 @@ Id=3
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=5
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=6
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -296,12 +296,12 @@ D(x) => D(x{u})
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=5
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=6
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -320,12 +320,12 @@ EXTENSIONAL DESCRIPTION:
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=5
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=6
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -335,12 +335,12 @@ Id=5
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=5
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=6
    Node(site_type:0<1)
     Id=1
      Leaf True 

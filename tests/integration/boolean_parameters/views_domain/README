@@ -1,0 +1,3 @@
+#Command-line:
+"${KAPPABIN}"KaSa example_views.ka --output-directory output --debugging-mode -syntax 4 || exit 0
+"${KAPPABIN}"KaSim example_views.ka -l 2000 -d output -p 20 -syntax 4 -seed 858703540 || exit 0

@@ -1522,14 +1522,16 @@ type acc_function_rules = {
   rule_names: int * Mods.StringSet.t;
   extra_vars:
     (string Loc.annoted * (Ast.mixture, string) Alg_expr.e Loc.annoted) list;
-  cleaned_rules: rule_inter_rep list;
+  cleaned_rules: (string LKappa.guard option * rule_inter_rep) list;
 }
 
 (** [name_and_purify] compiles the rules from Ast.rules into rule_inter_rep, called in a fold *)
 let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
     (acc : acc_function_rules)
-    ((label_opt, (ast_rule, r_pos)) :
-      string Loc.annoted option * Ast.rule Loc.annoted) : acc_function_rules =
+    ((label_opt, guard, (ast_rule, r_pos)) :
+      string Loc.annoted option
+      * string LKappa.guard option
+      * Ast.rule Loc.annoted) : acc_function_rules =
   let rule_names', rule_label =
     give_rule_label ast_rule.bidirectional acc.rule_names Ast.print_ast_rule
       ast_rule label_opt
@@ -1562,17 +1564,18 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
       rule_names = rule_names';
       extra_vars = acc'';
       cleaned_rules =
-        {
-          label_opt;
-          bidirectional = true;
-          mixture;
-          created_mix;
-          rm_token = [];
-          add_token = e.Ast.delta_token;
-          k_def;
-          k_un;
-          pos = r_pos;
-        }
+        ( guard,
+          {
+            label_opt;
+            bidirectional = true;
+            mixture;
+            created_mix;
+            rm_token = [];
+            add_token = e.Ast.delta_token;
+            k_def;
+            k_un;
+            pos = r_pos;
+          } )
         :: acc.cleaned_rules;
     }
   | Ast.Arrow a ->
@@ -1581,17 +1584,18 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
         a.Ast.lhs a.Ast.rhs
     in
     let rules' =
-      {
-        label_opt;
-        bidirectional = false;
-        mixture;
-        created_mix;
-        rm_token = a.Ast.rm_token;
-        add_token = a.Ast.add_token;
-        k_def;
-        k_un;
-        pos = r_pos;
-      }
+      ( guard,
+        {
+          label_opt;
+          bidirectional = false;
+          mixture;
+          created_mix;
+          rm_token = a.Ast.rm_token;
+          add_token = a.Ast.add_token;
+          k_def;
+          k_un;
+          pos = r_pos;
+        } )
       :: acc.cleaned_rules
     in
     let acc''', rules'' =
@@ -1607,18 +1611,19 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
             a.Ast.rhs a.Ast.lhs
         in
         ( (Loc.annot_with_dummy rate_var, k) :: acc_un,
-          {
-            label_opt =
-              Option_util.map (fun (l, p) -> Ast.flip_label l, p) label_opt;
-            bidirectional = false;
-            mixture;
-            created_mix;
-            rm_token = a.Ast.add_token;
-            add_token = a.Ast.rm_token;
-            k_def = Loc.annot_with_dummy (Alg_expr.ALG_VAR rate_var);
-            k_un = k_op_un;
-            pos = r_pos;
-          }
+          ( guard,
+            {
+              label_opt =
+                Option_util.map (fun (l, p) -> Ast.flip_label l, p) label_opt;
+              bidirectional = false;
+              mixture;
+              created_mix;
+              rm_token = a.Ast.add_token;
+              add_token = a.Ast.rm_token;
+              k_def = Loc.annot_with_dummy (Alg_expr.ALG_VAR rate_var);
+              k_un = k_op_un;
+              pos = r_pos;
+            } )
           :: rules' )
       | true, Some rate ->
         let rate_var_un = Ast.flip_label rule_label ^ "_un_rate" in
@@ -1630,18 +1635,19 @@ let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
             a.Ast.rhs a.Ast.lhs
         in
         ( acc_un,
-          {
-            label_opt =
-              Option_util.map (fun (l, p) -> Ast.flip_label l, p) label_opt;
-            bidirectional = false;
-            mixture;
-            created_mix;
-            rm_token = a.Ast.add_token;
-            add_token = a.Ast.rm_token;
-            k_def = rate;
-            k_un = k_op_un;
-            pos = r_pos;
-          }
+          ( guard,
+            {
+              label_opt =
+                Option_util.map (fun (l, p) -> Ast.flip_label l, p) label_opt;
+              bidirectional = false;
+              mixture;
+              created_mix;
+              rm_token = a.Ast.add_token;
+              add_token = a.Ast.rm_token;
+              k_def = rate;
+              k_un = k_op_un;
+              pos = r_pos;
+            } )
           :: rules' )
       | false, None -> acc'', rules'
       | false, Some _ | true, None ->
@@ -1896,13 +1902,59 @@ let create_sigs (l : Ast.agent_sig list) : Signature.s =
   (* TODO see agent_sigs namings *)
   Signature.create ~counters_per_agent agent_sigs
 
+type bool_or_error = Value of bool | Error of Loc.t
+
+let evaluate_guard_opt guard guard_param_values =
+  let rec evaluate_guard = function
+    | Logical_formulae.True -> Value true
+    | Logical_formulae.False -> Value false
+    | Logical_formulae.P (p, pos) ->
+      (match Mods.StringMap.find_option p guard_param_values with
+      | None -> Error pos
+      | Some value -> Value value)
+    | Logical_formulae.NOT guard ->
+      (match evaluate_guard guard with
+      | Value value -> Value (not value)
+      | Error pos -> Error pos)
+    | Logical_formulae.AND (g1, g2) ->
+      (match evaluate_guard g1, evaluate_guard g2 with
+      | Value v1, Value v2 -> Value (v1 && v2)
+      | Value false, _ | _, Value false -> Value false
+      | Error pos, _ | _, Error pos -> Error pos)
+    | Logical_formulae.OR (g1, g2) ->
+      (match evaluate_guard g1, evaluate_guard g2 with
+      | Value v1, Value v2 -> Value (v1 || v2)
+      | Value true, _ | _, Value true -> Value true
+      | Error pos, _ | _, Error pos -> Error pos)
+    | Logical_formulae.IMPLY (g1, g2) ->
+      (match evaluate_guard g1, evaluate_guard g2 with
+      | Value v1, Value v2 -> Value ((not v1) || v2)
+      | Value false, _ | _, Value true -> Value true
+      | Error pos, _ | _, Error pos -> Error pos)
+  in
+  match guard with
+  | None -> true
+  | Some guard ->
+    (match evaluate_guard guard with
+    | Error pos ->
+      raise
+        (ExceptionDefn.Malformed_Decl
+           ("Undefined value for guard parameter ", pos))
+    | Value value -> value)
+
 let init_of_ast ~warning ~syntax_version sigs counters_info contact_map tok algs
-    inits =
-  List.map
-    (fun (expr, ini) ->
-      ( alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs expr,
-        init_of_ast ~warning ~syntax_version sigs counters_info tok contact_map
-          ini ))
+    inits guard_param_values =
+  List.filter_map
+    (fun (guard, expr, ini) ->
+      if evaluate_guard_opt guard guard_param_values then
+        Some
+          ( guard,
+            alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
+              expr,
+            init_of_ast ~warning ~syntax_version sigs counters_info tok
+              contact_map ini )
+      else
+        None)
     inits
 
 type ast_compiled_data = {
@@ -2017,7 +2069,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     counter_fold_in_expr f acc obs_def
   in
   let counter_fold_in_init f acc init =
-    let e, _ = init in
+    let _, e, _ = init in
     counter_fold_in_expr f acc e
   in
   let counter_fold_in_print f acc p =
@@ -2054,7 +2106,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
   let counter_fold f init =
     let l1 =
       List.fold_left
-        (fun acc r -> counter_fold_in_rule f acc (snd r))
+        (fun acc (_, _, r) -> counter_fold_in_rule f acc r)
         init ast_compil.rules
     in
     let l2 =
@@ -2449,16 +2501,22 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     in
     { rule with rewrite; k_def; k_op; k_un; k_op_un }
   in
-  let rules : (string Loc.annoted option * Ast.rule Loc.annoted) list =
+  let rules :
+      (string Loc.annoted option
+      * string LKappa.guard option
+      * Ast.rule Loc.annoted)
+      list =
     List.rev_map
-      (fun rule_def -> fst rule_def, Loc.map_annot map_rule (snd rule_def))
+      (fun (name, guard, rule_def) ->
+        name, guard, Loc.map_annot map_rule rule_def)
       (List.rev ast_compil.rules)
   in
 
   let init : (Ast.mixture, Ast.mixture, string) Ast.init_statement list =
     List.map
-      (fun (quantity_alg_expr, init_kind) ->
-        ( quantity_alg_expr,
+      (fun (guard, quantity_alg_expr, init_kind) ->
+        ( guard,
+          quantity_alg_expr,
           match init_kind with
           | Ast.INIT_TOK _ -> init_kind
           | INIT_MIX mix_ ->
@@ -2513,6 +2571,15 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
       perturbations;
     },
     counter_conversion_info_map )
+
+let conflicts_to_id agents_sig conflicts =
+  List.map
+    (fun (agent, site1, site2) ->
+      let agent_id = Signature.num_of_agent agent agents_sig in
+      let site1_id = Signature.id_of_site agent site1 agents_sig in
+      let site2_id = Signature.id_of_site agent site2 agents_sig in
+      (agent_id, snd agent), (site1_id, snd site1), (site2_id, snd site2))
+    conflicts
 
 let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     =
@@ -2679,13 +2746,19 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
   in
 
   let rules =
-    List.rev_map
-      (fun (rule : rule_inter_rep) ->
-        ( rule.label_opt,
-          ( assemble_rule ~warning ~syntax_version rule agents_sig counters_info
-              tokens_finder alg_vars_finder,
-            rule.pos ) ))
-      cleaned_rules
+    List.rev
+      (List.filter_map
+         (fun (guard, (rule : rule_inter_rep)) ->
+           if evaluate_guard_opt guard ast_compil.guard_param_values then
+             Some
+               ( rule.label_opt,
+                 guard,
+                 ( assemble_rule ~warning ~syntax_version rule agents_sig
+                     counters_info tokens_finder alg_vars_finder,
+                   rule.pos ) )
+           else
+             None)
+         cleaned_rules)
   in
 
   let variables =
@@ -2706,11 +2779,16 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
       (List.rev ast_compil.observables)
   in
 
+  let conflicts = conflicts_to_id agents_sig ast_compil.conflicts in
+  let sequential_bonds =
+    conflicts_to_id agents_sig ast_compil.sequential_bonds
+  in
+
   let init =
     init_of_ast ~warning ~syntax_version agents_sig counters_info contact_map
       tokens_finder alg_vars_finder ast_compil.init
+      ast_compil.guard_param_values
   in
-
   {
     agents_sig;
     contact_map;
@@ -2730,5 +2808,8 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
         tokens = ast_compil.tokens;
         signatures = ast_compil.signatures;
         configurations = ast_compil.configurations;
+        guard_param_values = ast_compil.guard_param_values;
+        conflicts;
+        sequential_bonds;
       };
   }

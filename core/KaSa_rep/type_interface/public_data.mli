@@ -142,10 +142,19 @@ val local_influence_map_of_json :
   * refined_influence_node option
   * influence_map
 
+type 'a formula = 'a Logical_formulae.formula
 type dead_rules = rule list
+type rule_deadness_conditions = (rule * string formula) list
+(* contains the rules that are dead only for certain values of the boolean predicates *)
 
 val dead_rules_of_json : Yojson.Basic.t -> dead_rules
 val dead_rules_to_json : dead_rules -> Yojson.Basic.t
+
+val conditionally_dead_rules_of_json :
+  Yojson.Basic.t -> rule_deadness_conditions
+
+val conditionally_dead_rules_to_json :
+  rule_deadness_conditions -> Yojson.Basic.t
 
 type agent_kind = {
   agent_id: int;
@@ -154,16 +163,27 @@ type agent_kind = {
 }
 
 type dead_agents = agent_kind list
+type agent_deadness_conditions = (agent_kind * string formula) list
+(* contains the agents that are dead only for certain values of the boolean predicates *)
 
 val json_to_dead_agents : Yojson.Basic.t -> dead_agents
 val json_of_dead_agents : dead_agents -> Yojson.Basic.t
+
+val conditionally_dead_agents_of_json :
+  Yojson.Basic.t -> agent_deadness_conditions
+
+val conditionally_dead_agents_to_json :
+  agent_deadness_conditions -> Yojson.Basic.t
 
 type separating_transitions = (rule * (string * string) list) list
 
 val separating_transitions_of_json : Yojson.Basic.t -> separating_transitions
 val separating_transitions_to_json : separating_transitions -> Yojson.Basic.t
 
-type 'site_graph lemma = { hyp: 'site_graph; refinement: 'site_graph list }
+type 'site_graph lemma = {
+  hyp: 'site_graph;
+  refinement: ('site_graph * string formula option) list;
+}
 
 type binding_state =
   | Free
@@ -204,8 +224,12 @@ val lemmas_list_to_json :
 val lemmas_list_of_json :
   Yojson.Basic.t -> (string * agent list lemma list) list
 
+val print_formula : 'a -> (string -> 'a -> 'a) -> string formula -> 'a
 val get_hyp : 'site_graph lemma -> 'site_graph
-val get_refinement : 'site_graph lemma -> 'site_graph list
+
+val get_refinement :
+  'site_graph lemma ->
+  ('site_graph * string Logical_formulae.formula option) list
 
 val string_of_binding_type :
   ?binding_type_symbol:string ->

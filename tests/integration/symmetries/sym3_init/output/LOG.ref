@@ -194,12 +194,12 @@ EXTENSIONAL DESCRIPTION:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
-Id=5
+Id=11
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=10
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -213,12 +213,12 @@ EXTENSIONAL DESCRIPTION:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
-Id=5
+Id=11
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=10
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -238,12 +238,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(z[])
 
 INTENSIONAL DESCRIPTION:
-Id=5
+Id=11
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=10
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -272,12 +272,12 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=6
+Id=12
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=10
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -286,12 +286,12 @@ Id=6
      Leaf False 
 
 agent_type:0:A:cv_id:1
-Id=6
+Id=12
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=10
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -300,12 +300,12 @@ Id=6
      Leaf False 
 
 agent_type:0:A:cv_id:2
-Id=6
+Id=12
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=10
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -318,12 +318,12 @@ Id=6
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=12
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=10
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -333,12 +333,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=16
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=7
+  Id=14
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -348,12 +348,12 @@ Id=8
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=10
+Id=5
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=9
+  Id=4
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -370,12 +370,12 @@ A(z) => [ A(z[.]) v A(z[z.A]) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=12
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=10
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -385,12 +385,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=16
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=7
+  Id=14
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -400,12 +400,12 @@ Id=8
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=10
+Id=5
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=9
+  Id=4
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -424,12 +424,12 @@ EXTENSIONAL DESCRIPTION:
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=12
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=10
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -439,12 +439,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=16
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=7
+  Id=14
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -454,12 +454,12 @@ Id=8
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=10
+Id=5
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=9
+  Id=4
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -469,12 +469,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=12
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
+  Id=10
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -484,12 +484,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=16
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=7
+  Id=14
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -499,12 +499,12 @@ Id=8
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=10
+Id=5
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=9
+  Id=4
    Node(site_type:0<2)
     Id=1
      Leaf True 

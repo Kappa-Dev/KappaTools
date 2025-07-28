@@ -99,7 +99,8 @@ val generic_unary_other :
       * (('c Mvbdu_sig.mvbdu, 'c) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu),
     'j Mvbdu_sig.mvbdu * 'j Mvbdu_sig.mvbdu,
     'd,
-    'i )
+    'i,
+    'c Mvbdu_sig.mvbdu )
   Memo_sig.memoized_fun ->
   ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -111,7 +112,17 @@ val generic_unary_other :
 
 val clean_head :
   'a ->
-  ('b, 'c, 'd, 'e, 'f, 'g, 'b Mvbdu_sig.mvbdu, 'h, 'i) Memo_sig.memoized_fun ->
+  ( 'b,
+    'c,
+    'd,
+    'e,
+    'f,
+    'g,
+    'b Mvbdu_sig.mvbdu,
+    'h,
+    'i,
+    'b Mvbdu_sig.mvbdu )
+  Memo_sig.memoized_fun ->
   (Remanent_parameters_sig.parameters ->
   ('h, 'c, 'd, 'e, 'f, 'b, 'i) Memo_sig.handler ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -140,7 +151,17 @@ val keep_head_only :
     * 'c Mvbdu_sig.mvbdu
     * ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler)
     option) ->
-  ('c, 'e, 'f, 'g, 'h, 'j, 'c Mvbdu_sig.mvbdu, 'd, 'i) Memo_sig.memoized_fun ->
+  ( 'c,
+    'e,
+    'f,
+    'g,
+    'h,
+    'j,
+    'c Mvbdu_sig.mvbdu,
+    'd,
+    'i,
+    'c Mvbdu_sig.mvbdu )
+  Memo_sig.memoized_fun ->
   (Remanent_parameters_sig.parameters ->
   ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -151,6 +172,45 @@ val keep_head_only :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   'c Mvbdu_sig.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
+
+val keep_head_only_with_threshold :
+  (Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('a -> 'a -> int) ->
+  ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
+  'c Mvbdu_sig.cell ->
+  (int -> 'c Mvbdu_sig.mvbdu) ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (int
+    * 'c Mvbdu_sig.cell
+    * 'c Mvbdu_sig.mvbdu
+    * ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler)
+    option) ->
+  ( 'c,
+    'e,
+    'f,
+    'g,
+    'h,
+    'j,
+    int * 'c Mvbdu_sig.mvbdu,
+    'd,
+    'i,
+    'c Mvbdu_sig.mvbdu )
+  Memo_sig.memoized_fun ->
+  (Remanent_parameters_sig.parameters ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  'c Mvbdu_sig.mvbdu ->
+  'c Mvbdu_sig.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)) ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  int * 'c Mvbdu_sig.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
@@ -183,7 +243,8 @@ val redefine_range :
     Memo_sig.reset,
     'c Mvbdu_sig.mvbdu * (int option * int option) List_sig.list,
     'd,
-    'i )
+    'i,
+    'c Mvbdu_sig.mvbdu )
   Memo_sig.memoized_fun ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
@@ -222,7 +283,8 @@ val redefine :
     Memo_sig.reset,
     'c Mvbdu_sig.mvbdu * int List_sig.list,
     'd,
-    'i )
+    'i,
+    'c Mvbdu_sig.mvbdu )
   Memo_sig.memoized_fun ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
@@ -253,7 +315,8 @@ val monotonicaly_rename :
     'j,
     'c Mvbdu_sig.mvbdu * int List_sig.list,
     'd,
-    'i )
+    'i,
+    'c Mvbdu_sig.mvbdu )
   Memo_sig.memoized_fun ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
@@ -292,7 +355,8 @@ val project_keep_only :
     Memo_sig.reset,
     'c Mvbdu_sig.mvbdu * 'j List_sig.list,
     'd,
-    'i )
+    'i,
+    'c Mvbdu_sig.mvbdu )
   Memo_sig.memoized_fun ->
   (Remanent_parameters_sig.parameters ->
   ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
@@ -303,6 +367,53 @@ val project_keep_only :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
   ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  'c Mvbdu_sig.mvbdu ->
+  'j List_sig.list ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
+
+val project_keep_only_with_threshold :
+  (Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('a -> 'a -> int) ->
+  ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
+  'c Mvbdu_sig.cell ->
+  (int -> 'c Mvbdu_sig.mvbdu) ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (int
+    * 'c Mvbdu_sig.cell
+    * 'c Mvbdu_sig.mvbdu
+    * ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler)
+    option) ->
+  ( 'c,
+    'e,
+    'f,
+    'g,
+    'h,
+    ( 'c,
+      'e,
+      'f,
+      'g,
+      'h,
+      (('c Mvbdu_sig.mvbdu, 'c) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu,
+      'd,
+      'i )
+    Memo_sig.reset,
+    int * ('c Mvbdu_sig.mvbdu * 'j List_sig.list),
+    'd,
+    'i,
+    'c Mvbdu_sig.mvbdu )
+  Memo_sig.memoized_fun ->
+  (Remanent_parameters_sig.parameters ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  threshold:int ->
   'c Mvbdu_sig.mvbdu ->
   'j List_sig.list ->
   Exception_without_parameter.exceptions_caught_and_uncaught
@@ -337,7 +448,8 @@ val project_abstract_away :
     Memo_sig.reset,
     'c Mvbdu_sig.mvbdu * 'j List_sig.list,
     'd,
-    'i )
+    'i,
+    'c Mvbdu_sig.mvbdu )
   Memo_sig.memoized_fun ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
@@ -354,7 +466,37 @@ val recursive_not_memoize :
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   'a) ->
-  ('b, 'c, 'd, 'e, 'f, 'a, 'g, 'h, 'i) Memo_sig.memoized_fun
+  ('b, 'c, 'd, 'e, 'f, 'a, 'g, 'h, 'i, 'j) Memo_sig.memoized_fun
+
+val memoize_no_fun_with_threshold :
+  (('g, 'b, 'c, 'd, 'e, 'a, 'h) Memo_sig.handler -> 'i) ->
+  ('i ->
+  ('g, 'b, 'c, 'd, 'e, 'a, 'h) Memo_sig.handler ->
+  ('g, 'b, 'c, 'd, 'e, 'a, 'h) Memo_sig.handler) ->
+  (Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('g, 'b, 'c, 'd, 'e, 'a, 'h) Memo_sig.handler ->
+  int * 'a Mvbdu_sig.mvbdu ->
+  'i ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('g, 'b, 'c, 'd, 'e, 'a, 'h) Memo_sig.handler * 'a Mvbdu_sig.mvbdu option)) ->
+  (Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('g, 'b, 'c, 'd, 'e, 'a, 'h) Memo_sig.handler ->
+  int * 'a Mvbdu_sig.mvbdu ->
+  'a Mvbdu_sig.mvbdu ->
+  'i ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'i) ->
+  ( 'a,
+    'b,
+    'c,
+    'd,
+    'e,
+    'f,
+    'g,
+    'h,
+    'a Mvbdu_sig.mvbdu )
+  Memo_sig.unary_with_threshold_memoized_fun
 
 val memoize_no_fun :
   (('g, 'b, 'c, 'd, 'e, 'a, 'h) Memo_sig.handler -> 'i) ->
@@ -376,6 +518,37 @@ val memoize_no_fun :
   'i ->
   Exception_without_parameter.exceptions_caught_and_uncaught * 'i) ->
   ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.unary_memoized_fun
+
+val memoize_int_option_no_fun :
+  (('g, 'b, 'c, 'd, 'e, bool, 'h) Memo_sig.handler -> 'i) ->
+  ('i ->
+  ('g, 'b, 'c, 'd, 'e, bool, 'h) Memo_sig.handler ->
+  ('g, 'b, 'c, 'd, 'e, bool, 'h) Memo_sig.handler) ->
+  (Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('g, 'b, 'c, 'd, 'e, bool, 'h) Memo_sig.handler ->
+  bool Mvbdu_sig.mvbdu ->
+  'i ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('g, 'b, 'c, 'd, 'e, bool, 'h) Memo_sig.handler * int option)) ->
+  (Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('g, 'b, 'c, 'd, 'e, bool, 'h) Memo_sig.handler ->
+  bool Mvbdu_sig.mvbdu ->
+  int ->
+  'i ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'i) ->
+  ( bool,
+    'b,
+    'c,
+    'd,
+    'e,
+    'f,
+    bool Mvbdu_sig.mvbdu,
+    'g,
+    'h,
+    int )
+  Memo_sig.memoized_fun
 
 val memoize_binary_no_fun :
   (('g, 'b, 'c, 'd, 'e, 'a, 'h) Memo_sig.handler -> 'i) ->
@@ -420,7 +593,7 @@ val not_recursive_not_memoize_unary :
     * 'c Mvbdu_sig.mvbdu
     * ('g, 'h, 'i, 'j, 'k, 'c, 'l) Memo_sig.handler)
     option) ->
-  ('c, 'h, 'i, 'j, 'k, 'd, 'a, 'g, 'l) Memo_sig.memoized_fun
+  ('c, 'h, 'i, 'j, 'k, 'd, 'a, 'g, 'l, 'c Mvbdu_sig.mvbdu) Memo_sig.memoized_fun
 
 val recursive_memoize :
   (Remanent_parameters_sig.parameters ->
@@ -436,15 +609,39 @@ val recursive_memoize :
   'j ->
   'i ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * (('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler * 'g Mvbdu_sig.mvbdu option)) ->
+  * (('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler * 'k option)) ->
   (Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler ->
   'j ->
-  'g Mvbdu_sig.mvbdu ->
+  'k ->
   'i ->
   Exception_without_parameter.exceptions_caught_and_uncaught * 'i) ->
-  ('g, 'c, 'd, 'e, 'f, 'a, 'j, 'b, 'h) Memo_sig.memoized_fun
+  ('g, 'c, 'd, 'e, 'f, 'a, 'j, 'b, 'h, 'k) Memo_sig.memoized_fun
+
+val recursive_memoize_with_threshold :
+  (Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  'a) ->
+  (('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler -> 'i) ->
+  ('i ->
+  ('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler ->
+  ('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler) ->
+  (Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler ->
+  'j ->
+  'i ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler * 'k option)) ->
+  (Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.handler ->
+  'j ->
+  'k ->
+  'i ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * 'i) ->
+  ('g, 'c, 'd, 'e, 'f, 'a, 'j, 'b, 'h, 'k) Memo_sig.memoized_fun
 
 val not_recursive_binary :
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -468,7 +665,17 @@ val not_recursive_binary :
     * 'd Mvbdu_sig.mvbdu
     * ('h, 'i, 'j, 'k, 'l, 'd, 'm) Memo_sig.handler)
     option) ->
-  ('d, 'i, 'j, 'k, 'l, 'e, 'a * 'b, 'h, 'm) Memo_sig.memoized_fun
+  ( 'd,
+    'i,
+    'j,
+    'k,
+    'l,
+    'e,
+    'a * 'b,
+    'h,
+    'm,
+    'd Mvbdu_sig.mvbdu )
+  Memo_sig.memoized_fun
 
 val id_of_mvbdu : 'a Mvbdu_sig.mvbdu -> int
 
@@ -531,4 +738,60 @@ val a :
   (int -> 'j Mvbdu_sig.mvbdu) ->
   ('a, 'b, 'd, 'f, 'g, 'h, 'i) Memo_sig.handler ->
   'k * ('o * 'p * 'h Mvbdu_sig.mvbdu * 'l) option) ->
-  ('h, 'b, 'd, 'f, 'g, 'e, 'c, 'a, 'i) Memo_sig.memoized_fun
+  ('h, 'b, 'd, 'f, 'g, 'e, 'c, 'a, 'i, 'h Mvbdu_sig.mvbdu) Memo_sig.memoized_fun
+
+val height :
+  'a ->
+  ( 'c,
+    'e,
+    'f,
+    'g,
+    'h,
+    ( 'c,
+      'e,
+      'f,
+      'g,
+      'h,
+      (('c Mvbdu_sig.mvbdu, 'c) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu,
+      'd,
+      'i )
+    Memo_sig.reset,
+    'c Mvbdu_sig.mvbdu,
+    'd,
+    'i,
+    int )
+  Memo_sig.memoized_fun ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  'c Mvbdu_sig.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * int option)
+
+val width :
+  'a ->
+  ( bool,
+    'e,
+    'f,
+    'g,
+    'h,
+    ( 'c,
+      'e,
+      'f,
+      'g,
+      'h,
+      ((bool Mvbdu_sig.mvbdu, bool) Mvbdu_sig.precell, bool) Mvbdu_sig.premvbdu,
+      'd,
+      'i )
+    Memo_sig.reset,
+    bool Mvbdu_sig.mvbdu,
+    'd,
+    'i,
+    int )
+  Memo_sig.memoized_fun ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  ('d, 'e, 'f, 'g, 'h, bool, 'i) Memo_sig.handler ->
+  bool Mvbdu_sig.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('d, 'e, 'f, 'g, 'h, bool, 'i) Memo_sig.handler * int option)

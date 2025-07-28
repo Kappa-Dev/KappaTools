@@ -33,12 +33,12 @@ type covering_classes = {
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
 }
 
-module Dictionary_of_List_sites :
+module Dictionary_of_List_sites_or_guard :
   Dictionary.Dictionary
     with type key = cv_id
-     and type value = Ckappa_sig.c_site_name list
+     and type value = Ckappa_sig.c_site_or_guard_p list
 
-type pair_dic = (unit, unit) Dictionary_of_List_sites.dictionary
+type pair_dic = (unit, unit) Dictionary_of_List_sites_or_guard.dictionary
 
 module CV_map_and_set : Map_wrapper.S_with_logs with type elt = cv_id
 
@@ -74,7 +74,7 @@ module AgentsCV_setmap :
 
 module AgentSiteCV_setmap :
   SetMap.S
-    with type elt = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * cv_id
+    with type elt = Ckappa_sig.c_agent_name * Ckappa_sig.c_mvbdu_var * cv_id
 
 module AgentRuleCV_setmap :
   SetMap.S
@@ -92,7 +92,7 @@ module AgentSiteRuleCV_setmap :
   SetMap.S
     with type elt =
       Ckappa_sig.c_agent_name
-      * Ckappa_sig.c_site_name
+      * Ckappa_sig.c_mvbdu_var
       * Ckappa_sig.c_rule_id
       * cv_id
 
@@ -109,13 +109,13 @@ module Project2bdu_potential :
   SetMap.Projection2
     with type elt_a =
       Ckappa_sig.c_agent_name
-      * Ckappa_sig.c_site_name
+      * Ckappa_sig.c_mvbdu_var
       * Ckappa_sig.c_rule_id
       * cv_id
      and type elt_b = Ckappa_sig.c_rule_id
      and type 'a map_a = 'a AgentSiteRuleCV_setmap.Map.t
      and type 'a map_b = 'a Ckappa_sig.Rule_setmap.Map.t
-     and type elt_c = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * cv_id
+     and type elt_c = Ckappa_sig.c_agent_name * Ckappa_sig.c_mvbdu_var * cv_id
      and type 'a map_c = 'a AgentSiteCV_setmap.Map.t
 
 module Project2_bdu_views :
@@ -144,19 +144,21 @@ type predicate_covering_classes = {
   store_covering_classes_predicate:
     remanent Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
   store_list_of_site_type_in_covering_classes:
-    Ckappa_sig.c_site_name list AgentCV_map_and_set.Map.t;
-  store_covering_classes_id: cv_id list Ckappa_sig.AgentSite_map_and_set.Map.t;
+    Ckappa_sig.c_site_or_guard_p list AgentCV_map_and_set.Map.t;
+  store_covering_classes_id:
+    cv_id list Ckappa_sig.AgentSiteOrGuard_map_and_set.Map.t;
+  (*rewrite/ change type of this function ?*)
   store_remanent_triple:
-    (Dictionary_of_List_sites.key
-    * Dictionary_of_List_sites.value
-    * Ckappa_sig.Site_map_and_set.Set.t)
+    (Dictionary_of_List_sites_or_guard.key
+    * Dictionary_of_List_sites_or_guard.value
+    * Ckappa_sig.SiteOrGuard_map_and_set.Set.t)
     list
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
   site_correspondence:
-    (Ckappa_sig.c_site_name
+    (Ckappa_sig.c_mvbdu_var
      Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t
     * Ckappa_sig.c_site_name
-      Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t)
+      Ckappa_sig.Mvbdu_var_nearly_Inf_Int_storage_Imperatif.t)
     Cv_id_nearly_Inf_Int_storage_Imperatif.t
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
 }

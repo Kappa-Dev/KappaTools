@@ -1,0 +1,3 @@
+#Command-line:
+"${KAPPABIN}"KaSa example_conflict.ka --output-directory output -syntax 4 || exit 0
+"${KAPPABIN}"KaSim example_conflict.ka -l 2000 -d output -p 20 -syntax 4 -seed 858703540 || exit 0

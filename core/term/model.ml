@@ -6,13 +6,18 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type rule_with_label_and_guard =
+  string Loc.annoted option
+  * string LKappa.guard option
+  * LKappa.rule Loc.annoted
+
 type t = {
   filenames: string list;
   domain: Pattern.Env.t;
   tokens: unit NamedDecls.t;
   algs: Primitives.alg_expr Loc.annoted NamedDecls.t;
   observables: Primitives.alg_expr Loc.annoted array;
-  ast_rules: (string Loc.annoted option * LKappa.rule Loc.annoted) array;
+  ast_rules: rule_with_label_and_guard array;
   rules: Primitives.elementary_rule array;
   interventions: Primitives.perturbation array;
   dependencies_in_time: Operator.DepSet.t;
@@ -77,22 +82,26 @@ let fold_perturbations f x env =
 
 let get_rule env i = env.rules.(i)
 let get_ast_rule_with_label env i = env.ast_rules.(i - 1)
-let get_ast_rule env i = fst (snd (get_ast_rule_with_label env i))
+
+let get_ast_rule env i =
+  let _, _, (ast_rule, _) = get_ast_rule_with_label env i in
+  ast_rule
 
 let fold_ast_rules f x env =
   Tools.array_fold_lefti
-    (fun i x (_, _rule) ->
+    (fun i x (_, _, _rule) ->
       let lkappa_rule = get_ast_rule env i in
       f i x lkappa_rule)
     x env.ast_rules
 
 let get_ast_rule_rate_pos ~unary env i =
+  let _, _, (rule, _) = env.ast_rules.(i - 1) in
   if unary then (
-    match (fst (snd env.ast_rules.(i - 1))).LKappa.r_un_rate with
+    match rule.LKappa.r_un_rate with
     | None -> failwith "No unary rate to get position of"
     | Some ((_, pos), _) -> pos
   ) else
-    snd (fst (snd env.ast_rules.(i - 1))).LKappa.r_rate
+    snd rule.LKappa.r_rate
 
 let nb_rules env = Array.length env.rules
 
@@ -100,12 +109,12 @@ let nums_of_rule name env =
   fold_rules
     (fun i acc r ->
       match env.ast_rules.(pred r.Primitives.syntactic_rule) with
-      | Some (x, _), _ ->
+      | Some (x, _), _, _ ->
         if x = name then
           i :: acc
         else
           acc
-      | None, _ -> acc)
+      | None, _, _ -> acc)
     [] env
 
 let nb_syntactic_rules env = Array.length env.ast_rules
@@ -156,10 +165,10 @@ let print_ast_rule ~noCounters ?env f i =
       Format.pp_print_string f "Interventions"
     else (
       match env.ast_rules.(pred i) with
-      | Some (na, _), _ -> Format.pp_print_string f na
-      | None, (r, _) ->
+      | Some (na, _), _guard, _ -> Format.pp_print_string f na
+      | None, guard, (r, _) ->
         LKappa.print_rule ~noCounters ~full:false sigs counters_info
-          (print_token ~env) (print_alg ~env) f r
+          (print_token ~env) (print_alg ~env) f guard r
     )
 
 let print_rule ~noCounters ?env f id =
@@ -191,13 +200,14 @@ let print_kappa ~noCounters pr_alg ?pr_rule pr_pert f env =
       match pr_rule with
       | None ->
         Pp.array Pp.space ~trailing:Pp.space
-          (fun _ f (na, (e, _)) ->
+          (fun _ f (na, guard, (e, _)) ->
             Format.fprintf f "%a%a"
               (Pp.option ~with_space:false (fun f (na, _) ->
                    Format.fprintf f "'%s' " na))
               na
-              (LKappa.print_rule ~noCounters ~full:true sigs counters_info
-                 (print_token ~env) (print_alg ~env))
+              (fun f ->
+                LKappa.print_rule ~noCounters ~full:true sigs counters_info
+                  (print_token ~env) (print_alg ~env) f guard)
               e)
           f env.ast_rules
       | Some pr_rule ->
@@ -346,13 +356,13 @@ let to_yojson env =
       ( "ast_rules",
         `List
           (Array.fold_right
-             (fun (n, (r, _)) l ->
+             (fun (n, guard, (r, _)) l ->
                `List
                  [
                    (match n with
                    | None -> `Null
                    | Some (n, _) -> `String n);
-                   LKappa.rule_to_json ~filenames r;
+                   LKappa.rule_to_json ~filenames guard r;
                  ]
                :: l)
              env.ast_rules []) );
@@ -420,10 +430,13 @@ let of_yojson = function
              Tools.array_map_of_list
                (function
                  | `List [ `Null; r ] ->
-                   None, Loc.annot_with_dummy (LKappa.rule_of_json ~filenames r)
+                   let guard, rule = LKappa.rule_of_json ~filenames r in
+                   None, guard, Loc.annot_with_dummy rule
                  | `List [ `String n; r ] ->
+                   let guard, rule = LKappa.rule_of_json ~filenames r in
                    ( Some (Loc.annot_with_dummy n),
-                     Loc.annot_with_dummy (LKappa.rule_of_json ~filenames r) )
+                     guard,
+                     Loc.annot_with_dummy rule )
                  | _ -> raise Not_found)
                o
            | `Null -> [||]

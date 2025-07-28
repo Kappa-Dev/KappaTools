@@ -14,6 +14,15 @@
    * under the terms of the GNU Library General Public License *)
 
 (***************************************************************************)
+let print_formula_option parameters formula =
+  match formula with
+  | None -> ()
+  | Some formula ->
+    let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) " [ only if "
+    in
+    let () = Handler.print_formula parameters formula in
+    Loggers.fprintf (Remanent_parameters.get_logger parameters) " ]"
 
 let print_internal_pattern_aux ?logger parameters error _kappa_handler
     internal_constraints_list =
@@ -32,43 +41,51 @@ let print_internal_pattern_aux ?logger parameters error _kappa_handler
       "------------------------------------------------------------\n"
   in
   List.fold_left
-    (fun (error, _) lemma ->
+    (fun error lemma ->
       let hyp = Public_data.get_hyp lemma in
       let refinement = Public_data.get_refinement lemma in
       let error =
         Site_graphs.KaSa_site_graph.print logger parameters error hyp
       in
       let () = Loggers.fprintf logger "=> [" in
-      let error, b =
+      let error =
         match refinement with
-        | [] -> error, false
-        | [ hyp ] ->
-          Site_graphs.KaSa_site_graph.print logger parameters error hyp, false
+        | [] -> error
+        | [ (hyp, formula) ] ->
+          let error =
+            Site_graphs.KaSa_site_graph.print logger parameters error hyp
+          in
+          let () = print_formula_option parameters formula in
+          error
         | _ :: _ as l ->
-          List.fold_left
-            (fun (error, bool) hyp ->
-              let () =
-                Loggers.print_newline
-                  (Remanent_parameters.get_logger parameters)
-              in
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  (if bool then
-                     "\t\tv "
-                   else
-                     "\t\t  ")
-              in
-              let error =
-                Site_graphs.KaSa_site_graph.print logger parameters error hyp
-              in
-              error, true)
-            (error, false) (List.rev l)
+          let error, _ =
+            List.fold_left
+              (fun (error, bool) (hyp, formula) ->
+                let () =
+                  Loggers.print_newline
+                    (Remanent_parameters.get_logger parameters)
+                in
+                let () =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger parameters)
+                    (if bool then
+                       "\t\tv "
+                     else
+                       "\t\t  ")
+                in
+                let error =
+                  Site_graphs.KaSa_site_graph.print logger parameters error hyp
+                in
+                let () = print_formula_option parameters formula in
+                error, true)
+              (error, false) (List.rev l)
+          in
+          error
       in
       let () = Loggers.fprintf logger "]" in
       let () = Loggers.print_newline logger in
-      error, b)
-    (error, false) lemma_list
+      error)
+    error lemma_list
 
 (*print the information as the output of non relational properties*)
 let print_internal_pattern ?logger parameters error kappa_handler list =
@@ -80,7 +97,7 @@ let print_internal_pattern ?logger parameters error kappa_handler list =
   let error =
     List.fold_left
       (fun error pattern ->
-        let error, _ =
+        let error =
           print_internal_pattern_aux ?logger parameters error kappa_handler
             pattern
         in
@@ -130,7 +147,7 @@ let print_pattern_aux ?logger parameters error constraints_list =
       (*refinement*)
       let error, b =
         List.fold_left
-          (fun (error, bool) hyp ->
+          (fun (error, bool) (hyp, formula) ->
             let () =
               Loggers.print_newline (Remanent_parameters.get_logger parameters)
             in
@@ -143,6 +160,7 @@ let print_pattern_aux ?logger parameters error constraints_list =
                    "\t\t  ")
             in
             let error = print_for_list logger parameters error hyp in
+            let () = print_formula_option parameters formula in
             error, true)
           (error, false) (List.rev refinement)
       in
@@ -182,10 +200,10 @@ let site_graph_to_list error string_version =
 
 let site_graph_list_to_list error list =
   List.fold_left
-    (fun (error, current_list) t ->
+    (fun (error, current_list) (t, mvbdu) ->
       let string_version = Site_graphs.KaSa_site_graph.get_string_version t in
       let error, site_graph = site_graph_to_list error string_version in
-      error, site_graph :: current_list)
+      error, (site_graph, mvbdu) :: current_list)
     (error, []) list
 
 let _pair_list_to_list parameters error kappa_handler pattern agent_id1
@@ -211,10 +229,25 @@ let _pair_list_to_list parameters error kappa_handler pattern agent_id1
       | _ -> Exception.warn parameters error __POS__ Exit [])
     (error, []) pair_list
 
-let internal_pair_list_to_list parameters error kappa_handler pattern agent_id1
-    site_type1' agent_id2 site_type2' pair_list =
+let internal_pair_list_to_list parameters error handler kappa_handler pattern
+    agent_id1 site_type1' agent_id2 site_type2' pair_list restriction_bdu =
   List.fold_left
-    (fun (error, current_list) l ->
+    (fun (error, (handler, current_list)) (l, mvbdu) ->
+      let error, handler, is_true =
+        Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
+          restriction_bdu
+      in
+      let error, handler, formula =
+        if is_true then
+          error, handler, None
+        else (
+          let error, handler, formula =
+            Handler.mvbdu_to_string_formula parameters error kappa_handler
+              handler mvbdu
+          in
+          error, handler, Some formula
+        )
+      in
       match l with
       | [ (siteone, state1); (sitetwo, state2) ]
         when siteone == Ckappa_sig.fst_site && sitetwo == Ckappa_sig.snd_site ->
@@ -226,8 +259,9 @@ let internal_pair_list_to_list parameters error kappa_handler pattern agent_id1
           Site_graphs.KaSa_site_graph.add_state parameters error kappa_handler
             agent_id2 site_type2' state2 pattern
         in
-        error, pattern :: current_list
-      | _ -> Exception.warn parameters error __POS__ Exit [])
-    (error, []) pair_list
+        error, (handler, (pattern, formula) :: current_list)
+      | _ -> Exception.warn parameters error __POS__ Exit (handler, []))
+    (error, (handler, []))
+    pair_list
 
 (******************************************************************)

@@ -1,0 +1,489 @@
+Kappa Static Analyzer (v4.1.3.1-175-g514ee1742) (without Tk interface)
+Analysis launched at 2025/04/30 12:55:58 (GMT+2) on MP983-PRO
+Parsing temp_experiment.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule SoS@SS_op (File "temp_experiment.ka", line 112, characters 0-41:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule SoS@SS (File "temp_experiment.ka", line 111, characters 0-101:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule SoS_ERK_op (File "temp_experiment.ka", line 110, characters 0-63:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule SoS_ERK (File "temp_experiment.ka", line 109, characters 0-107:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MKP_ERK@187_op (File "temp_experiment.ka", line 106, characters 0-73:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule ERK@187_op (File "temp_experiment.ka", line 104, characters 0-79:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MKP_ERK@187 (File "temp_experiment.ka", line 103, characters 0-79:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MKP_ERK@185_op (File "temp_experiment.ka", line 102, characters 0-73:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule ERK@185_op (File "temp_experiment.ka", line 101, characters 0-79:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MKP_ERK@185 (File "temp_experiment.ka", line 100, characters 0-79:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MEK_ERK@187_op (File "temp_experiment.ka", line 97, characters 0-71:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule ERK@187 (File "temp_experiment.ka", line 96, characters 0-109:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MEK_ERK@187 (File "temp_experiment.ka", line 95, characters 0-109:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MEK_ERK@185_op (File "temp_experiment.ka", line 94, characters 0-71:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule ERK@185 (File "temp_experiment.ka", line 93, characters 0-109:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MEK_ERK@185 (File "temp_experiment.ka", line 91, characters 0-109:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule PP2A2_MEK@218_op (File "temp_experiment.ka", line 87, characters 0-77:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MEK@218_op (File "temp_experiment.ka", line 86, characters 0-83:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule PP2A2_MEK@218 (File "temp_experiment.ka", line 85, characters 0-83:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule PP2A2_MEK@222_op (File "temp_experiment.ka", line 84, characters 0-77:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MEK@222_op (File "temp_experiment.ka", line 82, characters 0-83:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule PP2A2_MEK@222 (File "temp_experiment.ka", line 81, characters 0-83:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule Raf_MEK@218_op (File "temp_experiment.ka", line 79, characters 0-79:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MEK@218 (File "temp_experiment.ka", line 78, characters 0-85:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule Raf_MEK@218 (File "temp_experiment.ka", line 77, characters 0-85:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule Raf_MEK@222_op (File "temp_experiment.ka", line 75, characters 0-79:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule MEK@222 (File "temp_experiment.ka", line 74, characters 0-85:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule Raf_MEK@222 (File "temp_experiment.ka", line 73, characters 0-85:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule PP2A1_Raf_op (File "temp_experiment.ka", line 69, characters 0-67:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule Raf_op (File "temp_experiment.ka", line 68, characters 0-73:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule PP2A1_Raf (File "temp_experiment.ka", line 66, characters 0-73:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule Ras_Raf_op (File "temp_experiment.ka", line 64, characters 0-79:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule Raf (File "temp_experiment.ka", line 63, characters 0-85:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule Ras_Raf (File "temp_experiment.ka", line 62, characters 0-85:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule intrinsic Ras GDP (File "temp_experiment.ka", line 58, characters 0-62:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule RasGAP_Ras_op (File "temp_experiment.ka", line 56, characters 0-80:) could be applied if @rule-0.and.@rule-1.and.@rule-2.and.(@rule-3.or.(@rule-4.and.@rule-15.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.(@rule-15.and.@rule-16)).and.((~@rule-4).or.(@rule-15.and.(@rule-16.or.@rule-19))))).
+rule Ras GDP (File "temp_experiment.ka", line 55, characters 0-90:) could be applied if @rule-0.and.@rule-1.and.@rule-2.and.(@rule-3.or.(@rule-4.and.@rule-15.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.(@rule-15.and.@rule-16)).and.((~@rule-4).or.(@rule-15.and.(@rule-16.or.@rule-19))))).
+rule direct RasGAP_Ras (File "temp_experiment.ka", line 54, characters 0-140:) could be applied if @rule-0.and.@rule-1.and.@rule-2.and.(@rule-3.or.(@rule-4.and.@rule-15.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.(@rule-15.and.@rule-16)).and.((~@rule-4).or.(@rule-15.and.(@rule-16.or.@rule-19))))).
+rule SoS_Ras_op (File "temp_experiment.ka", line 52, characters 0-74:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule Ras GTP (File "temp_experiment.ka", line 51, characters 0-84:) could be applied if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))).
+rule short arm SoS_Ras (File "temp_experiment.ka", line 49, characters 0-174:) could be applied if @rule-0.and.@rule-1.and.@rule-3.and.@rule-16.
+rule long arm SoS_Ras (File "temp_experiment.ka", line 48, characters 0-222:) could be applied if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19.
+rule Shc@318_op (File "temp_experiment.ka", line 44, characters 0-47:) could be applied if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19.
+rule Shc@318 (File "temp_experiment.ka", line 43, characters 0-117:) could be applied if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19.
+rule Shc_Grb2_op (File "temp_experiment.ka", line 42, characters 0-82:) could be applied if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19.
+rule Shc_Grb2 (File "temp_experiment.ka", line 42, characters 0-82:) could be applied if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19.
+rule EGF_EGFR_op (File "temp_experiment.ka", line 9, characters 0-75:) could be applied if @rule-0.
+rule EGF_EGFR (File "temp_experiment.ka", line 9, characters 0-75:) could be applied if @rule-0.
+rule EGFR_EGFR_op (File "temp_experiment.ka", line 10, characters 0-89:) could be applied if @rule-0.and.@rule-1.
+rule EGFR_EGFR (File "temp_experiment.ka", line 10, characters 0-89:) could be applied if @rule-0.and.@rule-1.
+rule EGFR@992 (File "temp_experiment.ka", line 12, characters 0-58:) could be applied if @rule-0.and.@rule-1.and.@rule-2.
+rule EGFR@1068 (File "temp_experiment.ka", line 13, characters 0-60:) could be applied if @rule-0.and.@rule-1.and.@rule-3.
+rule EGFR@1148 (File "temp_experiment.ka", line 14, characters 0-60:) could be applied if @rule-0.and.@rule-1.and.@rule-4.
+rule 992_op (File "temp_experiment.ka", line 17, characters 0-46:) could be applied if @rule-0.and.@rule-1.and.@rule-2.and.@rule-5.
+rule 1068_op (File "temp_experiment.ka", line 18, characters 0-48:) could be applied if @rule-0.and.@rule-1.and.@rule-3.and.@rule-6.
+rule 1148_op (File "temp_experiment.ka", line 19, characters 0-48:) could be applied if @rule-0.and.@rule-1.and.@rule-4.and.@rule-7.
+rule int_monomer (File "temp_experiment.ka", line 23, characters 0-80:) could be applied if @rule-0.and.@rule-8.
+rule int_dimer (File "temp_experiment.ka", line 24, characters 0-138:) could be applied if @rule-0.and.@rule-1.and.@rule-9.
+rule EGFR_EGFR_op (File "temp_experiment.ka", line 27, characters 0-91:) could be applied if @rule-0.and.@rule-1.and.@rule-10.
+rule EGF_EGFR_op (File "temp_experiment.ka", line 28, characters 0-77:) could be applied if @rule-0.and.@rule-11.
+rule deg_EGF (File "temp_experiment.ka", line 30, characters 0-33:) could be applied if @rule-12.
+rule deg_EGFR (File "temp_experiment.ka", line 31, characters 0-40:) could be applied if @rule-13.
+rule rec_EGFR (File "temp_experiment.ka", line 33, characters 0-95:) could be applied if @rule-14.
+rule EGFR_RasGAP_op (File "temp_experiment.ka", line 36, characters 0-88:) could be applied if @rule-0.and.@rule-1.and.@rule-2.and.@rule-15.
+rule EGFR_RasGAP (File "temp_experiment.ka", line 36, characters 0-88:) could be applied if @rule-0.and.@rule-1.and.@rule-2.and.@rule-15.
+rule EGFR_Grb2_op (File "temp_experiment.ka", line 37, characters 0-86:) could be applied if @rule-0.and.@rule-1.and.@rule-3.and.@rule-16.
+rule EGFR_Grb2 (File "temp_experiment.ka", line 37, characters 0-86:) could be applied if @rule-0.and.@rule-1.and.@rule-3.and.@rule-16.
+rule Grb2_SoS (File "temp_experiment.ka", line 38, characters 0-81:) could be applied if @rule-17.and.@rule-18.
+rule Grb2_SoS_op (File "temp_experiment.ka", line 39, characters 0-69:) could be applied if @rule-18.
+rule EGFR_Shc_op (File "temp_experiment.ka", line 40, characters 0-84:) could be applied if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19.
+rule EGFR_Shc (File "temp_experiment.ka", line 40, characters 0-84:) could be applied if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties: 
+------------------------------------------------------------
+EGF(r[L.EGFR]) [ if @rule-0 ] 
+EGF(r[.]) [ if .T. ] 
+
+EGFR(Y1148[PTB.Shc]) [ if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19 ] 
+EGFR(Y1148[.]) [ if .T. ] 
+
+EGFR(CR[CR.EGFR]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.]) [ if .T. ] 
+
+EGFR(L[r.EGF]) [ if @rule-0 ] 
+EGFR(L[.]) [ if .T. ] 
+
+EGFR(Y1068[SH2.Grb2]) [ if @rule-0.and.@rule-1.and.@rule-3.and.@rule-16 ] 
+EGFR(Y1068[.]) [ if .T. ] 
+
+EGFR(CR[CR.EGFR]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.]) [ if .T. ] 
+
+EGFR(L[r.EGF]) [ if @rule-0 ] 
+EGFR(L[.]) [ if .T. ] 
+
+EGFR(Y992[SH2.RasGAP]) [ if @rule-0.and.@rule-1.and.@rule-2.and.@rule-15 ] 
+EGFR(Y992[.]) [ if .T. ] 
+
+EGFR(CR[CR.EGFR]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.]) [ if .T. ] 
+
+EGFR(L[r.EGF]) [ if @rule-0 ] 
+EGFR(L[.]) [ if .T. ] 
+
+EGFR(Y1148{p}) [ if @rule-0.and.@rule-1.and.@rule-4 ] 
+EGFR(Y1148{u}) [ if .T. ] 
+
+EGFR(CR[CR.EGFR]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.]) [ if .T. ] 
+
+EGFR(L[r.EGF]) [ if @rule-0 ] 
+EGFR(L[.]) [ if .T. ] 
+
+EGFR(Y1068{p}) [ if @rule-0.and.@rule-1.and.@rule-3 ] 
+EGFR(Y1068{u}) [ if .T. ] 
+
+EGFR(CR[CR.EGFR]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.]) [ if .T. ] 
+
+EGFR(L[r.EGF]) [ if @rule-0 ] 
+EGFR(L[.]) [ if .T. ] 
+
+EGFR(Y992{p}) [ if @rule-0.and.@rule-1.and.@rule-2 ] 
+EGFR(Y992{u}) [ if .T. ] 
+
+EGFR(CR[CR.EGFR]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.]) [ if .T. ] 
+
+EGFR(L[r.EGF]) [ if @rule-0 ] 
+EGFR(L[.]) [ if .T. ] 
+
+EGFR(Y1148{p}) [ if @rule-0.and.@rule-1.and.@rule-4 ] 
+EGFR(Y1148{u}) [ if .T. ] 
+
+EGFR(Y1148[PTB.Shc]) [ if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19 ] 
+EGFR(Y1148[.]) [ if .T. ] 
+
+EGFR(Y1068{p}) [ if @rule-0.and.@rule-1.and.@rule-3 ] 
+EGFR(Y1068{u}) [ if .T. ] 
+
+EGFR(Y1068[SH2.Grb2]) [ if @rule-0.and.@rule-1.and.@rule-3.and.@rule-16 ] 
+EGFR(Y1068[.]) [ if .T. ] 
+
+EGFR(Y992{p}) [ if @rule-0.and.@rule-1.and.@rule-2 ] 
+EGFR(Y992{u}) [ if .T. ] 
+
+EGFR(Y992[SH2.RasGAP]) [ if @rule-0.and.@rule-1.and.@rule-2.and.@rule-15 ] 
+EGFR(Y992[.]) [ if .T. ] 
+
+ERK(T185{p}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{u}) [ if .T. ] 
+
+ERK(Y187{p}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187{u}) [ if .T. ] 
+
+ERK(s[SS.SoS]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(s[.]) [ if .T. ] 
+
+ERK(Y187[s.MEK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187[s.MKP3]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187[.]) [ if .T. ] 
+
+ERK(T185{p}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{u}) [ if .T. ] 
+
+ERK(T185[s.MEK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185[s.MKP3]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185[.]) [ if .T. ] 
+
+Grb2(SH3[a.SoS]) [ if .T. ] 
+Grb2(SH3[.]) [ if @rule-18 ] 
+
+Grb2(SH2[Y318.Shc]) [ if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19 ] 
+Grb2(SH2[Y1068.EGFR]) [ if @rule-0.and.@rule-1.and.@rule-3.and.@rule-16 ] 
+Grb2(SH2[.]) [ if .T. ] 
+
+MEK(S222{p}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(S222{u}) [ if .T. ] 
+
+MEK(S218{p}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(S218{u}) [ if .T. ] 
+
+MEK(s[T185.ERK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(s[Y187.ERK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(s[.]) [ if .T. ] 
+
+MEK(S222{p}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(S222{u}) [ if .T. ] 
+
+MEK(S222[x.Raf]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(S222[s.PP2A2]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(S222[.]) [ if .T. ] 
+
+MEK(S218{p}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(S218{u}) [ if .T. ] 
+
+MEK(S218[x.Raf]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(S218[s.PP2A2]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(S218[.]) [ if .T. ] 
+
+MKP3(s[T185.ERK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MKP3(s[Y187.ERK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MKP3(s[.]) [ if .T. ] 
+
+PP2A1(s[x.Raf]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+PP2A1(s[.]) [ if .T. ] 
+
+PP2A2(s[S222.MEK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+PP2A2(s[S218.MEK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+PP2A2(s[.]) [ if .T. ] 
+
+Raf(x{p}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x{u}) [ if .T. ] 
+
+Raf(x[S1S2.Ras]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x[s.PP2A1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x[S222.MEK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x[S218.MEK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x[.]) [ if .T. ] 
+
+Ras(S1S2{gtp}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Ras(S1S2{gdp}) [ if .T. ] 
+
+Ras(S1S2[b.SoS]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Ras(S1S2[s.RasGAP]) [ if @rule-0.and.@rule-1.and.@rule-2.and.(@rule-3.or.(@rule-4.and.@rule-15.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.(@rule-15.and.@rule-16)).and.((~@rule-4).or.(@rule-15.and.(@rule-16.or.@rule-19))))) ] 
+Ras(S1S2[x.Raf]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Ras(S1S2[.]) [ if .T. ] 
+
+RasGAP(s[S1S2.Ras]) [ if @rule-0.and.@rule-1.and.@rule-2.and.(@rule-3.or.(@rule-4.and.@rule-15.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.(@rule-15.and.@rule-16)).and.((~@rule-4).or.(@rule-15.and.(@rule-16.or.@rule-19))))) ] 
+RasGAP(s[.]) [ if .T. ] 
+
+RasGAP(SH2[Y992.EGFR]) [ if @rule-0.and.@rule-1.and.@rule-2.and.@rule-15 ] 
+RasGAP(SH2[.]) [ if .T. ] 
+
+Shc(Y318{p}) [ if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19 ] 
+Shc(Y318{u}) [ if .T. ] 
+
+Shc(PTB[Y1148.EGFR]) [ if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19 ] 
+Shc(PTB[.]) [ if .T. ] 
+
+Shc(Y318[SH2.Grb2]) [ if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19 ] 
+Shc(Y318[.]) [ if .T. ] 
+
+SoS(a[SH3.Grb2]) [ if .T. ] 
+SoS(a[.]) [ if @rule-18 ] 
+
+SoS(SS{p}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+SoS(SS{u}) [ if .T. ] 
+
+SoS(a[SH3.Grb2]) [ if .T. ] 
+SoS(a[.]) [ if @rule-18 ] 
+
+SoS(b[S1S2.Ras]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+SoS(b[.]) [ if .T. ] 
+
+SoS(SS{p}) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+SoS(SS{u}) [ if .T. ] 
+
+SoS(SS[s.ERK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+SoS(SS[.]) [ if .T. ] 
+
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+EGFR(CR[CR.EGFR],L[r.EGF]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.],L[.]) [ if .T. ] 
+EGFR(CR[.],L[r.EGF]) [ if @rule-0 ] 
+
+
+EGFR(CR[CR.EGFR],L[r.EGF]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.],L[.]) [ if .T. ] 
+EGFR(CR[.],L[r.EGF]) [ if @rule-0 ] 
+
+
+EGFR(CR[CR.EGFR],L[r.EGF]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.],L[.]) [ if .T. ] 
+EGFR(CR[.],L[r.EGF]) [ if @rule-0 ] 
+
+
+EGFR(CR[CR.EGFR],L[r.EGF]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.],L[.]) [ if .T. ] 
+EGFR(CR[.],L[r.EGF]) [ if @rule-0 ] 
+
+
+EGFR(CR[CR.EGFR],L[r.EGF]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.],L[.]) [ if .T. ] 
+EGFR(CR[.],L[r.EGF]) [ if @rule-0 ] 
+
+
+EGFR(CR[CR.EGFR],L[r.EGF]) [ if @rule-0.and.@rule-1 ] 
+EGFR(CR[.],L[.]) [ if .T. ] 
+EGFR(CR[.],L[r.EGF]) [ if @rule-0 ] 
+
+
+EGFR(Y1148{p}[.]) [ if @rule-0.and.@rule-1.and.@rule-4 ] 
+EGFR(Y1148{p}[PTB.Shc]) [ if @rule-0.and.@rule-1.and.@rule-4.and.@rule-19 ] 
+EGFR(Y1148{u}[.]) [ if .T. ] 
+EGFR(Y1148{u}[PTB.Shc]) [ if @rule-0.and.@rule-1.and.@rule-4.and.@rule-7.and.@rule-19 ] 
+
+EGFR(Y1068{p}[.]) [ if @rule-0.and.@rule-1.and.@rule-3 ] 
+EGFR(Y1068{p}[SH2.Grb2]) [ if @rule-0.and.@rule-1.and.@rule-3.and.@rule-16 ] 
+EGFR(Y1068{u}[.]) [ if .T. ] 
+EGFR(Y1068{u}[SH2.Grb2]) [ if @rule-0.and.@rule-1.and.@rule-3.and.@rule-6.and.@rule-16 ] 
+
+EGFR(Y992{p}[.]) [ if @rule-0.and.@rule-1.and.@rule-2 ] 
+EGFR(Y992{p}[SH2.RasGAP]) [ if @rule-0.and.@rule-1.and.@rule-2.and.@rule-15 ] 
+EGFR(Y992{u}[.]) [ if .T. ] 
+EGFR(Y992{u}[SH2.RasGAP]) [ if @rule-0.and.@rule-1.and.@rule-2.and.@rule-5.and.@rule-15 ] 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ras(S1S2{gtp}[.]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Ras(S1S2{gtp}[x.Raf]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Ras(S1S2{gtp}[s.RasGAP]) [ if @rule-0.and.@rule-1.and.@rule-2.and.(@rule-3.or.(@rule-4.and.@rule-15.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.(@rule-15.and.@rule-16)).and.((~@rule-4).or.(@rule-15.and.(@rule-16.or.@rule-19))))) ] 
+Ras(S1S2{gtp}[b.SoS]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Ras(S1S2{gdp}[.]) [ if .T. ] 
+Ras(S1S2{gdp}[s.RasGAP]) [ if @rule-0.and.@rule-1.and.@rule-2.and.(@rule-3.or.(@rule-4.and.@rule-15.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.(@rule-15.and.@rule-16)).and.((~@rule-4).or.(@rule-15.and.(@rule-16.or.@rule-19))))) ] 
+Ras(S1S2{gdp}[b.SoS]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+Raf(x{p}[.]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x{p}[S218.MEK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x{p}[S222.MEK]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x{p}[s.PP2A1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x{p}[S1S2.Ras]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x{u}[.]) [ if .T. ] 
+Raf(x{u}[s.PP2A1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x{u}[S1S2.Ras]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+
+
+EGFR(Y992{p}[1]),RasGAP(SH2[1],s[.]) [ if @rule-0.and.@rule-1.and.@rule-2 ] 
+EGFR(Y992{p}[1]),RasGAP(SH2[1],s[S1S2.Ras]) [ if @rule-0.and.@rule-1.and.@rule-2 ] 
+EGFR(Y992{u}[1]),RasGAP(SH2[1],s[.]) [ if @rule-0.and.@rule-1.and.@rule-2.and.(@rule-3.or.((@rule-4.or.@rule-5).and.((~@rule-4).or.@rule-5.or.(@rule-15.and.@rule-19)))).and.((~@rule-3).or.((@rule-4.or.@rule-5.or.(@rule-15.and.@rule-16)).and.((~@rule-4).or.@rule-5.or.(@rule-15.and.(@rule-16.or.@rule-19))))) ] 
+EGFR(Y992{u}[1]),RasGAP(SH2[1],s[S1S2.Ras]) [ if @rule-0.and.@rule-1.and.@rule-2.and.@rule-5 ] 
+
+
+EGFR(Y1068{p}[1]),Grb2(SH2[1],SH3[.]) [ if (@rule-0.or.@rule-18).and.((~@rule-0).or.((@rule-1.or.@rule-18).and.((~@rule-1).or.@rule-3.or.@rule-18))) ] 
+EGFR(Y1068{p}[1]),Grb2(SH2[1],SH3[a.SoS]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.@rule-3.or.(@rule-17.and.@rule-18)))) ] 
+EGFR(Y1068{u}[1]),Grb2(SH2[1],SH3[.]) [ if (@rule-0.or.@rule-18).and.((~@rule-0).or.((@rule-1.or.@rule-18).and.((~@rule-1).or.((@rule-3.or.@rule-18).and.((~@rule-3).or.@rule-6.or.@rule-18))))) ] 
+EGFR(Y1068{u}[1]),Grb2(SH2[1],SH3[a.SoS]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-3.or.(@rule-17.and.@rule-18)).and.((~@rule-3).or.@rule-6.or.(@rule-17.and.@rule-18)))))) ] 
+
+
+EGFR(Y1148{p}[1]),Shc(PTB[1],Y318{u}) [ if @rule-0.and.@rule-1.and.@rule-4 ] 
+EGFR(Y1148{p}[1]),Shc(PTB[1],Y318{p}) [ if @rule-0.and.@rule-1.and.@rule-4 ] 
+EGFR(Y1148{u}[1]),Shc(PTB[1],Y318{u}) [ if @rule-0.and.@rule-1.and.@rule-4.and.(@rule-7.or.@rule-19) ] 
+EGFR(Y1148{u}[1]),Shc(PTB[1],Y318{p}) [ if @rule-0.and.@rule-1.and.@rule-4.and.@rule-7 ] 
+
+
+EGFR(Y1148{p}[1]),Shc(PTB[1],Y318[.]) [ if @rule-0.and.@rule-1.and.@rule-4 ] 
+EGFR(Y1148{p}[1]),Shc(PTB[1],Y318[SH2.Grb2]) [ if @rule-0.and.@rule-1.and.@rule-4 ] 
+EGFR(Y1148{u}[1]),Shc(PTB[1],Y318[.]) [ if @rule-0.and.@rule-1.and.@rule-4.and.(@rule-7.or.@rule-19) ] 
+EGFR(Y1148{u}[1]),Shc(PTB[1],Y318[SH2.Grb2]) [ if @rule-0.and.@rule-1.and.@rule-4.and.(@rule-7.or.@rule-19) ] 
+
+
+Grb2(SH2[Y318.Shc],SH3[1]),SoS(a[1],b[.]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-3.or.((@rule-4.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))).and.((~@rule-3).or.((@rule-4.or.@rule-16.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.@rule-16.or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))))))) ] 
+Grb2(SH2[Y318.Shc],SH3[1]),SoS(a[1],b[S1S2.Ras]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-4.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))))) ] 
+Grb2(SH2[Y1068.EGFR],SH3[1]),SoS(a[1],b[.]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-3.or.((@rule-4.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))).and.((~@rule-3).or.((@rule-4.or.@rule-16.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.@rule-16.or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))))))) ] 
+Grb2(SH2[Y1068.EGFR],SH3[1]),SoS(a[1],b[S1S2.Ras]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-3.or.(@rule-17.and.@rule-18)).and.((~@rule-3).or.@rule-16.or.(@rule-17.and.@rule-18)))))) ] 
+Grb2(SH2[.],SH3[1]),SoS(a[1],b[.]) [ if .T. ] 
+Grb2(SH2[.],SH3[1]),SoS(a[1],b[S1S2.Ras]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-3.or.((@rule-4.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))).and.((~@rule-3).or.((@rule-4.or.@rule-16.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.@rule-16.or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))))))) ] 
+
+
+Grb2(SH2[1],SH3[a.SoS]),Shc(Y318{u}[1]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-4.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))))) ] 
+Grb2(SH2[1],SH3[a.SoS]),Shc(Y318{p}[1]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-4.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))))) ] 
+Grb2(SH2[1],SH3[.]),Shc(Y318{u}[1]) [ if (@rule-0.or.@rule-18).and.((~@rule-0).or.((@rule-1.or.@rule-18).and.((~@rule-1).or.((@rule-4.or.@rule-18).and.((~@rule-4).or.@rule-18.or.@rule-19))))) ] 
+Grb2(SH2[1],SH3[.]),Shc(Y318{p}[1]) [ if (@rule-0.or.@rule-18).and.((~@rule-0).or.((@rule-1.or.@rule-18).and.((~@rule-1).or.((@rule-4.or.@rule-18).and.((~@rule-4).or.@rule-18.or.@rule-19))))) ] 
+
+
+Grb2(SH2[1],SH3[a.SoS]),Shc(PTB[.],Y318[1]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-4.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))))) ] 
+Grb2(SH2[1],SH3[a.SoS]),Shc(PTB[Y1148.EGFR],Y318[1]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-4.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))))) ] 
+Grb2(SH2[1],SH3[.]),Shc(PTB[.],Y318[1]) [ if (@rule-0.or.@rule-18).and.((~@rule-0).or.((@rule-1.or.@rule-18).and.((~@rule-1).or.((@rule-4.or.@rule-18).and.((~@rule-4).or.@rule-18.or.@rule-19))))) ] 
+Grb2(SH2[1],SH3[.]),Shc(PTB[Y1148.EGFR],Y318[1]) [ if (@rule-0.or.@rule-18).and.((~@rule-0).or.((@rule-1.or.@rule-18).and.((~@rule-1).or.((@rule-4.or.@rule-18).and.((~@rule-4).or.@rule-18.or.@rule-19))))) ] 
+
+
+Ras(S1S2{gtp}[1]),SoS(a[.],b[1]) [ if (@rule-0.or.@rule-18).and.((~@rule-0).or.((@rule-1.or.@rule-18).and.((~@rule-1).or.((@rule-3.or.((@rule-4.or.@rule-18).and.((~@rule-4).or.@rule-18.or.@rule-19))).and.((~@rule-3).or.((@rule-4.or.@rule-16.or.@rule-18).and.((~@rule-4).or.@rule-16.or.@rule-18.or.@rule-19))))))) ] 
+Ras(S1S2{gtp}[1]),SoS(a[SH3.Grb2],b[1]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-3.or.((@rule-4.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))).and.((~@rule-3).or.((@rule-4.or.@rule-16.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.@rule-16.or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))))))) ] 
+Ras(S1S2{gdp}[1]),SoS(a[.],b[1]) [ if @rule-18 ] 
+Ras(S1S2{gdp}[1]),SoS(a[SH3.Grb2],b[1]) [ if (@rule-0.or.(@rule-17.and.@rule-18)).and.((~@rule-0).or.((@rule-1.or.(@rule-17.and.@rule-18)).and.((~@rule-1).or.((@rule-3.or.((@rule-4.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))).and.((~@rule-3).or.((@rule-4.or.@rule-16.or.(@rule-17.and.@rule-18)).and.((~@rule-4).or.@rule-16.or.((@rule-17.or.@rule-19).and.((~@rule-17).or.@rule-18.or.@rule-19))))))))) ] 
+
+
+Raf(x{p}[1]),Ras(S1S2{gtp}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+Raf(x{u}[1]),Ras(S1S2{gtp}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+
+MEK(S218{p}[1]),Raf(x{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(S218{u}[1]),Raf(x{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+
+MEK(S222{p}[1]),Raf(x{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+MEK(S222{u}[1]),Raf(x{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+
+ERK(T185{p},s[1]),SoS(SS{u}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{p},s[1]),SoS(SS{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{u},s[1]),SoS(SS{u}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{u},s[1]),SoS(SS{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+
+ERK(Y187{p},s[1]),SoS(SS{u}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187{p},s[1]),SoS(SS{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187{u},s[1]),SoS(SS{u}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187{u},s[1]),SoS(SS{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+
+ERK(Y187[s.MEK],s[1]),SoS(SS{u}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187[s.MEK],s[1]),SoS(SS{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187[s.MKP3],s[1]),SoS(SS{u}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187[s.MKP3],s[1]),SoS(SS{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187[.],s[1]),SoS(SS{u}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187[.],s[1]),SoS(SS{p}[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+
+ERK(Y187{p}[1]),MEK(S222{u},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187{p}[1]),MEK(S222{p},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187{u}[1]),MEK(S222{u},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187{u}[1]),MEK(S222{p},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+
+ERK(Y187{p}[1]),MEK(S218{u},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187{p}[1]),MEK(S218{p},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187{u}[1]),MEK(S218{u},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(Y187{u}[1]),MEK(S218{p},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+
+ERK(T185{p}[1]),MEK(S222{u},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{p}[1]),MEK(S222{p},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{u}[1]),MEK(S222{u},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{u}[1]),MEK(S222{p},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+
+
+ERK(T185{p}[1]),MEK(S218{u},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{p}[1]),MEK(S218{p},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{u}[1]),MEK(S218{u},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+ERK(T185{u}[1]),MEK(S218{p},s[1]) [ if @rule-0.and.@rule-1.and.(@rule-3.or.(@rule-4.and.@rule-19)).and.((~@rule-3).or.((@rule-4.or.@rule-16).and.((~@rule-4).or.@rule-16.or.@rule-19))) ] 
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+execution finished without any exception

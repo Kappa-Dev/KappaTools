@@ -51,6 +51,8 @@ Array.copy ra_ints)]. *)
 type rule_mixture = rule_agent list
 (** [rule_mixture] is the mixture description from the initial state of a rule *)
 
+type 'id guard = 'id Loc.annoted Logical_formulae.formula
+
 type rule = {
   r_mix: rule_mixture;  (** Initial mixture state *)
   r_created: Raw_mixture.t;  (** Mixture state after rule is applied *)
@@ -124,6 +126,9 @@ val print_rates :
   rule ->
   unit
 
+val string_of_guard : string guard -> string
+val print_guard : Format.formatter -> string guard -> unit
+
 val print_rule :
   noCounters:bool ->
   full:bool ->
@@ -132,8 +137,21 @@ val print_rule :
   (Format.formatter -> int -> unit) ->
   (Format.formatter -> int -> unit) ->
   Format.formatter ->
+  string guard option ->
   rule ->
   unit
 
-val rule_to_json : filenames:int Mods.StringMap.t -> rule -> Yojson.Basic.t
-val rule_of_json : filenames:string array -> Yojson.Basic.t -> rule
+val string_guard_option_to_json :
+  filenames:int Mods.StringMap.t -> string guard option -> Yojson.Basic.t
+
+val string_guard_option_of_json :
+  filenames:string array -> Yojson.Basic.t -> string guard option
+
+val rule_to_json :
+  filenames:int Mods.StringMap.t ->
+  string guard option ->
+  rule ->
+  Yojson.Basic.t
+
+val rule_of_json :
+  filenames:string array -> Yojson.Basic.t -> string guard option * rule

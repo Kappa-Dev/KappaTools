@@ -115,15 +115,6 @@ val translate_c_compil :
   * Cckappa_sig.kappa_handler
   * Cckappa_sig.compil
 
-val translate_pert :
-  Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Cckappa_sig.kappa_handler ->
-  (Ckappa_sig.mixture, string) Alg_expr.e * Loc.t ->
-  Ckappa_sig.mixture * 'a ->
-  Exception_without_parameter.exceptions_caught_and_uncaught
-  * Cckappa_sig.enriched_init
-
 val rename_rule_lhs :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->

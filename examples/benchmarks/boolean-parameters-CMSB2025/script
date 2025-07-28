@@ -1,0 +1,117 @@
+#!/bin/bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+KASA_BINARY="${SCRIPT_DIR}/../../../bin/KaSa"
+TEMP_FILE="${SCRIPT_DIR}/temp_experiment.ka"
+DEFAULT_TIMEOUT=1m
+
+# models
+MODELS_DIRECTORY="${SCRIPT_DIR}/models/"
+ENSEMBLE="${MODELS_DIRECTORY}ensemble.ka"
+EGFR="${MODELS_DIRECTORY}causality_05_sos.ka"
+REPRESSILATOR="${MODELS_DIRECTORY}Repressilator.ka"
+FGF="${MODELS_DIRECTORY}fgf.ka"
+SFB="${MODELS_DIRECTORY}sfb.ka"
+
+OUTPUT_DIR="${SCRIPT_DIR}/output/"
+
+# Array of models
+MODELS=("ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB")
+
+AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
+AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
+
+cd "${SCRIPT_DIR}/../../.."
+# Install the dependencies
+echo "Installing dependencies:"
+opam install . --update-invariant
+
+echo
+# Build Kappa
+echo "Building the project:"
+make all
+
+# Generate a new output file name (the stderr output of time)
+mkdir -p "${OUTPUT_DIR}"
+
+echo
+echo "Analyzing models: $AVAILABLE_MODELS"
+
+# Parse command-line arguments for timeout
+if [ -n "$1" ]; then
+    TIMEOUT=$1
+    echo "Using custom timeout: $TIMEOUT"
+else
+    TIMEOUT=$DEFAULT_TIMEOUT
+    echo "Using default timeout: $TIMEOUT"
+fi
+
+# Analyze each model
+for MODEL in "${MODELS[@]}"; do
+    EXAMPLE_MODEL=${!MODEL}
+
+    OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_experiments_output"
+    i=0
+    while [ -e "$OUTPUT_FILE~$i.txt" ]; do
+        i=$((i + 1))
+    done
+    OUTPUT_FILE="$OUTPUT_FILE~$i.txt"
+    #generate a new output file name for the stdout output of the analysis
+
+    # Clear the output file
+    > "$OUTPUT_FILE"
+
+    echo
+    echo "Processing model: $MODEL"
+    for i in 00 10 20 30 40 42 50 60 70 80; do
+        # If the current file contains the annotation //i for the current i, then the analysis is executed
+        if grep -q "//$i" "$EXAMPLE_MODEL"; then
+
+          STDOUT_OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_analysis_output_$i"
+          j=0
+          while [ -e "$STDOUT_OUTPUT_FILE~$j.txt" ]; do
+              j=$((j + 1))
+          done
+          STDOUT_OUTPUT_FILE="$STDOUT_OUTPUT_FILE~$j.txt"
+
+
+            # Replace "//i" with "]//i" in the input file and replace "// working_set" with "%working_set:["
+            sed "s|// working_set|%working_set:[|g" "$EXAMPLE_MODEL" | sed "s|//$i//|]|g" > "$TEMP_FILE"
+            echo >> "$OUTPUT_FILE"
+            echo "Runtime with $i rules in the working set:" >> "$OUTPUT_FILE"
+            { time timeout "$TIMEOUT" "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+             EXIT_STATUS=$?
+
+            # Check if the program was killed by timeout
+            if [ $EXIT_STATUS -eq 124 ]; then
+                echo "⚠️ Timeout or memory overflow occurred for $MODEL with $i rules." >> "$OUTPUT_FILE"
+                break
+            fi
+        fi
+    done
+
+    # Clean up temporary file
+    rm -f "$TEMP_FILE"
+
+    echo "✅ Completed: $MODEL"
+    echo "The results can be found in: $STDOUT_OUTPUT_FILE"
+    echo "The runtimes can be found in: $OUTPUT_FILE"
+
+    # Check for exceptions in STDOUT_OUTPUT_FILE
+    if grep -qi "exception:" "$STDOUT_OUTPUT_FILE"; then
+        echo "🚨 Exception raised during analysis of $MODEL."
+    else
+        echo "No exceptions during execution."
+    fi
+
+    # Check for exceptions in OUTPUT_FILE
+    if grep -qi "Killed" "$OUTPUT_FILE"; then
+        echo "⚠️ Some programs were killed (probably because they used too much memory)."
+    fi
+
+    # Check for timeouts
+    if grep -qi "Timeout or memory overflow occurred for" "$OUTPUT_FILE"; then
+        echo "⚠️ Some programs were killed by a timeout or a memory overflow."
+    fi
+done

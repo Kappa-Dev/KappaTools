@@ -56,6 +56,8 @@ module KaSa_site_graph = struct
     * (string option * binding_state option * (int option * int option) option)
       Wrapped_modules.LoggedStringMap.t
 
+  type string_version = agent Ckappa_sig.Agent_id_map_and_set.Map.t
+
   type t = {
     views:
       (Ckappa_sig.c_agent_name
@@ -67,7 +69,7 @@ module KaSa_site_graph = struct
     bonds:
       bond_index Ckappa_sig.Site_map_and_set.Map.t
       Ckappa_sig.Agent_id_map_and_set.Map.t;
-    string_version: agent Ckappa_sig.Agent_id_map_and_set.Map.t;
+    string_version: string_version;
   }
 
   let get_string_version t = t.string_version
@@ -149,7 +151,9 @@ module KaSa_site_graph = struct
         Ckappa_sig.Dictionary_of_sites.member parameter error new_site dic)
     | Ckappa_sig.Binding _ -> Exception.warn parameter error __POS__ Exit false
 
-  let add_site parameter error kappa_handler agent_id site t =
+  let add_site_or_guard parameter error kappa_handler agent_id site t =
+    let nsites = Handler.get_nsites kappa_handler in
+    let site_or_guard = Ckappa_sig.site_or_guard_p_of_mvbdu_var site nsites in
     let error, agent_op =
       Ckappa_sig.Agent_id_map_and_set.Map.find_option parameter error agent_id
         t.views
@@ -168,25 +172,35 @@ module KaSa_site_graph = struct
         Exception.check_point Exception.warn parameter error error' __POS__ Exit
       in
       let error', site_string =
-        Handler.string_of_site_contact_map ~ml_pos:(Some __POS__)
+        Handler.string_of_site_or_guard_contact_map ~ml_pos:(Some __POS__)
           ~message:"undefined site" parameter error kappa_handler agent_type
           site
       in
       let error =
         Exception.check_point Exception.warn parameter error error' __POS__ Exit
       in
-      let error, state_opt =
-        Wrapped_modules.LoggedStringMap.find_option_without_logs parameter error
-          site_string sitemap
-      in
-      let state =
-        match state_opt with
-        | None -> None, None, None
-        | Some state -> state
-      in
       let error, sitemap =
-        Wrapped_modules.LoggedStringMap.add_or_overwrite parameter error
-          site_string state sitemap
+        match site_or_guard with
+        | Ckappa_sig.Site _ ->
+          let error, state_opt =
+            Wrapped_modules.LoggedStringMap.find_option_without_logs parameter
+              error site_string sitemap
+          in
+          let state =
+            match state_opt with
+            | None -> None, None, None
+            | Some state -> state
+          in
+          let error, sitemap =
+            Wrapped_modules.LoggedStringMap.add_or_overwrite parameter error
+              site_string state sitemap
+          in
+          error, sitemap
+        | Ckappa_sig.Guard_p _ ->
+          Exception.warn parameter error __POS__
+            ~message:
+              "It is not possible to add a guard parameter to the site graph"
+            Exit sitemap
       in
       let error', string_version =
         Ckappa_sig.Agent_id_map_and_set.Map.overwrite parameter error agent_id
@@ -397,6 +411,17 @@ module KaSa_site_graph = struct
   let add_state parameter error kappa_handler agent_id site state t =
     add_state_interv parameter error kappa_handler agent_id site (Some state)
       (Some state) t
+
+  let add_state_or_guard parameter error kappa_handler agent_id site_or_guard
+      state t =
+    let nsites = Handler.get_nsites kappa_handler in
+    match Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard nsites with
+    | Ckappa_sig.Site site_name ->
+      add_state parameter error kappa_handler agent_id site_name state t
+    | Ckappa_sig.Guard_p _ ->
+      Exception.warn parameter error __POS__
+        ~message:"It is not possible to add a guard parameter to the site graph"
+        Exit t
 
   let add_counter_range parameter error kappa_handler agent_id site ?inf ?sup t
       =

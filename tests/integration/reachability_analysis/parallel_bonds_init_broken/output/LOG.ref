@@ -364,7 +364,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -378,7 +378,7 @@ Id=6
      Leaf False 
 
 agent_type:0:A:cv_id:1
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -392,7 +392,7 @@ Id=6
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -406,7 +406,7 @@ Id=6
      Leaf False 
 
 agent_type:1:B:cv_id:1
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -424,7 +424,7 @@ Id=6
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -439,12 +439,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=12
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=11
+  Id=6
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -454,7 +454,7 @@ Id=12
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -469,12 +469,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=12
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=11
+  Id=6
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -492,7 +492,7 @@ B(z) => [ B(z[.]) v B(z[z.A]) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -507,12 +507,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=12
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=11
+  Id=6
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -522,7 +522,7 @@ Id=12
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -537,12 +537,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=12
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=11
+  Id=6
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -561,7 +561,7 @@ EXTENSIONAL DESCRIPTION:
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -576,12 +576,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=12
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=11
+  Id=6
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -591,7 +591,7 @@ Id=12
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -606,12 +606,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=12
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=11
+  Id=6
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -621,7 +621,7 @@ Id=12
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -636,12 +636,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=12
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=11
+  Id=6
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -651,7 +651,7 @@ Id=12
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=6
+Id=10
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -666,12 +666,12 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=12
+Id=7
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=11
+  Id=6
    Node(site_type:0<2)
     Id=1
      Leaf True 

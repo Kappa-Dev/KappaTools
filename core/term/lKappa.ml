@@ -35,6 +35,7 @@ type rule_agent = {
 }
 
 type rule_mixture = rule_agent list
+type 'id guard = 'id Loc.annoted Logical_formulae.formula
 
 type rule = {
   r_mix: rule_mixture;
@@ -500,8 +501,39 @@ let print_rates ~noCounters sigs counters_info pr_tok pr_var f r =
                  md))
           max_dist)
 
-let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f r =
-  Format.fprintf f "@[<h>%t%t%a%t@]"
+let rec string_of_guard g =
+  match g with
+  | Logical_formulae.True -> "TRUE"
+  | Logical_formulae.False -> "FALSE"
+  | Logical_formulae.P (i, _) -> i
+  | Logical_formulae.AND (a, b) ->
+    string_of_guard a ^ " && " ^ string_of_guard b
+  | Logical_formulae.OR (a, b) -> string_of_guard a ^ " || " ^ string_of_guard b
+  | Logical_formulae.NOT a -> "[not] " ^ string_of_guard a
+  | Logical_formulae.IMPLY (a, b) ->
+    string_of_guard a ^ " => " ^ string_of_guard b
+
+let rec print_guard f g =
+  match g with
+  | Logical_formulae.True -> Format.fprintf f "TRUE"
+  | Logical_formulae.False -> Format.fprintf f "FALSE"
+  | Logical_formulae.P (i, _) -> Format.fprintf f "%s" i
+  | Logical_formulae.AND (a, b) ->
+    Format.fprintf f "@[%a && %a@]" print_guard a print_guard b
+  | Logical_formulae.OR (a, b) ->
+    Format.fprintf f "@[(%a || %a)@]" print_guard a print_guard b
+  | Logical_formulae.NOT a -> Format.fprintf f "@[[not] %a@]" print_guard a
+  | Logical_formulae.IMPLY (a, b) ->
+    Format.fprintf f "@[(%a => %a)@]" print_guard a print_guard b
+
+let print_guard f g = Format.fprintf f "#[ %a ]@ " print_guard g
+
+let print_rule ~noCounters ~full sigs counters_info pr_tok pr_var f guard r =
+  Format.fprintf f "@[<h>%t%t%t%a%t@]"
+    (fun f ->
+      match guard with
+      | None -> ()
+      | Some g -> print_guard f g)
     (fun f ->
       if full || r.r_edit_style then
         Format.fprintf f "%a%a"
@@ -620,9 +652,24 @@ let lalg_expr_of_json filenames =
     (rule_mixture_of_json filenames)
     (JsonUtil.to_int ?error_msg:None)
 
-let rule_to_json ~filenames r =
+let string_guard_option_to_json ~filenames =
+  JsonUtil.of_option
+    (Logical_formulae.formula_to_json
+       (Loc.yojson_of_annoted ~filenames JsonUtil.of_string))
+
+let string_guard_option_of_json ~filenames =
+  let string_of_json = function
+    | `String s -> s
+    | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct string", x))
+  in
+  JsonUtil.to_option
+    (Logical_formulae.formula_of_json
+       (Loc.annoted_of_yojson ~filenames string_of_json))
+
+let rule_to_json ~filenames guard r =
   `Assoc
     [
+      "guard", (string_guard_option_to_json ~filenames) guard;
       "mixture", rule_mixture_to_json filenames r.r_mix;
       "created", Raw_mixture.to_json r.r_created;
       ( "delta_tokens",
@@ -645,33 +692,35 @@ let rule_to_json ~filenames r =
     ]
 
 let rule_of_json ~filenames = function
-  | `Assoc l as x when List.length l < 7 ->
+  | `Assoc l as x when List.length l < 8 ->
     (try
-       {
-         r_mix = rule_mixture_of_json filenames (List.assoc "mixture" l);
-         r_created = Raw_mixture.of_json (List.assoc "created" l);
-         r_delta_tokens =
-           JsonUtil.to_list
-             (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                (Loc.annoted_of_yojson ~filenames (lalg_expr_of_json filenames))
-                (JsonUtil.to_int ?error_msg:None))
-             (List.assoc "delta_tokens" l);
-         r_rate =
-           Loc.annoted_of_yojson ~filenames
-             (lalg_expr_of_json filenames)
-             (List.assoc "rate" l);
-         r_un_rate =
-           (try
-              JsonUtil.to_option
-                (JsonUtil.to_pair
-                   (Loc.annoted_of_yojson ~filenames
-                      (lalg_expr_of_json filenames))
-                   (JsonUtil.to_option
-                      (Loc.annoted_of_yojson (lalg_expr_of_json filenames))))
-                (List.assoc "unary_rate" l)
-            with Not_found -> None);
-         r_edit_style = Yojson.Basic.Util.to_bool (List.assoc "edit_style" l);
-       }
+       ( (string_guard_option_of_json ~filenames) (List.assoc "guard" l),
+         {
+           r_mix = rule_mixture_of_json filenames (List.assoc "mixture" l);
+           r_created = Raw_mixture.of_json (List.assoc "created" l);
+           r_delta_tokens =
+             JsonUtil.to_list
+               (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
+                  (Loc.annoted_of_yojson ~filenames
+                     (lalg_expr_of_json filenames))
+                  (JsonUtil.to_int ?error_msg:None))
+               (List.assoc "delta_tokens" l);
+           r_rate =
+             Loc.annoted_of_yojson ~filenames
+               (lalg_expr_of_json filenames)
+               (List.assoc "rate" l);
+           r_un_rate =
+             (try
+                JsonUtil.to_option
+                  (JsonUtil.to_pair
+                     (Loc.annoted_of_yojson ~filenames
+                        (lalg_expr_of_json filenames))
+                     (JsonUtil.to_option
+                        (Loc.annoted_of_yojson (lalg_expr_of_json filenames))))
+                  (List.assoc "unary_rate" l)
+              with Not_found -> None);
+           r_edit_style = Yojson.Basic.Util.to_bool (List.assoc "edit_style" l);
+         } )
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect rule", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect rule", x))

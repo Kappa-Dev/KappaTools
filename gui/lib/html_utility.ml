@@ -113,6 +113,17 @@ let print_site_graph agent_list list =
          true, print_agent agent list)
        (false, list) (List.rev agent_list))
 
+let print_formula formula list =
+  List.rev (Public_data.print_formula [] print_string formula) @ list
+
+let print_formula_option formula list =
+  match formula with
+  | None -> list
+  | Some formula ->
+    let list = print_string " ]" list in
+    let list = print_formula formula list in
+    print_string " [ only if " list
+
 let print_exceptions_caught_and_uncaught mh =
   let uncaught = Exception_without_parameter.get_uncaught_exception_list mh in
   let caught = Exception_without_parameter.get_caught_exception_list mh in
@@ -133,3 +144,21 @@ let print_exceptions_caught_and_uncaught mh =
                (Format.asprintf "%a" Exception_without_parameter.pp_uncaught x);
            ])
        uncaught)
+
+let string_of_rule rule =
+  if rule.Public_data.rule_label <> "" then
+    " '" ^ rule.Public_data.rule_label ^ "'"
+  else if rule.Public_data.rule_ast <> "" then
+    rule.Public_data.rule_ast
+  else
+    string_of_int rule.Public_data.rule_id
+
+let print_rule rule list = print_string (string_of_rule rule) list
+
+let string_of_agent agent =
+  if agent.Public_data.agent_ast <> "" then
+    agent.Public_data.agent_ast
+  else
+    string_of_int agent.Public_data.agent_id
+
+let print_agent_kind agent list = print_string (string_of_agent agent) list

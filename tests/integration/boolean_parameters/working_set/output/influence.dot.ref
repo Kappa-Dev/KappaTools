@@ -1,0 +1,21 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa example_working_set.ka --output-directory output --debugging-mode -syntax 4
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"create A" [shape=box fillcolor="#87ceeb" style=filled];
+"phosphorization" [shape=box fillcolor="#87ceeb" style=filled];
+"binding x" [shape=box fillcolor="#87ceeb" style=filled];
+"binding y" [shape=box fillcolor="#87ceeb" style=filled];
+
+"Ap" [shape=ellipse fillcolor="#98fb98" style=filled];
+"create A" -> "phosphorization" [label="[0->0]" color="green"];
+"create A" -> "binding x" [label="[0->0];[0->1]" color="green"];
+"create A" -> "binding y" [label="[0->0];[0->1]" color="green"];
+"phosphorization" -> "Ap" [label="[0->0]" color="green"];
+"binding x" -> "binding x" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"binding y" -> "binding y" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+}

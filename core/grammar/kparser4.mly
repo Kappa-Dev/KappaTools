@@ -15,10 +15,16 @@
   let end_pos = Parsing.rhs_end_pos
   let start_pos = Parsing.rhs_start_pos
 
+  let nr_working_set_rules = ref 0
+  let inc_working_set_rules () = nr_working_set_rules := !nr_working_set_rules + 1
+
   let internal_memory = ref []
   let add x = internal_memory := x :: !internal_memory
   let output () =
-    let o = List.rev !internal_memory in let () = internal_memory := [] in o
+    let o = (!nr_working_set_rules, List.rev !internal_memory) in 
+    let () = internal_memory := [] in 
+    let () = nr_working_set_rules := 0 in 
+    o
 %}
 
 %token EOF COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR OP_BRA CL_BRA AT SEMICOLON
@@ -27,14 +33,15 @@
 %token SHARP UNDERSCORE PIPE RAR LRAR LAR EMAX TMAX CPUTIME TIME EVENT NULL_EVENT
 %token COLON NEWLINE BACKSLASH SIGNATURE TOKEN INIT OBS PLOT PERT CONFIG APPLY
 %token DELETE INTRO SNAPSHOT STOP FLUX TRACK ASSIGN PRINTF PLOTENTRY SPECIES_OF
-%token DO REPEAT ALARM RUN LET
+%token DO REPEAT ALARM RUN LET GUARD_PARAM SHARP_OP_BRA IF CONFLICT WORKING_SET
+%token SEQUENTIAL_BOND
 %token <int> INT
 %token <float> FLOAT
 %token <string> ID LABEL STRING
 %token <string> SPACE COMMENT
 
 %start model
-%type <Ast.parsing_instruction list> model
+%type <int * Ast.parsing_instruction list> model
 
 %start interactive_command
 %type <(Ast.mixture,Ast.mixture,string,Ast.rule) Ast.command> interactive_command
@@ -500,6 +507,37 @@ rule_content:
       (Ast.Edit {Ast.mix; Ast.delta_token},false,pend,an) }
   ;
 
+/*Boolean expression containing compiler parameters*/
+small_guard_bool_expr:
+  | OP_PAR annoted guard_bool_expr CL_PAR annoted { $3 }
+  | TRUE annoted { Logical_formulae.True }
+  | FALSE annoted { Logical_formulae.False }
+  | ID annoted { Logical_formulae.P ($1, rhs_pos 1) }
+  | NOT annoted small_guard_bool_expr
+    { Logical_formulae.NOT $3 }
+  ;
+
+guard_bool_expr_no_or:
+  | small_guard_bool_expr { $1 }
+  | small_guard_bool_expr AND annoted guard_bool_expr_no_or
+    { Logical_formulae.AND ($1, $4)}
+  ;
+
+guard_bool_expr:
+  | guard_bool_expr_no_or { $1 }
+  | guard_bool_expr_no_or OR annoted guard_bool_expr
+    { Logical_formulae.OR ($1, $4) }
+  ;
+
+guard:
+  | SHARP_OP_BRA annoted guard_bool_expr CL_BRA {$3}
+  ;
+
+rule_guard_and_content:
+  | guard annoted rule_content {Some $1, $3 }
+  | rule_content { None, $1 }
+  ;
+
 alg_with_radius:
   | alg_expr { let (x,_,_) = $1 in (x,None) }
   | alg_expr COLON annoted alg_expr
@@ -523,14 +561,14 @@ birate:
   ;
 
 rule:
-  | rule_content birate
+   | rule_guard_and_content birate
     { let (k_def,k_un,k_op,k_op_un,pos_end,_annot) = $2 in
-      let (rewrite,bidirectional,_,_) = $1 in
-      ({
+      let guard,(rewrite,bidirectional,_,_) = $1 in
+      guard,({
         Ast.rewrite;Ast.bidirectional;
         Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
       },Loc.of_pos (start_pos 1) pos_end) }
-  | rule_content error
+  | rule_guard_and_content error
     { raise (ExceptionDefn.Syntax_Error (add_pos 2 "rule rate expected")) }
   ;
 
@@ -572,6 +610,11 @@ init_declaration:
   | error
     { raise (ExceptionDefn.Syntax_Error
                (add_pos 1 "Malformed initial condition")) }
+  ;
+
+init_with_guard:
+  | guard annoted init_declaration {let (alg,init) = $3 in (Some $1,alg,init)}
+  | init_declaration {let (alg,init) = $1 in (None,alg,init)}
   ;
 
 value_list:
@@ -775,12 +818,22 @@ perturbation_declaration:
           ($1,None,e,post) }
   ;
 
+working_set_rule:
+  | LABEL annoted rule 
+    {let guard, rule = $3 in add (Ast.RULE (Some ($1, rhs_pos 1), guard, rule, true)); inc_working_set_rules () }
+  | rule { let guard, rule = $1 in add (Ast.RULE (None, guard, rule, true)); inc_working_set_rules () }
+
+working_set:
+  | working_set_rule working_set { }
+  | { }
+
 sentence:
   | LABEL annoted rule
-    { add (Ast.RULE(Some ($1, rhs_pos 1),$3)) }
+    { add (let guard, rule = $3 in Ast.RULE(Some ($1, rhs_pos 1),guard, rule, false)) }
   | LABEL annoted EQUAL annoted alg_expr
     { let (v,_,_) = $5 in add (Ast.DECLARE (($1,rhs_pos 1),v)) }
-  | rule { add (Ast.RULE (None,$1)) }
+  | rule { let guard,rule = $1 in add (Ast.RULE (None, guard, rule, false)) }
+  | WORKING_SET annoted OP_BRA annoted working_set CL_BRA annoted {}
   | SIGNATURE annoted agent_sig { let (a,_,_) = $3 in add (Ast.SIG a) }
   | SIGNATURE annoted error
     { raise
@@ -795,11 +848,14 @@ an algebraic expression is expected")) }
   | LET annoted variable_declaration
     { let (i,v,_,_) = $3 in add (Ast.DECLARE (i,v)) }
   | OBS annoted variable_declaration { let (i,v,_,_) = $3 in add (Ast.OBS (i,v)) }
-  | INIT annoted init_declaration
-    { let (alg,init) = $3 in add (Ast.INIT (alg,init)) }
+  | INIT annoted init_with_guard
+    { let (guard,alg,init) = $3 in add (Ast.INIT (guard,alg,init)) }
   | PERT perturbation_declaration { add (Ast.PERT ($2, rhs_pos 2)) }
   | CONFIG annoted STRING annoted value_list
     { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }
+  | GUARD_PARAM annoted ID annoted boolean annoted { add (Ast.GUARD_PARAM (($3,rhs_pos 3), $5)) }
+  | CONFLICT annoted ID annoted ID annoted ID annoted { add (Ast.CONFLICT (($3,rhs_pos 3), ($5,rhs_pos 5), ($7,rhs_pos 7))) }
+  | SEQUENTIAL_BOND annoted ID annoted ID annoted ID annoted { add (Ast.SEQUENTIAL_BOND (($3,rhs_pos 3), ($5,rhs_pos 5), ($7,rhs_pos 7))) }
   ;
 
 model_body:

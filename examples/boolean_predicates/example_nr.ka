@@ -1,0 +1,14 @@
+
+
+// Define agents
+%agent: A(x {u p},y {u p},z {u p})
+// global boolean parameter
+%guard_param: P [true]
+// P = x and y are in conflict
+
+// Initial conditions
+%init: 100 A()
+
+A(x{u}) -> A(x{p}) @1
+#[P] A(y{u}) -> A(y{p}) @1
+#[Q] A(z{u}) -> A(z{p}) @1 

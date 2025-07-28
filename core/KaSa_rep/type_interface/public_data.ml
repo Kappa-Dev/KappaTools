@@ -14,7 +14,9 @@ let agent = "agent name"
 let contactmap = "contact map"
 let accuracy_string = "accuracy"
 let dead_rules = "dead rules"
+let conditionally_dead_rules = "conditionally dead rules"
 let dead_agents = "dead agents"
+let conditionally_dead_agents = "conditionally dead agents"
 let map = "map"
 let interface = "interface"
 let site = "site name"
@@ -353,6 +355,8 @@ let scc_of_json = function
 (**************)
 (* dead rules *)
 (**************)
+
+type 'a formula = 'a Logical_formulae.formula
 
 type rule_direction =
   | Direct_rule
@@ -778,6 +782,8 @@ let local_influence_map_of_json = function
 (***************)
 
 type dead_rules = rule list
+type rule_deadness_conditions = (rule * string formula) list
+(* contains the rules that are dead only for certain values of the boolean predicates *)
 
 let dead_rules_to_json json =
   `Assoc [ dead_rules, JsonUtil.of_list rule_to_json json ]
@@ -793,6 +799,33 @@ let dead_rules_of_json = function
     raise
       (Yojson.Basic.Util.Type_error
          (JsonUtil.exn_msg_cant_import_from_json dead_rules, x))
+
+let conditionally_dead_rules_to_json json =
+  `Assoc
+    [
+      ( conditionally_dead_rules,
+        JsonUtil.of_list
+          (JsonUtil.of_pair rule_to_json
+             (Logical_formulae.formula_to_json JsonUtil.of_string))
+          json );
+    ]
+
+let conditionally_dead_rules_of_json = function
+  | `Assoc [ (s, json) ] as x when s = conditionally_dead_rules ->
+    (try
+       JsonUtil.to_list
+         (JsonUtil.to_pair json_to_rule
+            (Logical_formulae.formula_of_json
+               (JsonUtil.to_string ~error_msg:"wrong condition for dead rule")))
+         json
+     with Not_found ->
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json conditionally_dead_rules, x)))
+  | x ->
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json conditionally_dead_rules, x))
 
 (***************)
 (* dead agents *)
@@ -840,6 +873,8 @@ let agent_kind_to_json agent_kind =
     ]
 
 type dead_agents = agent_kind list
+type agent_deadness_conditions = (agent_kind * string formula) list
+(* contains the agents that are dead only for certain values of the boolean predicates *)
 
 let json_of_dead_agents json =
   `Assoc [ dead_agents, JsonUtil.of_list agent_kind_to_json json ]
@@ -855,6 +890,33 @@ let json_to_dead_agents = function
     raise
       (Yojson.Basic.Util.Type_error
          (JsonUtil.exn_msg_cant_import_from_json dead_agents, x))
+
+let conditionally_dead_agents_to_json json =
+  `Assoc
+    [
+      ( conditionally_dead_agents,
+        JsonUtil.of_list
+          (JsonUtil.of_pair agent_kind_to_json
+             (Logical_formulae.formula_to_json JsonUtil.of_string))
+          json );
+    ]
+
+let conditionally_dead_agents_of_json = function
+  | `Assoc [ (s, json) ] as x when s = conditionally_dead_agents ->
+    (try
+       JsonUtil.to_list
+         (JsonUtil.to_pair json_to_agent_kind
+            (Logical_formulae.formula_of_json
+               (JsonUtil.to_string ~error_msg:"wrong condition for dead agents")))
+         json
+     with Not_found ->
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json conditionally_dead_agents, x)))
+  | x ->
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json conditionally_dead_agents, x))
 
 (*************************************)
 (* non weakly reversible transitions *)
@@ -897,19 +959,30 @@ type agent =
     * (int option * int option) option)
     list
 
-type 'site_graph lemma = { hyp: 'site_graph; refinement: 'site_graph list }
+type 'site_graph lemma = {
+  hyp: 'site_graph;
+  refinement: ('site_graph * string formula option) list;
+}
+
 type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
 
 let lemma_to_json site_graph_to_json json =
   JsonUtil.of_pair ~lab1:hyp ~lab2:refinement site_graph_to_json
-    (JsonUtil.of_list site_graph_to_json)
+    (JsonUtil.of_list
+       (JsonUtil.of_pair site_graph_to_json
+          (JsonUtil.of_option
+             (Logical_formulae.formula_to_json JsonUtil.of_string))))
     (json.hyp, json.refinement)
 
 let lemma_of_json site_graph_of_json json =
   let a, b =
     JsonUtil.to_pair ~lab1:hyp ~lab2:refinement ~error_msg:"lemma"
       site_graph_of_json
-      (JsonUtil.to_list ~error_msg:"refinements list" site_graph_of_json)
+      (JsonUtil.to_list ~error_msg:"refinements list"
+         (JsonUtil.to_pair site_graph_of_json
+            (JsonUtil.to_option
+               (Logical_formulae.formula_of_json
+                  (JsonUtil.to_string ~error_msg:"boolean parameter")))))
       json
   in
   { hyp = a; refinement = b }
@@ -1071,3 +1144,5 @@ let lemmas_list_to_json_gen interface_to_json constraints =
 
 let lemmas_list_to_json constraints =
   lemmas_list_to_json_gen interface_light_to_json constraints
+
+let print_formula = Logical_formulae.print_formula

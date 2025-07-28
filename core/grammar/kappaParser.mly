@@ -58,26 +58,28 @@ newline:
 start_rule:
     | newline {$1}
     | LABEL rule_expression newline
-        {let out = (Some ($1, rhs_pos 1),$2) in
+        {let (guard, rule) = $2 in
+          let out = (Some ($1, rhs_pos 1), guard, rule) in
 	fun c -> let r = $3 c in {r with Ast.rules = out::r.Ast.rules}}
     | rule_expression newline
-        {fun c -> let r = $2 c in {r with Ast.rules = (None,$1)::r.Ast.rules}}
+        {let (guard, rule) = $1 in
+          fun c -> let r = $2 c in {r with Ast.rules = (None, guard, rule)::r.Ast.rules}}
     | LABEL EQUAL alg_expr newline
         {let out = (($1,rhs_pos 1),$3) in
 	fun c -> let r = $4 c in {r with Ast.variables = out::r.Ast.variables}}
     | instruction newline
 		  { fun c -> let r = $2 c in
 		      match $1 with
-		      | Ast.RULE ru ->
-			 {r with Ast.rules = ru::r.Ast.rules}
+		      | Ast.RULE (label, guard, rule, _) ->
+			 {r with Ast.rules = (label, guard, rule)::r.Ast.rules}
 		      | Ast.SIG ag ->
 			 {r with Ast.signatures=ag::r.Ast.signatures}
 		      | Ast.TOKENSIG (str_pos) ->
 			 {r with Ast.tokens=str_pos::r.Ast.tokens}
 		      | Ast.VOLSIG (vol_type,vol,vol_param) ->
 			 {r with Ast.volumes=(vol_type,vol,vol_param)::r.Ast.volumes}
-		      | Ast.INIT (alg,init_t) ->
-			 {r with Ast.init=(alg,init_t)::r.Ast.init}
+		      | Ast.INIT (guard,alg,init_t) ->
+			 {r with Ast.init=(guard,alg,init_t)::r.Ast.init}
 		      | Ast.DECLARE var ->
 			 {r with Ast.variables = var::r.Ast.variables}
 		      | Ast.OBS ((lbl,pos),_ as var) ->
@@ -95,6 +97,15 @@ start_rule:
 		      | Ast.CONFIG (param_name,value_list) ->
 			 {r with
 			  Ast.configurations = (param_name,value_list)::r.Ast.configurations}
+		      | Ast.GUARD_PARAM ((param_name,_),b) ->
+          {r with
+			  Ast.guard_param_values = Mods.StringMap.add param_name b r.Ast.guard_param_values;}
+          | Ast.CONFLICT (a,s1,s2) ->
+          {r with
+			  Ast.conflicts = (a,s1,s2)::r.Ast.conflicts}
+          | Ast.SEQUENTIAL_BOND (a,s1,s2) ->
+          {r with
+			  Ast.sequential_bonds = (a,s1,s2)::r.Ast.sequential_bonds}
 		  }
     | error
 	{raise (ExceptionDefn.Syntax_Error (add_pos "Syntax error"))}
@@ -106,7 +117,7 @@ instruction:
     | SIGNATURE error {raise (ExceptionDefn.Syntax_Error
 				(add_pos "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
 
-    | INIT init_declaration {Ast.INIT $2}
+    | INIT init_declaration {let a,i = $2 in Ast.INIT (None,a,i)}
     | INIT error
 	{ raise (ExceptionDefn.Syntax_Error
 		   (add_pos "Malformed initial condition"))}
@@ -325,8 +336,8 @@ rule_content:
 rule_expression:
   | rule_content birate
     { let (k_def,k_un,k_op,k_op_un) = $2 in
-      let rewrite,bidirectional = $1 in
-      add_pos {
+      let (rewrite,bidirectional) = $1 in
+      None, add_pos {
         Ast.rewrite;Ast.bidirectional;
         Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
       } };

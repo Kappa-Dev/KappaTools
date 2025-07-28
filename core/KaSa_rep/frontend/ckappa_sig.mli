@@ -18,6 +18,7 @@ module Int_Set_and_Map : Map_wrapper.S_with_logs with type elt = int
 
 type position = Loc.t
 type agent_name = string
+type guard_name = string
 type site_name = string
 type internal_state = string
 type counter_name = string
@@ -32,6 +33,9 @@ type c_rule_id
 type c_agent_id
 type c_link_value
 type c_counter_name
+type c_guard_parameter
+type c_site_or_guard_p = Site of c_site_name | Guard_p of c_guard_parameter
+type c_mvbdu_var
 
 (****************************************************************************)
 
@@ -44,15 +48,20 @@ val c_rule_id_of_string : string -> c_rule_id
 val string_of_c_link_value : c_link_value -> string
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
+val dummy_guard_parameter : c_guard_parameter
+val dummy_mvbdu_var : c_mvbdu_var
+val dummy_mvbdu_var_1 : c_mvbdu_var
 val dummy_state_index : c_state
+val dummy_state_index_true : c_state
+val dummy_state_index_false : c_state
 val dummy_rule_id : c_rule_id
 val dummy_agent_id : c_agent_id
 val dummy_link_value : c_link_value
-val dummy_site_name_1 : c_site_name
+val dummy_site_name_2 : c_site_name
 val dummy_site_name_minus1 : c_site_name
 val next_link_value : c_link_value -> c_link_value
-val fst_site : c_site_name
-val snd_site : c_site_name
+val fst_site : c_mvbdu_var
+val snd_site : c_mvbdu_var
 val dummy_state_index_1 : c_state
 val string_of_agent_name : c_agent_name -> string
 val int_of_agent_name : c_agent_name -> int
@@ -61,15 +70,36 @@ val string_of_agent_id : c_agent_id -> string
 val site_name_of_int : int -> c_site_name
 val int_of_site_name : c_site_name -> int
 val string_of_site_name : c_site_name -> string
+val string_of_site_or_guard : c_site_or_guard_p -> string
+val string_of_mvbdu_var : c_mvbdu_var -> string
 val state_index_of_int : int -> c_state
 val int_of_state_index : c_state -> int
 val string_of_state_index : c_state -> string
+val guard_parameter_of_int : int -> c_guard_parameter
+val mvbdu_var_of_int : int -> c_mvbdu_var
+val int_of_mvbdu_var : c_mvbdu_var -> int
+val mvbdu_var_of_site : c_site_name -> c_mvbdu_var
+val mvbdu_var_of_guard : c_guard_parameter -> c_site_name -> c_mvbdu_var
+
+val mvbdu_var_of_site_or_guard_p :
+  c_site_or_guard_p -> c_site_name -> c_mvbdu_var
+
+val int_of_guard_parameter : c_guard_parameter -> int
+
+val site_or_guard_p_of_mvbdu_var :
+  c_mvbdu_var -> c_site_name -> c_site_or_guard_p
 
 val string_of_state_index_option_min :
   Remanent_parameters_sig.parameters -> c_state option -> string
 
 val string_of_state_index_option_max :
   Remanent_parameters_sig.parameters -> c_state option -> string
+
+val bool_of_state_index :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  c_state ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * bool
 
 val int_of_rule_id : c_rule_id -> int
 val rule_id_of_int : int -> c_rule_id
@@ -84,6 +114,8 @@ val next_agent_id : c_agent_id -> c_agent_id
 val next_agent_name : c_agent_name -> c_agent_name
 val next_rule_id : c_rule_id -> c_rule_id
 val next_site_name : c_site_name -> c_site_name
+val next_guard_p_name : c_guard_parameter -> c_guard_parameter
+val next_mvbdu_var_name : c_mvbdu_var -> c_mvbdu_var
 val next_state_index : c_state -> c_state
 val pred_site_name : c_site_name -> c_site_name
 val pred_agent_name : c_agent_name -> c_agent_name
@@ -95,6 +127,7 @@ val compare_state_index : c_state -> c_state -> int
 val compare_state_index_option_min : c_state option -> c_state option -> int
 val compare_state_index_option_max : c_state option -> c_state option -> int
 val compare_agent_name : c_agent_name -> c_agent_name -> int
+val compare_guard_parameter : c_guard_parameter -> c_guard_parameter -> int
 
 val get_agent_shape :
   c_site_name -> Remanent_parameters_sig.parameters -> Graph_loggers_sig.shape
@@ -102,8 +135,10 @@ val get_agent_shape :
 val get_agent_color :
   c_site_name -> Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
 
+val get_list_of_guard_parameters : c_guard_parameter -> c_guard_parameter list
 val compare_unit : unit -> unit -> int
 val compare_unit_agent_name : unit -> unit -> c_agent_name
+val compare_unit_guard_parameter : unit -> unit -> c_guard_parameter
 val compare_unit_site_name : unit -> unit -> c_site_name
 val compare_unit_state_index : unit -> unit -> c_state
 val compare_unit_agent_site : unit -> unit -> int
@@ -239,6 +274,13 @@ val join_mixture :
   mixture ->
   Exception.exceptions_caught_and_uncaught * mixture
 
+val has_site : counter_name -> 'a interface -> bool
+val has_free_site : counter_name -> 'a interface -> bool
+val has_bound_site : counter_name -> 'a interface -> bool
+
+val modify_mixture :
+  (agent option -> mixture -> agent option * mixture) -> mixture -> mixture
+
 val add_agent :
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->
@@ -311,6 +353,8 @@ val add_free :
   mixture ->
   Exception.exceptions_caught_and_uncaught * mixture
 
+val to_site_list : c_site_or_guard_p list -> c_site_name list
+
 (*******************************************************)
 (*C type*)
 (*******************************************************)
@@ -325,6 +369,11 @@ type internal_state_specification = { string: internal_state option }
 
 module Dictionary_of_agents :
   Dictionary.Dictionary with type key = c_agent_name and type value = agent_name
+
+module Dictionary_of_guards :
+  Dictionary.Dictionary
+    with type key = c_guard_parameter
+     and type value = guard_name
 
 module Dictionary_of_sites :
   Dictionary.Dictionary with type key = c_site_name and type value = site
@@ -361,7 +410,16 @@ type c_port = {
   c_site_interval: c_state interval;
 }
 
+module SiteOrGuard_map_and_set :
+  Map_wrapper.S_with_logs with type elt = c_site_or_guard_p
+
 module Site_map_and_set : Map_wrapper.S_with_logs with type elt = c_site_name
+
+module MvbduVar_map_and_set :
+  Map_wrapper.S_with_logs with type elt = c_mvbdu_var
+
+module GuardP_map_and_set :
+  Map_wrapper.S_with_logs with type elt = c_guard_parameter
 
 type c_interface = c_port Site_map_and_set.Map.t
 
@@ -473,6 +531,11 @@ module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
     with type key = c_agent_name * c_site_name
      and type dimension = int * int
 
+module Agent_type_mvbdu_var_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
+  Int_storage.Storage
+    with type key = c_agent_name * c_mvbdu_var
+     and type dimension = int * int
+
 module Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
   Int_storage.Storage
     with type key = c_agent_name * c_site_name
@@ -488,6 +551,9 @@ module Site_type_nearly_Inf_Int_storage_Imperatif :
 
 module Site_type_quick_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_site_name and type dimension = int
+
+module Mvbdu_var_nearly_Inf_Int_storage_Imperatif :
+  Int_storage.Storage with type key = c_mvbdu_var and type dimension = int
 
 module State_index_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_state and type dimension = int
@@ -553,6 +619,9 @@ module PairAgentSite_map_and_set :
 module AgentSite_map_and_set :
   Map_wrapper.S_with_logs with type elt = c_agent_name * c_site_name
 
+module AgentSiteOrGuard_map_and_set :
+  Map_wrapper.S_with_logs with type elt = c_agent_name * c_site_or_guard_p
+
 module Agents_map_and_set :
   Map_wrapper.S_with_logs with type elt = c_agent_id * c_agent_name
 
@@ -571,7 +640,7 @@ module AgentsSitePState_map_and_set :
     with type elt = c_agent_id * c_agent_name * c_site_name * pair_of_states
 
 module Views_bdu :
-  Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state
+  Mvbdu_wrapper.Mvbdu with type key = c_mvbdu_var and type value = c_state
 
 module Views_intbdu :
   Mvbdu_wrapper.Internalized_mvbdu
@@ -606,3 +675,79 @@ type side_effects = {
 }
 
 val empty_side_effects : side_effects
+
+(*****************************************************************************)
+(*MVBDU OF THE GUARDS*)
+(*****************************************************************************)
+
+val mvbdu_or_for_guards :
+  Remanent_parameters_sig.parameters ->
+  Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.mvbdu ->
+  Views_bdu.mvbdu ->
+  Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu
+
+val mvbdu_and_for_guards :
+  Remanent_parameters_sig.parameters ->
+  Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.mvbdu ->
+  Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu
+
+val mvbdu_not_for_guards :
+  Remanent_parameters_sig.parameters ->
+  Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.mvbdu ->
+  Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu
+
+val mvbdu_is_true_for_guards :
+  Remanent_parameters_sig.parameters ->
+  Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.mvbdu ->
+  Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * bool
+
+val mvbdu_is_false_for_guards :
+  Remanent_parameters_sig.parameters ->
+  Views_bdu.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * bool
+
+val guard_to_bdu :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.handler ->
+  c_guard_parameter LKappa.guard ->
+  Views_bdu.mvbdu ->
+  c_site_name ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu
+
+val guard_to_bdu_opt :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Views_bdu.handler ->
+  c_guard_parameter LKappa.guard option ->
+  Views_bdu.mvbdu ->
+  c_site_name ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Views_bdu.handler
+  * Views_bdu.mvbdu

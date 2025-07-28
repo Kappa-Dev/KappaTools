@@ -45,10 +45,27 @@ module type Mvbdu = sig
     'input ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
 
+  type ('input, 'output) unary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int ->
+    'input ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
+
   type ('input1, 'input2, 'output) binary =
     Remanent_parameters_sig.parameters ->
     handler ->
     Exception.exceptions_caught_and_uncaught ->
+    'input1 ->
+    'input2 ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
+
+  type ('input1, 'input2, 'output) binary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int ->
     'input1 ->
     'input2 ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
@@ -127,6 +144,9 @@ module type Mvbdu = sig
   val mvbdu_rename : (mvbdu, hconsed_renaming_list, mvbdu) binary
   val mvbdu_project_keep_only : (mvbdu, hconsed_variables_list, mvbdu) binary
 
+  val mvbdu_project_keep_only_with_threshold :
+    (mvbdu, hconsed_variables_list, mvbdu) binary_with_threshold
+
   val mvbdu_project_abstract_away :
     (mvbdu, hconsed_variables_list, mvbdu) binary
 
@@ -134,7 +154,17 @@ module type Mvbdu = sig
     (mvbdu, int, mvbdu option * mvbdu list) binary
 
   val mvbdu_full_cartesian_decomposition : (mvbdu, mvbdu list) unary
+
+  val mvbdu_full_cartesian_decomposition_with_threshold :
+    (mvbdu, mvbdu list) unary_with_threshold
+
   val mvbdu_cartesian_abstraction : (mvbdu, mvbdu list) unary
+
+  val mvbdu_cartesian_abstraction_with_threshold :
+    (mvbdu, mvbdu list) unary_with_threshold
+
+  val mvbdu_width : (mvbdu, int) unary
+  val mvbdu_height : (mvbdu, int) unary
 
   val build_association_list :
     ((key * value) list, hconsed_association_list) unary
@@ -196,7 +226,18 @@ module type Mvbdu = sig
     (hconsed_range_list, (key * (value option * value option)) list) unary
 
   val extensional_of_mvbdu : (mvbdu, (key * value) list list) unary
+
+  val mvbdu_to_formula :
+    cartesian_decomposition:bool -> (mvbdu, key Logical_formulae.formula) unary
+
+  val parametric_conditions_of_mvbdu :
+    (mvbdu, ((key * value) list * mvbdu) list) unary_with_threshold
+
   val variables_list_of_mvbdu : (mvbdu, hconsed_variables_list) unary
+
+  val variables_list_of_mvbdu_with_threshold :
+    (mvbdu, hconsed_variables_list) unary_with_threshold
+
   val print : Remanent_parameters_sig.parameters -> mvbdu -> unit
 
   val print_association_list :
@@ -321,6 +362,8 @@ module type Internalized_mvbdu = sig
     mvbdu -> int -> mvbdu option * mvbdu list
 
   val mvbdu_full_cartesian_decomposition : mvbdu -> mvbdu list
+  val mvbdu_height : mvbdu -> int
+  val mvbdu_width : mvbdu -> int
   val build_association_list : (key * value) list -> hconsed_association_list
 
   val build_sorted_association_list :
@@ -379,6 +422,9 @@ module type Internalized_mvbdu = sig
 
   val hash_of_association_list : hconsed_association_list -> int
   val hash_of_variables_list : hconsed_variables_list -> int
+
+  val mvbdu_to_formula :
+    cartesian_decomposition:bool -> mvbdu -> int Logical_formulae.formula
 end
 
 module type Nul = sig end
@@ -416,10 +462,27 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     'input ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
 
+  type ('input, 'output) unary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int ->
+    'input ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
+
   type ('input1, 'input2, 'output) binary =
     Remanent_parameters_sig.parameters ->
     handler ->
     Exception.exceptions_caught_and_uncaught ->
+    'input1 ->
+    'input2 ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
+
+  type ('input1, 'input2, 'output) binary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int ->
     'input1 ->
     'input2 ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
@@ -560,12 +623,39 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
       let error, a = Exception.warn parameters error pos Exit a in
       error, handler, a
 
+  let lift1_int pos f parameters handler error a =
+    match f parameters error handler a with
+    | error, (handler, Some a) -> error, handler, a
+    | error, (handler, None) ->
+      let error, a = Exception.warn parameters error pos Exit 0 in
+      error, handler, a
+
   let lift1__ _string f parameters handler error a =
     match f parameters handler error a with
     | error, (handler, a) -> error, handler, a
 
+  let lift1_with_threshold ~threshold pos f parameters handler error a =
+    match f parameters handler error ~threshold a with
+    | error, (handler, Some a) -> error, handler, a
+    | error, (handler, None) ->
+      let error, a = Exception.warn parameters error pos Exit a in
+      error, handler, a
+
+  let lift1__with_threshold ~threshold _string f parameters handler error a =
+    match f parameters handler error ~threshold a with
+    | error, (handler, a) -> error, handler, a
+
   let lift1four buildlist pos f parameters handler error a =
     match f parameters error handler a with
+    | error, (handler, Some a) -> error, handler, a
+    | error, (handler, None) ->
+      let error, handler, list = buildlist parameters handler error [] in
+      let error, a = Exception.warn parameters error pos Exit list in
+      error, handler, (a : unit List_sig.list)
+
+  let lift1four_with_threshold buildlist pos f parameters handler error
+      ~threshold a =
+    match f parameters error handler ~threshold a with
     | error, (handler, Some a) -> error, handler, a
     | error, (handler, None) ->
       let error, handler, list = buildlist parameters handler error [] in
@@ -599,6 +689,14 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
 
   let lift2ter pos f parameters handler error a b =
     match f parameters error parameters handler a b with
+    | error, (handler, Some a) -> error, handler, a
+    | error, (handler, None) ->
+      let error, a = Exception.warn parameters error pos Exit a in
+      error, handler, a
+
+  let lift2ter_with_threshold pos ~threshold:int f parameters handler error a b
+      =
+    match f parameters error handler ~threshold:int a b with
     | error, (handler, Some a) -> error, handler, a
     | error, (handler, None) ->
       let error, a = Exception.warn parameters error pos Exit a in
@@ -649,6 +747,12 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
   let mvbdu_redefine_range = lift2bis __POS__ Boolean_mvbdu.redefine_range
   let mvbdu_rename = lift2bis __POS__ Boolean_mvbdu.monotonicaly_rename
   let mvbdu_project_keep_only = lift2ter __POS__ Boolean_mvbdu.project_keep_only
+
+  let mvbdu_project_keep_only_with_threshold parameters handler error ~threshold
+      =
+    lift2ter_with_threshold __POS__
+      Boolean_mvbdu.project_keep_only_with_threshold parameters handler error
+      ~threshold
 
   let mvbdu_project_abstract_away =
     lift2ter __POS__ Boolean_mvbdu.project_abstract_away
@@ -736,6 +840,12 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     lift1four build_sorted_variables_list __POS__
       Boolean_mvbdu.variables_of_mvbdu parameter handler error mvbdu
 
+  let variables_list_of_mvbdu_with_threshold parameter handler error ~threshold
+      mvbdu =
+    lift1four_with_threshold build_sorted_variables_list __POS__
+      Boolean_mvbdu.variables_of_mvbdu_with_threshold parameter handler error
+      ~threshold mvbdu
+
   let extensional_of_association_list parameters handler error l =
     lift1five __POS__ Boolean_mvbdu.extensional_description_of_association_list
       parameters handler error l
@@ -752,11 +862,21 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     lift1__ __POS__ Boolean_mvbdu.extensional_description_of_mvbdu parameters
       handler error mvbdu
 
+  let parametric_conditions_of_mvbdu parameters handler error ~threshold mvbdu =
+    lift1__with_threshold ~threshold __POS__
+      Boolean_mvbdu.extensional_description_of_mvbdu_with_threshold parameters
+      handler error mvbdu
+
   let print = Boolean_mvbdu.print_mvbdu
   let print_association_list = List_algebra.print_association_list
   let print_variables_list = List_algebra.print_variables_list
   let mvbdu_clean_head = lift1_ __POS__ Boolean_mvbdu.clean_head
   let mvbdu_keep_head_only = lift1_ __POS__ Boolean_mvbdu.keep_head_only
+  let mvbdu_height = lift1_int __POS__ Boolean_mvbdu.height
+  let mvbdu_width = lift1_int __POS__ Boolean_mvbdu.width
+
+  let mvbdu_keep_head_only_with_threshold =
+    lift1_with_threshold __POS__ Boolean_mvbdu.keep_head_only_with_threshold
 
   let mvbdu_cartesian_abstraction parameters handler error bdu =
     let error, handler, bdd_true = mvbdu_true parameters handler error in
@@ -788,11 +908,56 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     in
     aux error handler bdu []
 
+  let mvbdu_cartesian_abstraction_with_threshold parameters handler error
+      ~threshold bdu =
+    let error, handler, bdd_true = mvbdu_true parameters handler error in
+    (*let error = Exception.check_point
+          Exception.warn parameters error error' __POS__ Exit
+      in*)
+    let error, handler, bdd_false = mvbdu_false parameters handler error in
+    (*let error = Exception.check_point
+          Exception.warn parameters error error'' __POS__ Exit
+      in*)
+    let rec aux error handler bdu list =
+      if equal bdu bdd_true || equal bdu bdd_false then
+        error, handler, List.rev list
+      else (
+        match bdu.Mvbdu_sig.value with
+        | Mvbdu_sig.Leaf _ -> error, handler, List.rev list
+        | Mvbdu_sig.Node precell when precell.Mvbdu_sig.variable > threshold ->
+          error, handler, List.rev list
+        | Mvbdu_sig.Node _ ->
+          let error, handler, head =
+            mvbdu_keep_head_only_with_threshold parameters error handler
+              ~threshold bdu
+          in
+          (*let error = Exception.check_point
+                Exception.warn parameters error error' __POS__ Exit
+            in*)
+          let error, handler, tail =
+            mvbdu_clean_head parameters error handler bdu
+          in
+          (*let error = Exception.check_point
+                Exception.warn parameters error error'' __POS__ Exit
+            in*)
+          aux error handler tail (head :: list)
+      )
+    in
+    aux error handler bdu []
+
   let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
     Boolean_mvbdu.mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu
       extensional_of_variables_list build_sorted_variables_list
       mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal
       parameters handler error bdu int
+
+  let mvbdu_cartesian_decomposition_depth_with_threshold parameters handler
+      error ~threshold bdu int =
+    Boolean_mvbdu.mvbdu_cartesian_decomposition_depth_with_threshold
+      variables_list_of_mvbdu_with_threshold extensional_of_variables_list
+      build_sorted_variables_list mvbdu_project_keep_only_with_threshold
+      mvbdu_project_abstract_away mvbdu_and equal parameters handler error
+      ~threshold bdu int
 
   let mvbdu_full_cartesian_decomposition parameters handler error bdu =
     let error, handler, l =
@@ -817,6 +982,52 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     match bdu_opt with
     | None -> error, handler, list
     | Some bdu -> error, handler, bdu :: list
+
+  let mvbdu_full_cartesian_decomposition_with_threshold parameters handler error
+      ~threshold bdu =
+    let error, handler, l =
+      variables_list_of_mvbdu_with_threshold parameters handler error ~threshold
+        bdu
+    in
+    (*let error = Exception.check_point
+          Exception.warn parameters error error' __POS__ Exit
+      in*)
+    let error, handler, list =
+      extensional_of_variables_list parameters handler error l
+    in
+    (*let error = Exception.check_point
+          Exception.warn parameters error error'' __POS__ Exit
+      in*)
+    let size = List.length list in
+    let error, handler, (bdu_opt, list) =
+      mvbdu_cartesian_decomposition_depth_with_threshold parameters handler
+        error ~threshold bdu (size / 2)
+    in
+    (*let error = Exception.check_point
+          Exception.warn parameters error error_3 __POS__ Exit
+      in*)
+    match bdu_opt with
+    | None -> error, handler, list
+    | Some bdu -> error, handler, bdu :: list
+
+  let mvbdu_to_formula parameters handler error mvbdu =
+    lift1__ __POS__ Boolean_mvbdu.to_formula parameters handler error mvbdu
+
+  let mvbdu_to_formula ~cartesian_decomposition parameters handler error mvbdu =
+    if cartesian_decomposition then (
+      let error, handler, list =
+        mvbdu_full_cartesian_decomposition parameters handler error mvbdu
+      in
+      List.fold_left
+        (fun (error, handler, formula) mvbdu ->
+          let error, handler, f =
+            mvbdu_to_formula parameters handler error mvbdu
+          in
+          error, handler, Logical_formulae.AND (formula, f))
+        (error, handler, Logical_formulae.True)
+        list
+    ) else
+      mvbdu_to_formula parameters handler error mvbdu
 
   let merge_variables_lists parameters handler error l1 l2 =
     lift2four __POS__ Boolean_mvbdu.merge_variables_lists parameters handler
@@ -924,6 +1135,8 @@ module Internalize (M : Mvbdu with type key = int and type value = int) :
 
   let mvbdu_id = lift_unary __POS__ M.mvbdu_id
   let mvbdu_not = lift_unary __POS__ M.mvbdu_not
+  let mvbdu_height = lift_unary __POS__ M.mvbdu_height
+  let mvbdu_width = lift_unary __POS__ M.mvbdu_width
   let mvbdu_unary_true _ = mvbdu_true ()
   let mvbdu_unary_false _ = mvbdu_false ()
   let mvbdu_bi_true _ _ = mvbdu_true ()
@@ -988,6 +1201,9 @@ module Internalize (M : Mvbdu with type key = int and type value = int) :
 
   let build_reverse_sorted_renaming_list =
     lift_unary __POS__ M.build_reverse_sorted_renaming_list
+
+  let mvbdu_to_formula ~cartesian_decomposition =
+    lift_unary __POS__ (M.mvbdu_to_formula ~cartesian_decomposition)
 
   let empty_renaming_list () = build_renaming_list []
   let build_range_list = lift_unary __POS__ M.build_range_list
@@ -1165,6 +1381,8 @@ module Optimize_internalized
   let init = Mvbdu.init
   let is_init = Mvbdu.is_init
   let equal = Mvbdu.equal
+  let mvbdu_width a = Mvbdu.mvbdu_width a
+  let mvbdu_height a = Mvbdu.mvbdu_height a
   let mvbdu_nand a = Mvbdu.mvbdu_nand a
   let mvbdu_not a = mvbdu_nand a a
   let mvbdu_id = Mvbdu.mvbdu_id
@@ -1240,6 +1458,7 @@ module Optimize_internalized
   let mvbdu_cartesian_decomposition_depth =
     M.mvbdu_cartesian_decomposition_depth
 
+  let mvbdu_to_formula = M.mvbdu_to_formula
   let mvbdu_full_cartesian_decomposition = M.mvbdu_full_cartesian_decomposition
   let hash_of_association_list = M.hash_of_association_list
   let hash_of_variables_list = M.hash_of_variables_list

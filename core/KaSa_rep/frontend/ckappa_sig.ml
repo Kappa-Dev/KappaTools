@@ -19,6 +19,7 @@ let _ = local_trace
 
 type position = Loc.t
 type agent_name = string
+type guard_name = string
 type site_name = string
 type internal_state = string
 type counter_name = string
@@ -31,6 +32,11 @@ type c_rule_id = int
 type c_link_value = int
 type c_counter_name = int
 type binding_state = Free | Lnk_type of agent_name * site_name
+type c_guard_parameter = int
+type c_site_or_guard_p = Site of c_site_name | Guard_p of c_guard_parameter
+
+type c_mvbdu_var =
+  int (*the first n elements are sites, the last ones are boolean parameters*)
 
 type mixture =
   | SKIP of mixture
@@ -157,10 +163,15 @@ let c_rule_id_of_string s =
 
 let dummy_agent_name = 0
 let dummy_site_name = 0
+let dummy_guard_parameter = 0
+let dummy_mvbdu_var = 0
+let dummy_mvbdu_var_1 = 1
 let dummy_state_index = 0
+let dummy_state_index_true = 1
+let dummy_state_index_false = 0
 let dummy_rule_id = 0
 let dummy_agent_id = 0
-let dummy_site_name_1 = 1
+let dummy_site_name_2 = 2
 let dummy_site_name_minus1 = -1 (*REMOVE:Use in views_domain*)
 let dummy_state_index_1 = 1
 
@@ -179,9 +190,38 @@ let next_link_value (i : c_link_value) : c_link_value = i + 1
 let site_name_of_int (a : int) : c_site_name = a
 let int_of_site_name (a : c_site_name) : int = a
 let string_of_site_name (a : c_site_name) : string = string_of_int a
+let string_of_mvbdu_var (a : c_mvbdu_var) : string = string_of_int a
+
+let string_of_site_or_guard (a : c_site_or_guard_p) : string =
+  match a with
+  | Site s | Guard_p s -> string_of_int s
+
 let state_index_of_int (a : int) : c_state = a
 let int_of_state_index (a : c_state) : int = a
 let string_of_state_index (a : c_state) : string = string_of_int a
+let guard_parameter_of_int (a : int) : c_guard_parameter = a
+let mvbdu_var_of_int (a : int) : c_mvbdu_var = a
+let int_of_mvbdu_var (a : c_mvbdu_var) : int = a
+let mvbdu_var_of_site (a : c_site_name) : c_mvbdu_var = a
+
+let mvbdu_var_of_guard (a : c_guard_parameter) (nsites : c_site_name) :
+    c_mvbdu_var =
+  a + nsites
+
+let mvbdu_var_of_site_or_guard_p (a : c_site_or_guard_p) (nsites : c_site_name)
+    : c_mvbdu_var =
+  match a with
+  | Site s -> mvbdu_var_of_site s
+  | Guard_p s -> mvbdu_var_of_guard s nsites
+
+let int_of_guard_parameter (a : c_guard_parameter) : int = a
+
+let site_or_guard_p_of_mvbdu_var (a : c_mvbdu_var) (nsites : c_site_name) :
+    c_site_or_guard_p =
+  if a < nsites then
+    Site a
+  else
+    Guard_p (a - nsites)
 
 let string_of_state_index_option_min parameters a =
   match a with
@@ -201,6 +241,12 @@ let agent_id_of_int (a : int) : c_agent_id = a
 let string_of_agent_id (a : c_agent_id) : string = string_of_int a
 let string_of_c_link_value (a : c_link_value) : string = string_of_int a
 
+let bool_of_state_index parameter error (a : c_state) =
+  match a with
+  | 0 -> error, false
+  | 1 -> error, true
+  | _ -> Exception.warn parameter error __POS__ Exit false
+
 let get_agent_shape n_sites parameters =
   Misc_sa.fetch_array (int_of_site_name n_sites)
     (Remanent_parameters.get_agent_shape_array parameters)
@@ -210,6 +256,9 @@ let get_agent_color n_sites parameters =
   Misc_sa.fetch_array (int_of_site_name n_sites)
     (Remanent_parameters.get_agent_color_array parameters)
     (Remanent_parameters.get_agent_color_def parameters)
+
+let get_list_of_guard_parameters nr_guard_parameters =
+  List.init (int_of_guard_parameter nr_guard_parameters) guard_parameter_of_int
 
 (***************************************************************)
 (*RENAME*)
@@ -570,15 +619,24 @@ let mod_agent_gen parameters error agent_id f mixture =
   in
   aux k mixture
 
-let rec has_site x interface =
+let rec has_site_condition condition interface =
   match interface with
   | EMPTY_INTF -> false
-  | COUNTER_SEP (_, intf) -> has_site x intf
+  | COUNTER_SEP (_, intf) -> has_site_condition condition intf
   | PORT_SEP (p, intf) ->
-    if p.port_name = x then
+    if condition p then
       true
     else
-      has_site x intf
+      has_site_condition condition intf
+
+let has_site x = has_site_condition (fun p -> p.port_name = x)
+
+let has_free_site x =
+  has_site_condition (fun p ->
+      p.port_name = x && not (p.port_free = Some false))
+
+let has_bound_site x =
+  has_site_condition (fun p -> p.port_name = x && p.port_free = Some false)
 
 let rec has_counter x interface =
   match interface with
@@ -608,6 +666,27 @@ let add_site parameters error agent_id site_name mixture =
         error, { agent with ag_intf = interface }
       ))
     mixture
+
+let modify_mixture f mixture =
+  let get_agent new_agent old_agent =
+    match new_agent with
+    | None -> old_agent
+    | Some agent -> agent
+  in
+  match mixture with
+  | SKIP mixture' ->
+    let _, mixture'' = f None mixture' in
+    SKIP mixture''
+  | COMMA (agent, mixture') ->
+    let agent', mixture'' = f (Some agent) mixture' in
+    COMMA (get_agent agent' agent, mixture'')
+  | DOT (id, agent, mixture') ->
+    let agent', mixture'' = f (Some agent) mixture' in
+    DOT (id, get_agent agent' agent, mixture'')
+  | PLUS (id, agent, mixture') ->
+    let agent', mixture'' = f (Some agent) mixture' in
+    PLUS (id, get_agent agent' agent, mixture'')
+  | EMPTY_MIX -> mixture
 
 let add_counter parameters error agent_id counter_name mixture =
   mod_agent_gen parameters error agent_id
@@ -772,9 +851,22 @@ module Kasim_agent_name = struct
   let print = Format.pp_print_string
 end
 
+module Guard_name = struct
+  type t = guard_name
+
+  let compare = compare
+  let print = Format.pp_print_string
+end
+
 module Dictionary_of_agents :
   Dictionary.Dictionary with type key = c_agent_name and type value = agent_name =
   Dictionary.Dictionary_of_Ord (Kasim_agent_name)
+
+module Dictionary_of_guards :
+  Dictionary.Dictionary
+    with type key = c_guard_parameter
+     and type value = guard_name =
+  Dictionary.Dictionary_of_Ord (Guard_name)
 
 module Dictionary_of_sites :
   Dictionary.Dictionary with type key = c_site_name and type value = site =
@@ -812,8 +904,35 @@ type c_port = {
   c_site_interval: c_state interval;
 }
 
+let pp_print_site_or_guard_p state site =
+  Format.pp_print_string state
+    (match site with
+    | Site s -> "Site " ^ Int.to_string s
+    | Guard_p g -> "Guard_p " ^ Int.to_string g)
+
+module SiteOrGuard_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+  type t = c_site_or_guard_p
+
+  let compare = compare
+  let print = pp_print_site_or_guard_p
+end))
+
 module Site_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   type t = c_site_name
+
+  let compare = compare
+  let print = Format.pp_print_int
+end))
+
+module GuardP_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+  type t = c_guard_parameter
+
+  let compare = compare
+  let print = Format.pp_print_int
+end))
+
+module MvbduVar_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+  type t = c_mvbdu_var
 
   let compare = compare
   let print = Format.pp_print_int
@@ -908,12 +1027,15 @@ let next_rule_id = succ
 let next_agent_id = succ
 let next_agent_name = succ
 let next_site_name = succ
+let next_guard_p_name = succ
+let next_mvbdu_var_name = succ
 let next_state_index = succ
 let compare_rule_id = compare
 let compare_agent_id = compare
 let compare_site_name = compare
 let compare_state_index = compare
 let compare_agent_name = compare
+let compare_guard_parameter = compare
 
 let compare_state_index_option_min a b =
   match a, b with
@@ -932,6 +1054,7 @@ let compare_state_index_option_max a b =
 let compare_unit_agent_site _ _ = 0
 let compare_unit _ _ = 0
 let compare_unit_agent_name _ _ = dummy_agent_name
+let compare_unit_guard_parameter _ _ = dummy_guard_parameter
 let compare_unit_site_name _ _ = dummy_site_name
 let compare_unit_state_index _ _ = dummy_state_index
 
@@ -944,6 +1067,13 @@ let array_of_list_rule_id create set parameters error list =
     | t :: q -> aux q (next_rule_id k) (set parameters (fst a) k t (snd a))
   in
   aux list dummy_rule_id a
+
+let to_site_list site_or_guard_list =
+  List.filter_map
+    (function
+      | Site s -> Some s
+      | Guard_p _ -> None)
+    site_or_guard_list
 
 (***************************************************************************)
 (*MODULE*)
@@ -971,6 +1101,12 @@ module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
      and type dimension = int * int =
   Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif
 
+module Agent_type_mvbdu_var_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
+  Int_storage.Storage
+    with type key = c_agent_name * c_mvbdu_var
+     and type dimension = int * int =
+  Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+
 module Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
   Int_storage.Storage
     with type key = c_agent_name * c_site_name
@@ -992,6 +1128,11 @@ module Site_type_nearly_Inf_Int_storage_Imperatif :
 module Site_type_quick_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_site_name and type dimension = int =
   Int_storage.Quick_key_list (Site_type_nearly_Inf_Int_storage_Imperatif)
+
+(*guard parameters or site: the first n indexes are the guards, and the remaining are the sites*)
+module Mvbdu_var_nearly_Inf_Int_storage_Imperatif :
+  Int_storage.Storage with type key = c_mvbdu_var and type dimension = int =
+  Int_storage.Nearly_inf_Imperatif
 
 (*state*)
 module State_index_nearly_Inf_Int_storage_Imperatif :
@@ -1132,6 +1273,13 @@ module AgentSite_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   let print = Pp.pair Format.pp_print_int Format.pp_print_int
 end))
 
+module AgentSiteOrGuard_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+  type t = c_agent_name * c_site_or_guard_p
+
+  let compare = compare
+  let print = Pp.pair Format.pp_print_int pp_print_site_or_guard_p
+end))
+
 module Agents_map_and_set = Map_wrapper.Make (SetMap.Make (struct
   type t = c_agent_id * c_agent_name
 
@@ -1214,7 +1362,7 @@ end))
 
 module Views_bdu :
   Mvbdu_wrapper.Mvbdu
-    with type key = c_site_name
+    with type key = c_mvbdu_var
      and type value = c_state
     with type mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu =
   Mvbdu_wrapper.Mvbdu
@@ -1232,3 +1380,94 @@ let empty_side_effects =
     not_seen_yet = AgentsSiteState_map_and_set.Map.empty;
     seen = AgentSiteState_map_and_set.Set.empty;
   }
+
+(*****************************************************************************)
+(*MVBDU OF THE GUARDS*)
+(*****************************************************************************)
+
+(* bdu operations that restrict the values of the guard parameters to 0 and 1*)
+
+(** Returns the disjunction of the two mvbdus but the values of each variable are restricted to the values 0 and 1.
+Used for the boolean guard parameters. *)
+let mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
+    bdu_restriction =
+  let error, handler_bdu, or_bdu =
+    Views_bdu.mvbdu_or parameters handler_bdu error mvbdu1 mvbdu2
+  in
+  (*all guard parameters must have value 0 or 1*)
+  Views_bdu.mvbdu_and parameters handler_bdu error or_bdu bdu_restriction
+
+let mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2 =
+  Views_bdu.mvbdu_and parameters handler_bdu error mvbdu1 mvbdu2
+
+let mvbdu_not_for_guards parameters handler_bdu error mvbdu bdu_restriction =
+  let error, handler_bdu, not_bdu =
+    Views_bdu.mvbdu_not parameters handler_bdu error mvbdu
+  in
+  (*all guard parameters must have value 0 or 1*)
+  Views_bdu.mvbdu_and parameters handler_bdu error not_bdu bdu_restriction
+
+let mvbdu_is_true_for_guards parameters handler_bdu error mvbdu bdu_restriction
+    =
+  let error, handler_bdu, inter_mvbdu =
+    Views_bdu.mvbdu_and parameters handler_bdu error mvbdu bdu_restriction
+  in
+  error, handler_bdu, Views_bdu.equal inter_mvbdu bdu_restriction
+
+let mvbdu_is_false_for_guards parameters handler_bdu error mvbdu =
+  let error, handler_bdu, mvbdu_false =
+    Views_bdu.mvbdu_false parameters handler_bdu error
+  in
+  error, handler_bdu, Views_bdu.equal mvbdu mvbdu_false
+
+(**Returns the bdu representation of the guard, and a bdu that maps each guard parameter of the guard to 1 or 0.
+This second bdu is used to restrict the bdus that are calculated by using "or" and "not"
+to valid bdus where the values of the guards can only be 0 and 1. *)
+let guard_to_bdu parameters error handler_bdu guard bdu_restriction nsites =
+  let rec aux error handler_bdu guard =
+    match guard with
+    | Logical_formulae.True -> Views_bdu.mvbdu_true parameters handler_bdu error
+    | Logical_formulae.False ->
+      Views_bdu.mvbdu_false parameters handler_bdu error
+    | Logical_formulae.P (a, _) ->
+      let error, handler_bdu, association_list =
+        Views_bdu.build_association_list parameters handler_bdu error
+          [ mvbdu_var_of_guard a nsites, dummy_state_index_true ]
+      in
+      Views_bdu.mvbdu_of_hconsed_asso parameters handler_bdu error
+        association_list
+    | Logical_formulae.NOT g1 ->
+      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
+      mvbdu_not_for_guards parameters handler_bdu error mvbdu1 bdu_restriction
+    | Logical_formulae.AND (g1, g2) ->
+      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
+      let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
+      mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2
+    | Logical_formulae.OR (g1, g2) ->
+      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
+      let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
+      let error, handler, result =
+        mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
+          bdu_restriction
+      in
+      error, handler, result
+    | Logical_formulae.IMPLY (g1, g2) ->
+      let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
+      let error, handler_bdu, not_mvbdu1 =
+        mvbdu_not_for_guards parameters handler_bdu error mvbdu1 bdu_restriction
+      in
+      let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
+      let error, handler, result =
+        mvbdu_or_for_guards parameters handler_bdu error not_mvbdu1 mvbdu2
+          bdu_restriction
+      in
+      error, handler, result
+  in
+  aux error handler_bdu guard
+
+let guard_to_bdu_opt parameters error handler_bdu guard bdu_restriction nsites =
+  match guard with
+  | None -> Views_bdu.mvbdu_true parameters handler_bdu error
+  | Some g -> guard_to_bdu parameters error handler_bdu g bdu_restriction nsites
+
+(*****************************************************************************)

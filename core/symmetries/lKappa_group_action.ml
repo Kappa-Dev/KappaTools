@@ -507,7 +507,7 @@ let check_orbit ~trace ~fmt ~fmt_err ~env
           LKappa.print_rule ~noCounters:true ~full:true sigs counters_info
             (fun _ _ -> ())
             (fun _ _ -> ())
-            fmt rule
+            fmt None rule
         in
         let () = Format.pp_print_newline fmt () in
         ())
@@ -525,7 +525,7 @@ let check_orbit ~trace ~fmt ~fmt_err ~env
             LKappa.print_rule ~noCounters:true ~full:true sigs counters_info
               (fun _ _ -> ())
               (fun _ _ -> ())
-              fmt rule
+              fmt None rule
           in
           let () = Format.pp_print_newline fmt () in
           ())

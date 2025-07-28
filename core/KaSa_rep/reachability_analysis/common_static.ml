@@ -157,6 +157,7 @@ type common_views = {
 let empty_rule = Ckappa_sig.Rule_map_and_set.Map.empty
 let empty_site = Ckappa_sig.Site_map_and_set.Map.empty
 let empty_agentsite = Ckappa_sig.AgentSite_map_and_set.Map.empty
+let empty_agentsiteorguard = Ckappa_sig.AgentSiteOrGuard_map_and_set.Map.empty
 let empty_agentrule = Ckappa_sig.AgentRule_map_and_set.Map.empty
 
 let init_modification_views =
@@ -1092,6 +1093,44 @@ let scan_rule_set parameter error kappa_handler compil =
       store_result with
       store_potential_side_effects_per_rule = potential_side_effects_per_rule;
     } )
+
+(******************************************************************)
+
+let compute_restriction_mvbdu parameters error mvbdu_handler nr_guard_parameters
+    nsites =
+  let guard_p_list =
+    Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
+  in
+  let pair_list =
+    List.map
+      (fun guard ->
+        ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
+          ( Some Ckappa_sig.dummy_state_index_false,
+            Some Ckappa_sig.dummy_state_index_true ) ))
+      guard_p_list
+  in
+  Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters mvbdu_handler error
+    pair_list
+
+let collect_guard_mvbdus parameters error mvbdu_handler compilation
+    bdu_restriction nsites =
+  let error, (mvbdu_handler, guard_mvbdus) =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+      (fun parameters error rule_id rule (mvbdu_handler, guard_mvbdus) ->
+        match rule.Cckappa_sig.e_rule_c_rule.guard with
+        | None -> error, (mvbdu_handler, guard_mvbdus)
+        | Some guard ->
+          let error, mvbdu_handler, bdu =
+            Ckappa_sig.guard_to_bdu parameters error mvbdu_handler guard
+              bdu_restriction nsites
+          in
+          ( error,
+            ( mvbdu_handler,
+              Ckappa_sig.Rule_setmap.Map.add rule_id bdu guard_mvbdus ) ))
+      compilation.Cckappa_sig.rules
+      (mvbdu_handler, Ckappa_sig.Rule_setmap.Map.empty)
+  in
+  error, mvbdu_handler, guard_mvbdus
 
 (******************************************************************)
 (******************************************************************)

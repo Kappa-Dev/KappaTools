@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSa example_site_across_bonds.ka --output-directory output --debugging-mode -syntax 4 || exit 0

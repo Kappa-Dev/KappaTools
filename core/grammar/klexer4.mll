@@ -90,6 +90,10 @@ rule token = parse
     | "obs" -> OBS
     | "def" -> CONFIG
     | "token" -> TOKEN
+    | "guard_param" -> GUARD_PARAM
+    | "working_set" -> WORKING_SET
+    | "conflict" -> CONFLICT
+    | "sequential_bond" -> SEQUENTIAL_BOND
     | _ as s -> raise (ExceptionDefn.Syntax_Error
       ("Unknown directive: "^s,
        Loc.of_pos (Lexing.lexeme_start_p lexbuf)
@@ -144,6 +148,7 @@ rule token = parse
        Loc.of_pos (Lexing.lexeme_start_p lexbuf)
          (Lexing.lexeme_end_p lexbuf)))
     }
+  | "#[" { SHARP_OP_BRA }
   | eof { lexbuf.Lexing.lex_eof_reached <- true; EOF }
   | _ as c { raise (ExceptionDefn.Syntax_Error
       ("Unknown character: "^String.make 1 c,

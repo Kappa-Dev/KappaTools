@@ -289,19 +289,19 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 	Views in initial state:
 
 Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=23
+Influence_map:Id=25
 Influence_map: Node(site_type:1<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=22
+Influence_map:  Id=24
 Influence_map:   Node(site_type:1<1)
-Influence_map:    Id=21
+Influence_map:    Id=23
 Influence_map:     Node(site_type:2<0)
 Influence_map:      Id=0
 Influence_map:       Leaf False 
 
-Influence_map:      Id=20
+Influence_map:      Id=22
 Influence_map:       Node(site_type:2<1)
 Influence_map:        Id=13
 Influence_map:         Node(site_type:3<0)
@@ -363,19 +363,19 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(x{},z{},w{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=25
+Influence_map:Id=31
 Influence_map: Node(site_type:1<1)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=24
+Influence_map:  Id=30
 Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=21
+Influence_map:    Id=23
 Influence_map:     Node(site_type:2<0)
 Influence_map:      Id=0
 Influence_map:       Leaf False 
 
-Influence_map:      Id=20
+Influence_map:      Id=22
 Influence_map:       Node(site_type:2<1)
 Influence_map:        Id=13
 Influence_map:         Node(site_type:3<0)
@@ -470,12 +470,12 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(x{},y{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=29
+Influence_map:Id=39
 Influence_map: Node(site_type:1<1)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=28
+Influence_map:  Id=38
 Influence_map:   Node(site_type:1<2)
 Influence_map:    Id=11
 Influence_map:     Node(site_type:2<1)
@@ -505,12 +505,12 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(x{},z{},w{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=35
+Influence_map:Id=47
 Influence_map: Node(site_type:1<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=34
+Influence_map:  Id=46
 Influence_map:   Node(site_type:1<2)
 Influence_map:    Id=15
 Influence_map:     Node(site_type:2<1)
@@ -546,12 +546,12 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(y{},z{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=29
+Influence_map:Id=39
 Influence_map: Node(site_type:1<1)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=28
+Influence_map:  Id=38
 Influence_map:   Node(site_type:1<2)
 Influence_map:    Id=11
 Influence_map:     Node(site_type:2<1)
@@ -583,26 +583,26 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(x{},z{},w{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=44
+Influence_map:Id=58
 Influence_map: Node(site_type:1<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=43
+Influence_map:  Id=57
 Influence_map:   Node(site_type:1<1)
-Influence_map:    Id=42
+Influence_map:    Id=56
 Influence_map:     Node(site_type:2<1)
 Influence_map:      Id=0
 Influence_map:       Leaf False 
 
-Influence_map:      Id=41
+Influence_map:      Id=55
 Influence_map:       Node(site_type:2<2)
-Influence_map:        Id=40
+Influence_map:        Id=54
 Influence_map:         Node(site_type:3<1)
 Influence_map:          Id=0
 Influence_map:           Leaf False 
 
-Influence_map:          Id=39
+Influence_map:          Id=53
 Influence_map:           Node(site_type:3<2)
 Influence_map:            Id=1
 Influence_map:             Leaf True 
@@ -634,12 +634,12 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(y{},z{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=54
+Influence_map:Id=70
 Influence_map: Node(site_type:1<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=53
+Influence_map:  Id=69
 Influence_map:   Node(site_type:1<1)
 Influence_map:    Id=11
 Influence_map:     Node(site_type:2<1)
@@ -669,26 +669,26 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(x{},z{},w{})
 
 Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=61
+Influence_map:Id=77
 Influence_map: Node(site_type:1<1)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=60
+Influence_map:  Id=76
 Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=42
+Influence_map:    Id=56
 Influence_map:     Node(site_type:2<1)
 Influence_map:      Id=0
 Influence_map:       Leaf False 
 
-Influence_map:      Id=41
+Influence_map:      Id=55
 Influence_map:       Node(site_type:2<2)
-Influence_map:        Id=40
+Influence_map:        Id=54
 Influence_map:         Node(site_type:3<1)
 Influence_map:          Id=0
 Influence_map:           Leaf False 
 
-Influence_map:          Id=39
+Influence_map:          Id=53
 Influence_map:           Node(site_type:3<2)
 Influence_map:            Id=1
 Influence_map:             Leaf True 
@@ -759,19 +759,19 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Influence_map:Id=59
+Influence_map:Id=75
 Influence_map: Node(site_type:1<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=57
+Influence_map:  Id=73
 Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=48
+Influence_map:    Id=62
 Influence_map:     Node(site_type:2<0)
 Influence_map:      Id=0
 Influence_map:       Leaf False 
 
-Influence_map:      Id=47
+Influence_map:      Id=61
 Influence_map:       Node(site_type:2<1)
 Influence_map:        Id=13
 Influence_map:         Node(site_type:3<0)
@@ -786,14 +786,14 @@ Influence_map:             Leaf True
 Influence_map:            Id=0
 Influence_map:             Leaf False 
 
-Influence_map:        Id=46
+Influence_map:        Id=60
 Influence_map:         Node(site_type:2<2)
-Influence_map:          Id=45
+Influence_map:          Id=59
 Influence_map:           Node(site_type:3<0)
 Influence_map:            Id=0
 Influence_map:             Leaf False 
 
-Influence_map:            Id=39
+Influence_map:            Id=53
 Influence_map:             Node(site_type:3<2)
 Influence_map:              Id=1
 Influence_map:               Leaf True 
@@ -808,14 +808,14 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 agent_type:0:A:cv_id:1
-Influence_map:Id=52
+Influence_map:Id=68
 Influence_map: Node(site_type:1<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=31
+Influence_map:  Id=41
 Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=30
+Influence_map:    Id=40
 Influence_map:     Node(site_type:2<0)
 Influence_map:      Id=0
 Influence_map:       Leaf False 
@@ -832,12 +832,12 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 agent_type:0:A:cv_id:2
-Influence_map:Id=33
+Influence_map:Id=43
 Influence_map: Node(site_type:1<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=32
+Influence_map:  Id=42
 Influence_map:   Node(site_type:1<1)
 Influence_map:    Id=7
 Influence_map:     Node(site_type:2<0)
@@ -852,9 +852,9 @@ Influence_map:         Leaf True
 Influence_map:        Id=0
 Influence_map:         Leaf False 
 
-Influence_map:    Id=31
+Influence_map:    Id=41
 Influence_map:     Node(site_type:1<2)
-Influence_map:      Id=30
+Influence_map:      Id=40
 Influence_map:       Node(site_type:2<0)
 Influence_map:        Id=0
 Influence_map:         Leaf False 
@@ -875,37 +875,7 @@ Influence_map:       Leaf False
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=65
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=4
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=67
-Influence_map: Node(site_type:0<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=66
-Influence_map:   Node(site_type:0<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=30
+Influence_map:Id=40
 Influence_map: Node(site_type:2<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
@@ -920,13 +890,43 @@ Influence_map:     Leaf False
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=45
+Influence_map:Id=83
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=4
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=59
 Influence_map: Node(site_type:3<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=39
+Influence_map:  Id=53
 Influence_map:   Node(site_type:3<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=21
+Influence_map: Node(site_type:0<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=20
+Influence_map:   Node(site_type:0<2)
 Influence_map:    Id=1
 Influence_map:     Leaf True 
 
@@ -943,37 +943,7 @@ A(z) => [ A(z{u}) v A(z{p}) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=65
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=4
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=67
-Influence_map: Node(site_type:0<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=66
-Influence_map:   Node(site_type:0<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=30
+Influence_map:Id=40
 Influence_map: Node(site_type:2<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
@@ -988,12 +958,27 @@ Influence_map:     Leaf False
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=48
+Influence_map:Id=83
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=4
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=62
 Influence_map: Node(site_type:2<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=47
+Influence_map:  Id=61
 Influence_map:   Node(site_type:2<1)
 Influence_map:    Id=13
 Influence_map:     Node(site_type:3<0)
@@ -1008,14 +993,14 @@ Influence_map:         Leaf True
 Influence_map:        Id=0
 Influence_map:         Leaf False 
 
-Influence_map:    Id=46
+Influence_map:    Id=60
 Influence_map:     Node(site_type:2<2)
-Influence_map:      Id=45
+Influence_map:      Id=59
 Influence_map:       Node(site_type:3<0)
 Influence_map:        Id=0
 Influence_map:         Leaf False 
 
-Influence_map:        Id=39
+Influence_map:        Id=53
 Influence_map:         Node(site_type:3<2)
 Influence_map:          Id=1
 Influence_map:           Leaf True 
@@ -1028,12 +1013,27 @@ Influence_map:       Leaf False
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=71
+Influence_map:Id=21
 Influence_map: Node(site_type:0<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=70
+Influence_map:  Id=20
+Influence_map:   Node(site_type:0<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=87
+Influence_map: Node(site_type:0<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=86
 Influence_map:   Node(site_type:0<1)
 Influence_map:    Id=3
 Influence_map:     Node(site_type:1<0)
@@ -1048,9 +1048,9 @@ Influence_map:         Leaf True
 Influence_map:        Id=0
 Influence_map:         Leaf False 
 
-Influence_map:    Id=69
+Influence_map:    Id=85
 Influence_map:     Node(site_type:0<2)
-Influence_map:      Id=65
+Influence_map:      Id=83
 Influence_map:       Node(site_type:1<0)
 Influence_map:        Id=0
 Influence_map:         Leaf False 
@@ -1079,37 +1079,7 @@ A(y{p}) => A(x{p},y{p})
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=65
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=4
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=67
-Influence_map: Node(site_type:0<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=66
-Influence_map:   Node(site_type:0<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=30
+Influence_map:Id=40
 Influence_map: Node(site_type:2<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
@@ -1124,12 +1094,27 @@ Influence_map:     Leaf False
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=45
+Influence_map:Id=83
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=4
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=59
 Influence_map: Node(site_type:3<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=39
+Influence_map:  Id=53
 Influence_map:   Node(site_type:3<2)
 Influence_map:    Id=1
 Influence_map:     Leaf True 
@@ -1139,27 +1124,12 @@ Influence_map:     Leaf False
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=65
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=4
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=67
+Influence_map:Id=21
 Influence_map: Node(site_type:0<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=66
+Influence_map:  Id=20
 Influence_map:   Node(site_type:0<2)
 Influence_map:    Id=1
 Influence_map:     Leaf True 
@@ -1169,7 +1139,7 @@ Influence_map:     Leaf False
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=30
+Influence_map:Id=40
 Influence_map: Node(site_type:2<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
@@ -1184,12 +1154,27 @@ Influence_map:     Leaf False
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=48
+Influence_map:Id=83
+Influence_map: Node(site_type:1<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=4
+Influence_map:   Node(site_type:1<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=62
 Influence_map: Node(site_type:2<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=47
+Influence_map:  Id=61
 Influence_map:   Node(site_type:2<1)
 Influence_map:    Id=13
 Influence_map:     Node(site_type:3<0)
@@ -1204,14 +1189,14 @@ Influence_map:         Leaf True
 Influence_map:        Id=0
 Influence_map:         Leaf False 
 
-Influence_map:    Id=46
+Influence_map:    Id=60
 Influence_map:     Node(site_type:2<2)
-Influence_map:      Id=45
+Influence_map:      Id=59
 Influence_map:       Node(site_type:3<0)
 Influence_map:        Id=0
 Influence_map:         Leaf False 
 
-Influence_map:        Id=39
+Influence_map:        Id=53
 Influence_map:         Node(site_type:3<2)
 Influence_map:          Id=1
 Influence_map:           Leaf True 
@@ -1224,12 +1209,27 @@ Influence_map:       Leaf False
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Influence_map:Id=71
+Influence_map:Id=21
 Influence_map: Node(site_type:0<0)
 Influence_map:  Id=0
 Influence_map:   Leaf False 
 
-Influence_map:  Id=70
+Influence_map:  Id=20
+Influence_map:   Node(site_type:0<2)
+Influence_map:    Id=1
+Influence_map:     Leaf True 
+
+Influence_map:    Id=0
+Influence_map:     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Influence_map:Id=87
+Influence_map: Node(site_type:0<0)
+Influence_map:  Id=0
+Influence_map:   Leaf False 
+
+Influence_map:  Id=86
 Influence_map:   Node(site_type:0<1)
 Influence_map:    Id=3
 Influence_map:     Node(site_type:1<0)
@@ -1244,9 +1244,9 @@ Influence_map:         Leaf True
 Influence_map:        Id=0
 Influence_map:         Leaf False 
 
-Influence_map:    Id=69
+Influence_map:    Id=85
 Influence_map:     Node(site_type:0<2)
-Influence_map:      Id=65
+Influence_map:      Id=83
 Influence_map:       Node(site_type:1<0)
 Influence_map:        Id=0
 Influence_map:         Leaf False 

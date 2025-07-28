@@ -64,7 +64,8 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
              ast_compiled_data.agents_sig ast_compiled_data.counters_info
              ast_compiled_data.contact_map
              ast_compiled_data.token_names.NamedDecls.finder
-             ast_compiled_data.alg_vars_finder compil.Ast.init),
+             ast_compiled_data.alg_vars_finder compil.Ast.init
+             compil.Ast.guard_param_values),
         conf.Configuration.initial )
   in
   {
@@ -193,7 +194,7 @@ let get_pack_from_marshalizedfile ~warning kasim_args cli_args marshalized_file
           compilation_result.counters_info compilation_result.contact_map
           (Model.tokens_finder compilation_result.env)
           (Model.algs_finder compilation_result.env)
-          compil.Ast.init
+          compil.Ast.init compil.Ast.guard_param_values
       in
       let init_l =
         Eval.compile_inits ~debug_mode:!Parameter.debug_modeOn ~warning

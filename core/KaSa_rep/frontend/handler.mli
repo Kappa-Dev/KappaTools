@@ -195,6 +195,25 @@ val is_binding_site :
   Ckappa_sig.c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught * bool
 
+(*************************************************************)
+val print_guard_mvbdu :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+
+val print_guard_option :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.Views_bdu.mvbdu option ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+
 val print_labels :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -210,6 +229,16 @@ val string_of_site :
   ?add_parentheses:bool ->
   Quark_type.agent_quark ->
   Ckappa_sig.c_site_name ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * string
+
+val string_of_site_or_guard :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  ?state:Ckappa_sig.c_state ->
+  ?add_parentheses:bool ->
+  Quark_type.agent_quark ->
+  Ckappa_sig.c_site_or_guard_p ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
 val string_of_site_in_file_name :
@@ -239,12 +268,23 @@ val string_of_site_contact_map :
   Ckappa_sig.c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
-val string_of_site_in_natural_language :
+val string_of_site_or_guard_contact_map :
+  ?ml_pos:(string * int * int * int) option ->
+  ?ka_pos:Loc.t option ->
+  ?message:string ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   Quark_type.agent_quark ->
-  Ckappa_sig.c_site_name ->
+  Ckappa_sig.c_mvbdu_var ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * string
+
+val string_of_site_or_guard_in_natural_language :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Quark_type.agent_quark ->
+  Ckappa_sig.c_mvbdu_var ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
 val string_of_state :
@@ -262,6 +302,15 @@ val string_of_state_fully_deciphered :
   Cckappa_sig.kappa_handler ->
   Quark_type.agent_quark ->
   Ckappa_sig.c_site_name ->
+  Ckappa_sig.c_state ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * string
+
+val string_of_state_fully_deciphered_with_guard :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.c_agent_name ->
+  Ckappa_sig.c_mvbdu_var ->
   Ckappa_sig.c_state ->
   Exception_without_parameter.exceptions_caught_and_uncaught * string
 
@@ -347,6 +396,7 @@ val info_of_rule :
     * Loc.t
     * Public_data.rule_direction
     * string
+    * string LKappa.guard option
     * Ckappa_sig.c_rule_id)
 
 val has_no_label :
@@ -431,3 +481,31 @@ val nrules :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   int
+
+val get_nsites : Cckappa_sig.kappa_handler -> Ckappa_sig.c_site_name
+
+val get_nr_guard_parameters :
+  Cckappa_sig.kappa_handler -> Ckappa_sig.c_guard_parameter
+
+val mvbdu_to_string_formula :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+  * string Logical_formulae.formula
+
+val mvbdu_to_string_formula_option :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_sig.Views_bdu.handler ->
+  Ckappa_sig.Views_bdu.mvbdu option ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.Views_bdu.handler
+  * string Logical_formulae.formula option
+
+val print_formula :
+  Remanent_parameters_sig.parameters -> string Logical_formulae.formula -> unit

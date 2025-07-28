@@ -1,0 +1,455 @@
+Kappa Static Analyzer (v4.1.3.1-175-g514ee1742) (without Tk interface)
+Analysis launched at 2025/04/30 12:52:35 (GMT+2) on MP983-PRO
+Parsing temp_experiment.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule Ste7p -> u (File "temp_experiment.ka", lines 733-735, characters 0-53:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7pp -> p (File "temp_experiment.ka", lines 730-732, characters 0-54:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11p -> u (File "temp_experiment.ka", lines 722-724, characters 0-62:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11pp -> p (File "temp_experiment.ka", lines 719-721, characters 0-62:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11ppp -> pp (File "temp_experiment.ka", lines 716-718, characters 0-63:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule -Ste7 (File "temp_experiment.ka", line 706, characters 0-61:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7pp...Ste5 (File "temp_experiment.ka", lines 703-705, characters 0-98:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule +Ste12 (File "temp_experiment.ka", lines 698-700, characters 0-108:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule +Dig2 Ref1 (File "temp_experiment.ka", lines 688-690, characters 0-109:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Dig2@activation_u (File "temp_experiment.ka", lines 677-678, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Dig1@activation_u (File "temp_experiment.ka", lines 675-676, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Dig2@activation_p (File "temp_experiment.ka", lines 670-672, characters 0-75:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Dig2-Refinement (4) (File "temp_experiment.ka", lines 667-669, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Dig2-Refinement (2) (File "temp_experiment.ka", lines 660-662, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Dig2@activation_p (File "temp_experiment.ka", lines 651-653, characters 0-75:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Dig2-Refinement (4) (File "temp_experiment.ka", lines 648-650, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Dig2-Refinement (3) (File "temp_experiment.ka", lines 644-646, characters 0-59:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Dig1@activation_p (File "temp_experiment.ka", lines 632-634, characters 0-75:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Dig1-Refinement (4) (File "temp_experiment.ka", lines 628-630, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Dig1-Refinement (2) (File "temp_experiment.ka", lines 622-624, characters 0-59:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Dig1@activation_p (File "temp_experiment.ka", lines 612-614, characters 0-75:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Dig1-Refinement (4) (File "temp_experiment.ka", lines 609-611, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Dig1-Refinement (3) (File "temp_experiment.ka", lines 606-608, characters 0-59:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Ste12 Ref8 (File "temp_experiment.ka", lines 591-593, characters 0-81:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Ste12 Ref7 (File "temp_experiment.ka", lines 588-590, characters 0-83:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Ste12 Ref4 (File "temp_experiment.ka", lines 578-580, characters 0-68:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Ste12 Ref3 (File "temp_experiment.ka", lines 575-577, characters 0-67:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Ste12 Ref2 (File "temp_experiment.ka", lines 572-574, characters 0-67:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1...Ste12 Ref1 (File "temp_experiment.ka", lines 569-571, characters 0-67:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Ste12 Ref8 (File "temp_experiment.ka", lines 563-565, characters 0-81:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Ste12 Ref7 (File "temp_experiment.ka", lines 560-562, characters 0-81:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Ste12 Ref4 (File "temp_experiment.ka", lines 551-553, characters 0-65:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Ste12 Ref3 (File "temp_experiment.ka", lines 547-549, characters 0-65:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Ste12 Ref2 (File "temp_experiment.ka", lines 544-546, characters 0-65:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3...Ste12 Ref1 (File "temp_experiment.ka", lines 541-543, characters 0-64:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Dig2...Ste12 Ref2 (File "temp_experiment.ka", lines 536-538, characters 0-75:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Dig2...Ste12 Ref1 (File "temp_experiment.ka", lines 532-534, characters 0-61:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Dig1...Ste12 Ref4 (File "temp_experiment.ka", lines 527-529, characters 0-86:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Dig1...Ste12 Ref3 (File "temp_experiment.ka", lines 524-526, characters 0-68:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Dig1...Ste12 Ref2 (File "temp_experiment.ka", lines 521-523, characters 0-83:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Dig1...Ste12 Ref1 (File "temp_experiment.ka", lines 517-519, characters 0-69:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Dig1.Ste12 (File "temp_experiment.ka", lines 515-516, characters 0-75:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule +Msg5 Ref1 (File "temp_experiment.ka", lines 510-512, characters 0-83:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule +Fus3 Ref1 (File "temp_experiment.ka", lines 498-500, characters 0-103:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Msg5...Kss1@T183_u (File "temp_experiment.ka", lines 459-461, characters 0-47:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Msg5...Kss1 Ref4 (File "temp_experiment.ka", lines 456-458, characters 0-58:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Msg5...Kss1 Ref3 (File "temp_experiment.ka", lines 453-455, characters 0-58:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Msg5...Fus3@T180_u (File "temp_experiment.ka", lines 437-439, characters 0-47:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Msg5...Fus3 Ref4 (File "temp_experiment.ka", lines 434-436, characters 0-55:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Msg5...Fus3 Ref3 (File "temp_experiment.ka", lines 430-432, characters 0-55:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1@T183_u (File "temp_experiment.ka", line 419, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3@T180_u (File "temp_experiment.ka", line 417, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule deph Ste7_u (File "temp_experiment.ka", line 414, characters 0-70:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule deph Ste7_p (File "temp_experiment.ka", line 413, characters 0-71:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule -Ste11 (File "temp_experiment.ka", line 411, characters 0-48:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11@degradation_p...Fus3 (File "temp_experiment.ka", lines 408-410, characters 0-76:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11...Kss1 Ref4 (File "temp_experiment.ka", lines 405-407, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11...Kss1 Ref2 (File "temp_experiment.ka", lines 399-401, characters 0-59:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11@degradation_p...Kss1 (File "temp_experiment.ka", lines 389-391, characters 0-76:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11...Fus3 Ref4 (File "temp_experiment.ka", lines 386-388, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11...Fus3 Ref2 (File "temp_experiment.ka", lines 379-381, characters 0-59:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11@degradation_u (File "temp_experiment.ka", lines 371-372, characters 0-64:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule deph Ste11_u (File "temp_experiment.ka", lines 369-370, characters 0-70:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule deph Ste11_p (File "temp_experiment.ka", lines 366-367, characters 0-71:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule deph Ste11_pp (File "temp_experiment.ka", lines 364-365, characters 0-73:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1@Y185_p Ref2 (File "temp_experiment.ka", lines 350-352, characters 0-74:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1@Y185_p Ref1 (File "temp_experiment.ka", lines 347-349, characters 0-74:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1@T183_p Ref2 (File "temp_experiment.ka", lines 344-346, characters 0-74:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Kss1@T183_p Ref1 (File "temp_experiment.ka", lines 341-343, characters 0-74:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3@Y182_p Ref2 (File "temp_experiment.ka", lines 325-327, characters 0-96:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3@Y182_p Ref1 (File "temp_experiment.ka", lines 321-323, characters 0-96:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3@T180_p Ref2 (File "temp_experiment.ka", lines 318-320, characters 0-96:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Fus3@T180_p Ref1 (File "temp_experiment.ka", lines 315-317, characters 0-96:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_pp Ref6 (File "temp_experiment.ka", lines 307-309, characters 0-167:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_pp Ref5 (File "temp_experiment.ka", lines 304-306, characters 0-153:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_pp Ref4 (File "temp_experiment.ka", lines 301-303, characters 0-153:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_pp Ref3 (File "temp_experiment.ka", lines 298-300, characters 0-166:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_pp Ref2 (File "temp_experiment.ka", lines 295-297, characters 0-152:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_pp Ref1 (File "temp_experiment.ka", lines 291-293, characters 0-152:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_p Ref6 (File "temp_experiment.ka", lines 288-290, characters 0-166:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_p Ref5 (File "temp_experiment.ka", lines 285-287, characters 0-152:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_p Ref4 (File "temp_experiment.ka", lines 282-284, characters 0-154:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_p Ref3 (File "temp_experiment.ka", lines 279-281, characters 0-165:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_p Ref2 (File "temp_experiment.ka", lines 275-277, characters 0-151:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste7_p Ref1 (File "temp_experiment.ka", lines 272-274, characters 0-151:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11_ppp (File "temp_experiment.ka", lines 259-261, characters 0-110:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11_pp (File "temp_experiment.ka", lines 256-258, characters 0-107:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste11_p (File "temp_experiment.ka", lines 253-255, characters 0-106:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste5...Ste5 Ref3 (File "temp_experiment.ka", lines 244-246, characters 0-82:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste5...Ste5 Ref2 (File "temp_experiment.ka", lines 241-243, characters 0-68:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste5.Ste5 Ref3 (File "temp_experiment.ka", lines 235-237, characters 0-104:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste5.Ste5 Ref2 (File "temp_experiment.ka", lines 232-234, characters 0-91:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste4...Ste5 Ref2 (File "temp_experiment.ka", lines 225-227, characters 0-58:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste4...Ste5 Ref1 (File "temp_experiment.ka", lines 222-224, characters 0-43:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste4.Ste5 Ref3 (File "temp_experiment.ka", lines 219-221, characters 0-67:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste4.Ste5 Ref2 (File "temp_experiment.ka", lines 216-218, characters 0-99:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste4.Ste5 Ref1 (File "temp_experiment.ka", lines 212-214, characters 0-112:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste4...Ste20 (File "temp_experiment.ka", lines 210-211, characters 0-87:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Ste4.Ste20 (File "temp_experiment.ka", lines 208-209, characters 0-93:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule +Sst2 Ref1 (File "temp_experiment.ka", lines 203-205, characters 0-101:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule -Sst2 Ref2 (File "temp_experiment.ka", line 194, characters 0-45:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule +Ste4 (File "temp_experiment.ka", lines 190-192, characters 0-114:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule +Gpa1 (File "temp_experiment.ka", lines 177-179, characters 0-101:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule -Ste4 (File "temp_experiment.ka", line 168, characters 0-37:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule +Ste2 Ref1 (File "temp_experiment.ka", lines 163-165, characters 0-102:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule -PheromoneSte2 (File "temp_experiment.ka", line 155, characters 0-72:) could be applied if @rule-0.
+rule Sst2@S539_u (File "temp_experiment.ka", line 152, characters 0-60:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Sst2@S539_p...Kss1 (File "temp_experiment.ka", lines 149-151, characters 0-68:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Sst2...Kss1 Ref4 (File "temp_experiment.ka", lines 146-148, characters 0-67:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Sst2...Kss1 Ref2 (File "temp_experiment.ka", lines 139-141, characters 0-66:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Sst2@S539_p...Fus3 (File "temp_experiment.ka", lines 130-132, characters 0-68:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Sst2...Fus3 Ref4 (File "temp_experiment.ka", lines 127-129, characters 0-67:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Sst2...Fus3 Ref2 (File "temp_experiment.ka", lines 120-122, characters 0-66:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Gpa1@nuc_GDP Ref4 (File "temp_experiment.ka", lines 109-111, characters 0-80:) could be applied if @rule-0.and.@rule-2.and.@rule-9.and.@rule-10.
+rule Pheromone.Ste2 (File "temp_experiment.ka", lines 64-66, characters 0-66:) could be applied if @rule-0.
+rule Pheromone...Ste2 (File "temp_experiment.ka", lines 67-69, characters 0-31:) could be applied if @rule-0.and.@rule-1.
+rule Ste2.Gpa1 (File "temp_experiment.ka", lines 70-72, characters 0-40:) could be applied if @rule-2.
+rule Ste2...Gpa1 Ref1 (File "temp_experiment.ka", lines 73-75, characters 0-44:) could be applied if @rule-2.and.@rule-3.
+rule Ste2...Gpa1 Ref2 (File "temp_experiment.ka", lines 76-78, characters 0-58:) could be applied if @rule-2.and.@rule-4.
+rule Gpa1.Ste4 (File "temp_experiment.ka", lines 80-82, characters 0-71:) could be applied if @rule-0.and.@rule-2.and.@rule-5.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Gpa1.Ste4 Ref1 (File "temp_experiment.ka", lines 83-85, characters 0-74:) could be applied if @rule-0.and.@rule-2.and.@rule-6.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9).
+rule Gpa1...Ste4 Ref1 (File "temp_experiment.ka", lines 86-88, characters 0-55:) could be applied if @rule-0.and.@rule-2.and.@rule-7.and.@rule-9.
+rule Gpa1...Ste4 Ref2 (File "temp_experiment.ka", lines 89-91, characters 0-55:) could be applied if @rule-0.and.@rule-2.and.@rule-8.and.@rule-9.
+rule Gpa1@nuc_GTP (File "temp_experiment.ka", lines 92-94, characters 0-80:) could be applied if @rule-0.and.@rule-2.and.@rule-9.
+rule Sst2.Ste2 (File "temp_experiment.ka", lines 96-97, characters 0-72:) could be applied if @rule-10.
+rule Sst2...Ste2 (File "temp_experiment.ka", lines 98-99, characters 0-67:) could be applied if @rule-10.and.@rule-11.
+rule Gpa1@nuc_GDP Ref1 (File "temp_experiment.ka", lines 100-101, characters 0-64:) could be applied if @rule-0.and.@rule-2.and.@rule-9.and.@rule-12.
+rule Gpa1@nuc_GDP Ref2 (File "temp_experiment.ka", lines 102-104, characters 0-57:) could be applied if @rule-0.and.@rule-2.and.@rule-9.and.@rule-13.
+rule Gpa1@nuc_GDP Ref3 (File "temp_experiment.ka", lines 105-107, characters 0-80:) could be applied if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9.and.@rule-10.and.@rule-14)).and.((~@rule-7).or.(@rule-9.and.@rule-10.and.@rule-14)).
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties: 
+------------------------------------------------------------
+Dig1(activation{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Dig1(activation{u}) [ if .T. ] 
+
+Dig1(activation{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Dig1(activation{u}) [ if .T. ] 
+
+Dig1(mapk) => [ Dig1(mapk[.]) v Dig1(mapk[dock.Kss1]) v Dig1(mapk[dock.Fus3]) ]
+Dig1(ste12) => [ Dig1(ste12[.]) v Dig1(ste12[dig1.Ste12]) ]
+Dig2(activation{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Dig2(activation{u}) [ if .T. ] 
+
+Dig2(activation{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Dig2(activation{u}) [ if .T. ] 
+
+Dig2(mapk) => [ Dig2(mapk[.]) v Dig2(mapk[dock.Kss1]) v Dig2(mapk[dock.Fus3]) ]
+Dig2(ste12) => [ Dig2(ste12[.]) v Dig2(ste12[dig2.Ste12]) ]
+Dig2_gene(promoter) => [ Dig2_gene(promoter[.]) v Dig2_gene(promoter[dna.Ste12]) ]
+Fus3(T180{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Fus3(T180{u}) [ if .T. ] 
+
+Fus3(Y182) => [ Fus3(Y182{u}) v Fus3(Y182{p}) ]
+Fus3(dock) => [ Fus3(dock[.]) v Fus3(dock[mapk.Ste5]) v Fus3(dock[mapk.Ste7]) v Fus3(dock[mapk.Dig2]) v Fus3(dock[mapk.Dig1]) v Fus3(dock[mapk.Ste12]) v Fus3(dock[mapk.Ptp]) v Fus3(dock[mapk.Msg5]) v Fus3(dock[mapk.Ste11]) v Fus3(dock[mapk.Sst2]) ]
+Fus3_gene(promoter) => [ Fus3_gene(promoter[.]) v Fus3_gene(promoter[dna.Ste12]) ]
+Gpa1(nuc{GTP}) [ if @rule-0.and.@rule-2.and.@rule-9 ] 
+Gpa1(nuc{GDP}) [ if .T. ] 
+
+Gpa1(ste2[gpa1.Ste2]) [ if @rule-2 ] 
+Gpa1(ste2[.]) [ if .T. ] 
+
+Gpa1(ste4) => [ Gpa1(ste4[.]) v Gpa1(ste4[gpa1.Ste4]) ]
+Gpa1_gene(promoter) => [ Gpa1_gene(promoter[.]) v Gpa1_gene(promoter[dna.Ste12]) ]
+Kss1(T183{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Kss1(T183{u}) [ if .T. ] 
+
+Kss1(Y185) => [ Kss1(Y185{u}) v Kss1(Y185{p}) ]
+Kss1(dock) => [ Kss1(dock[.]) v Kss1(dock[mapk.Dig2]) v Kss1(dock[mapk.Dig1]) v Kss1(dock[mapk.Ste12]) v Kss1(dock[mapk.Ptp]) v Kss1(dock[mapk.Msg5]) v Kss1(dock[mapk.Ste11]) v Kss1(dock[mapk.Ste5]) v Kss1(dock[mapk.Ste7]) v Kss1(dock[mapk.Sst2]) ]
+Mekkp(ste11) => [ Mekkp(ste11[.]) v Mekkp(ste11[ste5.Ste11]) ]
+Mekp(ste7) => [ Mekp(ste7[.]) v Mekp(ste7[ste5.Ste7]) ]
+Msg5(mapk) => [ Msg5(mapk[.]) v Msg5(mapk[dock.Kss1]) v Msg5(mapk[dock.Fus3]) ]
+Msg5_gene(promoter) => [ Msg5_gene(promoter[.]) v Msg5_gene(promoter[dna.Ste12]) ]
+Pheromone(ste2[pheromone.Ste2]) [ if @rule-0 ] 
+Pheromone(ste2[.]) [ if .T. ] 
+
+Ptp(mapk) => [ Ptp(mapk[.]) v Ptp(mapk[dock.Kss1]) v Ptp(mapk[dock.Fus3]) ]
+Sst2(S539{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Sst2(S539{u}) [ if .T. ] 
+
+Sst2(S539{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Sst2(S539{u}) [ if .T. ] 
+
+Sst2(ste2[sst2.Ste2]) [ if @rule-10 ] 
+Sst2(ste2[.]) [ if .T. ] 
+
+Sst2(mapk) => [ Sst2(mapk[.]) v Sst2(mapk[dock.Kss1]) v Sst2(mapk[dock.Fus3]) ]
+Sst2_gene(promoter) => [ Sst2_gene(promoter[.]) v Sst2_gene(promoter[dna.Ste12]) ]
+Ste11(S302_S306_S307{ppp}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste11(S302_S306_S307{pp}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste11(S302_S306_S307{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste11(S302_S306_S307{u}) [ if .T. ] 
+
+Ste11(degradation{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste11(degradation{u}) [ if .T. ] 
+
+Ste11(degradation{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste11(degradation{u}) [ if .T. ] 
+
+Ste11(degradation{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste11(degradation{u}) [ if .T. ] 
+
+Ste11(S302_S306_S307{ppp}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste11(S302_S306_S307{pp}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste11(S302_S306_S307{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste11(S302_S306_S307{u}) [ if .T. ] 
+
+Ste11(mapk) => [ Ste11(mapk[.]) v Ste11(mapk[dock.Fus3]) v Ste11(mapk[dock.Kss1]) ]
+Ste11(ste5) => [ Ste11(ste5[.]) v Ste11(ste5[ste11.Mekkp]) v Ste11(ste5[ste11.Ste5]) ]
+Ste11(ste5) => [ Ste11(ste5[.]) v Ste11(ste5[ste11.Mekkp]) v Ste11(ste5[ste11.Ste5]) ]
+Ste12(dig1[ste12.Dig1]) [ if .T. ] 
+Ste12(dig1[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+
+Ste12(dig2) => [ Ste12(dig2[.]) v Ste12(dig2[ste12.Dig2]) ]
+Ste12(dna) => [ Ste12(dna[.]) v Ste12(dna[promoter.Ste12_gene]) v Ste12(dna[promoter.Dig2_gene]) v Ste12(dna[promoter.Msg5_gene]) v Ste12(dna[promoter.Fus3_gene]) v Ste12(dna[promoter.Sst2_gene]) v Ste12(dna[promoter.Ste4_gene]) v Ste12(dna[promoter.Gpa1_gene]) v Ste12(dna[promoter.Ste2_gene]) ]
+Ste12(mapk) => [ Ste12(mapk[.]) v Ste12(mapk[dock.Kss1]) v Ste12(mapk[dock.Fus3]) ]
+Ste12_gene(promoter) => [ Ste12_gene(promoter[.]) v Ste12_gene(promoter[dna.Ste12]) ]
+Ste2(pheromone[ste2.Pheromone]) [ if @rule-0 ] 
+Ste2(pheromone[.]) [ if .T. ] 
+
+Ste2(sst2[ste2.Sst2]) [ if @rule-10 ] 
+Ste2(sst2[.]) [ if .T. ] 
+
+Ste2(pheromone[ste2.Pheromone]) [ if @rule-0 ] 
+Ste2(pheromone[.]) [ if .T. ] 
+
+Ste2(gpa1[ste2.Gpa1]) [ if @rule-2 ] 
+Ste2(gpa1[.]) [ if .T. ] 
+
+Ste20(ste4[ste20.Ste4]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste20(ste4[.]) [ if .T. ] 
+
+Ste2_gene(promoter) => [ Ste2_gene(promoter[.]) v Ste2_gene(promoter[dna.Ste12]) ]
+Ste4(state{synth}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(state{reg}) [ if .T. ] 
+
+Ste4(gpa1[ste4.Gpa1]) [ if .T. ] 
+Ste4(gpa1[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+
+Ste4(ste5[ste4.Ste5]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(ste5[.]) [ if .T. ] 
+
+Ste4(ste20[ste4.Ste20]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(ste20[.]) [ if .T. ] 
+
+Ste4_gene(promoter) => [ Ste4_gene(promoter[.]) v Ste4_gene(promoter[dna.Ste12]) ]
+Ste5(ste4[ste5.Ste4]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(ste4[.]) [ if .T. ] 
+
+Ste5(T287) => [ Ste5(T287{u}) v Ste5(T287{p}) ]
+Ste5(T287) => [ Ste5(T287{u}) v Ste5(T287{p}) ]
+Ste5(loc) => [ Ste5(loc{n}) v Ste5(loc{c}) ]
+Ste5(loc) => [ Ste5(loc{n}) v Ste5(loc{c}) ]
+Ste5(mapk) => [ Ste5(mapk[.]) v Ste5(mapk[dock.Fus3]) v Ste5(mapk[dock.Kss1]) ]
+Ste5(mapk) => [ Ste5(mapk[.]) v Ste5(mapk[dock.Fus3]) v Ste5(mapk[dock.Kss1]) ]
+Ste5(ste11) => [ Ste5(ste11[.]) v Ste5(ste11[ste5.Ste11]) ]
+Ste5(ste5) => [ Ste5(ste5[.]) v Ste5(ste5[ste5.Ste5]) ]
+Ste5(ste7) => [ Ste5(ste7[.]) v Ste5(ste7[ste5.Ste7]) ]
+Ste5(ste7) => [ Ste5(ste7[.]) v Ste5(ste7[ste5.Ste7]) ]
+Ste7(S359_T363{pp}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste7(S359_T363{p}) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste7(S359_T363{u}) [ if .T. ] 
+
+Ste7(mapk) => [ Ste7(mapk[.]) v Ste7(mapk[dock.Fus3]) v Ste7(mapk[dock.Kss1]) ]
+Ste7(ste5) => [ Ste7(ste5[.]) v Ste7(ste5[ste7.Mekp]) v Ste7(ste5[ste7.Ste5]) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+
+
+
+
+
+
+Ste4(gpa1[.],state{synth},ste20[.],ste5[ste4.Ste5]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(gpa1[.],state{synth},ste20[ste4.Ste20],ste5[ste4.Ste5]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(gpa1[.],state{synth},ste20[.],ste5[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(gpa1[.],state{synth},ste20[ste4.Ste20],ste5[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(gpa1[ste4.Gpa1],state{synth},ste20[.],ste5[.]) [ if @rule-0.and.@rule-2.and.@rule-6.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(gpa1[.],state{reg},ste20[.],ste5[ste4.Ste5]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(gpa1[.],state{reg},ste20[ste4.Ste20],ste5[ste4.Ste5]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(gpa1[.],state{reg},ste20[.],ste5[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(gpa1[.],state{reg},ste20[ste4.Ste20],ste5[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(gpa1[ste4.Gpa1],state{reg},ste20[.],ste5[.]) [ if .T. ] 
+
+
+
+
+
+Ste5(loc{c},mapk[.],ste11[.],ste4[.],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[.],ste11[.],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[.],ste11[.],ste4[.],ste5[.],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[.],ste11[.],ste4[ste5.Ste4],ste5[.],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[.],ste11[ste5.Ste11],ste4[.],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[.],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[.],ste11[ste5.Ste11],ste4[.],ste5[.],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[.],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[.],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[.],ste11[.],ste4[.],ste5[ste5.Ste5],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[.],ste11[.],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[.],ste11[.],ste4[.],ste5[.],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[.],ste11[.],ste4[ste5.Ste4],ste5[.],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[.],ste11[ste5.Ste11],ste4[.],ste5[ste5.Ste5],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[.],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[.],ste11[ste5.Ste11],ste4[.],ste5[.],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[.],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[.],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[.],ste4[.],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[.],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[.],ste4[.],ste5[.],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[.],ste4[ste5.Ste4],ste5[.],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[ste5.Ste11],ste4[.],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[ste5.Ste11],ste4[.],ste5[.],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[.],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[.],ste4[.],ste5[ste5.Ste5],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[.],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[.],ste4[.],ste5[.],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[.],ste4[ste5.Ste4],ste5[.],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[ste5.Ste11],ste4[.],ste5[ste5.Ste5],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[ste5.Ste11],ste4[.],ste5[.],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Fus3],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[.],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[.],ste4[.],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[.],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[.],ste4[.],ste5[.],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[.],ste4[ste5.Ste4],ste5[.],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[ste5.Ste11],ste4[.],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[ste5.Ste11],ste4[.],ste5[.],ste7[ste5.Ste7]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[.],ste7[ste5.Ste7]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[.],ste4[.],ste5[ste5.Ste5],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[.],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[.],ste4[.],ste5[.],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[.],ste4[ste5.Ste4],ste5[.],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[ste5.Ste11],ste4[.],ste5[ste5.Ste5],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[ste5.Ste5],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[ste5.Ste11],ste4[.],ste5[.],ste7[.]) [ if .T. ] 
+Ste5(loc{c},mapk[dock.Kss1],ste11[ste5.Ste11],ste4[ste5.Ste4],ste5[.],ste7[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(loc{n},mapk[.],ste11[.],ste4[.],ste5[.],ste7[.]) [ if .T. ] 
+
+Ste5(ste7[ste5.Ste7]) => Ste5(loc{c},ste7[ste5.Ste7])
+
+Ste11(degradation{p},mapk[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste11(degradation{u},mapk[.]) [ if .T. ] 
+Ste11(degradation{u},mapk[dock.Fus3]) [ if .T. ] 
+Ste11(degradation{u},mapk[dock.Kss1]) [ if .T. ] 
+
+
+
+
+
+
+
+
+
+Dig1(activation{p},mapk[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Dig1(activation{u},mapk[.]) [ if .T. ] 
+Dig1(activation{u},mapk[dock.Kss1]) [ if .T. ] 
+Dig1(activation{u},mapk[dock.Fus3]) [ if .T. ] 
+
+
+Dig2(activation{p},mapk[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Dig2(activation{u},mapk[.]) [ if .T. ] 
+Dig2(activation{u},mapk[dock.Kss1]) [ if .T. ] 
+Dig2(activation{u},mapk[dock.Fus3]) [ if .T. ] 
+
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+
+
+Gpa1(nuc{GTP},ste4[1]),Ste4(gpa1[1],state{reg}) [ if @rule-0.and.@rule-2.and.@rule-9 ] 
+Gpa1(nuc{GTP},ste4[1]),Ste4(gpa1[1],state{synth}) [ if @rule-0.and.@rule-2.and.@rule-9 ] 
+Gpa1(nuc{GDP},ste4[1]),Ste4(gpa1[1],state{reg}) [ if .T. ] 
+Gpa1(nuc{GDP},ste4[1]),Ste4(gpa1[1],state{synth}) [ if @rule-0.and.@rule-2.and.(@rule-6.or.(@rule-9.and.(@rule-10.or.@rule-12.or.@rule-13))).and.((~@rule-6).or.((@rule-7.or.((@rule-8.or.(@rule-9.and.(@rule-10.or.@rule-12.or.@rule-13))).and.((~@rule-8).or.@rule-9))).and.((~@rule-7).or.@rule-9))) ] 
+
+
+Gpa1(nuc{GTP},ste4[1]),Ste4(gpa1[1],ste5[.]) [ if @rule-0.and.@rule-2.and.@rule-9 ] 
+Gpa1(nuc{GDP},ste4[1]),Ste4(gpa1[1],ste5[.]) [ if .T. ] 
+
+
+Gpa1(nuc{GTP},ste4[1]),Ste4(gpa1[1],ste20[.]) [ if @rule-0.and.@rule-2.and.@rule-9 ] 
+Gpa1(nuc{GDP},ste4[1]),Ste4(gpa1[1],ste20[.]) [ if .T. ] 
+
+
+Gpa1(ste2[gpa1.Ste2],ste4[1]),Ste4(gpa1[1],state{reg}) [ if @rule-2 ] 
+Gpa1(ste2[gpa1.Ste2],ste4[1]),Ste4(gpa1[1],state{synth}) [ if @rule-2 ] 
+Gpa1(ste2[.],ste4[1]),Ste4(gpa1[1],state{reg}) [ if .T. ] 
+Gpa1(ste2[.],ste4[1]),Ste4(gpa1[1],state{synth}) [ if @rule-2 ] 
+
+
+Gpa1(ste2[gpa1.Ste2],ste4[1]),Ste4(gpa1[1],ste5[.]) [ if @rule-2 ] 
+Gpa1(ste2[.],ste4[1]),Ste4(gpa1[1],ste5[.]) [ if .T. ] 
+
+
+Gpa1(ste2[gpa1.Ste2],ste4[1]),Ste4(gpa1[1],ste20[.]) [ if @rule-2 ] 
+Gpa1(ste2[.],ste4[1]),Ste4(gpa1[1],ste20[.]) [ if .T. ] 
+
+
+Gpa1(nuc{GTP},ste2[1]),Ste2(gpa1[1],pheromone[.]) [ if (@rule-0.or.@rule-2).and.((~@rule-0).or.@rule-1.or.@rule-2) ] 
+Gpa1(nuc{GTP},ste2[1]),Ste2(gpa1[1],pheromone[ste2.Pheromone]) [ if @rule-0.or.@rule-2 ] 
+Gpa1(nuc{GDP},ste2[1]),Ste2(gpa1[1],pheromone[.]) [ if (@rule-0.or.@rule-2).and.((~@rule-0).or.@rule-1.or.@rule-2) ] 
+Gpa1(nuc{GDP},ste2[1]),Ste2(gpa1[1],pheromone[ste2.Pheromone]) [ if @rule-0.or.@rule-2 ] 
+
+
+Gpa1(nuc{GTP},ste2[1]),Ste2(gpa1[1],sst2[.]) [ if @rule-2.or.@rule-10 ] 
+Gpa1(nuc{GTP},ste2[1]),Ste2(gpa1[1],sst2[ste2.Sst2]) [ if @rule-2.or.@rule-10 ] 
+Gpa1(nuc{GDP},ste2[1]),Ste2(gpa1[1],sst2[.]) [ if @rule-2.or.@rule-10 ] 
+Gpa1(nuc{GDP},ste2[1]),Ste2(gpa1[1],sst2[ste2.Sst2]) [ if @rule-2.or.@rule-10 ] 
+
+
+Ste4(gpa1[.],ste5[1]),Ste5(loc{c},ste4[1]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+
+
+Ste4(gpa1[.],ste5[1]),Ste5(ste4[1],ste5[.]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste4(gpa1[.],ste5[1]),Ste5(ste4[1],ste5[ste5.Ste5]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+
+
+Sst2(S539{p},ste2[1]),Ste2(gpa1[.],sst2[1]) [ if @rule-2.or.@rule-10 ] 
+Sst2(S539{p},ste2[1]),Ste2(gpa1[ste2.Gpa1],sst2[1]) [ if @rule-2.or.@rule-10 ] 
+Sst2(S539{u},ste2[1]),Ste2(gpa1[.],sst2[1]) [ if @rule-2.or.@rule-10 ] 
+Sst2(S539{u},ste2[1]),Ste2(gpa1[ste2.Gpa1],sst2[1]) [ if @rule-2.or.@rule-10 ] 
+
+
+Ste5(loc{c},ste5[1]),Ste5(ste4[.],ste5[1]) [ if .T. ] 
+Ste5(loc{c},ste5[1]),Ste5(ste4[ste5.Ste4],ste5[1]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+
+
+Ste5(ste4[ste5.Ste4],ste5[1]),Ste5(ste4[.],ste5[1]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(ste4[ste5.Ste4],ste5[1]),Ste5(ste4[ste5.Ste4],ste5[1]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+Ste5(ste4[.],ste5[1]),Ste5(ste4[.],ste5[1]) [ if .T. ] 
+Ste5(ste4[.],ste5[1]),Ste5(ste4[ste5.Ste4],ste5[1]) [ if @rule-0.and.@rule-2.and.(@rule-7.or.(@rule-8.and.@rule-9)).and.((~@rule-7).or.@rule-9) ] 
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+execution finished without any exception

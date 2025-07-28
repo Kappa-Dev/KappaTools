@@ -128,7 +128,9 @@ type ('mixture, 'id) init_t =
   | INIT_TOK of 'id Loc.annoted list
 
 type ('pattern, 'mixture, 'id) init_statement =
-  ('pattern, 'id) Alg_expr.e Loc.annoted * ('mixture, 'id) init_t
+  string LKappa.guard option
+  * ('pattern, 'id) Alg_expr.e Loc.annoted
+  * ('mixture, 'id) init_t
 
 type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) instruction =
   | SIG of 'agent_sig
@@ -140,7 +142,16 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) instruction =
   | PLOT of ('pattern, 'id) Alg_expr.e Loc.annoted
   | PERT of ('pattern, 'mixture, 'id, 'rule) perturbation
   | CONFIG of configuration
-  | RULE of (string Loc.annoted option * 'rule Loc.annoted)
+  | RULE of
+      (string Loc.annoted option
+      * string LKappa.guard option
+      * 'rule Loc.annoted
+      * bool)
+    (*label, guard, rule, is_in_working_set*)
+  | GUARD_PARAM of (string Loc.annoted * bool)
+  | CONFLICT of (string Loc.annoted * string Loc.annoted * string Loc.annoted)
+  | SEQUENTIAL_BOND of
+      (string Loc.annoted * string Loc.annoted * string Loc.annoted)
 
 type ('pattern, 'mixture, 'id, 'rule) command =
   | RUN of ('pattern, 'id) Alg_expr.bool Loc.annoted
@@ -152,8 +163,10 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   variables: ('pattern, 'id) variable_def list;
       (** pattern declaration for reusing as variable in perturbations or kinetic rate *)
   signatures: 'agent_sig list;  (** agent signature declarations *)
-  rules: (string Loc.annoted option * 'rule Loc.annoted) list;
-      (**rules (possibly named)*)
+  rules:
+    (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)
+    list;
+      (** rules (possibly named, possibly with a guard)*)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
       (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statement list;
@@ -162,6 +175,9 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
+  guard_param_values: bool Mods.StringMap.t;
+  conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
+  sequential_bonds: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil

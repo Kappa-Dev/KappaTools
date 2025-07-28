@@ -1,0 +1,65 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa example_views.ka --output-directory output --debugging-mode -syntax 4
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"5:A(x[1]),E(t[1])->A(x[.]),E(t[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"6:A(y[1]),E(t[1])->A(y[.]),E(t[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"7:A(z[1]),E(t[1])->A(z[.]),E(t[.])" [shape=box fillcolor="#87ceeb" style=filled];
+
+"Trimer" [shape=ellipse fillcolor="#98fb98" style=filled];
+"0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[0->0]" color="green"];
+"0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" -> "5:A(x[1]),E(t[1])->A(x[.]),E(t[.])" [label="[0->0];[1->1]" color="green"];
+"1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[0->0]" color="green"];
+"1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" -> "6:A(y[1]),E(t[1])->A(y[.]),E(t[.])" [label="[0->0];[1->1]" color="green"];
+"2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" -> "6:A(y[1]),E(t[1])->A(y[.]),E(t[.])" [label="[0->0];[1->1]" color="green"];
+"3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" -> "5:A(x[1]),E(t[1])->A(x[.]),E(t[.])" [label="[0->0];[1->1]" color="green"];
+"4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" -> "7:A(z[1]),E(t[1])->A(z[.]),E(t[.])" [label="[0->0];[1->1]" color="green"];
+"4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" -> "Trimer" [label="[0->0];[1->1]" color="green"];
+"5:A(x[1]),E(t[1])->A(x[.]),E(t[.])" -> "0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" [label="[0->0];[1->1]" color="green"];
+"5:A(x[1]),E(t[1])->A(x[.]),E(t[.])" -> "1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" [label="[1->1]" color="green"];
+"5:A(x[1]),E(t[1])->A(x[.]),E(t[.])" -> "2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" [label="[0->0];[1->1]" color="green"];
+"5:A(x[1]),E(t[1])->A(x[.]),E(t[.])" -> "3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" [label="[0->0];[1->1]" color="green"];
+"5:A(x[1]),E(t[1])->A(x[.]),E(t[.])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[1->1]" color="green"];
+"6:A(y[1]),E(t[1])->A(y[.]),E(t[.])" -> "0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" [label="[1->1]" color="green"];
+"6:A(y[1]),E(t[1])->A(y[.]),E(t[.])" -> "1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" [label="[0->0];[1->1]" color="green"];
+"6:A(y[1]),E(t[1])->A(y[.]),E(t[.])" -> "2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" [label="[0->0];[1->1]" color="green"];
+"6:A(y[1]),E(t[1])->A(y[.]),E(t[.])" -> "3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" [label="[0->0];[1->1]" color="green"];
+"6:A(y[1]),E(t[1])->A(y[.]),E(t[.])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[1->1]" color="green"];
+"7:A(z[1]),E(t[1])->A(z[.]),E(t[.])" -> "0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" [label="[1->1]" color="green"];
+"7:A(z[1]),E(t[1])->A(z[.]),E(t[.])" -> "1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" [label="[1->1]" color="green"];
+"7:A(z[1]),E(t[1])->A(z[.]),E(t[.])" -> "2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" [label="[1->1]" color="green"];
+"7:A(z[1]),E(t[1])->A(z[.]),E(t[.])" -> "3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" [label="[1->1]" color="green"];
+"7:A(z[1]),E(t[1])->A(z[.]),E(t[.])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[0->0];[1->1]" color="green"];
+"0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" -> "1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" -> "2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" -> "3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" -> "0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" -> "2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" -> "3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" -> "0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" -> "1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" -> "3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" -> "0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" -> "1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" -> "2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" -> "0:A(x[.]),E(t[.])->A(x[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" -> "1:A(y[.]),E(t[.])->A(y[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" -> "2:A(x[.],y[.]),E(t[.])->A(x[.],y[1]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" -> "3:A(x[.],y[.]),E(t[.])->A(x[1],y[.]),E(t[1])" [label="[1->1]" color="red" arrowhead="tee"];
+"5:A(x[1]),E(t[1])->A(x[.]),E(t[.])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[0->0]" color="red" arrowhead="tee"];
+"6:A(y[1]),E(t[1])->A(y[.]),E(t[.])" -> "4:A(x[_],y[_],z[.]),E(t[.])->A(x[_],y[_],z[1]),E(t[1])" [label="[0->0]" color="red" arrowhead="tee"];
+"7:A(z[1]),E(t[1])->A(z[.]),E(t[.])" -> "Trimer" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+}

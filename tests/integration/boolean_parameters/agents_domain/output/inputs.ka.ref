@@ -1,0 +1,22 @@
+%def: "seed" "858703540"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "3"
+%def: "progressBarSize" "70"
+%def: "progressBarSymbol" "#"
+%def: "plotPeriod" "20" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: A(x{u p})
+%agent: B(x{u p})
+
+%var:/*0*/ 'Au' |A(x{u})|
+%var:/*1*/ 'Bu' |B(x{u})|
+%plot: [T]
+%plot: Au
+%plot: Bu
+
+#[ (P1 || P2) ] B(x{u}[.])+ @ 1
+
+
+
+%mod: [E] = 1962 do $STOP;

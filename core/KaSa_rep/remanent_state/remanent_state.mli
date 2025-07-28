@@ -33,7 +33,12 @@ type var_id = int
 type dead_agents = Public_data.agent_kind list
 
 val info_to_rule :
-  string * Loc.t * Public_data.rule_direction * string * Ckappa_sig.c_rule_id ->
+  string
+  * Loc.t
+  * Public_data.rule_direction
+  * string
+  * string LKappa.guard option
+  * Ckappa_sig.c_rule_id ->
   Public_data.rule
 
 val info_to_agent :
@@ -87,7 +92,6 @@ type constraints_list = agent list Public_data.poly_constraints_list
 
 val lemmas_list_to_json : constraints_list -> Yojson.Basic.t
 val lemmas_list_of_json : Yojson.Basic.t -> constraints_list
-
 (*******************************************************************)
 
 type symmetric_sites = Symmetries.symmetries option
@@ -346,10 +350,26 @@ val set_dead_rules :
   ('static, 'compile) state ->
   ('static, 'compile) state
 
+val get_conditionally_dead_rules :
+  ('static, 'compile) state -> Public_data.rule_deadness_conditions option
+
+val set_conditionally_dead_rules :
+  Public_data.rule_deadness_conditions ->
+  ('static, 'compile) state ->
+  ('static, 'compile) state
+
 val get_dead_agents : ('static, 'compile) state -> dead_agents option
 
 val set_dead_agents :
   dead_agents -> ('static, 'compile) state -> ('static, 'compile) state
+
+val get_conditionally_dead_agents :
+  ('static, 'compile) state -> Public_data.agent_deadness_conditions option
+
+val set_conditionally_dead_agents :
+  Public_data.agent_deadness_conditions ->
+  ('static, 'compile) state ->
+  ('static, 'compile) state
 
 val get_influence_map_map :
   ('static, 'compile) state ->

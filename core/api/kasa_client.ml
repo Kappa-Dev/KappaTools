@@ -195,11 +195,25 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
               Public_data.dead_rules_of_json x |> Result_util.ok |> Lwt.return)
 
+    method get_conditionally_dead_rules =
+      let request = `List [ `String "CONDITIONALLY_DEAD_RULES" ] in
+      self#message request
+      >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
+              Public_data.conditionally_dead_rules_of_json x
+              |> Result_util.ok |> Lwt.return)
+
     method get_dead_agents =
       let request = `List [ `String "DEAD_AGENTS" ] in
       self#message request
       >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
               Public_data.json_to_dead_agents x |> Result_util.ok |> Lwt.return)
+
+    method get_conditionally_dead_agents =
+      let request = `List [ `String "CONDITIONALLY_DEAD_AGENTS" ] in
+      self#message request
+      >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
+              Public_data.conditionally_dead_agents_of_json x
+              |> Result_util.ok |> Lwt.return)
 
     method get_non_weakly_reversible_transitions =
       let request = `List [ `String "NON_WEAKLY_REVERSIBLE_TRANSITIONS" ] in

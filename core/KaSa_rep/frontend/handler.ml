@@ -16,6 +16,8 @@ let local_trace = false
 let nrules _parameter _error handler = handler.Cckappa_sig.nrules
 let nvars _parameter _error handler = handler.Cckappa_sig.nvars
 let nagents _parameter _error handler = handler.Cckappa_sig.nagents
+let get_nsites handler = handler.Cckappa_sig.nsites
+let get_nr_guard_parameters handler = handler.Cckappa_sig.nguard_params
 
 let check_pos parameter ka_pos ml_pos message error error' =
   match ml_pos with
@@ -194,6 +196,19 @@ let has_no_label parameters error compiled rule_id =
       | None -> true
       | Some _ -> false) )
 
+let string_of_guard parameters guardp kappa_handler error =
+  let guard_p_dic = kappa_handler.Cckappa_sig.guard_parameters_dic in
+  let error, output =
+    Ckappa_sig.Dictionary_of_guards.translate parameters error guardp
+      guard_p_dic
+  in
+  let error, guard_param_name =
+    match output with
+    | None -> Exception.warn parameters error __POS__ Exit ""
+    | Some (guard_param_name, (), ()) -> error, guard_param_name
+  in
+  error, guard_param_name
+
 let info_of_rule parameters ?(with_rates = false) ?(original = false) error
     compiled (rule_id : Ckappa_sig.c_rule_id) =
   let rules = compiled.Cckappa_sig.rules in
@@ -208,6 +223,7 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
         Loc.dummy,
         Public_data.Dummy_rule_direction,
         "",
+        None,
         Ckappa_sig.dummy_rule_id )
   | Some rule ->
     let label_opt = rule.Cckappa_sig.e_rule_label in
@@ -240,7 +256,8 @@ let info_of_rule parameters ?(with_rates = false) ?(original = false) error
       | false, true -> rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast
       | false, false -> rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast_no_rate
     in
-    error, (label, position, direction, ast, rule_id)
+    let guard = rule.Cckappa_sig.e_rule_guard_string in
+    error, (label, position, direction, ast, guard, rule_id)
 
 let hide rule = { rule with Public_data.rule_hidden = true }
 
@@ -273,6 +290,7 @@ let info_of_var parameters error handler compiled
         Loc.dummy,
         Public_data.Variable,
         "",
+        None,
         var_id )
   | Some var ->
     ( error,
@@ -282,11 +300,12 @@ let info_of_var parameters error handler compiled
         Public_data.Variable,
         ""
         (* TO DO: string for the ast representation (from var.Cckappa_sig.c_variable?) *),
+        None,
         var_id ) )
 
 let string_of_info ?(with_rule = true) ?(with_rule_name = true)
     ?(with_rule_id = true) ?(with_loc = true) ?(with_ast = true)
-    ?(kind = "rule ") (label, pos, _direction, ast, id) =
+    ?(kind = "rule ") (label, pos, _direction, ast, guard, id) =
   let label =
     if with_rule_name then
       label
@@ -317,14 +336,23 @@ let string_of_info ?(with_rule = true) ?(with_rule_name = true)
     else
       kind
   in
+  let guard =
+    if with_ast then (
+      match guard with
+      | None -> ""
+      | Some guard -> "#[" ^ LKappa.string_of_guard guard ^ "]"
+    ) else
+      ""
+  in
   let s =
     match label, pos, ast, id with
-    | "", "", "", s | "", "", s, _ | "", s, "", _ | s, "", _, _ -> prefix ^ s
-    | "", s2, s1, _ | s1, s2, _, _ -> prefix ^ s1 ^ " (" ^ s2 ^ ")"
+    | "", "", "", s | "", "", s, _ | "", s, "", _ | s, "", _, _ ->
+      prefix ^ guard ^ s
+    | "", s2, s1, _ | s1, s2, _, _ -> prefix ^ guard ^ s1 ^ " (" ^ s2 ^ ")"
   in
   s
 
-let pos_of_info (_, info, _, _, _) = info
+let pos_of_info (_, info, _, _, _, _) = info
 
 let string_of_rule ?(with_rule = true) ?(with_rule_name = true)
     ?(with_rule_id = true) ?(with_loc = true) ?(with_ast = true) parameters
@@ -369,10 +397,10 @@ let node_of_flattened_id_using rule var parameters error handler compiled id =
   let int = Ckappa_sig.int_of_rule_id id in
   let nrules = nrules parameters error handler in
   if int < nrules then (
-    let error, (a, b, c, d, e) = info_of_rule parameters error compiled id in
+    let error, (a, b, c, d, _, e) = info_of_rule parameters error compiled id in
     error, Public_data.Rule (rule e b a d c)
   ) else (
-    let error, (a, b, c, d, e) =
+    let error, (a, b, c, d, _, e) =
       info_of_var parameters error handler compiled id
     in
     error, Public_data.Var (var e b a d c)
@@ -546,6 +574,17 @@ let string_of_state = string_of_state_gen print_state
 let string_of_state_fully_deciphered =
   string_of_state_gen print_state_fully_deciphered
 
+let string_of_state_fully_deciphered_with_guard parameter error handler_kappa
+    agent_name site_or_guard state =
+  let nsites = get_nsites handler_kappa in
+  match Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard nsites with
+  | Ckappa_sig.Site site_name ->
+    string_of_state_gen print_state_fully_deciphered parameter error
+      handler_kappa agent_name site_name state
+  | Ckappa_sig.Guard_p _ ->
+    let error, bool = Ckappa_sig.bool_of_state_index parameter error state in
+    error, string_of_bool bool
+
 let string_of_site_aux ?(ml_pos = None) ?(ka_pos = None) ?(message = "")
     parameter error handler_kappa ?state agent_name
     (site_int : Ckappa_sig.c_site_name) =
@@ -570,6 +609,14 @@ let string_of_site parameter error handler_kappa ?state
   in
   error, print_site parameter ?state ~add_parentheses site_type
 
+let string_of_site_or_guard parameter error handler_kappa ?state
+    ?(add_parentheses = false) agent_type site_int =
+  match site_int with
+  | Ckappa_sig.Site s ->
+    string_of_site parameter error handler_kappa ?state ~add_parentheses
+      agent_type s
+  | Ckappa_sig.Guard_p g -> string_of_guard parameter g handler_kappa error
+
 (*this function used in views_domain*)
 let string_of_site_update_views parameter error handler_kappa agent_type
     site_int =
@@ -589,6 +636,17 @@ let string_of_site_in_natural_language parameter error handler_kapp agent_type
   | Ckappa_sig.Binding x -> error, "the binding state of site " ^ x
   | Ckappa_sig.Counter x -> error, "the value of counter " ^ x
 
+let string_of_site_or_guard_in_natural_language parameter error handler_kapp
+    agent_type (site_or_guard_int : Ckappa_sig.c_mvbdu_var) =
+  let nsites = get_nsites handler_kapp in
+  match Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard_int nsites with
+  | Ckappa_sig.Site site_int ->
+    string_of_site_in_natural_language parameter error handler_kapp agent_type
+      site_int
+  | Ckappa_sig.Guard_p guardp ->
+    let error, string = string_of_guard parameter guardp handler_kapp error in
+    error, "the value of the guard parameter " ^ string
+
 let string_of_site_in_file_name parameter error handler_kapp agent_type
     (site_int : Ckappa_sig.c_site_name) =
   let error, site_type, _ =
@@ -606,6 +664,79 @@ let string_of_site_contact_map ?(ml_pos = None) ?(ka_pos = None) ?(message = "")
       agent_name site_int
   in
   error, print_site_contact_map site_type
+
+let string_of_site_or_guard_contact_map ?(ml_pos = None) ?(ka_pos = None)
+    ?(message = "") parameter error handler_kappa agent_name site_or_guard_int =
+  let nsites = get_nsites handler_kappa in
+  match Ckappa_sig.site_or_guard_p_of_mvbdu_var site_or_guard_int nsites with
+  | Ckappa_sig.Site s ->
+    string_of_site_contact_map ~ml_pos ~ka_pos ~message parameter error
+      handler_kappa agent_name s
+  | Ckappa_sig.Guard_p g -> string_of_guard parameter g handler_kappa error
+
+let mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu =
+  let nr = get_nr_guard_parameters kappa_handler in
+  let b = Ckappa_sig.int_of_guard_parameter nr < 12 in
+  Ckappa_sig.Views_bdu.mvbdu_to_formula ~cartesian_decomposition:b parameters
+    bdu_handler error mvbdu
+
+let mvbdu_var_to_string parameters kappa_handler guard_name error =
+  let nsites = get_nsites kappa_handler in
+  match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
+  | Ckappa_sig.Guard_p guard_name ->
+    string_of_guard parameters guard_name kappa_handler error
+  | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
+
+let mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu =
+  let error, bdu_handler, formula =
+    mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu
+  in
+  let error, formula =
+    Logical_formulae.convert_p
+      (mvbdu_var_to_string parameters kappa_handler)
+      error
+      (Logical_formulae.simplify formula)
+  in
+  error, bdu_handler, formula
+
+let mvbdu_to_string_formula_option parameters error kappa_handler bdu_handler
+    mvbdu =
+  match mvbdu with
+  | None -> error, bdu_handler, None
+  | Some mvbdu ->
+    let error, handler, bdu_handler =
+      mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu
+    in
+    error, handler, Some bdu_handler
+
+let print_formula parameters formula =
+  Logical_formulae.print_formula ()
+    (fun s _ ->
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" s)
+    formula
+
+let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =
+  let error, bdu_handler, formula =
+    mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu
+  in
+  let formula = Logical_formulae.simplify formula in
+  let () = print_formula parameters formula in
+  error, bdu_handler
+
+let print_guard_option parameters error kappa_handler bdu_handler mvbdu =
+  match mvbdu with
+  | None -> error, bdu_handler
+  | Some mvbdu ->
+    let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) " [ only if "
+    in
+    let error, bdu_handler =
+      print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
+    in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) " ]" in
+    error, bdu_handler
+
+(*****************************************************************************)
 
 let print_labels parameters error handler couple =
   let _ = Quark_type.Labels.dump_couple parameters error handler couple in

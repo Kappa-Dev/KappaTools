@@ -626,12 +626,12 @@ EXTENSIONAL DESCRIPTION:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
-Id=43
+Id=49
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=42
+  Id=48
    Node(site_type:1<1)
     Id=27
      Node(site_type:2<0)
@@ -745,12 +745,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],c[])
 
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=62
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=61
    Node(site_type:1<2)
     Id=19
      Node(site_type:2<1)
@@ -775,26 +775,26 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for C(x1{},x2{},x1[],x2[])
 
 INTENSIONAL DESCRIPTION:
-Id=61
+Id=74
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=60
+  Id=73
    Node(site_type:1<1)
-    Id=59
+    Id=72
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=58
+      Id=71
        Node(site_type:2<1)
-        Id=57
+        Id=70
          Node(site_type:3<1)
           Id=0
            Leaf False 
 
-          Id=56
+          Id=69
            Node(site_type:3<2)
             Id=23
              Node(site_type:4<0)
@@ -974,19 +974,19 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for C(x1{},x2{},x1[],x2[])
 
 INTENSIONAL DESCRIPTION:
-Id=90
+Id=121
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=89
+  Id=120
    Node(site_type:1<2)
-    Id=88
+    Id=119
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=87
+      Id=118
        Node(site_type:2<2)
         Id=25
          Node(site_type:3<0)
@@ -1027,12 +1027,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],c[])
 
 INTENSIONAL DESCRIPTION:
-Id=105
+Id=140
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=104
+  Id=139
    Node(site_type:1<2)
     Id=31
      Node(site_type:2<2)
@@ -1069,12 +1069,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],c[])
 
 INTENSIONAL DESCRIPTION:
-Id=68
+Id=87
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=67
+  Id=86
    Node(site_type:1<1)
     Id=19
      Node(site_type:2<1)
@@ -1148,14 +1148,14 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=118
+Id=154
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=101
+  Id=136
    Node(site_type:1<2)
-    Id=100
+    Id=135
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1172,7 +1172,7 @@ Id=118
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=45
+Id=59
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1186,26 +1186,26 @@ Id=45
      Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=95
+Id=126
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=94
+  Id=125
    Node(site_type:1<1)
-    Id=64
+    Id=77
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=63
+      Id=76
        Node(site_type:2<1)
-        Id=62
+        Id=75
          Node(site_type:3<0)
           Id=0
            Leaf False 
 
-          Id=56
+          Id=69
            Node(site_type:3<2)
             Id=23
              Node(site_type:4<0)
@@ -1226,23 +1226,23 @@ Id=95
         Id=0
          Leaf False 
 
-    Id=93
+    Id=124
      Node(site_type:1<2)
-      Id=92
+      Id=123
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=91
+        Id=122
          Node(site_type:2<1)
-          Id=79
+          Id=104
            Node(site_type:3<0)
             Id=0
              Leaf False 
 
-            Id=78
+            Id=103
              Node(site_type:3<1)
-              Id=77
+              Id=102
                Node(site_type:4<0)
                 Id=0
                  Leaf False 
@@ -1258,7 +1258,7 @@ Id=95
               Id=0
                Leaf False 
 
-          Id=87
+          Id=118
            Node(site_type:2<2)
             Id=25
              Node(site_type:3<0)
@@ -1294,12 +1294,12 @@ Id=95
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=120
+Id=157
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=119
+  Id=98
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1309,12 +1309,12 @@ Id=120
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=111
+Id=43
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=42
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1324,12 +1324,12 @@ Id=111
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=111
+Id=43
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=42
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1339,22 +1339,7 @@ Id=111
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=45
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=52
+Id=63
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1369,7 +1354,22 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=125
+Id=59
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=162
  Node(site_type:3<0)
   Id=0
    Leaf False 
@@ -1384,12 +1384,12 @@ Id=125
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=111
+Id=43
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=42
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1410,12 +1410,12 @@ C(x2) => [ C(x2[.]) v C(x2[c.A]) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=120
+Id=157
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=119
+  Id=98
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1425,12 +1425,12 @@ Id=120
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=111
+Id=43
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=42
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1440,12 +1440,12 @@ Id=111
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=111
+Id=43
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=42
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1455,26 +1455,26 @@ Id=111
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=197
+Id=230
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=196
+  Id=229
    Node(site_type:0<1)
-    Id=189
+    Id=225
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=188
+      Id=224
        Node(site_type:1<1)
-        Id=156
+        Id=192
          Node(site_type:2<0)
           Id=0
            Leaf False 
 
-          Id=155
+          Id=80
            Node(site_type:2<2)
             Id=11
              Node(site_type:3<0)
@@ -1495,23 +1495,23 @@ Id=197
         Id=0
          Leaf False 
 
-    Id=195
+    Id=228
      Node(site_type:0<2)
-      Id=194
+      Id=227
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=193
+        Id=226
          Node(site_type:1<1)
-          Id=154
+          Id=191
            Node(site_type:2<0)
             Id=0
              Leaf False 
 
-            Id=153
+            Id=190
              Node(site_type:2<1)
-              Id=125
+              Id=162
                Node(site_type:3<0)
                 Id=0
                  Leaf False 
@@ -1527,14 +1527,14 @@ Id=197
               Id=0
                Leaf False 
 
-          Id=192
+          Id=127
            Node(site_type:1<2)
-            Id=191
+            Id=51
              Node(site_type:2<0)
               Id=0
                Leaf False 
 
-              Id=190
+              Id=50
                Node(site_type:2<1)
                 Id=11
                  Node(site_type:3<0)
@@ -1577,12 +1577,12 @@ C() =>
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=120
+Id=157
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=119
+  Id=98
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1592,12 +1592,12 @@ Id=120
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=111
+Id=43
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=42
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1607,12 +1607,12 @@ Id=111
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=111
+Id=43
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=42
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1622,22 +1622,7 @@ Id=111
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=45
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=52
+Id=63
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1652,7 +1637,22 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=125
+Id=59
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=162
  Node(site_type:3<0)
   Id=0
    Leaf False 
@@ -1667,12 +1667,12 @@ Id=125
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=111
+Id=43
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=42
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1682,12 +1682,12 @@ Id=111
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=120
+Id=157
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=119
+  Id=98
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1697,12 +1697,12 @@ Id=120
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=111
+Id=43
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=42
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1712,12 +1712,12 @@ Id=111
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=111
+Id=43
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=42
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1727,26 +1727,26 @@ Id=111
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=197
+Id=230
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=196
+  Id=229
    Node(site_type:0<1)
-    Id=189
+    Id=225
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=188
+      Id=224
        Node(site_type:1<1)
-        Id=156
+        Id=192
          Node(site_type:2<0)
           Id=0
            Leaf False 
 
-          Id=155
+          Id=80
            Node(site_type:2<2)
             Id=11
              Node(site_type:3<0)
@@ -1767,23 +1767,23 @@ Id=197
         Id=0
          Leaf False 
 
-    Id=195
+    Id=228
      Node(site_type:0<2)
-      Id=194
+      Id=227
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=193
+        Id=226
          Node(site_type:1<1)
-          Id=154
+          Id=191
            Node(site_type:2<0)
             Id=0
              Leaf False 
 
-            Id=153
+            Id=190
              Node(site_type:2<1)
-              Id=125
+              Id=162
                Node(site_type:3<0)
                 Id=0
                  Leaf False 
@@ -1799,14 +1799,14 @@ Id=197
               Id=0
                Leaf False 
 
-          Id=192
+          Id=127
            Node(site_type:1<2)
-            Id=191
+            Id=51
              Node(site_type:2<0)
               Id=0
                Leaf False 
 
-              Id=190
+              Id=50
                Node(site_type:2<1)
                 Id=11
                  Node(site_type:3<0)

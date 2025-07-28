@@ -34,6 +34,8 @@ type _ handle =
         handle
   | Rules_kasa : Public_data.rule list handle
   | Agents_kasa : Public_data.dead_agents handle
+  | Rules_kasa_with_conditions : Public_data.rule_deadness_conditions handle
+  | Agents_kasa_with_conditions : Public_data.agent_deadness_conditions handle
   | Transitions_kasa : (Public_data.rule * (string * string) list) list handle
   | Constraints_kasa
       : (string * Public_data.agent list Public_data.lemma list) list handle
@@ -122,6 +124,16 @@ let receive mailbox x =
              let json = read_result Yojson.Basic.read_json p lb in
              Lwt.wakeup thread
                (Result_util.map Public_data.dead_rules_of_json json)
+           | B (Agents_kasa_with_conditions, thread) ->
+             let json = read_result Yojson.Basic.read_json p lb in
+             Lwt.wakeup thread
+               (Result_util.map Public_data.conditionally_dead_agents_of_json
+                  json)
+           | B (Rules_kasa_with_conditions, thread) ->
+             let json = read_result Yojson.Basic.read_json p lb in
+             Lwt.wakeup thread
+               (Result_util.map Public_data.conditionally_dead_rules_of_json
+                  json)
            | B (Agents_kasa, thread) ->
              let json = read_result Yojson.Basic.read_json p lb in
              Lwt.wakeup thread
@@ -368,10 +380,24 @@ class virtual new_client ~is_running ~post mailbox =
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "DEAD_RULES") ])
 
+    method get_conditionally_dead_rules =
+      self#message Rules_kasa_with_conditions (fun b ->
+          JsonUtil.write_sequence b
+            [
+              (fun b -> Yojson.Basic.write_string b "CONDITIONALLY_DEAD_RULES");
+            ])
+
     method get_dead_agents =
       self#message Agents_kasa (fun b ->
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "DEAD_AGENTS") ])
+
+    method get_conditionally_dead_agents =
+      self#message Agents_kasa_with_conditions (fun b ->
+          JsonUtil.write_sequence b
+            [
+              (fun b -> Yojson.Basic.write_string b "CONDITIONALLY_DEAD_AGENTS");
+            ])
 
     method get_non_weakly_reversible_transitions =
       self#message Transitions_kasa (fun b ->

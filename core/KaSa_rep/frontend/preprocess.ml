@@ -67,6 +67,7 @@ let empty_rule handler error =
       diff_direct = empty_direct;
       diff_reverse = empty_reverse;
       actions = Cckappa_sig.empty_actions;
+      guard = None;
     } )
 
 let empty_e_rule handler error =
@@ -76,6 +77,7 @@ let empty_e_rule handler error =
       Cckappa_sig.e_rule_label = None;
       Cckappa_sig.e_rule_label_dot = None;
       Cckappa_sig.e_rule_initial_direction = Ckappa_sig.Direct;
+      Cckappa_sig.e_rule_guard_string = None;
       Cckappa_sig.e_rule_rule =
         {
           Ckappa_sig.position = Loc.dummy;
@@ -1160,6 +1162,25 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
             dead_state_sites,
             dead_link_sites ) )
 
+let translate_guard parameters error handler guard =
+  let convert (guard_p_name, loc) error =
+    let error, (bool, output) =
+      Ckappa_sig.Dictionary_of_guards.allocate_bool parameters error
+        Ckappa_sig.compare_unit_guard_parameter guard_p_name ()
+        Misc_sa.const_unit handler.Cckappa_sig.guard_parameters_dic
+    in
+    match bool, output with
+    | _, None | true, _ ->
+      Exception.warn parameters error __POS__ Exit
+        (Ckappa_sig.dummy_guard_parameter, loc)
+    | _, Some (i, _, _, _) -> error, (i, loc)
+  in
+  match guard with
+  | None -> error, None
+  | Some g ->
+    let error, guard = Logical_formulae.convert_p convert error g in
+    error, Some guard
+
 let update parameters error creation lhs_opt k =
   if creation then
     error, creation
@@ -1471,7 +1492,7 @@ let check_freeness parameters lhs source (error, half_release_set) =
           source half_release_set))
 
 let translate_rule parameters error handler rule =
-  let label, (rule, position) = rule in
+  let label, guard_string, (rule, position) = rule in
   let direction = rule.Ckappa_sig.interprete_delta in
   let error, c_rule_lhs, question_marks_l, delta_l =
     translate_mixture parameters error handler ~creation:false
@@ -1482,6 +1503,7 @@ let translate_rule parameters error handler rule =
     translate_mixture parameters error handler ~creation:false ~lhs
       rule.Ckappa_sig.rhs
   in
+  let error, guard = translate_guard parameters error handler guard_string in
   let error, delta =
     Ckappa_sig.AgentsSite_map_and_set.Map.map2 parameters error
       (fun _parameters error i -> error, i)
@@ -2049,6 +2071,7 @@ let translate_rule parameters error handler rule =
       Cckappa_sig.e_rule_label = label;
       Cckappa_sig.e_rule_label_dot = label_dot;
       Cckappa_sig.e_rule_initial_direction = direction;
+      Cckappa_sig.e_rule_guard_string = guard_string;
       Cckappa_sig.e_rule_rule = rule;
       Cckappa_sig.e_rule_c_rule =
         {
@@ -2059,6 +2082,7 @@ let translate_rule parameters error handler rule =
           Cckappa_sig.actions;
           Cckappa_sig.diff_direct = direct;
           Cckappa_sig.diff_reverse = reverse;
+          Cckappa_sig.guard;
         };
     } )
 
@@ -2106,9 +2130,11 @@ let lift_allowing_question_marks parameters handler error x =
   in
   clean_question_marks parameters a c b
 
-let translate_pert_init error (alg, _) (c_alg, _) mixture c_mixture _pos' =
+let translate_pert_init error guard (alg, _) (c_alg, _) mixture c_mixture _pos'
+    =
   ( error,
     {
+      Cckappa_sig.e_init_guard = guard;
       Cckappa_sig.e_init_factor = alg;
       Cckappa_sig.e_init_c_factor = c_alg;
       Cckappa_sig.e_init_mixture = mixture;
@@ -2117,32 +2143,25 @@ let translate_pert_init error (alg, _) (c_alg, _) mixture c_mixture _pos' =
 
 let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 
-let translate_pert parameters error handler alg (mixture, pos') =
-  (*  let mixture = c_mixture.Cckappa_sig.c_mixture in*)
-  let error, c_mixture, _, _ =
-    translate_mixture parameters error handler ~creation:false mixture
-  in
-  let error, c_alg =
-    alg_with_pos_map (lift_allowing_question_marks parameters handler) error alg
-  in
-  translate_pert_init error alg c_alg mixture c_mixture pos'
-
-let translate_init parameters error handler ((alg, pos_alg), init_t) =
+let translate_init parameters error handler
+    (guard_string, (alg, pos_alg), init_t) =
   let error, c_alg =
     Prepreprocess.alg_map
       (lift_allowing_question_marks parameters handler)
       error alg
   in
+  let error, guard = translate_guard parameters error handler guard_string in
   match init_t with
   | Ast.INIT_MIX (mixture, pos') ->
     let error, c_mixture, _, _ =
       translate_mixture parameters error handler ~creation:true mixture
     in
-    translate_pert_init error (alg, pos_alg) (c_alg, pos_alg) mixture c_mixture
-      pos'
+    translate_pert_init error guard (alg, pos_alg) (c_alg, pos_alg) mixture
+      c_mixture pos'
   | Ast.INIT_TOK _ ->
     (*TO DO*)
     let error, dft = Cckappa_sig.dummy_init parameters error in
+    let dft = { dft with Cckappa_sig.e_init_guard = guard } in
     (match Remanent_parameters.get_called_from parameters with
     | Remanent_parameters_sig.KaSa ->
       Exception.warn parameters error __POS__
@@ -2202,7 +2221,9 @@ let translate_perturb parameters error handler
         let error, elt' =
           Prepreprocess.modif_map
             (fun error ((_, pos) as x) ->
-              let err, r = translate_rule parameters error handler (None, x) in
+              let err, r =
+                translate_rule parameters error handler (None, None, x)
+              in
               err, (r.Cckappa_sig.e_rule_c_rule, pos))
             (lift_allowing_question_marks parameters handler)
             error elt
@@ -2239,8 +2260,10 @@ let translate_c_compil parameters error handler compil =
   in
   let error, c_rules =
     List.fold_left
-      (fun (error, list) rule ->
-        let error, c_rule = translate_rule parameters error handler rule in
+      (fun (error, list) (r1, guard, r2) ->
+        let error, c_rule =
+          translate_rule parameters error handler (r1, guard, r2)
+        in
         error, c_rule :: list)
       (error, []) compil.Ast.rules
   in

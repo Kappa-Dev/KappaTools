@@ -57,7 +57,9 @@ module type Type = sig
     state -> Public_data.short_influence_node option -> state * Yojson.Basic.t
 
   val get_dead_rules : state -> state * Yojson.Basic.t
+  val get_conditionally_dead_rules : state -> state * Yojson.Basic.t
   val get_dead_agents : state -> state * Yojson.Basic.t
+  val get_conditionally_dead_agents : state -> state * Yojson.Basic.t
   val get_separating_transitions : state -> state * Yojson.Basic.t
   val get_constraints_list : state -> state * Yojson.Basic.t
 
@@ -198,6 +200,14 @@ functor
     let get_dead_agents state =
       let state, agents = get_dead_agents state in
       state, Public_data.json_of_dead_agents agents
+
+    let get_conditionally_dead_rules state =
+      let state, rules = get_conditionally_dead_rules state in
+      state, Public_data.conditionally_dead_rules_to_json rules
+
+    let get_conditionally_dead_agents state =
+      let state, agents = get_conditionally_dead_agents state in
+      state, Public_data.conditionally_dead_agents_to_json agents
 
     let get_separating_transitions state =
       let state, separating_transitions = get_separating_transitions state in

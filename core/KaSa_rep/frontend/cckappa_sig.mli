@@ -19,11 +19,14 @@ type site =
   Ckappa_sig.site_type
 
 type state_dic = (unit, unit) Ckappa_sig.Dictionary_of_States.dictionary
+type guard_p_dic = (unit, unit) Ckappa_sig.Dictionary_of_guards.dictionary
 
 type kappa_handler = {
   nrules: int;
   nvars: int;
   nagents: Ckappa_sig.c_agent_name;
+  nsites: Ckappa_sig.c_site_name;
+  nguard_params: Ckappa_sig.c_guard_parameter;
   agents_dic: Ckappa_sig.agent_dic;
   agents_annotation:
     (string * Loc.t list)
@@ -41,6 +44,7 @@ type kappa_handler = {
     Ckappa_sig
     .Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
     .t;
+  guard_parameters_dic: guard_p_dic;
 }
 
 type 'a interval = { min: 'a option; max: 'a option }
@@ -150,6 +154,7 @@ type rule = {
   diff_direct: diff_views;
   diff_reverse: diff_views;
   actions: actions;
+  guard: Ckappa_sig.c_guard_parameter LKappa.guard option;
 }
 
 type modif_expr =
@@ -173,11 +178,13 @@ type enriched_rule = {
   e_rule_label: (string * Ckappa_sig.position) option;
   e_rule_label_dot: (string * Ckappa_sig.position) option;
   e_rule_initial_direction: Ckappa_sig.direction;
+  e_rule_guard_string: string LKappa.guard option;
   e_rule_rule: Ckappa_sig.mixture Ckappa_sig.rule;
   e_rule_c_rule: rule;
 }
 
 type enriched_init = {
+  e_init_guard: Ckappa_sig.c_guard_parameter LKappa.guard option;
   e_init_factor: (Ckappa_sig.mixture, string) Alg_expr.e;
   e_init_c_factor: (mixture, string) Alg_expr.e;
   e_init_mixture: Ckappa_sig.mixture;

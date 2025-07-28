@@ -148,20 +148,31 @@ type ('mixture, 'id) init_t =
 
 type ('pattern, 'mixture, 'id) init_statement =
   (*  string Loc.annoted option * (*volume*)*)
-  ('pattern, 'id) Alg_expr.e Loc.annoted * ('mixture, 'id) init_t
+  string LKappa.guard option
+  * ('pattern, 'id) Alg_expr.e Loc.annoted
+  * ('mixture, 'id) init_t
 
 type ('agent, 'agent_id, 'pattern, 'mixture, 'id, 'rule) instruction =
   | SIG of 'agent_id
   | TOKENSIG of string Loc.annoted
   | VOLSIG of string * float * string (* type, volume, parameter*)
   | INIT of ('pattern, 'mixture, 'id) init_statement
-  (*volume, init, position *)
+  (*guard, volume, init, position *)
   | DECLARE of ('pattern, 'id) variable_def
   | OBS of ('pattern, 'id) variable_def (*for backward compatibility*)
   | PLOT of ('pattern, 'id) Alg_expr.e Loc.annoted
   | PERT of ('pattern, 'mixture, 'id, 'rule) perturbation
   | CONFIG of configuration
-  | RULE of (string Loc.annoted option * 'rule Loc.annoted)
+  | RULE of
+      (string Loc.annoted option
+      * string LKappa.guard option
+      * 'rule Loc.annoted
+      * bool)
+    (*label, guard, rule, is_in_working_set*)
+  | GUARD_PARAM of (string Loc.annoted * bool)
+  | CONFLICT of (string Loc.annoted * string Loc.annoted * string Loc.annoted)
+  | SEQUENTIAL_BOND of
+      (string Loc.annoted * string Loc.annoted * string Loc.annoted)
 
 type ('pattern, 'mixture, 'id, 'rule) command =
   | RUN of ('pattern, 'id) Alg_expr.bool Loc.annoted
@@ -174,8 +185,10 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
       (** pattern declaration for reusing as variable in perturbations
     or kinetic rate *)
   signatures: 'agent_sig list;  (** agent signature declaration *)
-  rules: (string Loc.annoted option * 'rule Loc.annoted) list;
-      (** rules (possibly named): [name_option * rule_definition] *)
+  rules:
+    (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)
+    list;
+      (** rules (possibly named, possibly with a guard): [name_option * guard * rule_definition] *)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
       (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statement list;
@@ -184,6 +197,12 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   configurations: configuration list;
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
+  guard_param_values: bool Mods.StringMap.t;
+      (** The guard parameters that have a defined value (true or false).*)
+  conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
+      (** A conflict (A, s1, s2) states that there might be a conflict between the two sites s1, s2 of the agent A.*)
+  sequential_bonds: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
+      (** sequential_bonds (A, s1, s2) states that the site s2 of the agent A may only be able to bind if s1 is already bound.*)
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil
@@ -225,6 +244,9 @@ let empty_compil =
     configurations = [];
     tokens = [];
     volumes = [];
+    guard_param_values = Mods.StringMap.empty;
+    conflicts = [];
+    sequential_bonds = [];
   }
 
 (*
@@ -1025,13 +1047,17 @@ let print_configuration f ((n, _), l) =
     (Pp.list Pp.space (fun f (x, _) -> Format.fprintf f "\"%s\"" x))
     l
 
+let print_guard = Pp.option ~with_space:false LKappa.print_guard
+
 let print_init f = function
-  | (n, _), INIT_MIX (m, _) ->
-    Format.fprintf f "@[%%init: @[%a@]@ @[%a@]@]" print_ast_alg_expr n
+  | g, (n, _), INIT_MIX (m, _) ->
+    Format.fprintf f "@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]" print_guard g
+      print_ast_alg_expr n
       (print_ast_mix ~print_counter)
       m
-  | (n, _), INIT_TOK t ->
-    Format.fprintf f "@[%%init: %a %a@]" print_ast_alg_expr n
+  | g, (n, _), INIT_TOK t ->
+    Format.fprintf f "@[%%init: @[%a@]@ %a %a@]" print_guard g
+      print_ast_alg_expr n
       (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
       t
 
@@ -1113,7 +1139,8 @@ let print_perturbation f ((alarm, cond, modif, rep), _) =
     rep
 
 let print_parsing_compil_kappa f c =
-  Format.fprintf f "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@]@."
+  Format.fprintf f
+    "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,%a@,%a@,@]@."
     (Pp.list Pp.space print_configuration)
     c.configurations
     (Pp.list Pp.space (fun f a ->
@@ -1129,16 +1156,25 @@ let print_parsing_compil_kappa f c =
     (Pp.list Pp.space (fun f (a, _) ->
          Format.fprintf f "@[%%plot:@ @[%a@]@]" print_ast_alg_expr a))
     c.observables
-    (Pp.list Pp.space (fun f (s, (r, _)) ->
-         Format.fprintf f "@[@[%a%a@]@]"
+    (Pp.list Pp.space (fun f (s, guard, (r, _)) ->
+         Format.fprintf f "@[@[%a%a%a@]@]"
            (Pp.option ~with_space:false (fun f (s, _) ->
                 Format.fprintf f "'%s'@ " s))
-           s print_ast_rule r))
+           s print_guard guard print_ast_rule r))
     c.rules
     (Pp.list Pp.space print_perturbation)
     c.perturbations
     (Pp.list Pp.space print_init)
     c.init
+    (Pp.list Pp.space (fun f (s, b) ->
+         Format.fprintf f "%%guard_param: %s -> %b" s b))
+    (Mods.StringMap.bindings c.guard_param_values)
+    (Pp.list Pp.space (fun f ((a, _), (s1, _), (s2, _)) ->
+         Format.fprintf f "%%conflict: %s %s %s" a s1 s2))
+    c.conflicts
+    (Pp.list Pp.space (fun f ((a, _), (s1, _), (s2, _)) ->
+         Format.fprintf f "%%sequential_bond: %s %s %s" a s1 s2))
+    c.sequential_bonds
 
 let arrow_notation_to_yojson filenames f_mix f_var r =
   JsonUtil.smart_assoc
@@ -1525,8 +1561,8 @@ let merge_tokens =
 
 let sig_from_inits =
   List.fold_left (fun (ags, toks) -> function
-    | _, INIT_MIX (m, _) -> merge_agents ags m, toks
-    | na, INIT_TOK l -> ags, merge_tokens toks (List.map (fun x -> na, x) l))
+    | _, _, INIT_MIX (m, _) -> merge_agents ags m, toks
+    | _, na, INIT_TOK l -> ags, merge_tokens toks (List.map (fun x -> na, x) l))
 
 let sig_from_rule (ags, toks) r =
   match r.rewrite with
@@ -1540,7 +1576,7 @@ let sig_from_rule (ags, toks) r =
     in
     merge_agents ags' a.lhs, merge_tokens toks' a.rm_token
 
-let sig_from_rules = List.fold_left (fun p (_, (r, _)) -> sig_from_rule p r)
+let sig_from_rules = List.fold_left (fun p (_, _, (r, _)) -> sig_from_rule p r)
 
 let sig_from_perts =
   List.fold_left (fun acc ((_, _, p, _), _) ->
@@ -1644,8 +1680,9 @@ let compil_to_json c =
           c.variables );
       ( "rules",
         JsonUtil.of_list
-          (JsonUtil.of_pair
+          (JsonUtil.of_triple
              (JsonUtil.of_option (Loc.string_annoted_to_json ~filenames))
+             (LKappa.string_guard_option_to_json ~filenames)
              (Loc.yojson_of_annoted ~filenames
                 (rule_to_json filenames mix_to_json var_to_json)))
           c.rules );
@@ -1656,7 +1693,8 @@ let compil_to_json c =
           c.observables );
       ( "init",
         JsonUtil.of_list
-          (JsonUtil.of_pair
+          (JsonUtil.of_triple
+             (LKappa.string_guard_option_to_json ~filenames)
              (Loc.yojson_of_annoted ~filenames
                 (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json))
              (init_to_json ~filenames mix_to_json var_to_json))
@@ -1688,10 +1726,27 @@ let compil_to_json c =
              (Loc.string_annoted_to_json ~filenames)
              (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
+      ( "guard_param_values",
+        Mods.StringMap.to_json JsonUtil.of_string JsonUtil.of_bool
+          c.guard_param_values );
+      ( "conflicts",
+        JsonUtil.of_list
+          (JsonUtil.of_triple
+             (Loc.string_annoted_to_json ~filenames)
+             (Loc.string_annoted_to_json ~filenames)
+             (Loc.string_annoted_to_json ~filenames))
+          c.conflicts );
+      ( "sequential_bonds",
+        JsonUtil.of_list
+          (JsonUtil.of_triple
+             (Loc.string_annoted_to_json ~filenames)
+             (Loc.string_annoted_to_json ~filenames)
+             (Loc.string_annoted_to_json ~filenames))
+          c.sequential_bonds );
     ]
 
 let compil_of_json = function
-  | `Assoc l as x when List.length l = 9 ->
+  | `Assoc l as x when List.length l = 12 ->
     let var_of_json = JsonUtil.to_string ?error_msg:None in
     (try
        let filenames =
@@ -1725,8 +1780,9 @@ let compil_of_json = function
          rules =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST rules")
-             (JsonUtil.to_pair
+             (JsonUtil.to_triple
                 (JsonUtil.to_option (Loc.string_annoted_of_json ~filenames))
+                (LKappa.string_guard_option_of_json ~filenames)
                 (Loc.annoted_of_yojson ~filenames
                    (rule_of_json filenames mix_of_json var_of_json)))
              (List.assoc "rules" l);
@@ -1740,7 +1796,8 @@ let compil_of_json = function
          init =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST init")
-             (JsonUtil.to_pair
+             (JsonUtil.to_triple
+                (LKappa.string_guard_option_of_json ~filenames)
                 (Loc.annoted_of_yojson ~filenames
                    (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
                 (init_of_json ~filenames mix_of_json var_of_json))
@@ -1777,6 +1834,41 @@ let compil_of_json = function
                 (JsonUtil.to_list (Loc.string_annoted_of_json ~filenames)))
              (List.assoc "configurations" l);
          volumes = [];
+         guard_param_values =
+           Mods.StringMap.of_json
+             (JsonUtil.to_string
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json
+                     "AST guard_param_values sig"))
+             (JsonUtil.to_bool
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json
+                     "AST guard_param_values boolean value"))
+             (List.assoc "guard_param_values" l);
+         conflicts =
+           JsonUtil.to_list
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json "AST conflicts sig")
+             (JsonUtil.to_triple
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json "AST conflicts sig")
+                (Loc.string_annoted_of_json ~filenames)
+                (Loc.string_annoted_of_json ~filenames)
+                (Loc.string_annoted_of_json ~filenames))
+             (List.assoc "conflicts" l);
+         sequential_bonds =
+           JsonUtil.to_list
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json
+                  "AST sequential_bonds sig")
+             (JsonUtil.to_triple
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json
+                     "AST sequential_bonds sig")
+                (Loc.string_annoted_of_json ~filenames)
+                (Loc.string_annoted_of_json ~filenames)
+                (Loc.string_annoted_of_json ~filenames))
+             (List.assoc "sequential_bonds" l);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST", x)))

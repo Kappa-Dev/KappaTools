@@ -1,0 +1,33 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa example_initial_state.ka --output-directory output --debugging-mode -syntax 4
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"name 1" [shape=box fillcolor="#87ceeb" style=filled];
+"name 1_op" [shape=box fillcolor="#87ceeb" style=filled];
+"2:A(x[.],y[.]),B(y[.])->A(x[.],y[1]),B(y[1])" [shape=box fillcolor="#87ceeb" style=filled];
+"3:A(x[.],y[1]),B(y[1])->A(x[.],y[.]),B(y[.])" [shape=box fillcolor="#87ceeb" style=filled];
+"name 3" [shape=box fillcolor="#87ceeb" style=filled];
+"name 3_op" [shape=box fillcolor="#87ceeb" style=filled];
+"name 1" -> "name 1_op" [label="[0->0];[1->1]" color="green"];
+"name 1_op" -> "name 1" [label="[0->0];[1->1]" color="green"];
+"name 1_op" -> "2:A(x[.],y[.]),B(y[.])->A(x[.],y[1]),B(y[1])" [label="[0->0]" color="green"];
+"name 1_op" -> "3:A(x[.],y[1]),B(y[1])->A(x[.],y[.]),B(y[.])" [label="[0->0]" color="green"];
+"2:A(x[.],y[.]),B(y[.])->A(x[.],y[1]),B(y[1])" -> "3:A(x[.],y[1]),B(y[1])->A(x[.],y[.]),B(y[.])" [label="[0->0];[1->1]" color="green"];
+"2:A(x[.],y[.]),B(y[.])->A(x[.],y[1]),B(y[1])" -> "name 3_op" [label="[0->0];[1->1]" color="green"];
+"3:A(x[.],y[1]),B(y[1])->A(x[.],y[.]),B(y[.])" -> "2:A(x[.],y[.]),B(y[.])->A(x[.],y[1]),B(y[1])" [label="[0->0];[1->1]" color="green"];
+"3:A(x[.],y[1]),B(y[1])->A(x[.],y[.]),B(y[.])" -> "name 3" [label="[0->0];[1->1]" color="green"];
+"name 3" -> "3:A(x[.],y[1]),B(y[1])->A(x[.],y[.]),B(y[.])" [label="[0->0];[1->1]" color="green"];
+"name 3" -> "name 3_op" [label="[0->0];[1->1]" color="green"];
+"name 3_op" -> "2:A(x[.],y[.]),B(y[.])->A(x[.],y[1]),B(y[1])" [label="[0->0];[1->1]" color="green"];
+"name 3_op" -> "name 3" [label="[0->0];[1->1]" color="green"];
+"name 1" -> "2:A(x[.],y[.]),B(y[.])->A(x[.],y[1]),B(y[1])" [label="[0->0]" color="red" arrowhead="tee"];
+"name 1" -> "3:A(x[.],y[1]),B(y[1])->A(x[.],y[.]),B(y[.])" [label="[0->0]" color="red" arrowhead="tee"];
+"2:A(x[.],y[.]),B(y[.])->A(x[.],y[1]),B(y[1])" -> "name 3" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"3:A(x[.],y[1]),B(y[1])->A(x[.],y[.]),B(y[.])" -> "name 3_op" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"name 3" -> "2:A(x[.],y[.]),B(y[.])->A(x[.],y[1]),B(y[1])" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"name 3_op" -> "3:A(x[.],y[1]),B(y[1])->A(x[.],y[.]),B(y[.])" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+}

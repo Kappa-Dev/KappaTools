@@ -1,24 +1,38 @@
 (* Time-stamp: <Jul 02 2016> *)
 
+type agent_site =
+  Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state
+
+type agent_id_site =
+  Ckappa_sig.c_agent_id
+  * Ckappa_sig.c_agent_name
+  * Ckappa_sig.c_site_name
+  * Ckappa_sig.c_state
+
+type agent_two_sites =
+  Ckappa_sig.c_agent_name
+  * Ckappa_sig.c_site_name
+  * Ckappa_sig.c_site_name
+  * Ckappa_sig.c_state
+  * Ckappa_sig.c_state
+
+type agent_id_two_sites =
+  Ckappa_sig.c_agent_id
+  * Ckappa_sig.c_agent_name
+  * Ckappa_sig.c_site_name
+  * Ckappa_sig.c_site_name
+  * Ckappa_sig.c_state
+  * Ckappa_sig.c_state
+
 module PairAgentsSiteState_map_and_set = Map_wrapper.Make (SetMap.Make (struct
-  type t =
-    (Ckappa_sig.c_agent_id
-    * Ckappa_sig.c_agent_name
-    * Ckappa_sig.c_site_name
-    * Ckappa_sig.c_state)
-    * (Ckappa_sig.c_agent_id
-      * Ckappa_sig.c_agent_name
-      * Ckappa_sig.c_site_name
-      * Ckappa_sig.c_state)
+  type t = agent_id_site * agent_id_site
 
   let compare = compare
   let print _ _ = ()
 end))
 
 module PairAgentSiteState_map_and_set = Map_wrapper.Make (SetMap.Make (struct
-  type t =
-    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-    * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+  type t = agent_site * agent_site
 
   let compare = compare
   let print _ _ = ()
@@ -26,35 +40,14 @@ end))
 
 (*parallel*)
 module PairAgentsSitesStates_map_and_set = Map_wrapper.Make (SetMap.Make (struct
-  type t =
-    Ckappa_sig.c_agent_id
-    * ((Ckappa_sig.c_agent_name
-       * Ckappa_sig.c_site_name
-       * Ckappa_sig.c_site_name
-       * Ckappa_sig.c_state
-       * Ckappa_sig.c_state)
-      * (Ckappa_sig.c_agent_name
-        * Ckappa_sig.c_site_name
-        * Ckappa_sig.c_site_name
-        * Ckappa_sig.c_state
-        * Ckappa_sig.c_state))
+  type t = Ckappa_sig.c_agent_id * (agent_two_sites * agent_two_sites)
 
   let compare = compare
   let print _ _ = ()
 end))
 
 module PairAgentSitesStates_map_and_set = Map_wrapper.Make (SetMap.Make (struct
-  type t =
-    (Ckappa_sig.c_agent_name
-    * Ckappa_sig.c_site_name
-    * Ckappa_sig.c_site_name
-    * Ckappa_sig.c_state
-    * Ckappa_sig.c_state)
-    * (Ckappa_sig.c_agent_name
-      * Ckappa_sig.c_site_name
-      * Ckappa_sig.c_site_name
-      * Ckappa_sig.c_state
-      * Ckappa_sig.c_state)
+  type t = agent_two_sites * agent_two_sites
 
   let compare = compare
   let print _ _ = ()
@@ -92,11 +85,7 @@ end))
 (*******************************************************************)
 
 module AgentsSiteState_map_and_set = Map_wrapper.Make (SetMap.Make (struct
-  type t =
-    Ckappa_sig.c_agent_id
-    * Ckappa_sig.c_agent_name
-    * Ckappa_sig.c_site_name
-    * Ckappa_sig.c_state
+  type t = agent_id_site
 
   let compare = compare
   let print _ _ = ()
@@ -117,6 +106,9 @@ module AgentsSitesStates_map_and_set = Map_wrapper.Make (SetMap.Make (struct
 end))
 
 (*******************************************************************)
+
+(**The first variable of the mvbdu represents the question "if there is a bond, is it parallel?"*)
+let first_variable = Ckappa_sig.dummy_mvbdu_var
 
 let convert_pair parameters error kappa_handler pair =
   let agent, site = pair in
@@ -189,9 +181,231 @@ let cons_opt a l =
   | None -> l
   | Some a -> a :: l
 
+let add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu =
+  let pair_list =
+    [ first_variable, Ckappa_sig.state_index_of_int (Bool.to_int bool) ]
+  in
+  let error, bdu_handler, is_parallel_bond_mvbdu =
+    Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters bdu_handler error
+      pair_list
+  in
+  Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+    is_parallel_bond_mvbdu
+
+let add_parallel_bond_lattice_variable_to_mvbdu parameters bdu_handler error
+    value mvbdu =
+  match value with
+  | Usual_domains.Val bool ->
+    add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu
+  | Usual_domains.Any -> error, bdu_handler, mvbdu
+  | Usual_domains.Undefined ->
+    Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+
+let mvbdu_project_abstract_away_first_variable parameters bdu_handler error
+    mvbdu =
+  let error, bdu_handler, variable_list =
+    Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
+      [ first_variable ]
+  in
+  Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler error
+    mvbdu variable_list
+
+let compute_mvbdus_and_parallel_constraints parameters bdu_handler error mvbdu
+    restriction_bdu =
+  let error, bdu_handler, parallel_bond_mvbdu =
+    add_first_variable_to_mvbdu parameters bdu_handler error true mvbdu
+  in
+  let error, bdu_handler, non_parallel_bond_mvbdu =
+    add_first_variable_to_mvbdu parameters bdu_handler error false mvbdu
+  in
+  let error, bdu_handler, parallel_bond_mvbdu =
+    mvbdu_project_abstract_away_first_variable parameters bdu_handler error
+      parallel_bond_mvbdu
+  in
+  let error, bdu_handler, non_parallel_bond_mvbdu =
+    mvbdu_project_abstract_away_first_variable parameters bdu_handler error
+      non_parallel_bond_mvbdu
+  in
+  (* does the analysis result depend on the value of the boolean parameters? *)
+  let error, bdu_handler, parallel_is_true =
+    Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
+      parallel_bond_mvbdu restriction_bdu
+  in
+  let error, bdu_handler, parallel_is_false =
+    Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
+      parallel_bond_mvbdu
+  in
+  let error, bdu_handler, non_parallel_is_true =
+    Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
+      non_parallel_bond_mvbdu restriction_bdu
+  in
+  let error, bdu_handler, non_parallel_is_false =
+    Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
+      non_parallel_bond_mvbdu
+  in
+  let depends_on_parameters =
+    not
+      ((parallel_is_true || parallel_is_false)
+      && (non_parallel_is_true || non_parallel_is_false))
+  in
+  ( error,
+    bdu_handler,
+    parallel_bond_mvbdu,
+    non_parallel_bond_mvbdu,
+    depends_on_parameters,
+    parallel_is_true,
+    non_parallel_is_true,
+    parallel_is_false,
+    non_parallel_is_false )
+
+let print_without_formula parameters error kappa_handler list_site_graph
+    site_graph t_precondition prefix verbose string_agent string_site
+    string_site'' string_site' string_site''' string_agent'' modalite
+    sites_adjectve =
+  let error =
+    match Remanent_parameters.get_backend_mode parameters with
+    | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+      let error =
+        if verbose then (
+          (*print hyp*)
+          let error =
+            Site_graphs.KaSa_site_graph.print
+              (Remanent_parameters.get_logger parameters)
+              parameters error t_precondition
+          in
+          let () =
+            Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
+          in
+          error
+        ) else (
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameters)
+              "%s" prefix
+          in
+          error
+        )
+      in
+      (*print the list of refinement*)
+      Site_graphs.KaSa_site_graph.print_list
+        (Remanent_parameters.get_logger parameters)
+        parameters error kappa_handler list_site_graph
+    | Remanent_parameters_sig.Natural_language ->
+      if verbose then (
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "%sWhen the agent %s has its site %s bound to the site %s of a %s, \
+             and its site %s bound to the site %s of a %s, then both instances \
+             of %s %s %s."
+            prefix string_agent string_site string_site'' string_agent''
+            string_site' string_site''' string_agent'' string_agent'' modalite
+            sites_adjectve
+        in
+        error
+      ) else (
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "%s" prefix
+        in
+        Site_graphs.KaSa_site_graph.print
+          (Remanent_parameters.get_logger parameters)
+          parameters error site_graph
+      )
+  in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+  error
+
+let print_with_formula parameters bdu_handler error kappa_handler mvbdu
+    list_site_graph site_graph prefix verbose string_agent string_site
+    string_site'' string_site' string_site''' string_agent'' sites_adjectve =
+  let error, handler =
+    match Remanent_parameters.get_backend_mode parameters with
+    | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
+      let error =
+        Site_graphs.KaSa_site_graph.print_list
+          (Remanent_parameters.get_logger parameters)
+          parameters error kappa_handler list_site_graph
+      in
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
+      in
+      Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu
+    | Remanent_parameters_sig.Natural_language ->
+      if verbose then (
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "%sThe agent %s can have its site %s bound to the site %s of a %s, \
+             and its site %s bound to the site %s of %s %s, only if: "
+            prefix string_agent string_site string_site'' string_agent''
+            string_site' string_site''' sites_adjectve string_agent''
+        in
+        let error, bdu_handler =
+          Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler
+            mvbdu
+        in
+        error, bdu_handler
+      ) else (
+        let error =
+          Site_graphs.KaSa_site_graph.print
+            (Remanent_parameters.get_logger parameters)
+            parameters error site_graph
+        in
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            " only if "
+        in
+        Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler
+          mvbdu
+      )
+  in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+  error, handler
+
+let print_any_bond parameters error prefix dump_any verbose string_agent
+    string_site string_site'' string_site' string_site''' string_agent'' t_same
+    t_distinct =
+  let error =
+    if dump_any then
+      if verbose then (
+        let () =
+          match Remanent_parameters.get_backend_mode parameters with
+          | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw -> ()
+          | Remanent_parameters_sig.Natural_language ->
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameters)
+              "%sWhen the agent %s has its site %s bound to the site %s of a \
+               %s, and its site %s bound to the site %s of a %s, then both \
+               instances of %s may be  different or not."
+              prefix string_agent string_site string_site'' string_agent''
+              string_site' string_site''' string_agent'' string_agent''
+        in
+        error
+      ) else (
+        let error =
+          Site_graphs.KaSa_site_graph.print
+            (Remanent_parameters.get_logger parameters)
+            parameters error t_same
+        in
+        let () =
+          Loggers.print_newline (Remanent_parameters.get_logger parameters)
+        in
+        Site_graphs.KaSa_site_graph.print
+          (Remanent_parameters.get_logger parameters)
+          parameters error t_distinct
+      )
+    else
+      error
+  in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+  error
+
 let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     ?final_resul:(final_result = false) ?(dump_any = false) parameters error
-    kappa_handler tuple value =
+    kappa_handler tuple value bdu_handler restriction_bdu =
   let modalite =
     if final_result then
       "are necessarily"
@@ -283,190 +497,82 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     t_distinct :: cons_opt t_distinct_self1 (cons_opt t_distinct_self2 [])
   in
   if sparse && compare site site' > 0 then
-    error
+    error, bdu_handler
   else (
-    let error =
-      match value with
-      | Usual_domains.Val true ->
-        (match Remanent_parameters.get_backend_mode parameters with
-        | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-          let error =
-            if verbose then (
-              (*print hyp*)
-              let error =
-                Site_graphs.KaSa_site_graph.print
-                  (Remanent_parameters.get_logger parameters)
-                  parameters error t_precondition
-              in
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  " => "
-              in
-              error
-            ) else (
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  "%s" prefix
-              in
-              error
-            )
-          in
-          (*print the list of refinement*)
-          let error =
-            Site_graphs.KaSa_site_graph.print_list
-              (Remanent_parameters.get_logger parameters)
-              parameters error kappa_handler list_same
-          in
-          let () =
-            Loggers.print_newline (Remanent_parameters.get_logger parameters)
-          in
-          error
-        | Remanent_parameters_sig.Natural_language ->
-          if verbose then (
-            let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters)
-                "%sWhen the agent %s has its site %s bound to the site %s of a \
-                 %s, and its site %s bound to the site %s of a %s, then both \
-                 instances of %s %s the same."
-                prefix string_agent string_site string_site'' string_agent''
-                string_site' string_site''' string_agent'' string_agent''
-                modalite
-            in
-            error
-          ) else (
-            let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters)
-                "%s" prefix
-            in
-            let error =
-              Site_graphs.KaSa_site_graph.print
-                (Remanent_parameters.get_logger parameters)
-                parameters error t_same
-            in
-            let () =
-              Loggers.print_newline (Remanent_parameters.get_logger parameters)
-            in
-            error
-          ))
-      | Usual_domains.Val false ->
-        (match Remanent_parameters.get_backend_mode parameters with
-        | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-          let error =
-            if verbose then (
-              let error =
-                Site_graphs.KaSa_site_graph.print
-                  (Remanent_parameters.get_logger parameters)
-                  parameters error t_precondition
-              in
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  " => "
-              in
-              error
-            ) else (
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  "%s"
-                  (Remanent_parameters.get_prefix parameters)
-              in
-              error
-            )
-          in
-          let error =
-            Site_graphs.KaSa_site_graph.print_list
-              (Remanent_parameters.get_logger parameters)
-              parameters error kappa_handler list_distinct
-          in
-          let () =
-            Loggers.print_newline (Remanent_parameters.get_logger parameters)
-          in
-          error
-        | Remanent_parameters_sig.Natural_language ->
-          let error =
-            if verbose then (
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameters)
-                  "%sWhen the agent %s has its site %s bound to the site %s of \
-                   a %s, and its site %s bound to the site %s of a %s, then \
-                   both instances of %s %s  different."
-                  prefix string_agent string_site string_site'' string_agent''
-                  string_site' string_site''' string_agent'' string_agent''
-                  modalite
-              in
-              error
-            ) else (
-              let error =
-                Site_graphs.KaSa_site_graph.print
-                  (Remanent_parameters.get_logger parameters)
-                  parameters error t_distinct
-              in
-              error
-            )
-          in
-          let () =
-            Loggers.print_newline (Remanent_parameters.get_logger parameters)
-          in
-          error)
-      | Usual_domains.Undefined -> error
-      | Usual_domains.Any ->
+    let ( error,
+          bdu_handler,
+          parallel_bond_mvbdu,
+          non_parallel_bond_mvbdu,
+          depends_on_parameters,
+          parallel_is_true,
+          non_parallel_is_true,
+          parallel_is_false,
+          non_parallel_is_false ) =
+      compute_mvbdus_and_parallel_constraints parameters bdu_handler error value
+        restriction_bdu
+    in
+    (* printing for which values of the guards all double bonds are parallel *)
+    let error, bdu_handler =
+      if depends_on_parameters then
+        if not parallel_is_true then
+          print_with_formula parameters bdu_handler error kappa_handler
+            parallel_bond_mvbdu list_same t_same prefix verbose string_agent
+            string_site string_site'' string_site' string_site''' string_agent''
+            "the same"
+        else
+          error, bdu_handler
+      else (
+        (* if the double bonds are always parallel: *)
         let error =
-          if dump_any then
-            if verbose then (
-              let () =
-                match Remanent_parameters.get_backend_mode parameters with
-                | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
-                  ()
-                | Remanent_parameters_sig.Natural_language ->
-                  Loggers.fprintf
-                    (Remanent_parameters.get_logger parameters)
-                    "%sWhen the agent %s has its site %s bound to the site %s \
-                     of a %s, and its site %s bound to the site %s of a %s, \
-                     then both instances of %s may be  different or not."
-                    prefix string_agent string_site string_site'' string_agent''
-                    string_site' string_site''' string_agent'' string_agent''
-              in
-              error
-            ) else (
-              let error =
-                Site_graphs.KaSa_site_graph.print
-                  (Remanent_parameters.get_logger parameters)
-                  parameters error t_same
-              in
-              let () =
-                Loggers.print_newline
-                  (Remanent_parameters.get_logger parameters)
-              in
-              let error =
-                Site_graphs.KaSa_site_graph.print
-                  (Remanent_parameters.get_logger parameters)
-                  parameters error t_distinct
-              in
-              let () =
-                Loggers.print_newline
-                  (Remanent_parameters.get_logger parameters)
-              in
-              error
-            )
+          if parallel_is_true && non_parallel_is_false then
+            print_without_formula parameters error kappa_handler list_same
+              t_same t_precondition prefix verbose string_agent string_site
+              string_site'' string_site' string_site''' string_agent'' modalite
+              "the same"
           else
             error
         in
-        let () =
-          Loggers.print_newline (Remanent_parameters.get_logger parameters)
+        error, bdu_handler
+      )
+    in
+    (* printing for which values of the guards all double bonds are non-parallel*)
+    let error, bdu_handler =
+      if depends_on_parameters then
+        if not non_parallel_is_true then
+          print_with_formula parameters bdu_handler error kappa_handler
+            non_parallel_bond_mvbdu list_distinct t_distinct prefix verbose
+            string_agent string_site string_site'' string_site' string_site'''
+            string_agent'' "a different"
+        else
+          error, bdu_handler
+      else (
+        let error =
+          if parallel_is_false && non_parallel_is_true then
+            print_without_formula parameters error kappa_handler list_distinct
+              t_distinct t_precondition prefix verbose string_agent string_site
+              string_site'' string_site' string_site''' string_agent'' modalite
+              "different"
+          else
+            error
         in
+        error, bdu_handler
+      )
+    in
+    let error =
+      (* printing for which values of the guards the double bonds can be both parallel and non-parallel *)
+      if depends_on_parameters then
+        error
+      else if parallel_is_true && non_parallel_is_true then
+        print_any_bond parameters error prefix dump_any verbose string_agent
+          string_site string_site'' string_site' string_site''' string_agent''
+          t_same t_distinct
+      else
         error
     in
-    error
+    error, bdu_handler
   )
 
-(* add value used in parallel_bonds_static.ml, project_away_ag_id *)
-let add_value parameters error x value store_result =
+let add_value_lattice parameters error x value store_result =
   let error, old_value =
     match
       PairAgentSitesStates_map_and_set.Map.find_option_without_logs parameters
@@ -487,32 +593,73 @@ let add_value parameters error x value store_result =
     error, store_result
   )
 
+let add_value_mvbdu parameters error x bdu_handler store_result mvbdu
+    restriction_mvbdu =
+  let error, bdu_handler, mvbdu_false =
+    Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+  in
+  let error, old_mvbdu =
+    match
+      PairAgentSitesStates_map_and_set.Map.find_option_without_logs parameters
+        error x store_result
+    with
+    | error, None -> error, mvbdu_false
+    | error, Some old_mvbdu -> error, old_mvbdu
+  in
+  let error, bdu_handler, new_mvbdu =
+    Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error old_mvbdu mvbdu
+      restriction_mvbdu
+  in
+  let error, store_result =
+    PairAgentSitesStates_map_and_set.Map.add_or_overwrite parameters error x
+      new_mvbdu store_result
+  in
+  error, (bdu_handler, store_result)
 (*use at apply_gen*)
 
+(* add value used in parallel_bonds_static.ml, project_away_ag_id *)
+let add_value_bool parameters error x bdu_handler bool store_result mvbdu
+    restriction_mvbdu =
+  let error, bdu_handler, mvbdu_refined =
+    add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu
+  in
+  add_value_mvbdu parameters error x bdu_handler store_result mvbdu_refined
+    restriction_mvbdu
+
 let add_value_and_event parameters error kappa_handler x value store_set
-    store_result =
+    store_result guard_mvbdu bdu_handler restriction_mvbdu =
+  let error, bdu_handler, value_mvbdu =
+    add_parallel_bond_lattice_variable_to_mvbdu parameters bdu_handler error
+      value guard_mvbdu
+  in
+  let error, bdu_handler, mvbdu_false =
+    Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+  in
   let error, old_value =
     match
       PairAgentSitesStates_map_and_set.Map.find_option_without_logs parameters
         error x store_result
     with
-    | error, None -> error, Usual_domains.Undefined
+    | error, None -> error, mvbdu_false
     | error, Some v -> error, v
   in
   let proj (a, b, _, _, _) = a, b in
   let proj' (a, _, c, _, _) = a, c in
   let pair (x, y) = proj x, proj' x, proj y, proj' y in
-  let new_value = Usual_domains.lub old_value value in
-  if compare new_value old_value = 0 then
-    error, (store_set, store_result)
+  let error, bdu_handler, new_value =
+    Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error old_value
+      value_mvbdu restriction_mvbdu
+  in
+  if Ckappa_sig.Views_bdu.equal new_value old_value then
+    error, (bdu_handler, store_set, store_result)
   else (
     (*check whether or not if this is a fresh value*)
-    let error =
+    let error, bdu_handler =
       if Remanent_parameters.get_dump_reachability_analysis_diff parameters then
         print_parallel_constraint ~verbose:false ~dump_any:true parameters error
-          kappa_handler x value
+          kappa_handler x value_mvbdu bdu_handler restriction_mvbdu
       else
-        error
+        error, bdu_handler
     in
     (*compute new value only when it is needed*)
     let error, store_result =
@@ -526,7 +673,7 @@ let add_value_and_event parameters error kappa_handler x value store_set
     let error =
       Exception.check_point Exception.warn parameters error error' __POS__ Exit
     in
-    error, (new_set, store_result)
+    error, (bdu_handler, new_set, store_result)
   )
 
 let project (_, b, c, d, e, f) = b, c, d, e, f
@@ -535,7 +682,7 @@ let get_tuple (a, b) = project a, project b
 let project2 = snd
 
 let add_value_from_refined_tuple parameters error x =
-  add_value parameters error (project2 x)
+  add_value_lattice parameters error (project2 x)
 
 let swap_sites_in_tuple (a, b, s, s', st, st') = a, b, s', s, st', st
 

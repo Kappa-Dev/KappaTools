@@ -47,10 +47,27 @@ module type Mvbdu = sig
     'input ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
 
+  type ('input, 'output) unary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int ->
+    'input ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
+
   type ('input1, 'input2, 'output) binary =
     Remanent_parameters_sig.parameters ->
     handler ->
     Exception.exceptions_caught_and_uncaught ->
+    'input1 ->
+    'input2 ->
+    Exception.exceptions_caught_and_uncaught * handler * 'output
+
+  type ('input1, 'input2, 'output) binary_with_threshold =
+    Remanent_parameters_sig.parameters ->
+    handler ->
+    Exception.exceptions_caught_and_uncaught ->
+    threshold:int ->
     'input1 ->
     'input2 ->
     Exception.exceptions_caught_and_uncaught * handler * 'output
@@ -129,6 +146,9 @@ module type Mvbdu = sig
   val mvbdu_rename : (mvbdu, hconsed_renaming_list, mvbdu) binary
   val mvbdu_project_keep_only : (mvbdu, hconsed_variables_list, mvbdu) binary
 
+  val mvbdu_project_keep_only_with_threshold :
+    (mvbdu, hconsed_variables_list, mvbdu) binary_with_threshold
+
   val mvbdu_project_abstract_away :
     (mvbdu, hconsed_variables_list, mvbdu) binary
 
@@ -136,7 +156,17 @@ module type Mvbdu = sig
     (mvbdu, int, mvbdu option * mvbdu list) binary
 
   val mvbdu_full_cartesian_decomposition : (mvbdu, mvbdu list) unary
+
+  val mvbdu_full_cartesian_decomposition_with_threshold :
+    (mvbdu, mvbdu list) unary_with_threshold
+
   val mvbdu_cartesian_abstraction : (mvbdu, mvbdu list) unary
+
+  val mvbdu_cartesian_abstraction_with_threshold :
+    (mvbdu, mvbdu list) unary_with_threshold
+
+  val mvbdu_width : (mvbdu, int) unary
+  val mvbdu_height : (mvbdu, int) unary
 
   val build_association_list :
     ((key * value) list, hconsed_association_list) unary
@@ -198,7 +228,18 @@ module type Mvbdu = sig
     (hconsed_range_list, (key * (value option * value option)) list) unary
 
   val extensional_of_mvbdu : (mvbdu, (key * value) list list) unary
+
+  val mvbdu_to_formula :
+    cartesian_decomposition:bool -> (mvbdu, key Logical_formulae.formula) unary
+
+  val parametric_conditions_of_mvbdu :
+    (mvbdu, ((key * value) list * mvbdu) list) unary_with_threshold
+
   val variables_list_of_mvbdu : (mvbdu, hconsed_variables_list) unary
+
+  val variables_list_of_mvbdu_with_threshold :
+    (mvbdu, hconsed_variables_list) unary_with_threshold
+
   val print : Remanent_parameters_sig.parameters -> mvbdu -> unit
 
   val print_association_list :
@@ -323,6 +364,8 @@ module type Internalized_mvbdu = sig
     mvbdu -> int -> mvbdu option * mvbdu list
 
   val mvbdu_full_cartesian_decomposition : mvbdu -> mvbdu list
+  val mvbdu_height : mvbdu -> int
+  val mvbdu_width : mvbdu -> int
   val build_association_list : (key * value) list -> hconsed_association_list
 
   val build_sorted_association_list :
@@ -381,6 +424,9 @@ module type Internalized_mvbdu = sig
 
   val hash_of_association_list : hconsed_association_list -> int
   val hash_of_variables_list : hconsed_variables_list -> int
+
+  val mvbdu_to_formula :
+    cartesian_decomposition:bool -> mvbdu -> int Logical_formulae.formula
 end
 
 module type Nul = sig end

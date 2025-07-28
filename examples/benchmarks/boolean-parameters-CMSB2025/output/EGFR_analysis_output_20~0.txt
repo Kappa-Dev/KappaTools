@@ -1,0 +1,164 @@
+Kappa Static Analyzer (v4.1.3.1-175-g514ee1742) (without Tk interface)
+Analysis launched at 2025/04/30 12:55:52 (GMT+2) on MP983-PRO
+Parsing temp_experiment.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule EGFR.EGFR (File "temp_experiment.ka", lines 57-59, characters 0-89:) could be applied if @rule-0.and.@rule-2.
+rule EGFR/EGFR (File "temp_experiment.ka", lines 60-62, characters 0-90:) could be applied if @rule-0.and.@rule-1.and.@rule-2.
+rule EGF.EGFR (File "temp_experiment.ka", line 64, characters 0-78:) could be applied if @rule-2.
+rule EGF/EGFR (File "temp_experiment.ka", line 65, characters 0-79:) could be applied if @rule-2.and.@rule-3.
+rule Shc.Grb2 (File "temp_experiment.ka", line 66, characters 0-78:) could be applied if @rule-0.and.@rule-2.and.@rule-4.and.@rule-8.and.@rule-12.and.@rule-15.and.@rule-18.
+rule Shc/Grb2 (File "temp_experiment.ka", line 68, characters 0-77:) could be applied if @rule-0.and.@rule-2.and.@rule-4.and.@rule-5.and.@rule-8.and.@rule-12.and.@rule-15.and.@rule-18.
+rule EGFR.Grb2 (File "temp_experiment.ka", line 69, characters 0-87:) could be applied if @rule-0.and.@rule-2.and.@rule-6.and.@rule-12.and.@rule-14.
+rule EGFR/Grb2 (File "temp_experiment.ka", line 70, characters 0-88:) could be applied if @rule-0.and.@rule-2.and.@rule-6.and.@rule-7.and.@rule-12.and.@rule-14.
+rule EGFR.Shc (File "temp_experiment.ka", line 71, characters 0-84:) could be applied if @rule-0.and.@rule-2.and.@rule-8.and.@rule-12.and.@rule-15.
+rule EGFR/Shc (File "temp_experiment.ka", line 72, characters 0-85:) could be applied if @rule-0.and.@rule-2.and.@rule-8.and.@rule-9.and.@rule-12.and.@rule-15.
+rule Grb2.SoS (File "temp_experiment.ka", line 74, characters 0-90:) could be applied if @rule-10.
+rule Grb2/SoS (File "temp_experiment.ka", line 75, characters 0-75:) could be applied if @rule-10.and.@rule-11.
+rule EGFR.int (File "temp_experiment.ka", line 76, characters 0-112:) could be applied if @rule-0.and.@rule-2.and.@rule-12.
+rule EGFR/int (File "temp_experiment.ka", line 77, characters 0-113:) could be applied if @rule-0.and.@rule-2.and.@rule-12.and.@rule-13.
+rule pY1092@EGFR (File "temp_experiment.ka", line 78, characters 0-96:) could be applied if @rule-0.and.@rule-2.and.@rule-12.and.@rule-14.
+rule pY1172@EGFR (File "temp_experiment.ka", line 80, characters 0-96:) could be applied if @rule-0.and.@rule-2.and.@rule-12.and.@rule-15.
+rule uY1092@EGFR (File "temp_experiment.ka", line 81, characters 0-62:) could be applied if @rule-0.and.@rule-2.and.@rule-12.and.@rule-14.and.@rule-16.
+rule uY1172@EGFR (File "temp_experiment.ka", line 82, characters 0-62:) could be applied if @rule-0.and.@rule-2.and.@rule-12.and.@rule-15.and.@rule-17.
+rule pY@Shc (File "temp_experiment.ka", line 84, characters 0-99:) could be applied if @rule-0.and.@rule-2.and.@rule-8.and.@rule-12.and.@rule-15.and.@rule-18.
+rule uY@Shc (File "temp_experiment.ka", line 86, characters 0-47:) could be applied if @rule-0.and.@rule-2.and.@rule-8.and.@rule-12.and.@rule-15.and.@rule-18.and.@rule-19.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties: 
+------------------------------------------------------------
+EGF(r[L.EGFR]) [ if @rule-2 ] 
+EGF(r[.]) [ if .T. ] 
+
+EGFR(L[r.EGF]) [ if @rule-2 ] 
+EGFR(L[.]) [ if .T. ] 
+
+EGFR(CR[CR.EGFR]) [ if @rule-0.and.@rule-2 ] 
+EGFR(CR[.]) [ if .T. ] 
+
+EGFR(N[C.EGFR]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(N[.]) [ if .T. ] 
+
+EGFR(C[N.EGFR]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[.]) [ if .T. ] 
+
+EGFR(Y1172{p}) [ if @rule-0.and.@rule-2.and.@rule-12.and.@rule-15 ] 
+EGFR(Y1172{u}) [ if .T. ] 
+
+EGFR(Y1172[PTB.Shc]) [ if @rule-0.and.@rule-2.and.@rule-8.and.@rule-12.and.@rule-15 ] 
+EGFR(Y1172[.]) [ if .T. ] 
+
+EGFR(C[N.EGFR]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[.]) [ if .T. ] 
+
+EGFR(Y1092{p}) [ if @rule-0.and.@rule-2.and.@rule-12.and.@rule-14 ] 
+EGFR(Y1092{u}) [ if .T. ] 
+
+EGFR(Y1092[SH2.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-6.and.@rule-12.and.@rule-14 ] 
+EGFR(Y1092[.]) [ if .T. ] 
+
+EGFR(C[N.EGFR]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[.]) [ if .T. ] 
+
+EGFR(Y1016) => EGFR(Y1016{u})
+Grb2(SH3n[PR.SoS]) [ if @rule-10 ] 
+Grb2(SH3n[.]) [ if .T. ] 
+
+Grb2(SH2[Y1092.EGFR]) [ if @rule-0.and.@rule-2.and.@rule-6.and.@rule-12.and.@rule-14 ] 
+Grb2(SH2[Y.Shc]) [ if @rule-0.and.@rule-2.and.@rule-4.and.@rule-8.and.@rule-12.and.@rule-15.and.@rule-18 ] 
+Grb2(SH2[.]) [ if .T. ] 
+
+Grb2(SH2) => Grb2(SH2{u})
+Shc(Y{p}) [ if @rule-0.and.@rule-2.and.@rule-8.and.@rule-12.and.@rule-15.and.@rule-18 ] 
+Shc(Y{u}) [ if .T. ] 
+
+Shc(Y[SH2.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-4.and.@rule-8.and.@rule-12.and.@rule-15.and.@rule-18 ] 
+Shc(Y[.]) [ if .T. ] 
+
+Shc(PTB[Y1172.EGFR]) [ if @rule-0.and.@rule-2.and.@rule-8.and.@rule-12.and.@rule-15 ] 
+Shc(PTB[.]) [ if .T. ] 
+
+Shc(PTB) => Shc(PTB{u})
+SoS(PR[SH3n.Grb2]) [ if @rule-10 ] 
+SoS(PR[.]) [ if .T. ] 
+
+SoS(S) => SoS(S{u})
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+EGFR(C[.],CR[.],L[r.EGF],N[.]) [ if @rule-2 ] 
+EGFR(C[.],CR[CR.EGFR],L[r.EGF],N[C.EGFR]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[.],CR[CR.EGFR],L[r.EGF],N[.]) [ if @rule-0.and.@rule-2 ] 
+EGFR(C[N.EGFR],CR[CR.EGFR],L[r.EGF],N[.]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[.],CR[.],L[.],N[.]) [ if .T. ] 
+
+EGFR(C[N.EGFR],Y1172{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-12.and.@rule-15 ] 
+EGFR(C[.],Y1172{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-12.and.@rule-13.and.@rule-15 ] 
+EGFR(C[N.EGFR],Y1172{p}[PTB.Shc]) [ if @rule-0.and.@rule-2.and.@rule-8.and.@rule-12.and.@rule-15 ] 
+EGFR(C[.],Y1172{p}[PTB.Shc]) [ if @rule-0.and.@rule-2.and.@rule-8.and.@rule-12.and.@rule-13.and.@rule-15 ] 
+EGFR(C[N.EGFR],Y1172{u}[.]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[.],Y1172{u}[.]) [ if .T. ] 
+
+EGFR(C[N.EGFR],Y1092{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-12.and.@rule-14 ] 
+EGFR(C[.],Y1092{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-12.and.@rule-13.and.@rule-14 ] 
+EGFR(C[N.EGFR],Y1092{p}[SH2.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-6.and.@rule-12.and.@rule-14 ] 
+EGFR(C[.],Y1092{p}[SH2.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-6.and.@rule-12.and.@rule-13.and.@rule-14 ] 
+EGFR(C[N.EGFR],Y1092{u}[.]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[.],Y1092{u}[.]) [ if .T. ] 
+
+
+Shc(PTB[Y1172.EGFR],Y{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-8.and.@rule-12.and.@rule-15.and.@rule-18 ] 
+Shc(PTB[.],Y{p}[.]) [ if @rule-0.and.@rule-2.and.@rule-8.and.@rule-9.and.@rule-12.and.@rule-15.and.@rule-18 ] 
+Shc(PTB[Y1172.EGFR],Y{p}[SH2.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-4.and.@rule-8.and.@rule-12.and.@rule-15.and.@rule-18 ] 
+Shc(PTB[.],Y{p}[SH2.Grb2]) [ if @rule-0.and.@rule-2.and.@rule-4.and.@rule-8.and.@rule-9.and.@rule-12.and.@rule-15.and.@rule-18 ] 
+Shc(PTB[Y1172.EGFR],Y{u}[.]) [ if @rule-0.and.@rule-2.and.@rule-8.and.@rule-12.and.@rule-15 ] 
+Shc(PTB[.],Y{u}[.]) [ if .T. ] 
+
+
+
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+
+
+EGFR(CR[1],L[r.EGF]),EGFR(CR[1],N[.]) [ if @rule-0.and.@rule-2 ] 
+EGFR(CR[1],L[r.EGF]),EGFR(CR[1],N[C.EGFR]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+
+
+EGFR(CR[1],N[C.EGFR]),EGFR(CR[1],N[.]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(CR[1],N[.]),EGFR(CR[1],N[.]) [ if @rule-0.and.@rule-2 ] 
+EGFR(CR[1],N[.]),EGFR(CR[1],N[C.EGFR]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+
+
+EGFR(C[N.EGFR],CR[1]),EGFR(CR[1],L[r.EGF]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[.],CR[1]),EGFR(CR[1],L[r.EGF]) [ if @rule-0.and.@rule-2 ] 
+
+
+EGFR(C[N.EGFR],CR[1]),EGFR(CR[1],N[C.EGFR]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[.],CR[1]),EGFR(CR[1],N[.]) [ if @rule-0.and.@rule-2 ] 
+
+
+EGFR(C[N.EGFR],CR[1]),EGFR(C[.],CR[1]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[.],CR[1]),EGFR(C[.],CR[1]) [ if @rule-0.and.@rule-2 ] 
+EGFR(C[.],CR[1]),EGFR(C[N.EGFR],CR[1]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+EGFR(CR[1],N[2]),EGFR(C[2],CR[1]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+EGFR(C[2],CR[1]),EGFR(CR[1],N[2]) [ if @rule-0.and.@rule-2.and.@rule-12 ] 
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+execution finished without any exception

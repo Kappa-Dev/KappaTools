@@ -78,7 +78,7 @@
   (synopsis "Browser app for an interactive use of the Kappa tool suite. Best way to start with the kappa language")
   (depends
    (ocaml (and ( >= 4.13.0) ( < 5.0.0 )))
-   (dune ( = 3.14.0 ))
+   (dune (and ( >= 3.14.0) ( < 3.19.0 )))
    (yojson ( = 2.1.0 ))
    (lwt ( = 5.7.0 ))
    (lwt_react ( = 1.2.0 ))

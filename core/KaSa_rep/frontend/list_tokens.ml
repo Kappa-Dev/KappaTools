@@ -53,12 +53,15 @@ let empty_handler parameters error =
       Cckappa_sig.nvars = 0;
       Cckappa_sig.nagents = Ckappa_sig.dummy_agent_name;
       Cckappa_sig.nrules = 0;
+      Cckappa_sig.nsites = Ckappa_sig.dummy_site_name_2;
+      Cckappa_sig.nguard_params = Ckappa_sig.dummy_guard_parameter;
       Cckappa_sig.agents_dic = Ckappa_sig.Dictionary_of_agents.init ();
       Cckappa_sig.agents_annotation = agent_annotation;
       Cckappa_sig.interface_constraints = int_constraints;
       Cckappa_sig.sites;
       Cckappa_sig.states_dic;
       Cckappa_sig.dual;
+      Cckappa_sig.guard_parameters_dic = Ckappa_sig.Dictionary_of_guards.init ();
     } )
 
 let create_binding_state_dictionary parameters error =
@@ -156,6 +159,32 @@ let declare_agent parameters error handler agent_string pos =
   in
   error, (handler, agent_name)
 
+let declare_guard_p parameters error handler guard_p_string =
+  let guard_p_dic = handler.Cckappa_sig.guard_parameters_dic in
+  let error, (bool, output) =
+    Ckappa_sig.Dictionary_of_guards.allocate_bool parameters error
+      Ckappa_sig.compare_unit_guard_parameter guard_p_string ()
+      Misc_sa.const_unit guard_p_dic
+  in
+  match output with
+  | None -> Exception.warn parameters error __POS__ Exit handler
+  | Some (k, _, _, dic) ->
+    if bool then (
+      let handler =
+        let k' = Ckappa_sig.next_guard_p_name k in
+        if
+          Ckappa_sig.compare_guard_parameter k'
+            handler.Cckappa_sig.nguard_params
+          > 0
+        then
+          { handler with Cckappa_sig.nguard_params = k' }
+        else
+          handler
+      in
+      error, { handler with Cckappa_sig.guard_parameters_dic = dic }
+    ) else
+      error, handler
+
 let declare_site create parameters make_site make_state (error, handler)
     agent_name site_name list =
   let site = make_site site_name in
@@ -178,6 +207,16 @@ let declare_site create parameters make_site make_state (error, handler)
       Exception.warn parameters error __POS__ Exit
         (handler, [], Ckappa_sig.dummy_site_name)
     | Some (k, _, _, sites) ->
+      let nsites =
+        if
+          Ckappa_sig.int_of_site_name (Handler.get_nsites handler)
+          = Ckappa_sig.int_of_site_name k + 1
+        then
+          Ckappa_sig.site_name_of_int (Ckappa_sig.int_of_site_name k + 2)
+        else
+          Handler.get_nsites handler
+      in
+      let handler = { handler with Cckappa_sig.nsites } in
       let error, (states_dic, dic_states, handler) =
         if bool then (
           let error, dic_states = create parameters error in
@@ -396,8 +435,19 @@ let scan_alg _parameters remanent _alg =
   (*TO DO*)
   remanent
 
+let scan_guard parameters (error, handler) guard =
+  match guard with
+  | None -> error, handler
+  | Some guard ->
+    let guard_parameters = Logical_formulae.get_list_of_predicates guard in
+    List.fold_left
+      (fun (error, handler) guardp ->
+        declare_guard_p parameters error handler guardp)
+      (error, handler) guard_parameters
+
 let scan_initial_states parameters =
-  List.fold_left (fun remanent ((alg, _pos), init_t) ->
+  List.fold_left (fun remanent (guard, (alg, _pos), init_t) ->
+      let remanent = scan_guard parameters remanent guard in
       let remanent = scan_alg parameters remanent alg in
       match init_t with
       | Ast.INIT_MIX (mixture, _pos') ->
@@ -443,10 +493,12 @@ let scan_rules scan_mixt parameters a b =
     )
   in
   List.fold_left
-    (fun remanent (_, (rule, _)) ->
-      scan_mixture parameters
-        (scan_mixt parameters remanent rule.Ckappa_sig.lhs)
-        rule.Ckappa_sig.rhs)
+    (fun remanent (_, guard, (rule, _)) ->
+      scan_guard parameters
+        (scan_mixture parameters
+           (scan_mixt parameters remanent rule.Ckappa_sig.lhs)
+           rule.Ckappa_sig.rhs)
+        guard)
     a b
 
 let reverse_agents_annotation parameters (error, remanent) =
@@ -491,8 +543,8 @@ let scan_compil parameters error compil =
   let remanent =
     scan_perts scan_tested_mixture parameters remanent compil.Ast.perturbations
   in
-  let remanent =
+  let error, remanent =
     scan_rules scan_tested_mixture parameters remanent compil.Ast.rules
   in
-  let remanent = reverse_agents_annotation parameters remanent in
+  let remanent = reverse_agents_annotation parameters (error, remanent) in
   remanent

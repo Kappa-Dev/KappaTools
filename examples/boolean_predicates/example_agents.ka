@@ -1,0 +1,9 @@
+%agent: A(x{u p})
+// global boolean parameter
+// P
+%guard_param: P [false]
+
+#[P] . -> A(x{u}) @ 1
+A(x{u}) -> A(x{p}) @ 1
+
+%obs: 'Ap' |A(x{p})|
