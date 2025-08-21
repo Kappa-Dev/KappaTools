@@ -369,6 +369,48 @@ let unify_weight w_new w_old =
          (fun () () j _ -> (), j)
          (snd (w_new)) (snd (w_old)))
 
+(* The following functions implement a fusion relation specified as a list of equalitiy between integer identifiers *)
+(* It is not called very often, but there is room for improvement with an incremental version *)
+
+let build_alias aliases = 
+  match aliases with
+  | [] -> [], fun i -> i
+  | _ ->
+    let aliases =
+        List.rev_map
+          (fun (i, j) ->
+            if i < j then i, j else j, i)
+          aliases
+    in
+    let aliases = 
+      List.sort (fun (a, _) (b, _) -> compare a b) aliases 
+    in
+    let aliases_map =
+      List.fold_left
+        (fun m (i, j) ->
+           let im =
+               match Mods.IntMap.find_option i m with
+                 | None -> i
+                 | Some j -> j
+            in
+            Mods.IntMap.add j im m)
+        Mods.IntMap.empty aliases
+    in
+    let aliases_fun i =
+      match Mods.IntMap.find_option i aliases_map with
+       | None -> i
+       | Some j -> j
+    in
+    aliases, aliases_fun 
+          
+let init_alias = [],(fun i -> i)
+let apply_alias (_,f) = f 
+        
+let add_alias (i,j) (l,_) = 
+    build_alias ((i,j)::l)
+        
+
+
 let flush ~neighbor ~agtype ~(thresholds:weight->weight) t =
   let set = t.to_check_unbind in
   let l = Mods.IntSet.fold (fun i l -> (i, [ i ]) :: l) set [] in
@@ -384,58 +426,28 @@ let flush ~neighbor ~agtype ~(thresholds:weight->weight) t =
         let t = { t with split } in
         let tail = List.fold_left (fun l x -> x :: l) tail (neighbor h) in
         aux tail' ((i, tail) :: to_visit_after) t alias
-      | Some i' when i = i' ->
+      | Some i' when i = apply_alias alias i' ->
         (* already seen, nothing to do *)
         aux tail' ((i, tail) :: to_visit_after) t alias
       | Some i' ->
         (* seen in another equivalent class -> merge *)
-        merge (i, tail) i' tail' to_visit_after t ((i, i') :: alias))
+        let i' = apply_alias alias i' in 
+        merge (i, tail) i' tail' to_visit_after t (add_alias (i, i') alias))
   and merge (i, l1) j to_visit to_visit_after t alias =
     let lj_opt, to_visit, to_visit_after = scan2 j to_visit to_visit_after in
     match lj_opt with
-    | None -> assert false
+    | None -> 
+      assert false
     | Some l2 ->
       (match to_visit, to_visit_after with
-      | [], [] -> t, []
+      | [], [] -> t, alias 
       | _, _ ->
         let l = l1 @ l2 in
         let i = min i j in
         let to_visit_after = (i, l) :: to_visit_after in
         aux to_visit to_visit_after t alias)
   in
-  let t, aliases = aux l [] t [] in
-  let aliases =
-    match aliases with
-    | [] -> fun i -> i
-    | _ ->
-      let aliases =
-        List.rev_map
-          (fun (i, j) ->
-            if i < j then
-              i, j
-            else
-              j, i)
-          aliases
-      in
-      let aliases = List.sort (fun (a, _) (b, _) -> compare a b) aliases in
-      let aliases =
-        List.fold_left
-          (fun m (i, j) ->
-            let im =
-              match Mods.IntMap.find_option i m with
-              | None -> i
-              | Some j -> j
-            in
-            Mods.IntMap.add j im m)
-          Mods.IntMap.empty aliases
-      in
-      let aliases i =
-        match Mods.IntMap.find_option i aliases with
-        | None -> i
-        | Some j -> j
-      in
-      aliases
-  in
+  let t, (_,aliases) = aux l [] t init_alias in 
   let split =
     Blackboard.fold
       (fun i j split -> Blackboard.overwrite split i (Some (aliases j)))
