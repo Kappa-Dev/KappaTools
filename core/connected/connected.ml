@@ -348,7 +348,7 @@ let scan i l =
   let rec aux i l acc =
     match l with
     | (k, d) :: t when k = i -> List.rev acc @ t, Some d
-    | (k, d) :: t -> aux i t ((k, d) :: t)
+    | (k, d) :: t -> aux i t ((k, d) :: acc)
     | [] -> List.rev acc, None
   in
   aux i l []
