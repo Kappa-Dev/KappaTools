@@ -355,11 +355,13 @@ let scan i l =
 
 let scan2 i l l' =
   match scan i l with
-  | l, Some a -> Some a, l, l'
+  | l, Some a -> a, l, l'
   | _, None ->
-    let l', a = scan i l' in
-    a, l, l'
-
+    begin 
+      match scan i l' with 
+      | l', None -> [],l,l' 
+      | l', Some a -> a,l,l' 
+    end
 let unify_weight w_new w_old =  
   fst w_new, 
   snd (Mods.IntMap.map2_with_logs (fun () () _ _ _ -> ()) 
@@ -391,10 +393,7 @@ let flush ~neighbor ~agtype ~(thresholds:weight->weight) t =
         (* seen in another equivalent class -> merge *)
         merge (i, tail) i' tail' to_visit_after t ((i, i') :: alias))
   and merge (i, l1) j to_visit to_visit_after t alias =
-    let lj_opt, to_visit, to_visit_after = scan2 j to_visit to_visit_after in
-    match lj_opt with
-    | None -> assert false
-    | Some l2 ->
+    let l2, to_visit, to_visit_after = scan2 j to_visit to_visit_after in
       (match to_visit, to_visit_after with
       | [], [] -> t, []
       | _, _ ->
@@ -573,7 +572,7 @@ let flush ~neighbor ~agtype ~(thresholds:weight->weight) t =
           set (t, updates))
       threshold_update (t, [])
   in
-  
+
   let to_check_unbind = Mods.IntSet.empty in
   let t = { t with to_check_unbind; threshold_update; threshold_old } in
   flush_updates t, updates
