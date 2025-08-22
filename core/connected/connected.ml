@@ -81,6 +81,7 @@ type t = {
   split: id Blackboard.t;
   threshold_update: Mods.IntIntOptSet.t Blackboard.t;
   threshold_old: Mods.IntIntOptSet.t Blackboard.t;
+  degraded: int list; 
 }
 
 let flush_updates t =
@@ -105,6 +106,7 @@ let flush_updates t =
         array)
       t.size_update t.size
   in
+  let degraded = [] in 
   {
     t with
     array;
@@ -113,6 +115,7 @@ let flush_updates t =
     back_trans_update;
     size;
     size_update;
+    degraded; 
   }
 
 let print f t =
@@ -184,6 +187,8 @@ let print_update f t =
     Mods.IntSet.iter (fun j -> Format.fprintf f "%i," j) t.to_check_unbind
   in
   let () = Format.fprintf f "@." in
+  let () = Format.fprintf f "DEGRADED @." in 
+  let () = List.iter (fun j -> Format.fprintf f "%i," j) t.degraded in 
   ()
 
 let print_all f t =
@@ -202,6 +207,7 @@ let init () =
     split = Blackboard.create ();
     threshold_update = Blackboard.create ();
     threshold_old = Blackboard.create ();
+    degraded = []; 
   }
 
 let copy t =
@@ -216,6 +222,7 @@ let copy t =
     split = Blackboard.copy t.split;
     threshold_update = Blackboard.copy t.threshold_update;
     threshold_old = Blackboard.copy t.threshold_old;
+    degraded = t.degraded;
   }
 
 let lift t acc i =
@@ -342,7 +349,8 @@ let bind = join
 
 let degrade ~neighbor:f t i =
   let list = f i in
-  List.fold_left (fun t j -> unbind t i j) t list
+  let t = List.fold_left (fun t j -> unbind t i j) t list in 
+  {t with degraded=i::t.degraded}
 
 let scan i l =
   let rec aux i l acc =
@@ -413,6 +421,13 @@ let add_alias (i,j) (l,_) =
 
 let flush ~neighbor ~agtype ~(thresholds:weight->weight) t =
   let set = t.to_check_unbind in
+  let degraded_set = List.fold_left (fun set i -> Mods.IntSet.add i set) Mods.IntSet.empty t.degraded in 
+  let set = Mods.IntSet.diff set degraded_set in 
+  let with_degradation = 
+    match t.degraded with 
+      | [] -> false 
+      | _::_ -> true 
+  in 
   let l = Mods.IntSet.fold (fun i l -> (i, [ i ]) :: l) set [] in
   let rec aux to_visit to_visit_after t alias =
     match to_visit, to_visit_after with
@@ -440,7 +455,7 @@ let flush ~neighbor ~agtype ~(thresholds:weight->weight) t =
       assert false
     | Some l2 ->
       (match to_visit, to_visit_after with
-      | [], [] -> t, alias 
+      | [], [] when with_degradation -> t, alias 
       | _, _ ->
         let l = l1 @ l2 in
         let i = min i j in
@@ -581,11 +596,10 @@ let flush ~neighbor ~agtype ~(thresholds:weight->weight) t =
                   | None -> 0 
                   | Some i -> i 
             in 
-            t, { id; previous_threshold; current_threshold } :: updates)
+            t, { id; previous_threshold; current_threshold} :: updates)
           set (t, updates))
       threshold_update (t, [])
   in
-  
   let to_check_unbind = Mods.IntSet.empty in
   let t = { t with to_check_unbind; threshold_update; threshold_old } in
   flush_updates t, updates

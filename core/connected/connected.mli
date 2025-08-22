@@ -1,7 +1,7 @@
 type t
 type id = int
 type thresholds_state (*= int option * int Mods.IntMap.t *)
-type update = { id: id * id option; previous_threshold: id; current_threshold: id }
+type update = { id: id * id option; previous_threshold: id; current_threshold: id}
 type updates = update list
 type 'a pos_neg
 type cache 
