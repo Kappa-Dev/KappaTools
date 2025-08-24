@@ -45,7 +45,12 @@ let add_test_in_rule_agent sigs (agent : LKappa.rule_agent) (t_agent_name,(cmp,_
     | Operator.EQUAL | Operator.DIFF -> assert false 
   in
   let () =
-    Array.set agent.LKappa.ra_ints site (LKappa.I_VAL_CHANGED (int, int))
+    if agent.LKappa.ra_erased
+    then
+      let () = Array.set agent.LKappa.ra_ints site (LKappa.I_VAL_ERASED int) in
+      Array.set agent.LKappa.ra_ports site (Loc.annot_with_dummy LKappa.ANY_FREE, LKappa.Erased) (* JF: Specify that the binding state may also be erased. Not sure this is useful, I put it to do as for other internal states *)
+    else
+      Array.set agent.LKappa.ra_ints site (LKappa.I_VAL_CHANGED (int, int))
   in
   agent
 
