@@ -422,7 +422,7 @@ let add_alias (i,j) (l,_) =
 let flush ~neighbor ~agtype ~(thresholds:weight->weight) t =
   let set = t.to_check_unbind in
   let degraded_set = List.fold_left (fun set i -> Mods.IntSet.add i set) Mods.IntSet.empty t.degraded in 
-  let set = Mods.IntSet.diff set degraded_set in 
+  let set = Mods.IntSet.inter set (Mods.IntSet.diff set degraded_set) in 
   let with_degradation = 
     match t.degraded with 
       | [] -> false 
