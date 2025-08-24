@@ -268,7 +268,7 @@ let f ~debug_mode ren acc (i, _cc) em =
       p in
   (matc,mix)*)
 
-let with_thresholds = Size_info.previous_threshold_init () 
+let with_thresholds = Size_info.previous_threshold_init ()
 let with_connected_components = false
 
 let compose_embeddings_unary_binary compil p emb_list x =

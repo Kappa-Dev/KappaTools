@@ -125,7 +125,7 @@ module type Map = sig
   val pop : elt -> 'a t -> 'a option * 'a t
   val merge : 'a t -> 'a t -> 'a t
   val min_elt : 'a t -> (elt * 'a) option
-  val max_elt : 'a t -> (elt * 'a) option 
+  val max_elt : 'a t -> (elt * 'a) option
   val find_option : elt -> 'a t -> 'a option
   val find_default : 'a -> elt -> 'a t -> 'a
 

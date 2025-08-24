@@ -631,8 +631,10 @@ let compile ~outputs ~pause ~return ~sharing ~debug_mode ~compile_mode_on
     size_predicates_info with_thresholds tk_nd contact_map result =
   let warning ~pos msg = outputs (Data.Warning (Some pos, msg)) in
   outputs (Data.Log "+ Building initial simulation conditions...");
-  let n_ag_type = Signature.size sigs_nd in 
-  let previous_threshold = Connected.build_threshold n_ag_type with_thresholds in
+  let n_ag_type = Signature.size sigs_nd in
+  let previous_threshold =
+    Connected.build_threshold n_ag_type with_thresholds
+  in
   let cache_threshold =
     Size_compiler.compute_between_thresholds_matrix n_ag_type with_thresholds
   in

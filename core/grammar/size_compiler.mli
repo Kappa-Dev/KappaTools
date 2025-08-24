@@ -6,8 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type size_predicate_sites = Ast.size_cons Loc.annoted 
-type 'a with_size_predicates = { agent: 'a ; thresholds: Ast.size_cons}
+type size_predicate_sites = Ast.size_cons Loc.annoted
+type 'a with_size_predicates = { agent: 'a; thresholds: Ast.size_cons }
 
 type rule_mixture_with_size_predicates =
   LKappa.rule_agent with_size_predicates list
@@ -32,7 +32,7 @@ val annotate_dropped_size_predicates :
   int ->
   string ->
   (int -> unit) option ->
-  Ast.size_cons -> 
+  Ast.size_cons ->
   LKappa.rule_agent with_size_predicates
 
 val annotate_edit_size_predicates :
@@ -40,7 +40,8 @@ val annotate_edit_size_predicates :
   string Loc.annoted ->
   Ast.threshold list ->
   LKappa.rule_agent ->
-  (int -> int -> int -> int -> unit) -> Ast.size_cons -> 
+  (int -> int -> int -> int -> unit) ->
+  Ast.size_cons ->
   LKappa.rule_agent with_size_predicates
 
 val annotate_created_size_predicates :
@@ -49,7 +50,7 @@ val annotate_created_size_predicates :
   Ast.threshold list ->
   (int -> int -> int -> int -> unit) ->
   Raw_mixture.agent ->
-  Ast.size_cons -> 
+  Ast.size_cons ->
   Raw_mixture.agent with_size_predicates
 
 val annotate_size_predicates_with_diff :
@@ -59,10 +60,11 @@ val annotate_size_predicates_with_diff :
   Ast.threshold list ->
   LKappa.rule_agent ->
   (int -> int -> int -> int -> unit) ->
-  Ast.size_cons -> 
+  Ast.size_cons ->
   LKappa.rule_agent with_size_predicates
 
 (*val add_size_predicates_to_contact_map :
   Signature.s -> (int -> int -> int -> int -> unit) -> unit*)
 
-val compute_between_thresholds_matrix : int -> Mods.IntSet.t * Mods.IntSet.t Mods.IntMap.t -> Connected.cache
+val compute_between_thresholds_matrix :
+  int -> Mods.IntSet.t * Mods.IntSet.t Mods.IntMap.t -> Connected.cache

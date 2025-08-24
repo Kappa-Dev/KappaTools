@@ -1432,7 +1432,7 @@ end = struct
            sig_decl;
            counters_info = [||];
            thresholds_info = [||];
-           previous_threshold = [||],[||];
+           previous_threshold = [||], [||];
            thresholds_cache = Connected.dummy_cache;
            (* TO DO *)
            (* Si json le prendre, sinon le synthétiser avec l'ancien fonctionnement *)

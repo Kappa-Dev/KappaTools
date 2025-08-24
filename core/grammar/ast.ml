@@ -58,7 +58,7 @@ let counter_sig_of_counter (c : counter) : Counters_info.counter_sig =
 
 type threshold = {
   threshold_name: string Loc.annoted;
-  threshold_agent_id: string option; 
+  threshold_agent_id: string option;
   threshold_value: internal;
   threshold: int;
 }
@@ -68,7 +68,7 @@ let threshold_sig_of_threshold t =
     Size_info.threshold_sig_name = t.threshold_name;
     threshold_sig_value = t.threshold_value;
     threshold = t.threshold;
-    threshold_sig_agent_name = t.threshold_agent_id; 
+    threshold_sig_agent_name = t.threshold_agent_id;
   }
 
 type ('threshold, 'counter) site =
@@ -86,10 +86,18 @@ let map_size_predicates_in_site f = function
 
 type agent_mod = NoMod | Erase | Create
 
-type size_cons = (string Loc.annoted option * (Operator.compare_op * bool) Loc.annoted * int Loc.annoted) list 
+type size_cons =
+  (string Loc.annoted option
+  * (Operator.compare_op * bool) Loc.annoted
+  * int Loc.annoted)
+  list
 
 type ('threshold, 'counter) parametric_agent =
-  | Present of string Loc.annoted * ('threshold, 'counter) site list * agent_mod * size_cons 
+  | Present of
+      string Loc.annoted
+      * ('threshold, 'counter) site list
+      * agent_mod
+      * size_cons
   | Absent of Loc.t
 
 type agent = (threshold, counter) parametric_agent
@@ -131,9 +139,9 @@ type rule = {
     ((mixture, string) Alg_expr.e Loc.annoted
     * (mixture, string) Alg_expr.e Loc.annoted option)
     option;
-      (*rate for backward rule*)
-      threshold: size_cons Loc.annoted option;
-      threshold_op: size_cons Loc.annoted option;
+  (*rate for backward rule*)
+  threshold: size_cons Loc.annoted option;
+  threshold_op: size_cons Loc.annoted option;
 }
 
 let flip_label str = str ^ "_op"
@@ -270,7 +278,7 @@ let empty_compil =
     configurations = [];
     tokens = [];
     volumes = [];
-    thresholds = [],[];
+    thresholds = [], [];
   }
 
 (*
@@ -496,7 +504,10 @@ let build_size_predicate_of_json filenames n id i l =
   Size_predicate
     {
       threshold_name = Loc.string_annoted_of_json ~filenames n;
-      threshold_agent_id = (match id with None -> None | Some j ->  Some (JsonUtil.to_string j)) ; 
+      threshold_agent_id =
+        (match id with
+        | None -> None
+        | Some j -> Some (JsonUtil.to_string j));
       threshold = JsonUtil.to_int i;
       threshold_value =
         JsonUtil.to_list (Loc.string_option_annoted_of_json ~filenames) l;
@@ -773,182 +784,176 @@ let site_of_json filenames = function
         ("size_predicate_name", name);
       ] ->
     build_size_predicate_of_json filenames name None value threshold
-    | `Assoc
-    [
-      ("size_agent_id", id); 
-      ("size_predicate_name", name);
-      ("size_value", value);
-      ("size_threshold", threshold);
-    ]
-| `Assoc
-    [
-      ("size_agent_id", id); 
-      ("size_predicate_name", name);
-      ("size_threshold", threshold);
-      ("size_value", value);
-    ]
-| `Assoc
-    [
-      ("size_agent_id", id); 
-      ("size_value", value);
-      ("size_threshold", threshold);
-      ("size_predicate_name", name);
-    ]
-| `Assoc
-    [
-      ("size_agent_id", id); 
-      ("size_value", value);
-      ("size_predicate_name", name);
-      ("size_threshold", threshold);
-    ]
-| `Assoc
-    [
-      ("size_agent_id", id); 
-      ("size_threshold", threshold);
-      ("size_predicate_name", name);
-      ("size_value", value);
-    ]
-| `Assoc
-    [
-      ("size_agent_id", id); 
-      ("size_threshold", threshold);
-      ("size_value", value);
-      ("size_predicate_name", name);
-    ] 
-    
-    | `Assoc
-    [
-      ("size_predicate_name", name);
-      ("size_agent_id", id); 
-      ("size_value", value);
-      ("size_threshold", threshold);
-    ]
-| `Assoc
-    [
-      ("size_predicate_name", name);
-      ("size_agent_id", id); 
-      ("size_threshold", threshold);
-      ("size_value", value);
-    ]
-| `Assoc
-    [
-      ("size_value", value);
-      ("size_agent_id", id); 
-      ("size_threshold", threshold);
-      ("size_predicate_name", name);
-    ]
-| `Assoc
-    [
-      ("size_value", value);
-      ("size_agent_id", id); 
-      ("size_predicate_name", name);
-      ("size_threshold", threshold);
-    ]
-| `Assoc
-    [
-      ("size_threshold", threshold);
-      ("size_agent_id", id); 
-      ("size_predicate_name", name);
-      ("size_value", value);
-    ]
-| `Assoc
-    [
-      ("size_threshold", threshold);
-      ("size_agent_id", id); 
-      ("size_value", value);
-      ("size_predicate_name", name);
-    ] 
-
-      | `Assoc
+  | `Assoc
+      [
+        ("size_agent_id", id);
+        ("size_predicate_name", name);
+        ("size_value", value);
+        ("size_threshold", threshold);
+      ]
+  | `Assoc
+      [
+        ("size_agent_id", id);
+        ("size_predicate_name", name);
+        ("size_threshold", threshold);
+        ("size_value", value);
+      ]
+  | `Assoc
+      [
+        ("size_agent_id", id);
+        ("size_value", value);
+        ("size_threshold", threshold);
+        ("size_predicate_name", name);
+      ]
+  | `Assoc
+      [
+        ("size_agent_id", id);
+        ("size_value", value);
+        ("size_predicate_name", name);
+        ("size_threshold", threshold);
+      ]
+  | `Assoc
+      [
+        ("size_agent_id", id);
+        ("size_threshold", threshold);
+        ("size_predicate_name", name);
+        ("size_value", value);
+      ]
+  | `Assoc
+      [
+        ("size_agent_id", id);
+        ("size_threshold", threshold);
+        ("size_value", value);
+        ("size_predicate_name", name);
+      ]
+  | `Assoc
+      [
+        ("size_predicate_name", name);
+        ("size_agent_id", id);
+        ("size_value", value);
+        ("size_threshold", threshold);
+      ]
+  | `Assoc
+      [
+        ("size_predicate_name", name);
+        ("size_agent_id", id);
+        ("size_threshold", threshold);
+        ("size_value", value);
+      ]
+  | `Assoc
+      [
+        ("size_value", value);
+        ("size_agent_id", id);
+        ("size_threshold", threshold);
+        ("size_predicate_name", name);
+      ]
+  | `Assoc
+      [
+        ("size_value", value);
+        ("size_agent_id", id);
+        ("size_predicate_name", name);
+        ("size_threshold", threshold);
+      ]
+  | `Assoc
+      [
+        ("size_threshold", threshold);
+        ("size_agent_id", id);
+        ("size_predicate_name", name);
+        ("size_value", value);
+      ]
+  | `Assoc
+      [
+        ("size_threshold", threshold);
+        ("size_agent_id", id);
+        ("size_value", value);
+        ("size_predicate_name", name);
+      ]
+  | `Assoc
       [
         ("size_predicate_name", name);
         ("size_value", value);
-        ("size_agent_id", id); 
+        ("size_agent_id", id);
         ("size_threshold", threshold);
       ]
   | `Assoc
       [
         ("size_predicate_name", name);
         ("size_threshold", threshold);
-        ("size_agent_id", id); 
+        ("size_agent_id", id);
         ("size_value", value);
       ]
   | `Assoc
       [
         ("size_value", value);
         ("size_threshold", threshold);
-        ("size_agent_id", id); 
+        ("size_agent_id", id);
         ("size_predicate_name", name);
       ]
   | `Assoc
       [
         ("size_value", value);
         ("size_predicate_name", name);
-        ("size_agent_id", id); 
+        ("size_agent_id", id);
         ("size_threshold", threshold);
       ]
   | `Assoc
       [
         ("size_threshold", threshold);
         ("size_predicate_name", name);
-        ("size_agent_id", id); 
+        ("size_agent_id", id);
         ("size_value", value);
       ]
   | `Assoc
       [
         ("size_threshold", threshold);
         ("size_value", value);
-        ("size_agent_id", id); 
+        ("size_agent_id", id);
         ("size_predicate_name", name);
-      ] 
-
-        | `Assoc
-        [
-          ("size_predicate_name", name);
-          ("size_value", value);
-          ("size_threshold", threshold);
-          ("size_agent_id", id); 
-        ]
-    | `Assoc
-        [
-          ("size_predicate_name", name);
-          ("size_threshold", threshold);
-          ("size_value", value);
-          ("size_agent_id", id); 
-        ]
-    | `Assoc
-        [
-          ("size_value", value);
-          ("size_threshold", threshold);
-          ("size_predicate_name", name);
-          ("size_agent_id", id); 
-        ]
-    | `Assoc
-        [
-          ("size_value", value);
-          ("size_predicate_name", name);
-          ("size_threshold", threshold);
-          ("size_agent_id", id); 
-        ]
-    | `Assoc
-        [
-          ("size_threshold", threshold);
-          ("size_predicate_name", name);
-          ("size_value", value);
-          ("size_agent_id", id); 
-        ]
-    | `Assoc
-        [
-          ("size_threshold", threshold);
-          ("size_value", value);
-          ("size_predicate_name", name);
-          ("size_agent_id", id); 
-        ] 
-    ->
-  build_size_predicate_of_json filenames name (Some id) value threshold
-
-  
-    | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent", x))
+      ]
+  | `Assoc
+      [
+        ("size_predicate_name", name);
+        ("size_value", value);
+        ("size_threshold", threshold);
+        ("size_agent_id", id);
+      ]
+  | `Assoc
+      [
+        ("size_predicate_name", name);
+        ("size_threshold", threshold);
+        ("size_value", value);
+        ("size_agent_id", id);
+      ]
+  | `Assoc
+      [
+        ("size_value", value);
+        ("size_threshold", threshold);
+        ("size_predicate_name", name);
+        ("size_agent_id", id);
+      ]
+  | `Assoc
+      [
+        ("size_value", value);
+        ("size_predicate_name", name);
+        ("size_threshold", threshold);
+        ("size_agent_id", id);
+      ]
+  | `Assoc
+      [
+        ("size_threshold", threshold);
+        ("size_predicate_name", name);
+        ("size_value", value);
+        ("size_agent_id", id);
+      ]
+  | `Assoc
+      [
+        ("size_threshold", threshold);
+        ("size_value", value);
+        ("size_predicate_name", name);
+        ("size_agent_id", id);
+      ] ->
+    build_size_predicate_of_json filenames name (Some id) value threshold
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent", x))
 
 let counter_to_json ~filenames c =
   `Assoc
@@ -1019,34 +1024,39 @@ let print_agent_mod f = function
   | Erase -> Format.pp_print_string f "-"
   | NoMod -> Format.pp_print_string f ""
 
-let print_cc_agent f = function 
-  | None -> () 
-  | Some (a,_) -> Format.fprintf f "%s" a 
-let print_cc_comp f ((a,b),_) = 
-  Format.fprintf f "%s%s"  
-    (match a with Operator.GREATER -> ">" | Operator.SMALLER -> "<" | Operator.DIFF | Operator.EQUAL -> assert false)
-    (if b then "=" else "")
+let print_cc_agent f = function
+  | None -> ()
+  | Some (a, _) -> Format.fprintf f "%s" a
 
-let print_cc_int f (i,_) = Format.fprintf f "%i" i 
+let print_cc_comp f ((a, b), _) =
+  Format.fprintf f "%s%s"
+    (match a with
+    | Operator.GREATER -> ">"
+    | Operator.SMALLER -> "<"
+    | Operator.DIFF | Operator.EQUAL -> assert false)
+    (if b then
+       "="
+     else
+       "")
 
-let print_cc_constraint f (a,b,c) =
-  print_cc_agent f a; 
+let print_cc_int f (i, _) = Format.fprintf f "%i" i
+
+let print_cc_constraint f (a, b, c) =
+  print_cc_agent f a;
   print_cc_comp f b;
-  print_cc_int f c  
+  print_cc_int f c
 
+let print_cc_constraint_sig _f _triple = ()
 
-  let print_cc_constraint_sig _f _triple = () 
-let print_ast_agent ~print_counter ~print_size_predicate ~print_cc_constraint f = function
+let print_ast_agent ~print_counter ~print_size_predicate ~print_cc_constraint f
+    = function
   | Absent _ -> Format.pp_print_string f "."
   | Present ((agent_name, _), l, m, c) ->
     Format.fprintf f "%s%a(%a)%a" agent_name
-      (
-        match c with 
-        | [] -> (fun _ _ -> ())
-        | _ -> (Pp.list 
-                    (fun f -> Format.fprintf f " ")
-                    (print_cc_constraint)) 
-     ) c 
+      (match c with
+      | [] -> fun _ _ -> ()
+      | _ -> Pp.list (fun f -> Format.fprintf f " ") print_cc_constraint)
+      c
       (Pp.list
          (fun f -> Format.fprintf f " ")
          (print_ast_site ~print_counter ~print_size_predicate))
@@ -1064,144 +1074,158 @@ let agent_mod_of_yojson = function
   | x ->
     raise (Yojson.Basic.Util.Type_error ("Incorrect agent modification", x))
 
-let cmp_to_yojson = function 
-    | (Operator.GREATER,false) -> `String ">"
-    | (Operator.GREATER,true) ->  `String ">="
-    | (Operator.SMALLER,false) -> `String "<"
-    | (Operator.SMALLER,true) ->  `String "<="
-    | (Operator.DIFF | Operator.EQUAL),_ -> assert false 
+let cmp_to_yojson = function
+  | Operator.GREATER, false -> `String ">"
+  | Operator.GREATER, true -> `String ">="
+  | Operator.SMALLER, false -> `String "<"
+  | Operator.SMALLER, true -> `String "<="
+  | (Operator.DIFF | Operator.EQUAL), _ -> assert false
 
-let cmp_of_yojson = function 
-    | `String ">" -> (Operator.GREATER,false)
-    | `String ">=" -> (Operator.GREATER,true)
-    | `String "<" -> (Operator.SMALLER,false)
-    | `String "<=" -> (Operator.SMALLER,true)
-    | x ->
-      raise (Yojson.Basic.Util.Type_error ("Incorrect comparison operator", x))
+let cmp_of_yojson = function
+  | `String ">" -> Operator.GREATER, false
+  | `String ">=" -> Operator.GREATER, true
+  | `String "<" -> Operator.SMALLER, false
+  | `String "<=" -> Operator.SMALLER, true
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("Incorrect comparison operator", x))
 
-let cc_constraints_to_json filenames = function 
-  | (na, cmp, int) -> 
-    JsonUtil.smart_assoc 
-    [("name", JsonUtil.of_option (Loc.yojson_of_annoted ~filenames (JsonUtil.of_string)) na);
-     ("cmp", Loc.yojson_of_annoted ~filenames cmp_to_yojson cmp);
-     ("int", Loc.yojson_of_annoted ~filenames JsonUtil.of_int int)]
+let cc_constraints_to_json filenames = function
+  | na, cmp, int ->
+    JsonUtil.smart_assoc
+      [
+        ( "name",
+          JsonUtil.of_option
+            (Loc.yojson_of_annoted ~filenames JsonUtil.of_string)
+            na );
+        "cmp", Loc.yojson_of_annoted ~filenames cmp_to_yojson cmp;
+        "int", Loc.yojson_of_annoted ~filenames JsonUtil.of_int int;
+      ]
 
-let cc_constraints_of_json ~filenames = function 
-   `Assoc ["name" , na ; 
-    "cmp" , cmp ;
-    "int" , int ] -> JsonUtil.to_option (Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None)) na,(Loc.annoted_of_yojson ~filenames cmp_of_yojson cmp),(Loc.annoted_of_yojson ~filenames (JsonUtil.to_int ?error_msg:None) int)
-      | x ->
-        raise (Yojson.Basic.Util.Type_error ("Incorrect constraint about a connected component", x))
-  
-  
-let agent_to_json ~counter_to_json ~size_predicate_to_json ~cc_constraints_to_json filenames = function
+let cc_constraints_of_json ~filenames = function
+  | `Assoc [ ("name", na); ("cmp", cmp); ("int", int) ] ->
+    ( JsonUtil.to_option
+        (Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None))
+        na,
+      Loc.annoted_of_yojson ~filenames cmp_of_yojson cmp,
+      Loc.annoted_of_yojson ~filenames (JsonUtil.to_int ?error_msg:None) int )
+  | x ->
+    raise
+      (Yojson.Basic.Util.Type_error
+         ("Incorrect constraint about a connected component", x))
+
+let agent_to_json ~counter_to_json ~size_predicate_to_json
+    ~cc_constraints_to_json filenames = function
   | Absent _ -> `Null
   | Present (na, l, m, c) ->
     JsonUtil.smart_assoc
-    (("name", Loc.yojson_of_annoted ~filenames JsonUtil.of_string na):: 
-    (   
-    let list  = [
-        "name", Loc.yojson_of_annoted ~filenames JsonUtil.of_string na;
-        ( "sig",
-          JsonUtil.of_list
-            (site_to_json ~counter_to_json ~size_predicate_to_json filenames)
-            l );
-        "mod", agent_mod_to_yojson m
-      ]
-  in 
-  (match c with [] -> list
-          | _ -> 
-                ("cc_constraints",JsonUtil.of_list (cc_constraints_to_json filenames )c)::list)))
-    
+      (("name", Loc.yojson_of_annoted ~filenames JsonUtil.of_string na)
+      ::
+      (let list =
+         [
+           "name", Loc.yojson_of_annoted ~filenames JsonUtil.of_string na;
+           ( "sig",
+             JsonUtil.of_list
+               (site_to_json ~counter_to_json ~size_predicate_to_json filenames)
+               l );
+           "mod", agent_mod_to_yojson m;
+         ]
+       in
+       match c with
+       | [] -> list
+       | _ ->
+         ( "cc_constraints",
+           JsonUtil.of_list (cc_constraints_to_json filenames) c )
+         :: list))
 
 let agent_of_json ~site_of_json filenames = function
   | `Null -> Absent Loc.dummy
   | `Assoc [ ("name", n); ("sig", s); ("mod", m) ]
   | `Assoc [ ("sig", s); ("name", n); ("mod", m) ]
-  | `Assoc [ ("name", n); ("mod", m); ("sig", s)]
-  | `Assoc [ ("sig", s); ("mod", m); ("name", n)]
+  | `Assoc [ ("name", n); ("mod", m); ("sig", s) ]
+  | `Assoc [ ("sig", s); ("mod", m); ("name", n) ]
   | `Assoc [ ("mod", m); ("name", n); ("sig", s) ]
-  | `Assoc [ ("mod", m); ("sig", s); ("name", n)] -> 
-    Present
-    ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
-      JsonUtil.to_list (site_of_json filenames) s,
-      agent_mod_of_yojson m,[] )
- 
-  | `Assoc [ ("name", n); ("sig", s); ("mod", m); ("cc_constraints",cc) ]
-  | `Assoc [ ("sig", s); ("name", n); ("mod", m); ("cc_constraints",cc) ]
-  | `Assoc [ ("name", n); ("mod", m); ("sig", s); ("cc_constraints",cc)]
-  | `Assoc [ ("sig", s); ("mod", m); ("name", n); ("cc_constraints",cc) ]
-  | `Assoc [ ("mod", m); ("name", n); ("sig", s);("cc_constraints",cc) ]
-  | `Assoc [ ("mod", m); ("sig", s); ("name", n); ("cc_constraints",cc) ] 
-  | `Assoc [ ("name", n); ("sig", s); ("cc_constraints",cc); ("mod", m) ]
-  | `Assoc [ ("sig", s); ("name", n); ("cc_constraints",cc); ("mod", m)]
-  | `Assoc [ ("name", n); ("mod", m); ("cc_constraints",cc); ("sig", s)]
-  | `Assoc [ ("sig", s); ("mod", m); ("cc_constraints",cc); ("name", n)]
-  | `Assoc [ ("mod", m); ("name", n); ("cc_constraints",cc); ("sig", s)]
-  | `Assoc [ ("mod", m); ("sig", s); ("cc_constraints",cc); ("name", n)] 
-  | `Assoc [ ("name", n); ("cc_constraints",cc); ("sig", s); ("mod", m)]
-  | `Assoc [ ("sig", s); ("cc_constraints",cc); ("name", n); ("mod", m)]
-  | `Assoc [ ("name", n); ("cc_constraints",cc); ("mod", m); ("sig", s)]
-  | `Assoc [ ("sig", s); ("cc_constraints",cc); ("mod", m); ("name", n)]
-  | `Assoc [ ("mod", m); ("cc_constraints",cc); ("name", n); ("sig", s)]
-  | `Assoc [ ("mod", m); ("cc_constraints",cc); ("sig", s); ("name", n)] 
-  | `Assoc [("cc_constraints",cc); ("name", n); ("sig", s); ("mod", m)]
-  | `Assoc [("cc_constraints",cc); ("sig", s); ("name", n); ("mod", m)]
-  | `Assoc [("cc_constraints",cc); ("name", n); ("mod", m); ("sig", s)]
-  | `Assoc [("cc_constraints",cc); ("sig", s); ("mod", m); ("name", n)]
-  | `Assoc [("cc_constraints",cc); ("mod", m); ("name", n); ("sig", s)]
-  | `Assoc [("cc_constraints",cc); ("mod", m); ("sig", s); ("name", n)] 
-  
-  ->
+  | `Assoc [ ("mod", m); ("sig", s); ("name", n) ] ->
     Present
       ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
         JsonUtil.to_list (site_of_json filenames) s,
-        agent_mod_of_yojson m, JsonUtil.to_list (cc_constraints_of_json ~filenames) cc )
+        agent_mod_of_yojson m,
+        [] )
+  | `Assoc [ ("name", n); ("sig", s); ("mod", m); ("cc_constraints", cc) ]
+  | `Assoc [ ("sig", s); ("name", n); ("mod", m); ("cc_constraints", cc) ]
+  | `Assoc [ ("name", n); ("mod", m); ("sig", s); ("cc_constraints", cc) ]
+  | `Assoc [ ("sig", s); ("mod", m); ("name", n); ("cc_constraints", cc) ]
+  | `Assoc [ ("mod", m); ("name", n); ("sig", s); ("cc_constraints", cc) ]
+  | `Assoc [ ("mod", m); ("sig", s); ("name", n); ("cc_constraints", cc) ]
+  | `Assoc [ ("name", n); ("sig", s); ("cc_constraints", cc); ("mod", m) ]
+  | `Assoc [ ("sig", s); ("name", n); ("cc_constraints", cc); ("mod", m) ]
+  | `Assoc [ ("name", n); ("mod", m); ("cc_constraints", cc); ("sig", s) ]
+  | `Assoc [ ("sig", s); ("mod", m); ("cc_constraints", cc); ("name", n) ]
+  | `Assoc [ ("mod", m); ("name", n); ("cc_constraints", cc); ("sig", s) ]
+  | `Assoc [ ("mod", m); ("sig", s); ("cc_constraints", cc); ("name", n) ]
+  | `Assoc [ ("name", n); ("cc_constraints", cc); ("sig", s); ("mod", m) ]
+  | `Assoc [ ("sig", s); ("cc_constraints", cc); ("name", n); ("mod", m) ]
+  | `Assoc [ ("name", n); ("cc_constraints", cc); ("mod", m); ("sig", s) ]
+  | `Assoc [ ("sig", s); ("cc_constraints", cc); ("mod", m); ("name", n) ]
+  | `Assoc [ ("mod", m); ("cc_constraints", cc); ("name", n); ("sig", s) ]
+  | `Assoc [ ("mod", m); ("cc_constraints", cc); ("sig", s); ("name", n) ]
+  | `Assoc [ ("cc_constraints", cc); ("name", n); ("sig", s); ("mod", m) ]
+  | `Assoc [ ("cc_constraints", cc); ("sig", s); ("name", n); ("mod", m) ]
+  | `Assoc [ ("cc_constraints", cc); ("name", n); ("mod", m); ("sig", s) ]
+  | `Assoc [ ("cc_constraints", cc); ("sig", s); ("mod", m); ("name", n) ]
+  | `Assoc [ ("cc_constraints", cc); ("mod", m); ("name", n); ("sig", s) ]
+  | `Assoc [ ("cc_constraints", cc); ("mod", m); ("sig", s); ("name", n) ] ->
+    Present
+      ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
+        JsonUtil.to_list (site_of_json filenames) s,
+        agent_mod_of_yojson m,
+        JsonUtil.to_list (cc_constraints_of_json ~filenames) cc )
   | `Assoc [ ("name", n); ("mod", m) ] | `Assoc [ ("mod", m); ("name", n) ] ->
     Present
       ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
         [],
-        agent_mod_of_yojson m, [] )
-  | `Assoc [ ("name", n); ("mod", m); ("cc_constraints",cc) ] 
-  | `Assoc [ ("mod", m); ("name", n); ("cc_constraints",cc) ]
-  | `Assoc [ ("name", n); ("cc_constraints",cc); ("mod", m) ] 
-  | `Assoc [ ("mod", m); ("cc_constraints",cc); ("name", n) ] 
-  | `Assoc [ ("cc_constraints",cc); ("name", n); ("mod", m) ] 
-  | `Assoc [ ("cc_constraints",cc); ("mod", m); ("name", n) ]     
-    ->
-          Present
-            ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
-              [],
-              agent_mod_of_yojson m, JsonUtil.to_list (cc_constraints_of_json ~filenames) cc  )
-      
-
+        agent_mod_of_yojson m,
+        [] )
+  | `Assoc [ ("name", n); ("mod", m); ("cc_constraints", cc) ]
+  | `Assoc [ ("mod", m); ("name", n); ("cc_constraints", cc) ]
+  | `Assoc [ ("name", n); ("cc_constraints", cc); ("mod", m) ]
+  | `Assoc [ ("mod", m); ("cc_constraints", cc); ("name", n) ]
+  | `Assoc [ ("cc_constraints", cc); ("name", n); ("mod", m) ]
+  | `Assoc [ ("cc_constraints", cc); ("mod", m); ("name", n) ] ->
+    Present
+      ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
+        [],
+        agent_mod_of_yojson m,
+        JsonUtil.to_list (cc_constraints_of_json ~filenames) cc )
   | `Assoc [ ("name", n); ("sig", s) ] | `Assoc [ ("sig", s); ("name", n) ] ->
     Present
       ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
         JsonUtil.to_list (site_of_json filenames) s,
-        NoMod, [] )
-        | `Assoc [ ("cc_constraints",cc); ("name", n); ("sig", s) ] 
-        | `Assoc [ ("cc_constraints",cc); ("sig", s); ("name", n) ] 
-          | `Assoc [ ("name", n);  ("cc_constraints",cc);("sig", s) ] 
-          | `Assoc [ ("sig", s);  ("cc_constraints",cc);("name", n) ] 
-            | `Assoc [ ("name", n); ("sig", s);  ("cc_constraints",cc);] 
-            | `Assoc [ ("sig", s); ("name", n);  ("cc_constraints",cc);] 
-            ->
-                      Present
-            ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
-              JsonUtil.to_list (site_of_json filenames) s,
-              NoMod, JsonUtil.to_list (cc_constraints_of_json ~filenames) cc )
+        NoMod,
+        [] )
+  | `Assoc [ ("cc_constraints", cc); ("name", n); ("sig", s) ]
+  | `Assoc [ ("cc_constraints", cc); ("sig", s); ("name", n) ]
+  | `Assoc [ ("name", n); ("cc_constraints", cc); ("sig", s) ]
+  | `Assoc [ ("sig", s); ("cc_constraints", cc); ("name", n) ]
+  | `Assoc [ ("name", n); ("sig", s); ("cc_constraints", cc) ]
+  | `Assoc [ ("sig", s); ("name", n); ("cc_constraints", cc) ] ->
+    Present
+      ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
+        JsonUtil.to_list (site_of_json filenames) s,
+        NoMod,
+        JsonUtil.to_list (cc_constraints_of_json ~filenames) cc )
   | `Assoc [ ("name", n) ] ->
     Present
       ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
         [],
-        NoMod, [])
-        | `Assoc [ ("cc_constraints",cc); ("name", n) ] 
-        | `Assoc [ ("name", n); ("cc_constraints",cc) ] ->
-          Present
-            ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
-              [],
-              NoMod, JsonUtil.to_list (cc_constraints_of_json ~filenames) cc )
+        NoMod,
+        [] )
+  | `Assoc [ ("cc_constraints", cc); ("name", n) ]
+  | `Assoc [ ("name", n); ("cc_constraints", cc) ] ->
+    Present
+      ( Loc.annoted_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
+        [],
+        NoMod,
+        JsonUtil.to_list (cc_constraints_of_json ~filenames) cc )
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent", x))
 
 let agent_sig_of_json = agent_of_json ~site_of_json:site_sig_of_json
@@ -1213,12 +1237,16 @@ let agent_sig_to_json =
     ~cc_constraints_to_json:(fun _ _ -> `Assoc [])
 
 let agent_of_json = agent_of_json ~site_of_json
-let agent_to_json = agent_to_json ~counter_to_json ~size_predicate_to_json ~cc_constraints_to_json
+
+let agent_to_json =
+  agent_to_json ~counter_to_json ~size_predicate_to_json ~cc_constraints_to_json
 
 let print_ast_mix =
   Pp.list
     (fun f -> Format.fprintf f "\\@ ")
-    (Pp.list Pp.comma (print_ast_agent ~print_counter ~print_size_predicate ~print_cc_constraint))
+    (Pp.list Pp.comma
+       (print_ast_agent ~print_counter ~print_size_predicate
+          ~print_cc_constraint))
 
 let to_erased_mixture =
   List.map
@@ -1265,7 +1293,8 @@ let to_dummy_user_site = function
       User_graph.site_type = User_graph.Counter (-1);
       (* TODO *)
     }
-  | Size_predicate { threshold_name; threshold_value; threshold ; threshold_agent_id} ->
+  | Size_predicate
+      { threshold_name; threshold_value; threshold; threshold_agent_id } ->
     let _ = threshold_value, threshold, threshold_agent_id in
     {
       User_graph.site_name = fst threshold_name;
@@ -1675,23 +1704,36 @@ let rule_content_of_yojson filenames f_mix f_var = function
     Arrow (arrow_notation_of_yojson filenames f_mix f_var r)
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule content", x))
 
+let scc_constraints_to_yojson filenames =
+  JsonUtil.of_list
+    (JsonUtil.of_triple
+       (JsonUtil.of_option
+          (Loc.yojson_of_annoted ~filenames JsonUtil.of_string))
+       (Loc.yojson_of_annoted ~filenames
+          (JsonUtil.of_pair Operator.compare_op_to_json JsonUtil.of_bool))
+       (Loc.yojson_of_annoted ~filenames JsonUtil.of_int))
 
-let scc_constraints_to_yojson filenames = 
-     JsonUtil.of_list 
-         (JsonUtil.of_triple 
-            (JsonUtil.of_option (Loc.yojson_of_annoted ~filenames 
-                  JsonUtil.of_string))
-            (Loc.yojson_of_annoted ~filenames (JsonUtil.of_pair Operator.compare_op_to_json JsonUtil.of_bool)) 
-            (Loc.yojson_of_annoted ~filenames JsonUtil.of_int))
+let scc_constraints_of_yojson filenames =
+  JsonUtil.to_list
+    (JsonUtil.to_triple
+       (JsonUtil.to_option
+          (Loc.annoted_of_yojson ~filenames
+             (JsonUtil.to_string
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json
+                     "AST signature : Scc constraints"))))
+       (Loc.annoted_of_yojson ~filenames
+          (JsonUtil.to_pair Operator.compare_op_of_json
+             (JsonUtil.to_bool
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json
+                     "AST signature : Scc constraints"))))
+       (Loc.annoted_of_yojson ~filenames
+          (JsonUtil.to_int
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json
+                  "AST signature : Scc constraints"))))
 
-let scc_constraints_of_yojson filenames = 
-        JsonUtil.to_list 
-            (JsonUtil.to_triple 
-               (JsonUtil.to_option (Loc.annoted_of_yojson ~filenames 
-                     (JsonUtil.to_string ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST signature : Scc constraints"))))
-               (Loc.annoted_of_yojson ~filenames (JsonUtil.to_pair Operator.compare_op_of_json (JsonUtil.to_bool ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST signature : Scc constraints")))) 
-               (Loc.annoted_of_yojson ~filenames (JsonUtil.to_int ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST signature : Scc constraints"))))
-    
 let rule_to_json filenames f_mix f_var r =
   JsonUtil.smart_assoc
     [
@@ -1712,7 +1754,8 @@ let rule_to_json filenames f_mix f_var r =
           r.k_un );
       ( "scc_constraints",
         JsonUtil.of_option
-          (Loc.yojson_of_annoted ~filenames (scc_constraints_to_yojson filenames))
+          (Loc.yojson_of_annoted ~filenames
+             (scc_constraints_to_yojson filenames))
           r.threshold );
       ( "k_op",
         JsonUtil.of_option
@@ -1730,8 +1773,9 @@ let rule_to_json filenames f_mix f_var r =
           r.k_op_un );
       ( "scc_constraints_op",
         JsonUtil.of_option
-           (Loc.yojson_of_annoted ~filenames (scc_constraints_to_yojson filenames))
-            r.threshold_op );
+          (Loc.yojson_of_annoted ~filenames
+             (scc_constraints_to_yojson filenames))
+          r.threshold_op );
     ]
 
 let rule_of_json filenames f_mix f_var = function
@@ -1771,15 +1815,16 @@ let rule_of_json filenames f_mix f_var = function
                    (Loc.annoted_of_yojson ~filenames
                       (Alg_expr.e_of_yojson ~filenames f_mix f_var))))
              (Yojson.Basic.Util.member "k_op_un" x);
-         threshold = 
-            JsonUtil.to_option 
-                (Loc.annoted_of_yojson ~filenames (scc_constraints_of_yojson filenames)) 
-                (Yojson.Basic.Util.member "scc_constraints" x);
-
-          threshold_op =
-            JsonUtil.to_option 
-              (Loc.annoted_of_yojson ~filenames (scc_constraints_of_yojson filenames)) 
-              (Yojson.Basic.Util.member "scc_constraints_op" x);
+         threshold =
+           JsonUtil.to_option
+             (Loc.annoted_of_yojson ~filenames
+                (scc_constraints_of_yojson filenames))
+             (Yojson.Basic.Util.member "scc_constraints" x);
+         threshold_op =
+           JsonUtil.to_option
+             (Loc.annoted_of_yojson ~filenames
+                (scc_constraints_of_yojson filenames))
+             (Yojson.Basic.Util.member "scc_constraints_op" x);
        }
      with Not_found ->
        raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule", x)))
@@ -1981,7 +2026,8 @@ let merge_agents =
   List.fold_left
     (List.fold_left (fun (acc : agent_sig list) -> function
        | Absent _ -> acc
-       | Present (((na, _) as x), (s : (threshold, counter) site list), _, cc) ->
+       | Present (((na, _) as x), (s : (threshold, counter) site list), _, cc)
+         ->
          let rec aux = function
            | [] ->
              [
@@ -1996,9 +2042,11 @@ let merge_agents =
                          map_size_predicates_in_site threshold_sig_of_threshold
                            x)
                      s,
-                   NoMod, cc );
+                   NoMod,
+                   cc );
              ]
-           | Present ((na', _), s', _, cc) :: t when String.compare na na' = 0 ->
+           | Present ((na', _), s', _, cc) :: t when String.compare na na' = 0
+             ->
              Present (x, merge_sites s' s, NoMod, cc) :: t
            | ((Present _ | Absent _) as h) :: t -> h :: aux t
          in
@@ -2047,49 +2095,50 @@ let sig_from_perts =
             p)
         acc p)
 
-let add_elt (s_opt,i) (a,m) = 
-  match s_opt with 
-    | None -> (Mods.IntSet.add i a,m)
-    | Some s -> 
-      let oldset = 
-        match Mods.StringMap.find_option s m with 
-          | None -> Mods.IntSet.empty 
-          | Some s -> s 
-      in 
-      a,Mods.StringMap.add s (Mods.IntSet.add i oldset) m 
+let add_elt (s_opt, i) (a, m) =
+  match s_opt with
+  | None -> Mods.IntSet.add i a, m
+  | Some s ->
+    let oldset =
+      match Mods.StringMap.find_option s m with
+      | None -> Mods.IntSet.empty
+      | Some s -> s
+    in
+    a, Mods.StringMap.add s (Mods.IntSet.add i oldset) m
 
-let add_cc_cons cc_cons acc = 
-  List.fold_left (fun acc (s_opt,((op,b),_),(i,_)) -> 
-    add_elt  
-      (Tools.map_opt fst s_opt, Size_info.compute_threshold ((op,b),i)) 
-      acc) acc cc_cons 
+let add_cc_cons cc_cons acc =
+  List.fold_left
+    (fun acc (s_opt, ((op, b), _), (i, _)) ->
+      add_elt
+        (Tools.map_opt fst s_opt, Size_info.compute_threshold ((op, b), i))
+        acc)
+    acc cc_cons
 
 let thresholds_from_rules =
-  List.fold_left (fun acc  (_, ((r : rule), _)) ->
+  List.fold_left (fun acc (_, ((r : rule), _)) ->
       let acc =
         match r.threshold with
         | None -> acc
-        | Some (a, _) -> add_cc_cons  a acc
+        | Some (a, _) -> add_cc_cons a acc
       in
       let acc =
         match r.threshold_op with
         | None -> acc
-        | Some (a, _) -> add_cc_cons a acc 
+        | Some (a, _) -> add_cc_cons a acc
       in
       let acc =
-         let mixture = 
-          match r.rewrite with 
+        let mixture =
+          match r.rewrite with
           | Edit e -> e.mix
-          | Arrow a -> a.lhs 
-         in 
-         List.fold_left 
-          (List.fold_left 
-              (fun acc ag -> 
-                match ag with 
-                | Present(_,_,_,a) -> add_cc_cons a acc
-                | Absent _ -> acc))
-          acc mixture 
-      in      
+          | Arrow a -> a.lhs
+        in
+        List.fold_left
+          (List.fold_left (fun acc ag ->
+               match ag with
+               | Present (_, _, _, a) -> add_cc_cons a acc
+               | Absent _ -> acc))
+          acc mixture
+      in
       acc)
 
 let infer_agent_signatures r =
@@ -2098,17 +2147,16 @@ let infer_agent_signatures r =
   let ags, toks = sig_from_perts acc' r.perturbations in
   { r with signatures = ags; tokens = toks }
 
-let compute_thresholds_list r = 
-  let acc_init = Mods.IntSet.empty, Mods.StringMap.empty in 
+let compute_thresholds_list r =
+  let acc_init = Mods.IntSet.empty, Mods.StringMap.empty in
   let thresholds_set = thresholds_from_rules acc_init r.rules in
-  let thresholds = 
-    Mods.IntSet.elements (fst thresholds_set), 
-    Mods.StringMap.fold 
-      (fun s set l -> 
-        (s, Mods.IntSet.elements set)::l)
-      (snd thresholds_set) []
-  in 
-   { r with thresholds }, thresholds_set
+  let thresholds =
+    ( Mods.IntSet.elements (fst thresholds_set),
+      Mods.StringMap.fold
+        (fun s set l -> (s, Mods.IntSet.elements set) :: l)
+        (snd thresholds_set) [] )
+  in
+  { r with thresholds }, thresholds_set
 
 let split_mixture m =
   List.fold_right
@@ -2120,7 +2168,8 @@ let split_mixture m =
             | Absent _ -> pack
             | Present (((_, pos) as na), intf, modif, cc) ->
               (match modif with
-              | Create -> Absent pos :: lhs, Present (na, intf, NoMod, []) :: rhs
+              | Create ->
+                Absent pos :: lhs, Present (na, intf, NoMod, []) :: rhs
               | Erase -> Present (na, intf, NoMod, cc) :: lhs, Absent pos :: rhs
               | NoMod ->
                 let intfl, intfr =
@@ -2163,7 +2212,7 @@ let split_mixture m =
                           Counter { c with counter_test = None } :: r ))
                     ([], []) intf
                 in
-                ( Present (na, intfl, NoMod, cc ) :: lhs,
+                ( Present (na, intfl, NoMod, cc) :: lhs,
                   Present (na, intfr, NoMod, []) :: rhs )))
           l ([], [])
       in
@@ -2242,11 +2291,13 @@ let compil_to_json c =
              (Loc.string_annoted_to_json ~filenames)
              (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
-      "thresholds", 
-            JsonUtil.of_pair 
-              (JsonUtil.of_list JsonUtil.of_int) 
-              (JsonUtil.of_list 
-              (JsonUtil.of_pair JsonUtil.of_string (JsonUtil.of_list JsonUtil.of_int) )) c.thresholds;
+      ( "thresholds",
+        JsonUtil.of_pair
+          (JsonUtil.of_list JsonUtil.of_int)
+          (JsonUtil.of_list
+             (JsonUtil.of_pair JsonUtil.of_string
+                (JsonUtil.of_list JsonUtil.of_int)))
+          c.thresholds );
     ]
 
 let compil_of_json = function
@@ -2337,25 +2388,27 @@ let compil_of_json = function
              (List.assoc "configurations" l);
          volumes = [];
          thresholds =
-         JsonUtil.to_pair 
-           (JsonUtil.to_list
-             ~error_msg:
-               (JsonUtil.exn_msg_cant_import_from_json "AST thresholds")
-             (JsonUtil.to_int
+           JsonUtil.to_pair
+             (JsonUtil.to_list
                 ~error_msg:
-                  (JsonUtil.exn_msg_cant_import_from_json "AST threshold")))
-          (JsonUtil.to_list 
-          ~error_msg:
-          (JsonUtil.exn_msg_cant_import_from_json "AST thresholds")
-          (JsonUtil.to_pair 
-            (JsonUtil.to_string ~error_msg:
-            (JsonUtil.exn_msg_cant_import_from_json "AST thresholds"))
-            (JsonUtil.to_list
-             ~error_msg:
-               (JsonUtil.exn_msg_cant_import_from_json "AST thresholds")
-             (JsonUtil.to_int
+                  (JsonUtil.exn_msg_cant_import_from_json "AST thresholds")
+                (JsonUtil.to_int
+                   ~error_msg:
+                     (JsonUtil.exn_msg_cant_import_from_json "AST threshold")))
+             (JsonUtil.to_list
                 ~error_msg:
-                  (JsonUtil.exn_msg_cant_import_from_json "AST threshold")))))
+                  (JsonUtil.exn_msg_cant_import_from_json "AST thresholds")
+                (JsonUtil.to_pair
+                   (JsonUtil.to_string
+                      ~error_msg:
+                        (JsonUtil.exn_msg_cant_import_from_json "AST thresholds"))
+                   (JsonUtil.to_list
+                      ~error_msg:
+                        (JsonUtil.exn_msg_cant_import_from_json "AST thresholds")
+                      (JsonUtil.to_int
+                         ~error_msg:
+                           (JsonUtil.exn_msg_cant_import_from_json
+                              "AST threshold")))))
              (List.assoc "thresholds" l);
        }
      with Not_found ->

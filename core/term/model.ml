@@ -392,11 +392,11 @@ let to_yojson env =
       "thresholds_info", Size_info.to_yojson ~filenames env.thresholds;
       "counters_info", Counters_info.to_yojson ~filenames env.counters_info;
       "threshold_matrix", Connected.json_of_cache env.matrix_between_thresholds;
-      "previous_thresholds", 
-      JsonUtil.of_pair 
-      (JsonUtil.of_array (JsonUtil.of_int))
-      (JsonUtil.of_array       (JsonUtil.of_array (JsonUtil.of_int)))
-      env.previous_threshold
+      ( "previous_thresholds",
+        JsonUtil.of_pair
+          (JsonUtil.of_array JsonUtil.of_int)
+          (JsonUtil.of_array (JsonUtil.of_array JsonUtil.of_int))
+          env.previous_threshold );
     ]
 
 let kappa_instance_of_yojson =
@@ -423,20 +423,20 @@ let of_yojson = function
             with Not_found -> Pattern.Env.thresholds_info domain);
          previous_threshold =
            (try
-              JsonUtil.to_pair 
-              (JsonUtil.to_array
-                (JsonUtil.to_int
-                   ?error_msg:
-                     (Some
-                        (JsonUtil.exn_msg_cant_import_from_json
-                           "previous_threshold"))))
-                           (JsonUtil.to_array 
-                           (JsonUtil.to_array
-                (JsonUtil.to_int
-                   ?error_msg:
-                     (Some
-                        (JsonUtil.exn_msg_cant_import_from_json
-                           "previous_threshold")))))
+              JsonUtil.to_pair
+                (JsonUtil.to_array
+                   (JsonUtil.to_int
+                      ?error_msg:
+                        (Some
+                           (JsonUtil.exn_msg_cant_import_from_json
+                              "previous_threshold"))))
+                (JsonUtil.to_array
+                   (JsonUtil.to_array
+                      (JsonUtil.to_int
+                         ?error_msg:
+                           (Some
+                              (JsonUtil.exn_msg_cant_import_from_json
+                                 "previous_threshold")))))
                 (List.assoc "previous_threshold" l)
             with Not_found -> Pattern.Env.previous_threshold domain);
          tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);

@@ -438,7 +438,7 @@ let rec translate_mixture ~translate_counter parameters mixture remanent =
 
 let support_agent = function
   | Ast.Absent _ -> None
-  | Ast.Present ((name, _), intfs, _, _ ) ->
+  | Ast.Present ((name, _), intfs, _, _) ->
     let list =
       let rec scan intf list =
         match intf with

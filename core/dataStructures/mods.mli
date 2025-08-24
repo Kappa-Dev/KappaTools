@@ -28,7 +28,7 @@ module Int2Map = Int2SetMap.Map
 module CharSetMap : SetMap.S with type elt = char
 module CharSet = CharSetMap.Set
 module CharMap = CharSetMap.Map
-module IntIntOptSetMap : SetMap.S with type elt = int * int option 
+module IntIntOptSetMap : SetMap.S with type elt = int * int option
 module IntIntOptSet = IntIntOptSetMap.Set
 module IntIntOptMap = IntIntOptSetMap.Map
 module DynArray : GenArray.GenArray

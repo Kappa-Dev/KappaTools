@@ -155,7 +155,8 @@ let prepare_counters rules =
 
   let rec prepare_lhs_rule rhs lhs =
     match rhs, lhs with
-    | Ast.Present (rna, rsites, _, _) :: r, Ast.Present (lna, lsites, b, lcc) :: l ->
+    | ( Ast.Present (rna, rsites, _, _) :: r,
+        Ast.Present (lna, lsites, b, lcc) :: l ) ->
       check_syntax lsites
         (fun c -> not (Loc.v c.counter_delta = 0))
         " has a modif in the lhs";
@@ -564,7 +565,7 @@ let make_counter_agent sigs (is_first, (dst, ra_erased)) (is_last, equal) i j
         ra_ints;
         ra_syntax = Some (Array.copy ra_ports, Array.copy ra_ints);
       };
-      Size_compiler.thresholds = []
+    Size_compiler.thresholds = [];
   }
 
 let raw_counter_agent (is_first, first_link) (is_last, last_link) i j sigs equal
@@ -599,7 +600,7 @@ let raw_counter_agent (is_first, first_link) (is_last, last_link) i j sigs equal
         Raw_mixture.a_ports = ports;
         Raw_mixture.a_ints = internals;
       };
-    Size_compiler.thresholds = []; 
+    Size_compiler.thresholds = [];
   }
 
 let rec add_incr (i : int) (first_link : int) (last_link : int)
@@ -646,14 +647,23 @@ let rec erase_incr (sigs : Signature.s) (i : int)
     if i = abs delta then (
       let before, _ = incr_.LKappa.ra_ports.(port_b) in
       incr_.LKappa.ra_ports.(port_b) <- before, LKappa.Linked link;
-      { (*incr with*) agent = incr_ ; thresholds = incr.Size_compiler.thresholds} :: incr_s
+      {
+        (*incr with*) agent = incr_;
+        thresholds = incr.Size_compiler.thresholds;
+      }
+      :: incr_s
     ) else (
       Array.iteri
         (fun i (a, _) ->
           incr.Size_compiler.agent.LKappa.ra_ports.(i) <- a, LKappa.Erased)
         incr.Size_compiler.agent.LKappa.ra_ports;
       let agent = { incr.Size_compiler.agent with LKappa.ra_erased = true } in
-      let rule_agent = { (*incr with*) Size_compiler.agent ; thresholds = incr.Size_compiler.thresholds} in
+      let rule_agent =
+        {
+          (*incr with*) Size_compiler.agent;
+          thresholds = incr.Size_compiler.thresholds;
+        }
+      in
       rule_agent :: erase_incr sigs (i + 1) incr_s delta link
     )
   | [] -> []

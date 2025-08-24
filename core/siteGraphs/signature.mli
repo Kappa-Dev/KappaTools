@@ -50,7 +50,7 @@ type s
 (* TODO See what to be kept here? *)
 val create :
   counters_per_agent:(string Loc.annoted * string Loc.annoted list) list ->
-  size_predicate_list:(int list * (string * int list) list) ->
+  size_predicate_list:int list * (string * int list) list ->
   t NamedDecls.t ->
   s
 

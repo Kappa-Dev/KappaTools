@@ -18,9 +18,12 @@ let raise_if_modification_agent (pos : Loc.t) = function
     raise
       (ExceptionDefn.Malformed_Decl ("A modification is forbidden here.", pos))
 
-let raise_if_cc_constraint (pos : Loc.t) = function 
+let raise_if_cc_constraint (pos : Loc.t) = function
   | [] -> ()
-  | _::_ -> raise (ExceptionDefn.Malformed_Decl ("Constraints about connected components are forbidden on rhs", pos))
+  | _ :: _ ->
+    raise
+      (ExceptionDefn.Malformed_Decl
+         ("Constraints about connected components are forbidden on rhs", pos))
 
 let build_l_type sigs pos dst_ty dst_p switch =
   let ty_id = Signature.num_of_agent dst_ty sigs in
@@ -274,10 +277,10 @@ let annotate_dropped_agent ~warning ~syntax_version ~r_edit_style sigs
   in
   let ra' =
     Size_compiler.annotate_dropped_size_predicates sign threshold_list ra arity
-      agent_name None cc 
+      agent_name None cc
   in
   ( Counters_compiler.annotate_dropped_counters sign counter_list ra' arity
-      agent_name None ,
+      agent_name None,
     lannot )
 
 let annotate_created_agent ~warning ~syntax_version ~r_edit_style sigs
@@ -506,7 +509,8 @@ let annotate_edit_agent ~warning ~syntax_version ~is_rule sigs ?contact_map
   let ra' =
     Size_compiler.annotate_edit_size_predicates sigs ag_ty size_predicate_list
       ra
-      (add_link_contact_map ?contact_map) cc 
+      (add_link_contact_map ?contact_map)
+      cc
   in
   ( Counters_compiler.annotate_edit_counters sigs ag_ty counter_list ra'
       (add_link_contact_map ?contact_map),
@@ -815,7 +819,8 @@ let annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
   in
   let ra' =
     Size_compiler.annotate_size_predicates_with_diff sigs ag_ty ls rs ra
-      (add_link_contact_map ?contact_map) lcc 
+      (add_link_contact_map ?contact_map)
+      lcc
   in
   ( Counters_compiler.annotate_counters_with_diff sigs ag_ty lc rc ra'
       (add_link_contact_map ?contact_map),
@@ -908,14 +913,14 @@ let annotate_lhs_with_diff_v3 ~warning sigs ?contact_map lhs rhs =
            && Ast.no_more_site_on_right true lag_s rag_s ->
       raise_if_modification_agent lpos lmod;
       raise_if_modification_agent rpos rmod;
-      raise_if_cc_constraint rpos rcc; 
+      raise_if_cc_constraint rpos rcc;
       let lag_p, (lag_s : Ast.threshold list), lag_c =
         separate_simple_ports_from_counters lag_s
       in
       let rag_p, rag_s, rag_c = separate_simple_ports_from_counters rag_s in
       let ra, links_annot' =
         annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
-          ag_ty links_annot lag_p rag_p lag_s rag_s lag_c rag_c lcc 
+          ag_ty links_annot lag_p rag_p lag_s rag_s lag_c rag_c lcc
       in
       aux links_annot' (ra :: acc) lt rt
     | ((Ast.Present _ :: _ | []) as erased), added ->
@@ -1016,13 +1021,13 @@ let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs =
       let ra, lannot' =
         annotate_dropped_agent ~warning ~syntax_version ~r_edit_style:false sigs
           (fst links_annot) agent_type simple_port_list size_predicate_list
-          counter_list lcc 
+          counter_list lcc
       in
       aux (lannot', snd links_annot) (ra :: mix) cmix lt rt
     | ( Ast.Absent _ :: lt,
-        Ast.Present (((_, pos) as agent_type), sites, rmod,rcc) :: rt ) ->
+        Ast.Present (((_, pos) as agent_type), sites, rmod, rcc) :: rt ) ->
       raise_if_modification_agent pos rmod;
-      raise_if_cc_constraint pos rcc; 
+      raise_if_cc_constraint pos rcc;
       let simple_port_list, size_predicate_list, counter_list =
         separate_simple_ports_from_counters sites
       in
@@ -1055,7 +1060,7 @@ let annotate_lhs_with_diff_v4 ~warning sigs ?contact_map lhs rhs =
         let rag_p, rag_s, rag_c = separate_simple_ports_from_counters rag_s in
         let ra, links_annot' =
           annotate_agent_with_diff ~warning ~syntax_version sigs ?contact_map
-            ag_ty links_annot lag_p rag_p lag_s rag_s lag_c rag_c lcc 
+            ag_ty links_annot lag_p rag_p lag_s rag_s lag_c rag_c lcc
         in
         aux links_annot' (ra :: mix) cmix lt rt
       ) else
@@ -1165,7 +1170,7 @@ let annotate_created_mixture ~warning ~syntax_version sigs ?contact_map
              (ExceptionDefn.Malformed_Decl
                 ("Absent agent cannot occurs in created mixtures", pos))
          | Ast.Present (agent_type, sites, _modif, cc) ->
-           let () = raise_if_cc_constraint (snd agent_type) cc in 
+           let () = raise_if_cc_constraint (snd agent_type) cc in
            let simple_port_list, threshold_list, counter_list =
              separate_simple_ports_from_counters sites
            in
@@ -1177,7 +1182,7 @@ let annotate_created_mixture ~warning ~syntax_version sigs ?contact_map
              Size_compiler.annotate_created_size_predicates sigs agent_type
                threshold_list
                (add_link_contact_map ?contact_map)
-               x' cc 
+               x' cc
            in
            let x''' =
              Counters_compiler.annotate_created_counters sigs agent_type
@@ -1862,10 +1867,11 @@ let prepare_agent_sig
             c.counter_sig_name :: acc_counter_names ))
       sites ([], [])
   in
-  let add agent_id l site_sigs_pre_nameddecls = 
+  let add agent_id l site_sigs_pre_nameddecls =
     List.fold_right
       (fun threshold site_sigs_pre_nameddecls ->
-        ( (Size_info.name_of_size_predicate_before_compil agent_id threshold, Loc.dummy),
+        ( ( Size_info.name_of_size_predicate_before_compil agent_id threshold,
+            Loc.dummy ),
           {
             Signature.internal_state =
               NamedDecls.create
@@ -1886,14 +1892,16 @@ let prepare_agent_sig
         :: site_sigs_pre_nameddecls)
       l site_sigs_pre_nameddecls
   in
-  let site_sigs_pre_nameddecls = add None (fst size_predicate_list) site_sigs_pre_nameddecls in 
-  let site_sigs_pre_nameddecls = 
-    List.fold_right 
-      (fun (id,l) site_sigs_pre_nameddecls -> 
+  let site_sigs_pre_nameddecls =
+    add None (fst size_predicate_list) site_sigs_pre_nameddecls
+  in
+  let site_sigs_pre_nameddecls =
+    List.fold_right
+      (fun (id, l) site_sigs_pre_nameddecls ->
         add (Some id) l site_sigs_pre_nameddecls)
-        (snd size_predicate_list) site_sigs_pre_nameddecls
-      in 
-        NamedDecls.create_from_list site_sigs_pre_nameddecls, counter_names
+      (snd size_predicate_list) site_sigs_pre_nameddecls
+  in
+  NamedDecls.create_from_list site_sigs_pre_nameddecls, counter_names
 
 (** [make_counter_agent_site_sigs counters_per_agent] evaluates to
   (counter_agent_name, site_sigs_counter_agent) which describe the counter
@@ -2376,7 +2384,8 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
                     counter map ))
               counters_with_clte_tests_from_agent ([], map)
           in
-          ( Ast.Present (agent_name_, site_list @ new_counter_sites, agent_mod, cc)
+          ( Ast.Present
+              (agent_name_, site_list @ new_counter_sites, agent_mod, cc)
             :: acc,
             map ))
       ([], Mods.StringMap.empty)
@@ -2752,13 +2761,14 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
     let () = aux 0 in
     t
   in
-  let size_predicate_set = 
-    fst size_predicate_set, 
-    Mods.StringMap.fold (fun s l m -> 
-      let i = Signature.num_of_agent (Loc.annot_with_dummy s) agents_sig in 
-      Mods.IntMap.add i l m)
-      
-      (snd size_predicate_set) Mods.IntMap.empty in 
+  let size_predicate_set =
+    ( fst size_predicate_set,
+      Mods.StringMap.fold
+        (fun s l m ->
+          let i = Signature.num_of_agent (Loc.annot_with_dummy s) agents_sig in
+          Mods.IntMap.add i l m)
+        (snd size_predicate_set) Mods.IntMap.empty )
+  in
   (*let () =
         Mods.StringMap.iter
             (fun agent_name m ->

@@ -11,7 +11,10 @@
 module type Edges = sig
   type t
 
-  val empty : with_connected_components:bool -> with_thresholds:Size_info.previous_threshold -> t
+  val empty :
+    with_connected_components:bool ->
+    with_thresholds:Size_info.previous_threshold ->
+    t
 
   val copy : t -> t
   (** You'd better NOT use that on the state of a simulation *)

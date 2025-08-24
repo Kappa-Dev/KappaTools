@@ -202,13 +202,17 @@ let one_of_json : Yojson.Basic.t -> bool array array site_sig NamedDecls.t =
               | x ->
                 raise
                   (Yojson.Basic.Util.Type_error ("Problematic threshold", x)))
-            d
+            d;
       }
     | x ->
       raise (Yojson.Basic.Util.Type_error ("Problematic agent signature", x)))
 
 type counter_agent_info = { id: int; arity: int; ports: int * int }
-type size_predicates_info = { n_thresholds: int * int array; thresholds: int list * int list array}
+
+type size_predicates_info = {
+  n_thresholds: int * int array;
+  thresholds: int list * int list array;
+}
 
 type s = {
   agent_sigs: t NamedDecls.t;
@@ -217,16 +221,17 @@ type s = {
 }
 
 let thresholds s id_opt =
-  match s.size_predicates_info, id_opt  with
+  match s.size_predicates_info, id_opt with
   | None, _ -> []
   | Some a, None -> fst a.thresholds
   | Some a, Some i -> (snd a.thresholds).(i)
 
 let n_thresholds s id_opt =
-  match s.size_predicates_info, id_opt  with
+  match s.size_predicates_info, id_opt with
   | None, _ -> 0
   | Some a, None -> fst a.n_thresholds
   | Some a, Some i -> (snd a.n_thresholds).(i)
+
 let size sigs = NamedDecls.size sigs.agent_sigs
 let get sigs agent_id = NamedDecls.elt_val sigs.agent_sigs agent_id
 let arity sigs agent_id = NamedDecls.size (get sigs agent_id)
@@ -292,22 +297,25 @@ let create ~counters_per_agent ~size_predicate_list agent_sigs =
          (* If there is a counter agent, we choose 0 for its agent id and 0 and 1 as its port ids *)
          Some { id = 0; arity = 2; ports = 0, 1 });
     size_predicates_info =
-      let size_cc, agent_cc = size_predicate_list in 
-      let thresholds_agent = Array.make (NamedDecls.size agent_sigs) [] in 
-      let n_thresholds_agent = Array.make (NamedDecls.size agent_sigs) 0 in 
-      let () = 
-        List.iter 
-          (fun (s,l) -> 
-            let id = NamedDecls.elt_id ~kind:"agent" agent_sigs (Loc.annot_with_dummy s) in 
-            thresholds_agent.(id)<- l; 
-            n_thresholds_agent.(id) <- (List.length l); 
-            ) agent_cc 
-      in 
-      Some
-        {
-          thresholds = size_cc, thresholds_agent ;
-          n_thresholds = List.length size_cc, n_thresholds_agent;
-        };
+      (let size_cc, agent_cc = size_predicate_list in
+       let thresholds_agent = Array.make (NamedDecls.size agent_sigs) [] in
+       let n_thresholds_agent = Array.make (NamedDecls.size agent_sigs) 0 in
+       let () =
+         List.iter
+           (fun (s, l) ->
+             let id =
+               NamedDecls.elt_id ~kind:"agent" agent_sigs
+                 (Loc.annot_with_dummy s)
+             in
+             thresholds_agent.(id) <- l;
+             n_thresholds_agent.(id) <- List.length l)
+           agent_cc
+       in
+       Some
+         {
+           thresholds = size_cc, thresholds_agent;
+           n_thresholds = List.length size_cc, n_thresholds_agent;
+         });
   }
 
 let is_counter_agent sigs agent_id =
@@ -424,18 +432,15 @@ let to_json sigs =
               `Assoc
                 [
                   ( "thresholds",
-                    JsonUtil.of_pair 
-                    (JsonUtil.of_list JsonUtil.of_int)
-                    (JsonUtil.of_array
-                        (JsonUtil.of_list JsonUtil.of_int))
+                    JsonUtil.of_pair
+                      (JsonUtil.of_list JsonUtil.of_int)
+                      (JsonUtil.of_array (JsonUtil.of_list JsonUtil.of_int))
                       size_predicates_info.thresholds );
-                  ("n_thresholds", 
-                  JsonUtil.of_pair 
-                  (JsonUtil.of_int)
-                  (JsonUtil.of_array
-                      (JsonUtil.of_int))
-                    size_predicates_info.n_thresholds );
-                 ])
+                  ( "n_thresholds",
+                    JsonUtil.of_pair JsonUtil.of_int
+                      (JsonUtil.of_array JsonUtil.of_int)
+                      size_predicates_info.n_thresholds );
+                ])
           sigs.size_predicates_info );
     ]
 
@@ -470,14 +475,15 @@ let of_json v =
           | `Assoc
               [ ("thresholds", thresholds); ("n_thresholds", n_thresholds) ] ->
             {
-              thresholds = 
-                JsonUtil.to_pair 
+              thresholds =
+                JsonUtil.to_pair
                   (JsonUtil.to_list Yojson.Basic.Util.to_int)
-                  (JsonUtil.to_array (JsonUtil.to_list Yojson.Basic.Util.to_int)) thresholds;
-              n_thresholds = 
-               JsonUtil.to_pair 
-                  Yojson.Basic.Util.to_int
-                  (JsonUtil.to_array Yojson.Basic.Util.to_int) 
+                  (JsonUtil.to_array
+                     (JsonUtil.to_list Yojson.Basic.Util.to_int))
+                  thresholds;
+              n_thresholds =
+                JsonUtil.to_pair Yojson.Basic.Util.to_int
+                  (JsonUtil.to_array Yojson.Basic.Util.to_int)
                   n_thresholds;
             }
           | x ->

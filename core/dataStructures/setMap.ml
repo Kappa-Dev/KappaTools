@@ -1705,7 +1705,6 @@ module Make (Ord : OrderedType) : S with type elt = Ord.t = struct
       | Private.Node (_, key, data, Private.Empty, _, _) -> Some (key, data)
       | Private.Node (_, _, _, right, _, _) -> max_elt right
 
-
     let rec find_option key = function
       | Private.Empty -> None
       | Private.Node (left, key_map, data, right, _, _) ->

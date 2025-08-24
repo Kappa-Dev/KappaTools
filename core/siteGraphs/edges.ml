@@ -210,7 +210,7 @@ module Edges (I : Interface) = struct
     missings: Mods.Int2Set.t;
     free_id: int * int list;
     cc: Connected.t;
-    thresholds: Size_info.previous_threshold; 
+    thresholds: Size_info.previous_threshold;
   }
 
   (** (agent,site -> binding_state; missings);
@@ -382,37 +382,37 @@ module Edges (I : Interface) = struct
 
   let iter_neighbors f ag graph =
     match graph.tables with
-      | None -> assert false
-      | Some tables ->
-        let ag_table = Mods.DynArray.get tables.connect ag in
-        Array.iter
-          (function
-            | None -> ()
-            | Some s -> f (fst s))
-          ag_table
-      
-  let fold_neighbors_safe f ag tables acc = 
+    | None -> assert false
+    | Some tables ->
+      let ag_table = Mods.DynArray.get tables.connect ag in
+      Array.iter
+        (function
+          | None -> ()
+          | Some s -> f (fst s))
+        ag_table
+
+  let fold_neighbors_safe f ag tables acc =
     let ag_table = Mods.DynArray.get tables.connect ag in
-    Array.fold_right 
-      (fun target acc -> 
-          match target with 
-          | None -> acc
-          | Some s -> f (fst s) acc)
-      ag_table acc 
-      
-  let _fold_neighbors f ag graph acc = 
+    Array.fold_right
+      (fun target acc ->
+        match target with
+        | None -> acc
+        | Some s -> f (fst s) acc)
+      ag_table acc
+
+  let _fold_neighbors f ag graph acc =
     match graph.tables with
     | None -> assert false
-    | Some tables -> fold_neighbors_safe f ag tables acc 
-  
-  let build_neighbors_safe tables = 
-    (fun i -> fold_neighbors_safe (fun a acc -> (fst a)::acc) i tables []) 
-          
-  let build_neighbors graph = 
-    match graph.tables with 
-      | None -> assert false 
-      | Some g -> build_neighbors_safe g 
-          
+    | Some tables -> fold_neighbors_safe f ag tables acc
+
+  let build_neighbors_safe tables i =
+    fold_neighbors_safe (fun a acc -> fst a :: acc) i tables []
+
+  let build_neighbors graph =
+    match graph.tables with
+    | None -> assert false
+    | Some g -> build_neighbors_safe g
+
   let remove_agent ag graph =
     match graph.tables with
     | None -> assert false
@@ -622,10 +622,12 @@ module Edges (I : Interface) = struct
 
   let flush ~thresholds graph =
     if I.early then (
-      let neighbor = build_neighbors graph in 
-      let agtype ag  = get_sort ag graph in 
+      let neighbor = build_neighbors graph in
+      let agtype ag = get_sort ag graph in
       let thresholds = Connected.eval_threshold thresholds in
-      let cc, updates = Connected.flush ~neighbor ~agtype ~thresholds graph.cc in
+      let cc, updates =
+        Connected.flush ~neighbor ~agtype ~thresholds graph.cc
+      in
       { graph with cc }, updates
     ) else
       graph, []
