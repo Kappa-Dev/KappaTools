@@ -82,6 +82,7 @@ type t = {
   threshold_update: Mods.IntIntOptSet.t Blackboard.t;
   threshold_old: Mods.IntIntOptSet.t Blackboard.t;
   degraded: int list; 
+  fresh: int list;
 }
 
 let flush_updates t =
@@ -107,6 +108,7 @@ let flush_updates t =
       t.size_update t.size
   in
   let degraded = [] in 
+  let fresh = [] in 
   {
     t with
     array;
@@ -116,6 +118,7 @@ let flush_updates t =
     size;
     size_update;
     degraded; 
+    fresh
   }
 
 let print f t =
@@ -208,6 +211,7 @@ let init () =
     threshold_update = Blackboard.create ();
     threshold_old = Blackboard.create ();
     degraded = []; 
+    fresh = []; 
   }
 
 let copy t =
@@ -223,6 +227,7 @@ let copy t =
     threshold_update = Blackboard.copy t.threshold_update;
     threshold_old = Blackboard.copy t.threshold_old;
     degraded = t.degraded;
+    fresh = t.fresh; 
   }
 
 let lift t acc i =
@@ -295,7 +300,8 @@ let fresh t i id =
   let back_trans_update =
     Blackboard.set t.back_trans_update i (Some (Mods.IntSet.singleton i))
   in
-  { t with array_update; size_update; back_trans_update }
+  let fresh = i::t.fresh in 
+  { t with array_update; size_update; back_trans_update ; fresh}
 
 let map2 f g h m n = (* TO DO : improve data_structures *)
  let (),rep =  Mods.IntMap.monadic_fold2 () () 
@@ -422,7 +428,10 @@ let add_alias (i,j) (l,_) =
 let flush ~neighbor ~agtype ~(thresholds:weight->weight) t =
   let set = t.to_check_unbind in
   let degraded_set = List.fold_left (fun set i -> Mods.IntSet.add i set) Mods.IntSet.empty t.degraded in 
-  let set = Mods.IntSet.inter set (Mods.IntSet.diff set degraded_set) in 
+  let fresh_set = List.fold_left (fun set i -> Mods.IntSet.add i set) Mods.IntSet.empty t.fresh in 
+  let set = Mods.IntSet.inter set (Mods.IntSet.union fresh_set (Mods.IntSet.diff set degraded_set)) 
+  (* Id of agents with some unbinding without the degraded agents which have not been replaced with a fresh one *)
+  in 
   let with_degradation = 
     match t.degraded with 
       | [] -> false 
