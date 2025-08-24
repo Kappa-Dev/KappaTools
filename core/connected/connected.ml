@@ -309,12 +309,12 @@ let fresh t i id =
   let fresh = i :: t.fresh in
   { t with array_update; size_update; back_trans_update; fresh }
 
-let clean_degraded_agent t i = 
-  let () = Mods.DynArray.set t.array i None in 
-  let () = Mods.DynArray.set t.back_trans i Mods.IntSet.empty in 
-  let () = Mods.DynArray.set t.size i None in 
+let clean_degraded_agent t i =
+  let () = Mods.DynArray.set t.array i None in
+  let () = Mods.DynArray.set t.back_trans i Mods.IntSet.empty in
+  let () = Mods.DynArray.set t.size i None in
   t
-  
+
 let map2 f g h m n =
   (* TO DO : improve data_structures *)
   let (), rep =
@@ -441,7 +441,6 @@ let build_alias aliases =
 let init_alias = [], fun i -> i
 let apply_alias (_, f) = f
 let add_alias (i, j) (l, _) = build_alias ((i, j) :: l)
-
 let setminus a b = Mods.IntSet.inter a (Mods.IntSet.diff a b)
 
 let flush ~neighbor ~agtype ~(thresholds : weight -> weight) t =
@@ -456,9 +455,9 @@ let flush ~neighbor ~agtype ~(thresholds : weight -> weight) t =
       (fun set i -> Mods.IntSet.add i set)
       Mods.IntSet.empty t.fresh
   in
-  let proper_degraded_set = setminus degraded_set fresh_set in 
-  let set = setminus set proper_degraded_set in  
-    (* Id of agents with some unbinding without the degraded agents which have not been replaced with a fresh one *)
+  let proper_degraded_set = setminus degraded_set fresh_set in
+  let set = setminus set proper_degraded_set in
+  (* Id of agents with some unbinding without the degraded agents which have not been replaced with a fresh one *)
   let with_degradation =
     match t.degraded with
     | [] -> false
@@ -651,14 +650,12 @@ let flush ~neighbor ~agtype ~(thresholds : weight -> weight) t =
           set (t, updates))
       threshold_update (t, [])
   in
-  let t = 
-    Mods.IntSet.fold 
-      (fun a b -> clean_degraded_agent b a) 
-    proper_degraded_set t 
-  in 
+  let t =
+    Mods.IntSet.fold (fun a b -> clean_degraded_agent b a) proper_degraded_set t
+  in
   let to_check_unbind = Mods.IntSet.empty in
   let t = { t with to_check_unbind; threshold_update; threshold_old } in
-  let t = flush_updates t in 
+  let t = flush_updates t in
   t, updates
 
 (*let t = [|0;1;1;1;1;1;1;1;1;1;10;10;10;10|]
