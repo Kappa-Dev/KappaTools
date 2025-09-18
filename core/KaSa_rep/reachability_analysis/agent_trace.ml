@@ -81,6 +81,24 @@ let mvbdu_of_reverse_order_association_list asso =
   mvbdu_of_association_list_gen
     Ckappa_sig.Views_intbdu.build_reverse_sorted_association_list asso
 
+(*The results about the boolean parameters from the reachability analysis are ignored by the agent_trace analysis.*)
+let project_bdu_abstract_away_guard_parameters bdu nr_guard_parameters nsites =
+  let guard_parameter_list =
+    List.map
+      (fun x ->
+        Ckappa_sig.site_name_of_int
+          (Ckappa_sig.int_of_mvbdu_var (Ckappa_sig.mvbdu_var_of_guard x nsites)))
+      (Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters)
+  in
+  (*project bdu to abstract away the guard parameters*)
+  let renamed_list =
+    Ckappa_sig.Views_intbdu.build_variables_list guard_parameter_list
+  in
+  let bdu_proj_guard =
+    Ckappa_sig.Views_intbdu.mvbdu_project_abstract_away bdu renamed_list
+  in
+  bdu_proj_guard
+
 let empty_transition_system title agent_string agent_name =
   {
     title;
@@ -195,10 +213,6 @@ let dump_mvbdu logger parameters error handler_kappa transition_system mvbdu =
       ~directives:[ Graph_loggers_sig.Label label ]
   in
   error
-
-let add_node_from_mvbdu _parameters _handler_kappa error _agent_type
-    _agent_string mvbdu transition_system =
-  error, { transition_system with nodes = mvbdu :: transition_system.nodes }
 
 let bdu_of_view parameters error test =
   let mvbdu_false = Ckappa_sig.Views_intbdu.mvbdu_false () in
@@ -1171,6 +1185,14 @@ let agent_trace parameters log_info error dead_rules handler static
                    transition_system_length,
                    log_info ) ) ->
             try
+              let nr_guard_parameters =
+                Handler.get_nr_guard_parameters handler_kappa
+              in
+              let nsites = Handler.get_nsites handler_kappa in
+              let mvbdu =
+                project_bdu_abstract_away_guard_parameters mvbdu
+                  nr_guard_parameters nsites
+              in
               let sites =
                 Ckappa_sig.Views_intbdu.variables_list_of_mvbdu mvbdu
               in
