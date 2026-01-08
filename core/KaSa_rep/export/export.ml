@@ -554,6 +554,18 @@ functor
       get_gen ~log_title:"Reachability analysis"
         Remanent_state.get_reachability_result compute_reachability_result
 
+    let output_reachability_result state =
+      let error = Remanent_state.get_errors state in
+      let parameters = Remanent_state.get_parameters state in
+      let log = Remanent_parameters.get_logger parameters in
+      let state, (static, dynamic) = get_reachability_analysis state in
+      let error, dynamic = Reachability.print static dynamic error log in
+      let state =
+        Remanent_state.set_reachability_result (static, dynamic) state
+      in
+      let state = Remanent_state.set_errors error state in
+      state
+
     (******************************************************************)
     (*ODE flows*)
     (******************************************************************)

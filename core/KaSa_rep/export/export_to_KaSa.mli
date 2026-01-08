@@ -119,6 +119,8 @@ module type Type = sig
     state ->
     state
 
+  val output_reachability_result : state -> state
+
   val get_data :
     state ->
     Cckappa_sig.kappa_handler option
