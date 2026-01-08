@@ -35,6 +35,11 @@ let main () =
         print_endline "TODO";
         loop state
       | "print rules" ->
+        let state, compilation = Export_to_KaSa.get_compilation state in
+        let log = Remanent_parameters.get_logger parameters in
+        let () =
+          Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
+        in
         print_endline "TODO";
         loop state
       | "print result" ->

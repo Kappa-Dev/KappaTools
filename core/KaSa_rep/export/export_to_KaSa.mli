@@ -25,6 +25,7 @@ module type Type = sig
   val empty_constraints_list : internal_constraints_list
 
   type handler = Cckappa_sig.kappa_handler
+  type compilation = Ast.parsing_compil
   type c_compilation = Cckappa_sig.compil
   type reachability_analysis
   type ode_flow
@@ -37,6 +38,7 @@ module type Type = sig
   val get_handler : state -> state * handler
   val get_errors : state -> errors
   val get_env : state -> state * Model.t option
+  val get_compilation : state -> state * compilation
   val get_c_compilation : state -> state * c_compilation
 
   val get_contact_map :

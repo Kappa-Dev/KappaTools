@@ -30,6 +30,7 @@ functor
     type contact_map = Public_data.contact_map
     type ctmc_flow = Remanent_state.flow
     type ode_flow = Ode_fragmentation_type.ode_frag
+    type compilation = Ast.parsing_compil
     type c_compilation = Cckappa_sig.compil
 
     type reachability_analysis =

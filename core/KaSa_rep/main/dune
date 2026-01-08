@@ -107,4 +107,8 @@
    -open
    Kappa_kasa_export
    -open
-   Kappa_kasa_type_interface)))
+   Kappa_kasa_type_interface
+   -open
+   Kappa_kasa_remanent_state
+   -open
+   Kappa_grammar)))
