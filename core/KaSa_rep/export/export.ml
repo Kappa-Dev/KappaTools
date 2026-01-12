@@ -918,7 +918,7 @@ functor
         "Rule " ^ rule i (*(string_of_int i.Public_data.rule_id)*)
       | Public_data.Var i -> "Var " ^ var i
     (*string_of_int i.Public_data.var_id)
-                                        *)
+      *)
 
     let string_of_short_influence_node =
       string_of_influence_node string_of_int string_of_int
@@ -2068,4 +2068,25 @@ functor
         state
 
     let get_data = Remanent_state.get_data
+
+    let toggle_rule bool state rule_name =
+      let error = Remanent_state.get_errors state in
+      let bdu_handler = Remanent_state.get_bdu_handler state in
+      let kappa_handler = Remanent_state.get_handler state in
+      (* TODO compilation and refind_compilation and c_compil
+         let compilation = Remanent_state.get_compilation in *)
+      let state, (static, dynamic) = get_reachability_analysis state in
+      let error, static, dynamic, bdu_handler =
+        Reachability.enable_or_disable_rule static dynamic error bdu_handler kappa_handler
+          state bool rule_name
+      in
+      (*TODO modify dead rules and dead agents*)
+      let state =
+        Remanent_state.set_reachability_result (static, dynamic) state
+      in
+      let state = Remanent_state.set_errors error state in
+      Remanent_state.set_bdu_handler bdu_handler state
+
+    let enable_rule = toggle_rule true
+    let disable_rule = toggle_rule false
   end

@@ -49,7 +49,8 @@ let main () =
         let state =
           match input with
           | "add" -> state
-          | "disable" | "enable" -> state
+          | "disable" -> Export_to_KaSa.disable_rule state "" (*TODO*)
+          | "enable" -> Export_to_KaSa.enable_rule state ""
           | _ ->
             print_endline "??";
             state

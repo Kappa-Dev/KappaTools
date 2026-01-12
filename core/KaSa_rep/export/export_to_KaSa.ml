@@ -132,6 +132,8 @@ module type Type = sig
     * Public_data.dead_rules option
     * Remanent_state.separating_transitions option
     * int list option
+
+  val enable_rule : state -> string -> state
 end
 
 module Export =
@@ -155,4 +157,6 @@ functor
     let output_constraints_list = output_internal_constraints_list
     let output_scc_decomposition = dump_internal_scc_decomposition
     let empty_constraints_list = []
+    let enable_rule = enable_rule
+    let disable_rule = disable_rule
   end

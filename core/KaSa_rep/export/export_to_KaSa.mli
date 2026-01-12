@@ -129,6 +129,9 @@ module type Type = sig
     * Public_data.dead_rules option
     * Remanent_state.separating_transitions option
     * int list option
+
+  val enable_rule : state -> string -> state
+  val disable_rule : state -> string -> state
 end
 
 module Export : functor (Reachability : Analyzer.Analyzer) -> Type

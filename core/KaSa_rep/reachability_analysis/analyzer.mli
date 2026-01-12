@@ -54,6 +54,16 @@ module type Analyzer = sig
     Analyzer_headers.pattern_matching_flag ->
     Cckappa_sig.mixture ->
     Exception.exceptions_caught_and_uncaught * dynamic_information * bool
+
+  val enable_or_disable_rule :
+    static_information ->
+    dynamic_information ->
+    Exception.exceptions_caught_and_uncaught ->
+    string ->
+    bool ->
+    Exception.exceptions_caught_and_uncaught
+    * static_information
+    * dynamic_information
 end
 
 module Make : functor (Domain : Composite_domain.Composite_domain) -> Analyzer
