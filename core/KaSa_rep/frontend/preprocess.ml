@@ -78,6 +78,7 @@ let empty_e_rule handler error =
       Cckappa_sig.e_rule_label_dot = None;
       Cckappa_sig.e_rule_initial_direction = Ckappa_sig.Direct;
       Cckappa_sig.e_rule_guard_string = None;
+      Cckappa_sig.e_rule_working_set_id = None;
       Cckappa_sig.e_rule_rule =
         {
           Ckappa_sig.position = Loc.dummy;
@@ -1492,7 +1493,7 @@ let check_freeness parameters lhs source (error, half_release_set) =
           source half_release_set))
 
 let translate_rule parameters error handler rule =
-  let label, guard_string, (rule, position) = rule in
+  let ws_id, label, guard_string, (rule, position) = rule in
   let direction = rule.Ckappa_sig.interprete_delta in
   let error, c_rule_lhs, question_marks_l, delta_l =
     translate_mixture parameters error handler ~creation:false
@@ -2072,6 +2073,7 @@ let translate_rule parameters error handler rule =
       Cckappa_sig.e_rule_label_dot = label_dot;
       Cckappa_sig.e_rule_initial_direction = direction;
       Cckappa_sig.e_rule_guard_string = guard_string;
+      Cckappa_sig.e_rule_working_set_id = ws_id;
       Cckappa_sig.e_rule_rule = rule;
       Cckappa_sig.e_rule_c_rule =
         {
@@ -2222,7 +2224,7 @@ let translate_perturb parameters error handler
           Prepreprocess.modif_map
             (fun error ((_, pos) as x) ->
               let err, r =
-                translate_rule parameters error handler (None, None, x)
+                translate_rule parameters error handler (None, None, None, x)
               in
               err, (r.Cckappa_sig.e_rule_c_rule, pos))
             (lift_allowing_question_marks parameters handler)
@@ -2260,9 +2262,9 @@ let translate_c_compil parameters error handler compil =
   in
   let error, c_rules =
     List.fold_left
-      (fun (error, list) (_, r1, guard, r2) ->
+      (fun (error, list) (ws_id, r1, guard, r2) ->
         let error, c_rule =
-          translate_rule parameters error handler (r1, guard, r2)
+          translate_rule parameters error handler (ws_id, r1, guard, r2)
         in
         error, c_rule :: list)
       (error, []) compil.Ast.rules
