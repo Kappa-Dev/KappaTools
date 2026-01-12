@@ -158,15 +158,19 @@ type ('pattern, 'mixture, 'id, 'rule) command =
   | MODIFY of ('pattern, 'mixture, 'id, 'rule) modif_expr list
   | QUIT
 
+type 'rule compil_rule =
+  int option * string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted
+
 type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;
   variables: ('pattern, 'id) variable_def list;
-      (** pattern declaration for reusing as variable in perturbations or kinetic rate *)
-  signatures: 'agent_sig list;  (** agent signature declarations *)
-  rules:
-    (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)
-    list;
-      (** rules (possibly named, possibly with a guard)*)
+      (** pattern declaration for reusing as variable in perturbations
+    or kinetic rate *)
+  signatures: 'agent_sig list;  (** agent signature declaration *)
+  rules: 'rule compil_rule list;
+      (** rules (possibly named, possibly with a guard): [working_set_id_option * name_option * guard * rule_definition].
+      The rules that are in the working set are indexed. The index is mapped to true in working_set_values if the corresponding rule is enabled, otherwise it is mapped to false. Index None means that the rule is not in the working set.
+      *)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
       (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statement list;
@@ -176,8 +180,13 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   tokens: string Loc.annoted list;
   volumes: (string * float * string) list;
   guard_param_values: bool Mods.StringMap.t;
+      (** The guard parameters that have a defined value (true or false).*)
+  working_set_values: bool Mods.IntMap.t;
+      (** Maps each rule in the working set to true if it is enabled or false if it is disabled.*)
   conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
+      (** A conflict (A, s1, s2) states that there might be a conflict between the two sites s1, s2 of the agent A.*)
   sequential_bonds: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
+      (** sequential_bonds (A, s1, s2) states that the site s2 of the agent A may only be able to bind if s1 is already bound.*)
 }
 
 type parsing_compil = (agent, agent_sig, mixture, mixture, string, rule) compil

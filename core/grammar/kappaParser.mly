@@ -59,11 +59,11 @@ start_rule:
     | newline {$1}
     | LABEL rule_expression newline
         {let (guard, rule) = $2 in
-          let out = (Some ($1, rhs_pos 1), guard, rule) in
+          let out = (None, Some ($1, rhs_pos 1), guard, rule) in
 	fun c -> let r = $3 c in {r with Ast.rules = out::r.Ast.rules}}
     | rule_expression newline
         {let (guard, rule) = $1 in
-          fun c -> let r = $2 c in {r with Ast.rules = (None, guard, rule)::r.Ast.rules}}
+          fun c -> let r = $2 c in {r with Ast.rules = (None, None, guard, rule)::r.Ast.rules}}
     | LABEL EQUAL alg_expr newline
         {let out = (($1,rhs_pos 1),$3) in
 	fun c -> let r = $4 c in {r with Ast.variables = out::r.Ast.variables}}

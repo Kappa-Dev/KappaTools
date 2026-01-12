@@ -397,6 +397,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
 
   (* TODO [split_for_each_counter_var_value_rule] rule evalues to a list of rules with their names *)
   let split_for_each_counter_var_value_rule
+      ws
       (rule_name : string Loc.annoted option)
       (rule_guard : string LKappa.guard option)
       ((rule, annot) : Ast.rule Loc.annoted) :
@@ -457,7 +458,7 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
           )
         in
 
-        ( new_rule_name,
+        (ws, new_rule_name,
           rule_guard,
           ( {
               Ast.rewrite =
@@ -476,8 +477,8 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
 
   let rules = prepare_counters rules in
   List.fold_left
-    (fun acc (rule_name, rule_guard, rule_annoted) ->
-      split_for_each_counter_var_value_rule rule_name rule_guard rule_annoted
+    (fun acc (ws, rule_name, rule_guard, rule_annoted) ->
+      split_for_each_counter_var_value_rule ws rule_name rule_guard rule_annoted
       @ acc)
     [] rules
   (* TODO: is rev relevant here? *)

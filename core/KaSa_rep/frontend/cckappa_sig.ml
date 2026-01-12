@@ -27,6 +27,7 @@ type kappa_handler = {
   nagents: Ckappa_sig.c_agent_name;
   nsites: Ckappa_sig.c_site_name; (*highest number of sites of any agent*)
   nguard_params: Ckappa_sig.c_guard_parameter;
+  nworking_set_rules: Ckappa_sig.c_guard_parameter;
   agents_dic: Ckappa_sig.agent_dic;
   agents_annotation:
     (string * Loc.t list)
@@ -208,6 +209,10 @@ type compil = {
     Ckappa_sig.c_state option Ckappa_sig.AgentSite_map_and_set.Map.t;
   rules: enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
   (*rules (possibly named)*)
+  working_set_valuations:
+    (Ckappa_sig.c_guard_parameter * bool)
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
+  (*maps working_set rules to their boolean parameter and a boolean that tells us if they are enabled or not*)
   observables:
     (mixture, string) Alg_expr.e Loc.annoted Int_storage.Nearly_inf_Imperatif.t;
   (*list of patterns to plot*)

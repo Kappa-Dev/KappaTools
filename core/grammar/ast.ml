@@ -179,16 +179,19 @@ type ('pattern, 'mixture, 'id, 'rule) command =
   | MODIFY of ('pattern, 'mixture, 'id, 'rule) modif_expr list
   | QUIT
 
+type 'rule compil_rule =
+  int option * string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted
+
 type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;
   variables: ('pattern, 'id) variable_def list;
       (** pattern declaration for reusing as variable in perturbations
     or kinetic rate *)
   signatures: 'agent_sig list;  (** agent signature declaration *)
-  rules:
-    (string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted)
-    list;
-      (** rules (possibly named, possibly with a guard): [name_option * guard * rule_definition] *)
+  rules: 'rule compil_rule list;
+      (** rules (possibly named, possibly with a guard): [working_set_id_option * name_option * guard * rule_definition].
+      The rules that are in the working set are indexed. The index is mapped to true in working_set_values if the corresponding rule is enabled, otherwise it is mapped to false. Index None means that the rule is not in the working set.
+      *)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
       (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statement list;
@@ -199,6 +202,8 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   volumes: (string * float * string) list;
   guard_param_values: bool Mods.StringMap.t;
       (** The guard parameters that have a defined value (true or false).*)
+  working_set_values: bool Mods.IntMap.t;
+      (** Maps each rule in the working set to true if it is enabled or false if it is disabled.*)
   conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
       (** A conflict (A, s1, s2) states that there might be a conflict between the two sites s1, s2 of the agent A.*)
   sequential_bonds: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
@@ -245,6 +250,7 @@ let empty_compil =
     tokens = [];
     volumes = [];
     guard_param_values = Mods.StringMap.empty;
+    working_set_values = Mods.IntMap.empty;
     conflicts = [];
     sequential_bonds = [];
   }
@@ -1156,8 +1162,12 @@ let print_parsing_compil_kappa f c =
     (Pp.list Pp.space (fun f (a, _) ->
          Format.fprintf f "@[%%plot:@ @[%a@]@]" print_ast_alg_expr a))
     c.observables
-    (Pp.list Pp.space (fun f (s, guard, (r, _)) ->
-         Format.fprintf f "@[@[%a%a%a@]@]"
+    (Pp.list Pp.space (fun f (ws_id, (s, guard, (r, _))) ->
+         Format.fprintf f "@[@[%s%a%a%a@]@]"
+           (match ws_id with (*TODO*)
+           | None -> ""
+           | Some 0 -> "[ACTIVE] "
+           | Some _ -> "[INACTIVE] ")
            (Pp.option ~with_space:false (fun f (s, _) ->
                 Format.fprintf f "'%s'@ " s))
            s print_guard guard print_ast_rule r))
@@ -1576,7 +1586,8 @@ let sig_from_rule (ags, toks) r =
     in
     merge_agents ags' a.lhs, merge_tokens toks' a.rm_token
 
-let sig_from_rules = List.fold_left (fun p (_, _, (r, _)) -> sig_from_rule p r)
+let sig_from_rules =
+  List.fold_left (fun p (_, (_, _, (r, _))) -> sig_from_rule p r)
 
 let sig_from_perts =
   List.fold_left (fun acc ((_, _, p, _), _) ->
@@ -1680,11 +1691,13 @@ let compil_to_json c =
           c.variables );
       ( "rules",
         JsonUtil.of_list
-          (JsonUtil.of_triple
-             (JsonUtil.of_option (Loc.string_annoted_to_json ~filenames))
-             (LKappa.string_guard_option_to_json ~filenames)
-             (Loc.yojson_of_annoted ~filenames
-                (rule_to_json filenames mix_to_json var_to_json)))
+          (JsonUtil.of_pair
+             (JsonUtil.of_option JsonUtil.of_int)
+             (JsonUtil.of_triple
+                (JsonUtil.of_option (Loc.string_annoted_to_json ~filenames))
+                (LKappa.string_guard_option_to_json ~filenames)
+                (Loc.yojson_of_annoted ~filenames
+                   (rule_to_json filenames mix_to_json var_to_json))))
           c.rules );
       ( "observables",
         JsonUtil.of_list
@@ -1780,11 +1793,16 @@ let compil_of_json = function
          rules =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST rules")
-             (JsonUtil.to_triple
-                (JsonUtil.to_option (Loc.string_annoted_of_json ~filenames))
-                (LKappa.string_guard_option_of_json ~filenames)
-                (Loc.annoted_of_yojson ~filenames
-                   (rule_of_json filenames mix_of_json var_of_json)))
+             (JsonUtil.to_pair
+                (JsonUtil.to_option
+                   (JsonUtil.to_int
+                      ~error_msg:
+                        (JsonUtil.exn_msg_cant_import_from_json "AST rules")))
+                (JsonUtil.to_triple
+                   (JsonUtil.to_option (Loc.string_annoted_of_json ~filenames))
+                   (LKappa.string_guard_option_of_json ~filenames)
+                   (Loc.annoted_of_yojson ~filenames
+                      (rule_of_json filenames mix_of_json var_of_json))))
              (List.assoc "rules" l);
          observables =
            JsonUtil.to_list

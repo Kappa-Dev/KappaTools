@@ -10,8 +10,8 @@ let add_working_set_guard guard k loc =
   let guard_name = "@rule-" ^ string_of_int k in
   let guard_param = Logical_formulae.P (guard_name, loc) in
   match guard with
-  | None -> Some guard_param, guard_name
-  | Some guard -> Some (Logical_formulae.AND (guard_param, guard)), guard_name
+  | None -> Some guard_param
+  | Some guard -> Some (Logical_formulae.AND (guard_param, guard))
 
 let append_to_ast_compil (nr_working_set_rules, rev_instr) compil =
   fst
@@ -19,20 +19,17 @@ let append_to_ast_compil (nr_working_set_rules, rev_instr) compil =
        (fun (r, k) -> function
          | Ast.RULE (label, guard, (rule, loc), is_in_working_set) ->
            if is_in_working_set then (
-             let updated_guard, new_guard_p_name =
-               add_working_set_guard guard k loc
-             in
+             let updated_guard = add_working_set_guard guard k loc in
              ( {
                  r with
-                 Ast.rules = (label, updated_guard, (rule, loc)) :: r.Ast.rules;
-                 (* set the new guard to true *)
-                 Ast.guard_param_values =
-                   Mods.StringMap.add new_guard_p_name true
-                     r.Ast.guard_param_values;
+                 Ast.rules =
+                   (Some k, label, updated_guard, (rule, loc))
+                   :: r.Ast.rules;
+                   Ast.working_set_values = Mods.IntMap.add k true r.Ast.working_set_values;
                },
                k - 1 )
            ) else
-             ( { r with Ast.rules = (label, guard, (rule, loc)) :: r.Ast.rules },
+             ( { r with Ast.rules = (None, label, guard, (rule, loc)) :: r.Ast.rules },
                k )
          | Ast.SIG ag -> { r with Ast.signatures = ag :: r.Ast.signatures }, k
          | Ast.TOKENSIG str_pos ->

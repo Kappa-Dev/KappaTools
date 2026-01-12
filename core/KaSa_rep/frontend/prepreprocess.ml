@@ -901,7 +901,7 @@ let add_rules_with_conflicts_and_sequential parameters error rule conflicts
     List.fold_left
       (fun (error, rules, i) ((agent, _), (site1, _), (site2, _)) ->
         List.fold_left
-          (fun (error, rules, i) (id, guard, (rule, p)) ->
+          (fun (error, rules, i) (ws, id, guard, (rule, p)) ->
             let error, new_rule, was_changed, is_not_allowed =
               add_site_to_rule parameters error agent site1 site2 rule
             in
@@ -909,18 +909,18 @@ let add_rules_with_conflicts_and_sequential parameters error rule conflicts
               add_param_to_guard guard agent site1 site2 true p guard_p_name
             in
             if is_not_allowed then
-              error, (id, guard_og_rule, (rule, p)) :: rules, i
+              error, (ws, id, guard_og_rule, (rule, p)) :: rules, i
             else if was_changed then (
               let guard_new_rule =
                 add_param_to_guard guard agent site1 site2 false p guard_p_name
               in
               ( error,
-                (id, guard_og_rule, (rule, p))
-                :: (rename_rule id suffix i, guard_new_rule, (new_rule, p))
+                (ws, id, guard_og_rule, (rule, p))
+                :: (ws, rename_rule id suffix i, guard_new_rule, (new_rule, p))
                 :: rules,
                 i + 1 )
             ) else
-              error, (id, guard, (rule, p)) :: rules, i)
+              error, (ws, id, guard, (rule, p)) :: rules, i)
           (error, [], i) rules)
       (error, inital_rules, i) modifications
   in
@@ -1042,7 +1042,7 @@ let translate_compil parameters error
   in
   let error, _id_set, rules_rev =
     List.fold_left
-      (fun (error, id_set, list) (id, guard, (rule, p)) ->
+      (fun (error, id_set, list) (ws_bool, id, guard, (rule, p)) ->
         let error, id_set =
           match id with
           | None -> error, id_set
@@ -1112,9 +1112,11 @@ let translate_compil parameters error
             in
             ( error,
               id_set,
-              (id, guard, (reverse, p)) :: (id, guard, (direct, p)) :: list )
+              (ws_bool, id, guard, (reverse, p))
+              :: (ws_bool, id, guard, (direct, p))
+              :: list )
           ) else
-            error, id_set, (id, guard, (direct, p)) :: list)
+            error, id_set, (ws_bool, id, guard, (direct, p)) :: list)
       (error, id_set, []) compil.Ast.rules
   in
   let error, init_rev =
@@ -1155,7 +1157,7 @@ let translate_compil parameters error
                 | error, Some m' ->
                   ( error,
                     Ast.APPLY (a', (m', p)) :: list,
-                    (None, None, (m', p)) :: rules_rev ))
+                    (None, None, None, (m', p)) :: rules_rev ))
               | Ast.UPDATE (x, y) ->
                 let error, y' =
                   alg_with_pos_map (refine_mixture parameters) error y
@@ -1194,10 +1196,10 @@ let translate_compil parameters error
   let error, rules_rev, _, _ =
     List.fold_left
       (fun (error, list, index_conflict, index_seq)
-           (rule_string, guard, (rule, p)) ->
+           (ws, rule_string, guard, (rule, p)) ->
         let error, rules_with_conflicts, index_conflict, index_seq =
           add_rules_with_conflicts_and_sequential parameters error
-            (rule_string, guard, (rule, p))
+            (ws, rule_string, guard, (rule, p))
             compil.Ast.conflicts compil.Ast.sequential_bonds index_conflict
             index_seq
         in
