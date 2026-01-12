@@ -27,7 +27,6 @@ type kappa_handler = {
   nagents: Ckappa_sig.c_agent_name;
   nsites: Ckappa_sig.c_site_name;
   nguard_params: Ckappa_sig.c_guard_parameter;
-  nworking_set_rules: Ckappa_sig.c_guard_parameter;
   agents_dic: Ckappa_sig.agent_dic;
   agents_annotation:
     (string * Loc.t list)
@@ -203,8 +202,7 @@ type compil = {
   rules: enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
   (*rules (possibly named)*)
   working_set_valuations:
-    (Ckappa_sig.c_guard_parameter * bool)
-    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
+    bool Ckappa_sig.Guard_p_nearly_Inf_Int_storage_Imperatif.t;
   (*maps working_set rules to their boolean parameter and a boolean that tells us if they are enabled or not*)
   observables:
     (mixture, string) Alg_expr.e Loc.annoted Int_storage.Nearly_inf_Imperatif.t;

@@ -180,7 +180,10 @@ type ('pattern, 'mixture, 'id, 'rule) command =
   | QUIT
 
 type 'rule compil_rule =
-  int option * string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted
+  int option
+  * string Loc.annoted option
+  * string LKappa.guard option
+  * 'rule Loc.annoted
 
 type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;
@@ -1162,9 +1165,10 @@ let print_parsing_compil_kappa f c =
     (Pp.list Pp.space (fun f (a, _) ->
          Format.fprintf f "@[%%plot:@ @[%a@]@]" print_ast_alg_expr a))
     c.observables
-    (Pp.list Pp.space (fun f (ws_id, (s, guard, (r, _))) ->
+    (Pp.list Pp.space (fun f (ws_id, s, guard, (r, _)) ->
          Format.fprintf f "@[@[%s%a%a%a@]@]"
-           (match ws_id with (*TODO*)
+           (match ws_id with
+           (*TODO*)
            | None -> ""
            | Some 0 -> "[ACTIVE] "
            | Some _ -> "[INACTIVE] ")
@@ -1587,7 +1591,7 @@ let sig_from_rule (ags, toks) r =
     merge_agents ags' a.lhs, merge_tokens toks' a.rm_token
 
 let sig_from_rules =
-  List.fold_left (fun p (_, (_, _, (r, _))) -> sig_from_rule p r)
+  List.fold_left (fun p (_, _, _, (r, _)) -> sig_from_rule p r)
 
 let sig_from_perts =
   List.fold_left (fun acc ((_, _, p, _), _) ->
@@ -1691,13 +1695,12 @@ let compil_to_json c =
           c.variables );
       ( "rules",
         JsonUtil.of_list
-          (JsonUtil.of_pair
+          (JsonUtil.of_tuple4
              (JsonUtil.of_option JsonUtil.of_int)
-             (JsonUtil.of_triple
-                (JsonUtil.of_option (Loc.string_annoted_to_json ~filenames))
-                (LKappa.string_guard_option_to_json ~filenames)
-                (Loc.yojson_of_annoted ~filenames
-                   (rule_to_json filenames mix_to_json var_to_json))))
+             (JsonUtil.of_option (Loc.string_annoted_to_json ~filenames))
+             (LKappa.string_guard_option_to_json ~filenames)
+             (Loc.yojson_of_annoted ~filenames
+                (rule_to_json filenames mix_to_json var_to_json)))
           c.rules );
       ( "observables",
         JsonUtil.of_list
@@ -1793,16 +1796,15 @@ let compil_of_json = function
          rules =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST rules")
-             (JsonUtil.to_pair
+             (JsonUtil.to_tuple4
                 (JsonUtil.to_option
                    (JsonUtil.to_int
                       ~error_msg:
                         (JsonUtil.exn_msg_cant_import_from_json "AST rules")))
-                (JsonUtil.to_triple
-                   (JsonUtil.to_option (Loc.string_annoted_of_json ~filenames))
-                   (LKappa.string_guard_option_of_json ~filenames)
-                   (Loc.annoted_of_yojson ~filenames
-                      (rule_of_json filenames mix_of_json var_of_json))))
+                (JsonUtil.to_option (Loc.string_annoted_of_json ~filenames))
+                (LKappa.string_guard_option_of_json ~filenames)
+                (Loc.annoted_of_yojson ~filenames
+                   (rule_of_json filenames mix_of_json var_of_json)))
              (List.assoc "rules" l);
          observables =
            JsonUtil.to_list
@@ -1852,6 +1854,17 @@ let compil_of_json = function
                 (JsonUtil.to_list (Loc.string_annoted_of_json ~filenames)))
              (List.assoc "configurations" l);
          volumes = [];
+         working_set_values =
+           Mods.IntMap.of_json
+             (JsonUtil.to_int
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json
+                     "AST working_set_values sig"))
+             (JsonUtil.to_bool
+                ~error_msg:
+                  (JsonUtil.exn_msg_cant_import_from_json
+                     "AST working_set_values boolean value"))
+             (List.assoc "working_set_values" l);
          guard_param_values =
            Mods.StringMap.of_json
              (JsonUtil.to_string

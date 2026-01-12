@@ -23,13 +23,16 @@ let append_to_ast_compil (nr_working_set_rules, rev_instr) compil =
              ( {
                  r with
                  Ast.rules =
-                   (Some k, label, updated_guard, (rule, loc))
-                   :: r.Ast.rules;
-                   Ast.working_set_values = Mods.IntMap.add k true r.Ast.working_set_values;
+                   (Some k, label, updated_guard, (rule, loc)) :: r.Ast.rules;
+                 Ast.working_set_values =
+                   Mods.IntMap.add k true r.Ast.working_set_values;
                },
                k - 1 )
            ) else
-             ( { r with Ast.rules = (None, label, guard, (rule, loc)) :: r.Ast.rules },
+             ( {
+                 r with
+                 Ast.rules = (None, label, guard, (rule, loc)) :: r.Ast.rules;
+               },
                k )
          | Ast.SIG ag -> { r with Ast.signatures = ag :: r.Ast.signatures }, k
          | Ast.TOKENSIG str_pos ->

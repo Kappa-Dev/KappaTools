@@ -503,6 +503,9 @@ type c_compil = {
 module Rule_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_rule_id and type dimension = int
 
+module Guard_p_nearly_Inf_Int_storage_Imperatif :
+  Int_storage.Storage with type key = c_guard_parameter and type dimension = int
+
 val array_of_list_rule_id :
   ( Rule_nearly_Inf_Int_storage_Imperatif.dimension,
     'a Rule_nearly_Inf_Int_storage_Imperatif.t )

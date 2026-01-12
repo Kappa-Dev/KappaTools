@@ -197,7 +197,7 @@ let prepare_counters rules =
             };
       }
   in
-  List.map (fun (s, g, (r, a)) -> s, g, (aux r, a)) rules
+  List.map (fun (ws, s, g, (r, a)) -> ws, s, g, (aux r, a)) rules
 
 let counters_signature s agents =
   match
@@ -396,15 +396,10 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
   in
 
   (* TODO [split_for_each_counter_var_value_rule] rule evalues to a list of rules with their names *)
-  let split_for_each_counter_var_value_rule
-      ws
+  let split_for_each_counter_var_value_rule ws
       (rule_name : string Loc.annoted option)
       (rule_guard : string LKappa.guard option)
-      ((rule, annot) : Ast.rule Loc.annoted) :
-      (string Loc.annoted option
-      * string LKappa.guard option
-      * Ast.rule Loc.annoted)
-      list =
+      ((rule, annot) : Ast.rule Loc.annoted) =
     let mix_lhs =
       match rule.rewrite with
       | Ast.Edit content -> content.mix
@@ -458,7 +453,8 @@ let split_counter_variables_into_separate_rules ~warning rules signatures =
           )
         in
 
-        (ws, new_rule_name,
+        ( ws,
+          new_rule_name,
           rule_guard,
           ( {
               Ast.rewrite =
@@ -494,7 +490,7 @@ let split_counter_variables_into_separate_rules ~warning ~debug_mode
   if debug_mode then (
     Format.printf "@.ast rules@.";
     List.iter
-      (fun (s, _, (r, _)) ->
+      (fun (_, s, _, (r, _)) ->
         let label =
           match s with
           | None -> ""

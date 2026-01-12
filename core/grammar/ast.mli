@@ -159,7 +159,10 @@ type ('pattern, 'mixture, 'id, 'rule) command =
   | QUIT
 
 type 'rule compil_rule =
-  int option * string Loc.annoted option * string LKappa.guard option * 'rule Loc.annoted
+  int option
+  * string Loc.annoted option
+  * string LKappa.guard option
+  * 'rule Loc.annoted
 
 type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;

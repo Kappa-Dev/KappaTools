@@ -141,6 +141,31 @@ val to_triple :
   Yojson.Basic.t ->
   'a * 'b * 'c
 
+val of_tuple4 :
+  ?lab1:string ->
+  ?lab2:string ->
+  ?lab3:string ->
+  ?lab4:string ->
+  ('a -> Yojson.Basic.t) ->
+  ('b -> Yojson.Basic.t) ->
+  ('c -> Yojson.Basic.t) ->
+  ('d -> Yojson.Basic.t) ->
+  'a * 'b * 'c * 'd ->
+  Yojson.Basic.t
+
+val to_tuple4 :
+  ?lab1:string ->
+  ?lab2:string ->
+  ?lab3:string ->
+  ?lab4:string ->
+  ?error_msg:string ->
+  (Yojson.Basic.t -> 'a) ->
+  (Yojson.Basic.t -> 'b) ->
+  (Yojson.Basic.t -> 'c) ->
+  (Yojson.Basic.t -> 'd) ->
+  Yojson.Basic.t ->
+  'a * 'b * 'c * 'd
+
 val of_map :
   ?lab_key:string ->
   ?lab_value:string ->

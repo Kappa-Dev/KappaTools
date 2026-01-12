@@ -1095,6 +1095,10 @@ module Rule_id_quick_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_rule_id and type dimension = int =
   Int_storage.Quick_key_list (Rule_id_nearly_Inf_Int_storage_Imperatif)
 
+module Guard_p_nearly_Inf_Int_storage_Imperatif :
+  Int_storage.Storage with type key = c_guard_parameter and type dimension = int =
+  Int_storage.Nearly_inf_Imperatif
+
 module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
   Int_storage.Storage
     with type key = c_agent_name * c_site_name

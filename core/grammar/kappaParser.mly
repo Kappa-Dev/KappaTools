@@ -71,7 +71,7 @@ start_rule:
 		  { fun c -> let r = $2 c in
 		      match $1 with
 		      | Ast.RULE (label, guard, rule, _) ->
-			 {r with Ast.rules = (label, guard, rule)::r.Ast.rules}
+			 {r with Ast.rules = (None, label, guard, rule)::r.Ast.rules}
 		      | Ast.SIG ag ->
 			 {r with Ast.signatures=ag::r.Ast.signatures}
 		      | Ast.TOKENSIG (str_pos) ->

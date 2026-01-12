@@ -212,6 +212,23 @@ let to_pair ?(lab1 = "first") ?(lab2 = "second")
      with Not_found -> raise (Yojson.Basic.Util.Type_error (error_msg, x)))
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg, x))
 
+let to_tuple4 ?(lab1 = "first") ?(lab2 = "second") ?(lab3 = "third")
+    ?(lab4 = "fourth") ?(error_msg = exn_msg_cant_import_from_json "tuple4")
+    of_json1 of_json2 of_json3 of_json4 = function
+  | `Assoc l as x when List.length l = 4 ->
+    (try
+       ( of_json1 (List.assoc lab1 l),
+         of_json2 (List.assoc lab2 l),
+         of_json3 (List.assoc lab3 l),
+         of_json4 (List.assoc lab4 l) )
+     with Not_found -> raise (Yojson.Basic.Util.Type_error (error_msg, x)))
+  | x -> raise (Yojson.Basic.Util.Type_error (error_msg, x))
+
+let of_tuple4 ?(lab1 = "first") ?(lab2 = "second") ?(lab3 = "third")
+    ?(lab4 = "fourth") to_json1 to_json2 to_json3 to_json4 (a, b, c, d) =
+  `Assoc
+    [ lab1, to_json1 a; lab2, to_json2 b; lab3, to_json3 c; lab4, to_json4 d ]
+
 let write_compact_pair f g ob (x, y) =
   let () = Buffer.add_char ob '[' in
   let () = f ob x in

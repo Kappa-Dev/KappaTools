@@ -1528,8 +1528,9 @@ type acc_function_rules = {
 (** [name_and_purify] compiles the rules from Ast.rules into rule_inter_rep, called in a fold *)
 let name_and_purify_rule ~warning ~syntax_version sigs ~contact_map
     (acc : acc_function_rules)
-    ((label_opt, guard, (ast_rule, r_pos)) :
-      string Loc.annoted option
+    ((_, label_opt, guard, (ast_rule, r_pos)) :
+      int option
+      * string Loc.annoted option
       * string LKappa.guard option
       * Ast.rule Loc.annoted) : acc_function_rules =
   let rule_names', rule_label =
@@ -2106,7 +2107,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
   let counter_fold f init =
     let l1 =
       List.fold_left
-        (fun acc (_, _, r) -> counter_fold_in_rule f acc r)
+        (fun acc (_, _, _, r) -> counter_fold_in_rule f acc r)
         init ast_compil.rules
     in
     let l2 =
@@ -2501,14 +2502,10 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     in
     { rule with rewrite; k_def; k_op; k_un; k_op_un }
   in
-  let rules :
-      (string Loc.annoted option
-      * string LKappa.guard option
-      * Ast.rule Loc.annoted)
-      list =
+  let rules =
     List.rev_map
-      (fun (name, guard, rule_def) ->
-        name, guard, Loc.map_annot map_rule rule_def)
+      (fun (id, name, guard, rule_def) ->
+        id, name, guard, Loc.map_annot map_rule rule_def)
       (List.rev ast_compil.rules)
   in
 
@@ -2751,7 +2748,8 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
          (fun (guard, (rule : rule_inter_rep)) ->
            if evaluate_guard_opt guard ast_compil.guard_param_values then
              Some
-               ( rule.label_opt,
+               ( None,
+                 rule.label_opt,
                  guard,
                  ( assemble_rule ~warning ~syntax_version rule agents_sig
                      counters_info tokens_finder alg_vars_finder,
@@ -2809,6 +2807,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
         signatures = ast_compil.signatures;
         configurations = ast_compil.configurations;
         guard_param_values = ast_compil.guard_param_values;
+        working_set_values = ast_compil.working_set_values;
         conflicts;
         sequential_bonds;
       };

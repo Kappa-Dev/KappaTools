@@ -231,11 +231,11 @@ let cflows_of_label ~debug_mode origin ~compile_mode_on contact_map domain on
   in
   let mix =
     try
-      let _, _, (rule, _) =
+      let _, _, _, (rule, _) =
         List.find
           (function
-            | None, _, _ -> false
-            | Some (l, _), _, _ -> l = label)
+            | _, None, _, _ -> false
+            | _, Some (l, _), _, _ -> l = label)
           rules
       in
       LKappa.to_maintained rule.LKappa.r_mix
@@ -574,7 +574,7 @@ let compile_rules ~debug_mode ~warning alg_deps ~compile_mode_on contact_map
   match
     List.fold_left
       (fun (domain, syntax_ref, deps_machinery, acc)
-           (_, _guard (*guard is ignored here*), rule) ->
+           (_, _, _guard (*guard is ignored here*), rule) ->
         let domain', origin', cr =
           rules_of_ast ~debug_mode ~warning ?deps_machinery ~compile_mode_on
             contact_map domain ~syntax_ref rule

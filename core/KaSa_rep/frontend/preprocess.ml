@@ -2260,7 +2260,7 @@ let translate_c_compil parameters error handler compil =
   in
   let error, c_rules =
     List.fold_left
-      (fun (error, list) (r1, guard, r2) ->
+      (fun (error, list) (_, r1, guard, r2) ->
         let error, c_rule =
           translate_rule parameters error handler (r1, guard, r2)
         in
@@ -2332,6 +2332,30 @@ let translate_c_compil parameters error handler compil =
       (List.rev c_perturbations)
   in
 
+  let convert_guard_p guard_p_name error =
+    let error, (bool, output) =
+      Ckappa_sig.Dictionary_of_guards.allocate_bool parameters error
+        Ckappa_sig.compare_unit_guard_parameter guard_p_name ()
+        Misc_sa.const_unit handler.Cckappa_sig.guard_parameters_dic
+    in
+    match bool, output with
+    | _, None | true, _ ->
+      Exception.warn parameters error __POS__ Exit
+        Ckappa_sig.dummy_guard_parameter
+    | _, Some (i, _, _, _) -> error, i
+  in
+  let error, c_working_set_valuations =
+    Mods.IntMap.fold
+      (fun id bool (error, valuations) ->
+        let guard_name = "@rule-" ^ string_of_int id in
+        let error, guard_p_id = convert_guard_p guard_name error in
+        Ckappa_sig.Guard_p_nearly_Inf_Int_storage_Imperatif.set parameters error
+          guard_p_id bool valuations)
+      compil.Ast.working_set_values
+      (Ckappa_sig.Guard_p_nearly_Inf_Int_storage_Imperatif.create parameters
+         error 0)
+  in
+
   ( error,
     { handler with Cckappa_sig.nrules = n_rules; Cckappa_sig.nvars = n_vars },
     {
@@ -2339,6 +2363,7 @@ let translate_c_compil parameters error handler compil =
       Cckappa_sig.signatures = c_signatures;
       Cckappa_sig.counter_default;
       Cckappa_sig.rules = c_rules;
+      Cckappa_sig.working_set_valuations = c_working_set_valuations;
       Cckappa_sig.observables = c_observables;
       Cckappa_sig.init = c_inits;
       Cckappa_sig.perturbations = c_perturbations;

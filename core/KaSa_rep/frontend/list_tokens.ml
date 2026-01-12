@@ -493,7 +493,7 @@ let scan_rules scan_mixt parameters a b =
     )
   in
   List.fold_left
-    (fun remanent (_, guard, (rule, _)) ->
+    (fun remanent (_, _, guard, (rule, _)) ->
       scan_guard parameters
         (scan_mixture parameters
            (scan_mixt parameters remanent rule.Ckappa_sig.lhs)
