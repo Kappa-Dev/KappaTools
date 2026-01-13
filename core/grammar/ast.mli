@@ -216,6 +216,7 @@ val print_rule_content :
   bidirectional:bool -> Format.formatter -> rule_content -> unit
 
 val print_parsing_compil_kappa : Format.formatter -> parsing_compil -> unit
+val print_working_set : Format.formatter -> parsing_compil -> unit
 val to_erased_mixture : mixture -> mixture
 val to_created_mixture : mixture -> mixture
 val compil_of_json : Yojson.Basic.t -> parsing_compil

@@ -1192,6 +1192,22 @@ let print_parsing_compil_kappa f c =
          Format.fprintf f "%%sequential_bond: %s %s %s" a s1 s2))
     c.sequential_bonds
 
+let print_working_set f c =
+  Format.fprintf f "@[<v>%a@,@]@."
+    (Pp.list Pp.space (fun f (ws_id, s, guard, (r, _)) ->
+         match ws_id with
+         | None -> ()
+         | Some id ->
+           Format.fprintf f "@[@[%s%a%a%a@]@]"
+             (match Mods.IntMap.find_option id c.working_set_values with
+             | None -> "[UNKNOWN] "
+             | Some true -> "[ACTIVE] "
+             | Some false -> "[INACTIVE] ")
+             (Pp.option ~with_space:false (fun f (s, _) ->
+                  Format.fprintf f "'%s'@ " s))
+             s print_guard guard print_ast_rule r))
+    c.rules
+
 let arrow_notation_to_yojson filenames f_mix f_var r =
   JsonUtil.smart_assoc
     [

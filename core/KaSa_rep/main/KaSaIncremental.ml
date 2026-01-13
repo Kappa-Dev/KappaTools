@@ -41,6 +41,11 @@ let main () =
           Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
         in
         loop state
+      | "print working set" | "print ws" ->
+        let state, compilation = Export_to_KaSa.get_compilation state in
+        let log = Remanent_parameters.get_logger parameters in
+        let () = Loggers.fprintf log "%a" Ast.print_working_set compilation in
+        loop state
       | "print result" ->
         let state = Export_to_KaSa.output_reachability_result state in
         loop state
