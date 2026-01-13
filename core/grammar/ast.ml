@@ -168,7 +168,7 @@ type ('agent, 'agent_id, 'pattern, 'mixture, 'id, 'rule) instruction =
       * string LKappa.guard option
       * 'rule Loc.annoted
       * bool)
-    (*label, guard, rule, is_in_working_set*)
+  (*label, guard, rule, is_in_working_set*)
   | GUARD_PARAM of (string Loc.annoted * bool)
   | CONFLICT of (string Loc.annoted * string Loc.annoted * string Loc.annoted)
   | SEQUENTIAL_BOND of
@@ -189,12 +189,12 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   filenames: string list;
   variables: ('pattern, 'id) variable_def list;
       (** pattern declaration for reusing as variable in perturbations
-    or kinetic rate *)
+      or kinetic rate *)
   signatures: 'agent_sig list;  (** agent signature declaration *)
   rules: 'rule compil_rule list;
       (** rules (possibly named, possibly with a guard): [working_set_id_option * name_option * guard * rule_definition].
       The rules that are in the working set are indexed. The index is mapped to true in working_set_values if the corresponding rule is enabled, otherwise it is mapped to false. Index None means that the rule is not in the working set.
-      *)
+  *)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
       (** list of patterns to plot *)
   init: ('pattern, 'mixture, 'id) init_statement list;
@@ -1147,6 +1147,14 @@ let print_perturbation f ((alarm, cond, modif, rep), _) =
          Format.fprintf f "repeat @[%a@]" print_ast_bool_expr r))
     rep
 
+let print_working_set_prefix id working_set_values =
+  string_of_int id ^ ". "
+  ^
+  match Mods.IntMap.find_option id working_set_values with
+  | None -> "[UNKNOWN] "
+  | Some true -> "[ACTIVE] "
+  | Some false -> "[INACTIVE] "
+
 let print_parsing_compil_kappa f c =
   Format.fprintf f
     "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,%a@,%a@,@]@."
@@ -1169,11 +1177,7 @@ let print_parsing_compil_kappa f c =
          Format.fprintf f "@[@[%s%a%a%a@]@]"
            (match ws_id with
            | None -> ""
-           | Some id ->
-             (match Mods.IntMap.find_option id c.working_set_values with
-             | None -> "[UNKNOWN] "
-             | Some true -> "[ACTIVE] "
-             | Some false -> "[INACTIVE] "))
+           | Some id -> print_working_set_prefix id c.working_set_values)
            (Pp.option ~with_space:false (fun f (s, _) ->
                 Format.fprintf f "'%s'@ " s))
            s print_guard guard print_ast_rule r))
@@ -1199,10 +1203,7 @@ let print_working_set f c =
          | None -> ()
          | Some id ->
            Format.fprintf f "@[@[%s%a%a%a@]@]"
-             (match Mods.IntMap.find_option id c.working_set_values with
-             | None -> "[UNKNOWN] "
-             | Some true -> "[ACTIVE] "
-             | Some false -> "[INACTIVE] ")
+             (print_working_set_prefix id c.working_set_values)
              (Pp.option ~with_space:false (fun f (s, _) ->
                   Format.fprintf f "'%s'@ " s))
              s print_guard guard print_ast_rule r))
