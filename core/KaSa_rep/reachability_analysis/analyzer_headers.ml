@@ -27,6 +27,7 @@ type global_static_information = {
   global_wake_up_relation: Common_static.site_to_rules;
   global_guard_mvbdus: Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t;
   global_restriction_mvbdu: Ckappa_sig.Views_bdu.mvbdu;
+  global_working_set_mvbdu: Ckappa_sig.Views_bdu.mvbdu;
 }
 
 let add_wake_up_relation static wake =
@@ -268,8 +269,12 @@ let set_guard_mvbdus guard_mvbdus static =
 let set_restriction_mvbdu restriction_mvbdu static =
   { static with global_restriction_mvbdu = restriction_mvbdu }
 
+let set_working_set_mvbdu mvbdu static =
+  { static with global_working_set_mvbdu = mvbdu }
+
 let get_guard_mvbdus static = static.global_guard_mvbdus
 let get_restriction_mvbdu static = static.global_restriction_mvbdu
+let get_working_set_mvbdu static = static.global_working_set_mvbdu
 
 let get_nr_guard_parameters static =
   Handler.get_nr_guard_parameters (get_kappa_handler static)
@@ -301,8 +306,13 @@ let scan_rule static error mvbdu_handler =
   let error, mvbdu_handler, guard_mvbdus =
     Common_static.collect_guard_mvbdus parameters error mvbdu_handler
       compilation restriction_mvbdu nsites
-  in
+in
   let static = set_guard_mvbdus guard_mvbdus static in
+  let error, mvbdu_handler, working_set_mvbdu =
+    Common_static.compute_working_set_mvbdu parameters error mvbdu_handler
+      compilation nsites
+  in
+    let static = set_working_set_mvbdu working_set_mvbdu static in
   error, mvbdu_handler, static
 
 let initialize_global_information parameters log_info error mvbdu_handler
@@ -310,6 +320,9 @@ let initialize_global_information parameters log_info error mvbdu_handler
   let error, init_common = Common_static.init_common_views parameters error in
   let error, wake_up = Common_static.empty_site_to_rules parameters error in
   let error, mvbdu_handler, restriction_mvbdu =
+    Ckappa_sig.Views_bdu.mvbdu_true parameters mvbdu_handler error
+  in
+  let error, mvbdu_handler, working_set_mvbdu =
     Ckappa_sig.Views_bdu.mvbdu_true parameters mvbdu_handler error
   in
   let init_global_static =
@@ -320,6 +333,7 @@ let initialize_global_information parameters log_info error mvbdu_handler
       global_wake_up_relation = wake_up;
       global_guard_mvbdus = Ckappa_sig.Rule_setmap.Map.empty;
       global_restriction_mvbdu = restriction_mvbdu;
+      global_working_set_mvbdu = working_set_mvbdu;
     }
   in
   let error, mvbdu_handler, static =

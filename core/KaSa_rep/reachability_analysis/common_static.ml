@@ -1132,6 +1132,20 @@ let collect_guard_mvbdus parameters error mvbdu_handler compilation
   in
   error, mvbdu_handler, guard_mvbdus
 
+let compute_working_set_mvbdu parameters error mvbdu_handler compilation
+   nsites =
+  let pair_list =
+    Ckappa_sig.Ws_index_map_and_set.Map.fold 
+      (fun _ (guard, bool) pair_list ->
+        ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
+          (match bool with 
+          | false -> Ckappa_sig.dummy_state_index_false
+          | true -> Ckappa_sig.dummy_state_index_true ) ) :: pair_list)
+     compilation.Cckappa_sig.working_set_valuations []
+  in
+  Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters mvbdu_handler error
+    (List.rev pair_list)
+
 (******************************************************************)
 (******************************************************************)
 
