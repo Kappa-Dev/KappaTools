@@ -48,12 +48,14 @@ module Domain = struct
         - if the "first variable" must be true in order to satisfy the mvbdu: it means that when the sites x and y are bound with sites of the types a and b, then they are always bound to the same agent.
         - if the "first variable" must be false in order to satisfy the mvbdu: it means that when when the sites x and y are bound with sites of the types a and b, then they are never bound to the same agent.
         - if the first variable may be both true or false: both cases may happen.*)
+  type store_value =
+    Ckappa_sig.Views_bdu.mvbdu
+    Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t
 
   type local_dynamic_information = {
     dummy: unit;
-    store_value:
-      Ckappa_sig.Views_bdu.mvbdu
-      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
+    store_value: store_value;
+    store_value_current_working_set: store_value option;
   }
 
   type dynamic_information = {
@@ -250,6 +252,48 @@ module Domain = struct
     error, dynamic, bdu_guard
 
   let get_value dynamic = (get_local_dynamic_information dynamic).store_value
+
+  let get_value_without_working_set_vars parameters error static dynamic =
+    match dynamic.local.store_value_current_working_set with
+    | Some result -> error, dynamic, result
+    | None ->
+      let result, bdu_handler, error =
+        let bdu_handler = get_mvbdu_handler dynamic in
+        let working_set_mvbdu =
+          Analyzer_headers.get_working_set_mvbdu
+            static.global_static_information
+        in
+        let working_set_guards =
+          Analyzer_headers.get_working_set_guard_parameters
+            static.global_static_information
+        in
+        let error, bdu_handler, working_set_guards_hcons =
+          Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
+            working_set_guards
+        in
+        let current_working_set =
+          Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty
+        in
+        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
+          (fun rule_id mvbdu (current_working_set, bdu_handler, error) ->
+            let error, bdu_handler, mvbdu =
+              Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+                working_set_mvbdu
+            in
+            let error, bdu_handler, mvbdu =
+              Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters
+                bdu_handler error mvbdu working_set_guards_hcons
+            in
+            let error, current_working_set =
+              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add
+                parameters error rule_id mvbdu current_working_set
+            in
+            current_working_set, bdu_handler, error)
+          dynamic.local.store_value
+          (current_working_set, bdu_handler, error)
+      in
+      let dynamic = set_mvbdu_handler bdu_handler dynamic in
+      error, dynamic, result
 
   let set_value value dynamic =
     set_local_dynamic_information
@@ -505,6 +549,7 @@ module Domain = struct
         dummy = ();
         store_value =
           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
+        store_value_current_working_set = None;
       }
     in
     let init_global_dynamic_information =
@@ -1451,7 +1496,9 @@ module Domain = struct
           Loggers.fprintf log
             "------------------------------------------------------------\n"
         in
-        let store_value = get_value dynamic in
+        let error, _dynamic, store_value =
+          get_value_without_working_set_vars parameters error static dynamic
+        in
         let restriction_bdu = get_restriction_mvbdu static in
         let error, bdu_handler =
           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
@@ -1552,7 +1599,9 @@ module Domain = struct
     let _ = static in
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    let store_value = get_value dynamic in
+    let error, _dynamic, store_value =
+      get_value_without_working_set_vars parameters error static dynamic
+    in
     let domain_name = "Parallel bonds" in
     let bdu_handler = get_mvbdu_handler dynamic in
     let restriction_bdu = get_restriction_mvbdu static in
