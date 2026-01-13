@@ -33,6 +33,7 @@ type c_link_value = int
 type c_counter_name = int
 type binding_state = Free | Lnk_type of agent_name * site_name
 type c_guard_parameter = int
+type c_working_set_index = int
 type c_site_or_guard_p = Site of c_site_name | Guard_p of c_guard_parameter
 
 type c_mvbdu_var =
@@ -200,6 +201,7 @@ let state_index_of_int (a : int) : c_state = a
 let int_of_state_index (a : c_state) : int = a
 let string_of_state_index (a : c_state) : string = string_of_int a
 let guard_parameter_of_int (a : int) : c_guard_parameter = a
+let working_set_index_of_int (a : int) : c_working_set_index = a
 let mvbdu_var_of_int (a : int) : c_mvbdu_var = a
 let int_of_mvbdu_var (a : c_mvbdu_var) : int = a
 let mvbdu_var_of_site (a : c_site_name) : c_mvbdu_var = a
@@ -215,6 +217,7 @@ let mvbdu_var_of_site_or_guard_p (a : c_site_or_guard_p) (nsites : c_site_name)
   | Guard_p s -> mvbdu_var_of_guard s nsites
 
 let int_of_guard_parameter (a : c_guard_parameter) : int = a
+let int_of_working_set_index (a : c_working_set_index) : int = a
 
 let site_or_guard_p_of_mvbdu_var (a : c_mvbdu_var) (nsites : c_site_name) :
     c_site_or_guard_p =
@@ -1095,9 +1098,12 @@ module Rule_id_quick_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_rule_id and type dimension = int =
   Int_storage.Quick_key_list (Rule_id_nearly_Inf_Int_storage_Imperatif)
 
-module Guard_p_nearly_Inf_Int_storage_Imperatif :
-  Int_storage.Storage with type key = c_guard_parameter and type dimension = int =
-  Int_storage.Nearly_inf_Imperatif
+module Ws_index_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+  type t = c_working_set_index
+
+  let compare = compare
+  let print = Format.pp_print_int
+end))
 
 module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif :
   Int_storage.Storage

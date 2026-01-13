@@ -1908,3 +1908,4 @@ let compil_of_json = function
 let write_parsing_compil b ast = Yojson.Basic.write_json b (compil_to_json ast)
 let read_parsing_compil p lb = compil_of_json (Yojson.Basic.read_json p lb)
 let print_ast_mix = print_ast_mix ~print_counter
+let working_set_index_to_string k = "@rule-" ^ string_of_int k

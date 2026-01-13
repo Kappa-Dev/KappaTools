@@ -186,7 +186,7 @@ type enriched_rule = {
   e_rule_label_dot: (string * Ckappa_sig.position) option;
   e_rule_initial_direction: Ckappa_sig.direction;
   e_rule_guard_string: string LKappa.guard option;
-  e_rule_working_set_id: int option;
+  e_rule_working_set_id: Ckappa_sig.c_working_set_index option;
   e_rule_rule: Ckappa_sig.mixture Ckappa_sig.rule;
   e_rule_c_rule: rule;
 }
@@ -210,7 +210,7 @@ type compil = {
   rules: enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
   (*rules (possibly named)*)
   working_set_valuations:
-    bool Ckappa_sig.Guard_p_nearly_Inf_Int_storage_Imperatif.t;
+    (Ckappa_sig.c_guard_parameter * bool) Ckappa_sig.Ws_index_map_and_set.Map.t;
   (*maps working_set rules to their boolean parameter and a boolean that tells us if they are enabled or not*)
   observables:
     (mixture, string) Alg_expr.e Loc.annoted Int_storage.Nearly_inf_Imperatif.t;

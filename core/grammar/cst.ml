@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 let add_working_set_guard guard k loc =
-  let guard_name = "@rule-" ^ string_of_int k in
+  let guard_name = Ast.working_set_index_to_string k in
   let guard_param = Logical_formulae.P (guard_name, loc) in
   match guard with
   | None -> Some guard_param

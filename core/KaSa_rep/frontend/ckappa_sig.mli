@@ -34,6 +34,7 @@ type c_agent_id
 type c_link_value
 type c_counter_name
 type c_guard_parameter
+type c_working_set_index
 type c_site_or_guard_p = Site of c_site_name | Guard_p of c_guard_parameter
 type c_mvbdu_var
 
@@ -76,6 +77,7 @@ val state_index_of_int : int -> c_state
 val int_of_state_index : c_state -> int
 val string_of_state_index : c_state -> string
 val guard_parameter_of_int : int -> c_guard_parameter
+val working_set_index_of_int : int -> c_working_set_index
 val mvbdu_var_of_int : int -> c_mvbdu_var
 val int_of_mvbdu_var : c_mvbdu_var -> int
 val mvbdu_var_of_site : c_site_name -> c_mvbdu_var
@@ -85,6 +87,7 @@ val mvbdu_var_of_site_or_guard_p :
   c_site_or_guard_p -> c_site_name -> c_mvbdu_var
 
 val int_of_guard_parameter : c_guard_parameter -> int
+val int_of_working_set_index : c_working_set_index -> int
 
 val site_or_guard_p_of_mvbdu_var :
   c_mvbdu_var -> c_site_name -> c_site_or_guard_p
@@ -503,9 +506,6 @@ type c_compil = {
 module Rule_nearly_Inf_Int_storage_Imperatif :
   Int_storage.Storage with type key = c_rule_id and type dimension = int
 
-module Guard_p_nearly_Inf_Int_storage_Imperatif :
-  Int_storage.Storage with type key = c_guard_parameter and type dimension = int
-
 val array_of_list_rule_id :
   ( Rule_nearly_Inf_Int_storage_Imperatif.dimension,
     'a Rule_nearly_Inf_Int_storage_Imperatif.t )
@@ -635,6 +635,10 @@ module AgentsSite_map_and_set :
 module AgentsSiteState_map_and_set :
   Map_wrapper.S_with_logs
     with type elt = c_agent_id * c_agent_name * c_site_name * c_state
+
+module Ws_index_map_and_set :
+  Map_wrapper.S_with_logs
+    with type elt = c_working_set_index
 
 type pair_of_states = c_state option * c_state option
 
