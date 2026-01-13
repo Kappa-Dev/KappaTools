@@ -29,9 +29,14 @@ module Domain = struct
 
   (* This array is statically allocated *)
   (* Why do you use extensive arrays ? *)
-  type local_dynamic_information =
+  type rule_liveness =
     Ckappa_sig.Views_bdu.mvbdu
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t
+
+  type local_dynamic_information = {
+    rule_liveness: rule_liveness;
+    liveness_current_working_set: rule_liveness option;
+  }
 
   type dynamic_information = {
     local: local_dynamic_information;
@@ -93,9 +98,53 @@ module Domain = struct
     error, dynamic, bdu_guard
 
   (** dead rule local dynamic information*)
-  let get_dead_rule dynamic = dynamic.local
+  let get_dead_rule dynamic = dynamic.local.rule_liveness
 
-  let set_dead_rule dead_rule dynamic = { dynamic with local = dead_rule }
+  let get_dead_rule_without_working_set_vars parameters error static dynamic =
+    match dynamic.local.liveness_current_working_set with
+    | Some result -> error, dynamic, result
+    | None ->
+      let error, (result, bdu_handler) =
+        let bdu_handler = get_mvbdu_handler dynamic in
+        let working_set_mvbdu =
+          Analyzer_headers.get_working_set_mvbdu
+            static.global_static_information
+        in
+        let working_set_guards =
+          Analyzer_headers.get_working_set_guard_parameters
+            static.global_static_information
+        in
+        let error, bdu_handler, working_set_guards_hcons =
+          Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
+            working_set_guards
+        in
+        let error, current_working_set =
+          Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create parameters
+            error 0
+        in
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+          (fun parameters error rule_id mvbdu (current_working_set, bdu_handler) ->
+            let error, bdu_handler, mvbdu =
+              Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+                working_set_mvbdu
+            in
+            let error, bdu_handler, mvbdu =
+              Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters
+                bdu_handler error mvbdu working_set_guards_hcons
+            in
+            let error, current_working_set =
+              Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set parameters
+                error rule_id mvbdu current_working_set
+            in
+            error, (current_working_set, bdu_handler))
+          dynamic.local.rule_liveness
+          (current_working_set, bdu_handler)
+      in
+      let dynamic = set_mvbdu_handler bdu_handler dynamic in
+      error, dynamic, result
+
+  let set_dead_rule dead_rule dynamic =
+    { dynamic with local = { dynamic.local with rule_liveness = dead_rule } }
 
   let is_false_mvbdu parameters error dynamic mvbdu =
     let bdu_handler = get_mvbdu_handler dynamic in
@@ -169,7 +218,14 @@ module Domain = struct
           (nrules - 1) (fun _ error _ -> error, mvbdu_false)
     in
     let init_global_dynamic_information =
-      { global = dynamic; local = init_dead_rule_array }
+      {
+        global = dynamic;
+        local =
+          {
+            rule_liveness = init_dead_rule_array;
+            liveness_current_working_set = None;
+          };
+      }
     in
     error, init_global_static_information, init_global_dynamic_information, []
 
@@ -324,7 +380,9 @@ module Domain = struct
     in
     let original = hide_reverse_rule in
     let compil = get_compil static in
-    let array = get_dead_rule dynamic in
+    let error, dynamic, array =
+      get_dead_rule_without_working_set_vars parameters error static dynamic
+    in
     let restriction_bdu = get_restriction_mvbdu static in
     let kappa_handler = get_kappa_handler static in
     let error, (dead_rules_list, conditionally_dead_rules_list, dynamic) =
@@ -380,7 +438,9 @@ module Domain = struct
 
   let print_dead_rule static dynamic error =
     let parameters = get_parameter static in
-    let result = get_dead_rule dynamic in
+    let error, dynamic, result =
+      get_dead_rule_without_working_set_vars parameters error static dynamic
+    in
     let compiled = get_compil static in
     let kappa_handler = get_kappa_handler static in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
@@ -514,9 +574,12 @@ module Domain = struct
     error, dynamic, ()
 
   let get_dead_rules static dynamic parameters error r_id =
+    let error, dynamic, dead_rules =
+      get_dead_rule_without_working_set_vars parameters error static dynamic
+    in
     match
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters error r_id
-        (get_dead_rule dynamic)
+        dead_rules
     with
     | error, None -> Exception.warn parameters error __POS__ Exit false
     | error, Some b ->

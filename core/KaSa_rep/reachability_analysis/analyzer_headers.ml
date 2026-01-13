@@ -276,6 +276,18 @@ let get_guard_mvbdus static = static.global_guard_mvbdus
 let get_restriction_mvbdu static = static.global_restriction_mvbdu
 let get_working_set_mvbdu static = static.global_working_set_mvbdu
 
+let get_working_set_guard_parameters static =
+  let compilation = get_cc_code static in
+  let handler = get_kappa_handler static in
+  let nsites = Handler.get_nsites handler in
+  let guards =
+    Ckappa_sig.Ws_index_map_and_set.Map.fold
+      (fun _ (guard_p, _) guards ->
+        Ckappa_sig.mvbdu_var_of_guard guard_p nsites :: guards)
+      compilation.working_set_valuations []
+  in
+  List.rev guards
+
 let get_nr_guard_parameters static =
   Handler.get_nr_guard_parameters (get_kappa_handler static)
 
@@ -306,13 +318,13 @@ let scan_rule static error mvbdu_handler =
   let error, mvbdu_handler, guard_mvbdus =
     Common_static.collect_guard_mvbdus parameters error mvbdu_handler
       compilation restriction_mvbdu nsites
-in
+  in
   let static = set_guard_mvbdus guard_mvbdus static in
   let error, mvbdu_handler, working_set_mvbdu =
     Common_static.compute_working_set_mvbdu parameters error mvbdu_handler
       compilation nsites
   in
-    let static = set_working_set_mvbdu working_set_mvbdu static in
+  let static = set_working_set_mvbdu working_set_mvbdu static in
   error, mvbdu_handler, static
 
 let initialize_global_information parameters log_info error mvbdu_handler
