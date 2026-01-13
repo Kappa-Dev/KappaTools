@@ -40,7 +40,6 @@ let main () =
         let () =
           Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
         in
-        print_endline "TODO";
         loop state
       | "print result" ->
         let state = Export_to_KaSa.output_reachability_result state in

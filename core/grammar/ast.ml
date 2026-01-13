@@ -1168,10 +1168,12 @@ let print_parsing_compil_kappa f c =
     (Pp.list Pp.space (fun f (ws_id, s, guard, (r, _)) ->
          Format.fprintf f "@[@[%s%a%a%a@]@]"
            (match ws_id with
-           (*TODO*)
            | None -> ""
-           | Some 0 -> "[ACTIVE] "
-           | Some _ -> "[INACTIVE] ")
+           | Some id ->
+             (match Mods.IntMap.find_option id c.working_set_values with
+             | None -> "[UNKNOWN] "
+             | Some true -> "[ACTIVE] "
+             | Some false -> "[INACTIVE] "))
            (Pp.option ~with_space:false (fun f (s, _) ->
                 Format.fprintf f "'%s'@ " s))
            s print_guard guard print_ast_rule r))
