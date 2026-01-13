@@ -637,8 +637,7 @@ module AgentsSiteState_map_and_set :
     with type elt = c_agent_id * c_agent_name * c_site_name * c_state
 
 module Ws_index_map_and_set :
-  Map_wrapper.S_with_logs
-    with type elt = c_working_set_index
+  Map_wrapper.S_with_logs with type elt = c_working_set_index
 
 type pair_of_states = c_state option * c_state option
 

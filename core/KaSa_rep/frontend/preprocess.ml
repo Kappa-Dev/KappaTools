@@ -2073,7 +2073,8 @@ let translate_rule parameters error handler rule =
       Cckappa_sig.e_rule_label_dot = label_dot;
       Cckappa_sig.e_rule_initial_direction = direction;
       Cckappa_sig.e_rule_guard_string = guard_string;
-      Cckappa_sig.e_rule_working_set_id = Option.map Ckappa_sig.working_set_index_of_int ws_id;
+      Cckappa_sig.e_rule_working_set_id =
+        Option.map Ckappa_sig.working_set_index_of_int ws_id;
       Cckappa_sig.e_rule_rule = rule;
       Cckappa_sig.e_rule_c_rule =
         {
@@ -2351,7 +2352,7 @@ let translate_c_compil parameters error handler compil =
       (fun id bool (error, valuations) ->
         let guard_name = Ast.working_set_index_to_string id in
         let error, guard_p_id = convert_guard_p guard_name error in
-        let id = Ckappa_sig.working_set_index_of_int id in 
+        let id = Ckappa_sig.working_set_index_of_int id in
         Ckappa_sig.Ws_index_map_and_set.Map.add parameters error id
           (guard_p_id, bool) valuations)
       compil.Ast.working_set_values
