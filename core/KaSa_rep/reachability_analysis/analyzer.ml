@@ -54,6 +54,19 @@ module type Analyzer = sig
     Analyzer_headers.pattern_matching_flag ->
     Cckappa_sig.mixture ->
     Exception.exceptions_caught_and_uncaught * dynamic_information * bool
+
+  val enable_or_disable_rule :
+    static_information ->
+    dynamic_information ->
+    Exception.exceptions_caught_and_uncaught ->
+    Ckappa_sig.Views_bdu.handler ->
+    Cckappa_sig.kappa_handler ->
+    string ->
+    bool ->
+    Exception.exceptions_caught_and_uncaught
+    * static_information
+    * dynamic_information
+    * Ckappa_sig.Views_bdu.handler
 end
 
 (***************************************************************************)
@@ -235,4 +248,8 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     match precondition with
     | None -> error, dynamic, false
     | Some _ -> error, dynamic, true
+
+  let enable_or_disable_rule static dynamic error bdu_handler _kappa_handler
+      _rule_name _bool =
+    error, static, dynamic, bdu_handler
 end

@@ -134,6 +134,7 @@ module type Type = sig
     * int list option
 
   val enable_rule : state -> string -> state
+  val disable_rule : state -> string -> state
 end
 
 module Export =
