@@ -53,7 +53,6 @@ module Domain = struct
     Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t
 
   type local_dynamic_information = {
-    dummy: unit;
     store_value: store_value;
     store_value_current_working_set: store_value option;
   }
@@ -297,7 +296,7 @@ module Domain = struct
 
   let set_value value dynamic =
     set_local_dynamic_information
-      { (get_local_dynamic_information dynamic) with store_value = value }
+      { store_value = value; store_value_current_working_set = None }
       dynamic
 
   (*--------------------------------------------------------------*)
@@ -546,7 +545,6 @@ module Domain = struct
     in
     let init_local_dynamic_information =
       {
-        dummy = ();
         store_value =
           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
         store_value_current_working_set = None;

@@ -39,7 +39,6 @@ module Domain = struct
   type local_static_information = {
     store_basic_static_information:
       Site_across_bonds_domain_static.basic_static_information;
-    dummy: unit;
   }
 
   type static_information = {
@@ -55,11 +54,13 @@ module Domain = struct
   *)
   (*--------------------------------------------------------------*)
 
+  type store_value =
+    Ckappa_sig.Views_bdu.mvbdu
+    Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.t
+
   type local_dynamic_information = {
-    dummy: unit;
-    store_value:
-      Ckappa_sig.Views_bdu.mvbdu
-      Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.t;
+    store_value: store_value;
+    store_value_current_working_set: store_value option;
   }
 
   type dynamic_information = {
@@ -118,10 +119,7 @@ module Domain = struct
 
   let set_basic_static_information domain static =
     set_local_static_information
-      {
-        (get_local_static_information static) with
-        store_basic_static_information = domain;
-      }
+      { store_basic_static_information = domain }
       static
 
   (***************************************************************************)
@@ -356,7 +354,7 @@ module Domain = struct
 
   let set_value value dynamic =
     set_local_dynamic_information
-      { (get_local_dynamic_information dynamic) with store_value = value }
+      { store_value = value; store_value_current_working_set = None }
       dynamic
 
   (** profiling *)
@@ -634,7 +632,6 @@ module Domain = struct
       {
         store_basic_static_information =
           Site_across_bonds_domain_static.init_basic_static_information;
-        dummy = ();
       }
     in
     let init_global_static_information =
@@ -645,10 +642,10 @@ module Domain = struct
     in
     let init_local_dynamic_information =
       {
-        dummy = ();
         store_value =
           Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map
           .empty;
+        store_value_current_working_set = None;
       }
     in
     let init_global_dynamic_information =

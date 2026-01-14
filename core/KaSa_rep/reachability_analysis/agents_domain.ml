@@ -169,7 +169,11 @@ module Domain = struct
       error, dynamic, result
 
   let set_seen_agent seen_agent dynamic =
-    { dynamic with local = { dynamic.local with agents_liveness = seen_agent } }
+    {
+      dynamic with
+      local =
+        { agents_liveness = seen_agent; liveness_current_working_set = None };
+    }
 
   let is_false_mvbdu parameters error dynamic mvbdu =
     let bdu_handler = get_mvbdu_handler dynamic in

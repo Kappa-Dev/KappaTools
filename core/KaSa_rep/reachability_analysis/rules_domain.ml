@@ -144,7 +144,10 @@ module Domain = struct
       error, dynamic, result
 
   let set_dead_rule dead_rule dynamic =
-    { dynamic with local = { dynamic.local with rule_liveness = dead_rule } }
+    {
+      dynamic with
+      local = { rule_liveness = dead_rule; liveness_current_working_set = None };
+    }
 
   let is_false_mvbdu parameters error dynamic mvbdu =
     let bdu_handler = get_mvbdu_handler dynamic in
