@@ -263,3 +263,28 @@ val dummy_side_effects :
   Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_rule_id ->
   Exception.exceptions_caught_and_uncaught * Ckappa_sig.side_effects option
+
+module AbstractWS
+    (IntStorageT : Int_storage.Storage with type dimension = int) : sig
+  val abstract_away_working_set_vars :
+    Remanent_parameters_sig.parameters ->
+    Exception_without_parameter.exceptions_caught_and_uncaught ->
+    Ckappa_sig.Views_bdu.handler ->
+    global_static_information ->
+    Ckappa_sig.Views_bdu.mvbdu IntStorageT.t ->
+    Exception_without_parameter.exceptions_caught_and_uncaught
+    * Ckappa_sig.Views_bdu.handler
+    * Ckappa_sig.Views_bdu.mvbdu IntStorageT.t
+end
+
+module AbstractWSMap (MapT : Map_wrapper.S_with_logs) : sig
+  val abstract_away_working_set_vars :
+    Remanent_parameters_sig.parameters ->
+    Exception_without_parameter.exceptions_caught_and_uncaught ->
+    Ckappa_sig.Views_bdu.handler ->
+    global_static_information ->
+    Ckappa_sig.Views_bdu.mvbdu MapT.Map.t ->
+    Exception_without_parameter.exceptions_caught_and_uncaught
+    * Ckappa_sig.Views_bdu.handler
+    * Ckappa_sig.Views_bdu.mvbdu MapT.Map.t
+end

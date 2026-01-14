@@ -356,3 +356,67 @@ let initialize_global_information parameters log_info error mvbdu_handler
 
 let dummy_dead_rules _ error _ = error, false
 let dummy_side_effects _ error _ = error, None
+
+let abstract_away_working_set_vars parameters error bdu_handler mvbdu
+    working_set_mvbdu working_set_guards_hcons =
+  let error, bdu_handler, mvbdu =
+    Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+      working_set_mvbdu
+  in
+  Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler error
+    mvbdu working_set_guards_hcons
+
+module AbstractWS (IntStorageT : Int_storage.Storage with type dimension = int) =
+struct
+  let abstract_away_working_set_vars parameters error bdu_handler global_static
+      dynamic_local =
+    let error, (result, bdu_handler) =
+      let working_set_mvbdu = get_working_set_mvbdu global_static in
+      let working_set_guards = get_working_set_guard_parameters global_static in
+      let error, bdu_handler, working_set_guards_hcons =
+        Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
+          working_set_guards
+      in
+      let error, current_working_set = IntStorageT.create parameters error 0 in
+      IntStorageT.fold parameters error
+        (fun parameters error agent_id mvbdu (current_working_set, bdu_handler) ->
+          let error, bdu_handler, mvbdu =
+            abstract_away_working_set_vars parameters error bdu_handler mvbdu
+              working_set_mvbdu working_set_guards_hcons
+          in
+          let error, current_working_set =
+            IntStorageT.set parameters error agent_id mvbdu current_working_set
+          in
+          error, (current_working_set, bdu_handler))
+        dynamic_local
+        (current_working_set, bdu_handler)
+    in
+    error, bdu_handler, result
+end
+
+module AbstractWSMap (MapT : Map_wrapper.S_with_logs) = struct
+  let abstract_away_working_set_vars parameters error bdu_handler global_static
+      dynamic_local =
+    let result, bdu_handler, error =
+      let working_set_mvbdu = get_working_set_mvbdu global_static in
+      let working_set_guards = get_working_set_guard_parameters global_static in
+      let error, bdu_handler, working_set_guards_hcons =
+        Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
+          working_set_guards
+      in
+      let current_working_set = MapT.Map.empty in
+      MapT.Map.fold
+        (fun rule_id mvbdu (current_working_set, bdu_handler, error) ->
+          let error, bdu_handler, mvbdu =
+            abstract_away_working_set_vars parameters error bdu_handler mvbdu
+              working_set_mvbdu working_set_guards_hcons
+          in
+          let error, current_working_set =
+            MapT.Map.add parameters error rule_id mvbdu current_working_set
+          in
+          current_working_set, bdu_handler, error)
+        dynamic_local
+        (current_working_set, bdu_handler, error)
+    in
+    error, bdu_handler, result
+end

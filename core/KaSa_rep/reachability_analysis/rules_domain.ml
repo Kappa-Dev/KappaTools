@@ -104,41 +104,13 @@ module Domain = struct
     match dynamic.local.liveness_current_working_set with
     | Some result -> error, dynamic, result
     | None ->
-      let error, (result, bdu_handler) =
-        let bdu_handler = get_mvbdu_handler dynamic in
-        let working_set_mvbdu =
-          Analyzer_headers.get_working_set_mvbdu
-            static.global_static_information
-        in
-        let working_set_guards =
-          Analyzer_headers.get_working_set_guard_parameters
-            static.global_static_information
-        in
-        let error, bdu_handler, working_set_guards_hcons =
-          Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
-            working_set_guards
-        in
-        let error, current_working_set =
-          Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create parameters
-            error 0
-        in
-        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
-          (fun parameters error rule_id mvbdu (current_working_set, bdu_handler) ->
-            let error, bdu_handler, mvbdu =
-              Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
-                working_set_mvbdu
-            in
-            let error, bdu_handler, mvbdu =
-              Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters
-                bdu_handler error mvbdu working_set_guards_hcons
-            in
-            let error, current_working_set =
-              Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set parameters
-                error rule_id mvbdu current_working_set
-            in
-            error, (current_working_set, bdu_handler))
-          dynamic.local.rule_liveness
-          (current_working_set, bdu_handler)
+      let bdu_handler = get_mvbdu_handler dynamic in
+      let module AbstractWS =
+        Analyzer_headers.AbstractWS
+          (Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif) in
+      let error, bdu_handler, result =
+        AbstractWS.abstract_away_working_set_vars parameters error bdu_handler
+          static.global_static_information dynamic.local.rule_liveness
       in
       let dynamic = set_mvbdu_handler bdu_handler dynamic in
       error, dynamic, result
