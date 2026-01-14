@@ -814,7 +814,9 @@ module Domain = struct
           [] (List.rev list)
       | Analyzer_headers.Embeddings -> list
     in
-    let store_value = get_value dynamic in
+    let error, dynamic, store_value =
+      get_value_without_working_set_vars parameters error static dynamic
+    in
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, mvbdu_true =
       Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error

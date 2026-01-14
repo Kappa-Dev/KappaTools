@@ -542,8 +542,16 @@ module Domain = struct
   (* This primitive should not change the list of the agent type
      which have been seen*)
 
-  let refine_mvbdu_of_agent parameters error agent_type dynamic new_mvbdu =
-    let local = get_seen_agent dynamic in
+  let refine_mvbdu_of_agent parameters error agent_type static dynamic new_mvbdu
+      current_ws =
+    let error, dynamic, local =
+      if current_ws then
+        get_seen_agent_without_working_set_vars parameters error static dynamic
+      else (
+        let local = get_seen_agent dynamic in
+        error, dynamic, local
+      )
+    in
     let error, mvbdu =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameters
         error agent_type local
@@ -594,7 +602,8 @@ module Domain = struct
       let error, dynamic, state_guard_parameters =
         List.fold_left
           (fun (error, dynamic, guard_bdu) agent_type ->
-            refine_mvbdu_of_agent parameters error agent_type dynamic guard_bdu)
+            refine_mvbdu_of_agent parameters error agent_type static dynamic
+              guard_bdu false)
           (error, dynamic, guard_bdu_inter)
           l
       in
@@ -635,8 +644,8 @@ module Domain = struct
             | Cckappa_sig.Agent agent ->
               let agent_type = agent.Cckappa_sig.agent_name in
               let error, dynamic, current_mvbdu =
-                refine_mvbdu_of_agent parameters error agent_type dynamic
-                  current_mvbdu
+                refine_mvbdu_of_agent parameters error agent_type static dynamic
+                  current_mvbdu true
               in
               let error, dynamic, is_false =
                 is_false_mvbdu parameters error dynamic current_mvbdu
