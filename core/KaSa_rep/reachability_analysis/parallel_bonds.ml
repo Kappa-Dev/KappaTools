@@ -1496,9 +1496,10 @@ module Domain = struct
           Loggers.fprintf log
             "------------------------------------------------------------\n"
         in
-        let error, _dynamic, store_value =
+        let error, dynamic, store_value =
           get_value_without_working_set_vars parameters error static dynamic
         in
+        let bdu_handler = get_mvbdu_handler dynamic in
         let restriction_bdu = get_restriction_mvbdu static in
         let error, bdu_handler =
           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
@@ -1599,7 +1600,7 @@ module Domain = struct
     let _ = static in
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    let error, _dynamic, store_value =
+    let error, dynamic, store_value =
       get_value_without_working_set_vars parameters error static dynamic
     in
     let domain_name = "Parallel bonds" in

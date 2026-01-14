@@ -1866,9 +1866,10 @@ module Domain = struct
         in
         (*--------------------------------------------------------*)
         (*print result*)
-        let error, _dynamic, store_value =
+        let error, dynamic, store_value =
           get_value_without_working_set_vars parameters error static dynamic
         in
+            let handler = get_mvbdu_handler dynamic in
         let error, handler =
           Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
             (fun (x, y) mvbdu (error, handler) ->
