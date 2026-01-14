@@ -6,29 +6,20 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let add_working_set_guard guard k loc =
-  let guard_name = Ast.working_set_index_to_string k in
-  let guard_param = Logical_formulae.P (guard_name, loc) in
-  match guard with
-  | None -> Some guard_param
-  | Some guard -> Some (Logical_formulae.AND (guard_param, guard))
-
 let append_to_ast_compil (nr_working_set_rules, rev_instr) compil =
   fst
   @@ List.fold_left
        (fun (r, k) -> function
          | Ast.RULE (label, guard, (rule, loc), is_in_working_set) ->
-           if is_in_working_set then (
-             let updated_guard = add_working_set_guard guard k loc in
+           if is_in_working_set then
              ( {
                  r with
-                 Ast.rules =
-                   (Some k, label, updated_guard, (rule, loc)) :: r.Ast.rules;
+                 Ast.rules = (Some k, label, guard, (rule, loc)) :: r.Ast.rules;
                  Ast.working_set_values =
                    Mods.IntMap.add k true r.Ast.working_set_values;
                },
                k - 1 )
-           ) else
+           else
              ( {
                  r with
                  Ast.rules = (None, label, guard, (rule, loc)) :: r.Ast.rules;

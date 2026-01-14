@@ -1042,7 +1042,17 @@ let translate_compil parameters error
   in
   let error, _id_set, rules_rev =
     List.fold_left
-      (fun (error, id_set, list) (ws_bool, id, guard, (rule, p)) ->
+      (fun (error, id_set, list) (ws_id, id, guard, (rule, p)) ->
+        let guard =
+          match ws_id with
+          | None -> guard
+          | Some ws_id ->
+            let guard_name = Ast.working_set_index_to_string ws_id in
+            let guard_param = Logical_formulae.P (guard_name, p) in
+            (match guard with
+            | None -> Some guard_param
+            | Some guard -> Some (Logical_formulae.AND (guard_param, guard)))
+        in
         let error, id_set =
           match id with
           | None -> error, id_set
@@ -1112,11 +1122,11 @@ let translate_compil parameters error
             in
             ( error,
               id_set,
-              (ws_bool, id, guard, (reverse, p))
-              :: (ws_bool, id, guard, (direct, p))
+              (ws_id, id, guard, (reverse, p))
+              :: (ws_id, id, guard, (direct, p))
               :: list )
           ) else
-            error, id_set, (ws_bool, id, guard, (direct, p)) :: list)
+            error, id_set, (ws_id, id, guard, (direct, p)) :: list)
       (error, id_set, []) compil.Ast.rules
   in
   let error, init_rev =
