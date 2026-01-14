@@ -60,7 +60,6 @@ module type Analyzer = sig
     dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->
     Ckappa_sig.Views_bdu.handler ->
-    Cckappa_sig.kappa_handler ->
     string ->
     bool ->
     Exception.exceptions_caught_and_uncaught

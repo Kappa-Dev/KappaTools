@@ -2070,22 +2070,14 @@ functor
     let get_data = Remanent_state.get_data
 
     let toggle_rule bool state rule_name =
-      let parameters = Remanent_state.get_parameters state in
       let error = Remanent_state.get_errors state in
       let bdu_handler = Remanent_state.get_bdu_handler state in
-      let error, kappa_handler =
-        match Remanent_state.get_handler state with
-        | Some kappa_handler -> error, kappa_handler
-        | None ->
-          Exception.warn parameters error __POS__ Exit
-            (snd (List_tokens.empty_handler parameters error))
-      in
       (* TODO compilation and refind_compilation and c_compil
          let compilation = Remanent_state.get_compilation in *)
       let state, (static, dynamic) = get_reachability_analysis state in
       let error, static, dynamic, bdu_handler =
         Reachability.enable_or_disable_rule static dynamic error bdu_handler
-          kappa_handler rule_name bool
+          rule_name bool
       in
       (*TODO modify dead rules and dead agents*)
       let state =
