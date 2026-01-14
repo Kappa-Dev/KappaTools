@@ -272,6 +272,10 @@ module AbstractWS
     Ckappa_sig.Views_bdu.handler ->
     global_static_information ->
     Ckappa_sig.Views_bdu.mvbdu IntStorageT.t ->
+    (Remanent_parameters_sig.parameters ->
+    Exception_without_parameter.exceptions_caught_and_uncaught ->
+    IntStorageT.key ->
+    Exception_without_parameter.exceptions_caught_and_uncaught * bool) ->
     Exception_without_parameter.exceptions_caught_and_uncaught
     * Ckappa_sig.Views_bdu.handler
     * Ckappa_sig.Views_bdu.mvbdu IntStorageT.t

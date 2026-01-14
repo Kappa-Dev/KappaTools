@@ -135,6 +135,7 @@ module Domain = struct
       let error, bdu_handler, result =
         AbstractWS.abstract_away_working_set_vars parameters error bdu_handler
           static.global_static_information dynamic.local.agents_liveness
+          (fun _ error _ -> error, true)
       in
       let dynamic = set_mvbdu_handler bdu_handler dynamic in
       error, dynamic, result

@@ -108,9 +108,16 @@ module Domain = struct
       let module AbstractWS =
         Analyzer_headers.AbstractWS
           (Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif) in
+      let compilation =
+        Analyzer_headers.get_cc_code static.global_static_information
+      in
+      let keep parameters error rule_id =
+        Cckappa_sig.rule_is_enabled_in_current_working_set parameters error
+          rule_id compilation
+      in
       let error, bdu_handler, result =
         AbstractWS.abstract_away_working_set_vars parameters error bdu_handler
-          static.global_static_information dynamic.local.rule_liveness
+          static.global_static_information dynamic.local.rule_liveness keep
       in
       let dynamic = set_mvbdu_handler bdu_handler dynamic in
       error, dynamic, result

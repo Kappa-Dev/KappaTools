@@ -369,7 +369,7 @@ let abstract_away_working_set_vars parameters error bdu_handler mvbdu
 module AbstractWS (IntStorageT : Int_storage.Storage with type dimension = int) =
 struct
   let abstract_away_working_set_vars parameters error bdu_handler global_static
-      dynamic_local =
+      dynamic_local keep =
     let error, (result, bdu_handler) =
       let working_set_mvbdu = get_working_set_mvbdu global_static in
       let working_set_guards = get_working_set_guard_parameters global_static in
@@ -380,14 +380,19 @@ struct
       let error, current_working_set = IntStorageT.create parameters error 0 in
       IntStorageT.fold parameters error
         (fun parameters error agent_id mvbdu (current_working_set, bdu_handler) ->
-          let error, bdu_handler, mvbdu =
-            abstract_away_working_set_vars parameters error bdu_handler mvbdu
-              working_set_mvbdu working_set_guards_hcons
-          in
-          let error, current_working_set =
-            IntStorageT.set parameters error agent_id mvbdu current_working_set
-          in
-          error, (current_working_set, bdu_handler))
+          let error, bool = keep parameters error agent_id in
+          if bool then (
+            let error, bdu_handler, mvbdu =
+              abstract_away_working_set_vars parameters error bdu_handler mvbdu
+                working_set_mvbdu working_set_guards_hcons
+            in
+            let error, current_working_set =
+              IntStorageT.set parameters error agent_id mvbdu
+                current_working_set
+            in
+            error, (current_working_set, bdu_handler)
+          ) else
+            error, (current_working_set, bdu_handler))
         dynamic_local
         (current_working_set, bdu_handler)
     in

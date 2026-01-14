@@ -690,3 +690,28 @@ let add_agent_interface parameters error site agent_interface =
       ~message:"this agent interface is already used" Exit
   in
   error, agent_interface
+
+let working_set_id_of_rule_id parameters error rule_id compilation =
+  match
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters error
+      rule_id compilation.rules
+  with
+  | error, None ->
+    Exception.warn parameters error __POS__ ~message:"rule_id does not exist"
+      Exit None
+  | error, Some rule_info -> error, rule_info.e_rule_working_set_id
+
+let rule_is_enabled_in_current_working_set parameters error rule_id compilation
+    =
+  match working_set_id_of_rule_id parameters error rule_id compilation with
+  | error, None ->
+    error, true (* rules that are not in the working set are always enabled *)
+  | error, Some ws_id ->
+    (match
+       Ckappa_sig.Ws_index_map_and_set.Map.find_option parameters error ws_id
+         compilation.working_set_valuations
+     with
+    | error, None ->
+      Exception.warn parameters error __POS__
+        ~message:"working_set_id does not exist" Exit false
+    | error, Some (_, bool) -> error, bool)
