@@ -38,8 +38,11 @@ module Domain = struct
 
   module AgentCV_map_and_set = Covering_classes_type.AgentCV_map_and_set
 
+  type fixpoint_result = Ckappa_sig.Views_bdu.mvbdu AgentCV_map_and_set.Map.t
+
   type local_dynamic_information = {
-    fixpoint_result: Ckappa_sig.Views_bdu.mvbdu AgentCV_map_and_set.Map.t;
+    fixpoint_result: fixpoint_result;
+    fixpoint_result_current_working_set: fixpoint_result option;
     domain_dynamic_information: Bdu_dynamic_views.bdu_analysis_dynamic;
     subviews: unit option;
     ranges:
@@ -166,9 +169,28 @@ module Domain = struct
   let get_fixpoint_result dynamic =
     (get_local_dynamic_information dynamic).fixpoint_result
 
+  let get_fixpoint_result_without_working_set_vars parameters error static
+      dynamic =
+    match dynamic.local.fixpoint_result_current_working_set with
+    | Some result -> error, dynamic, result
+    | None ->
+      let bdu_handler = get_mvbdu_handler dynamic in
+      let module AbstractWS =
+        Analyzer_headers.AbstractWSMap (AgentCV_map_and_set) in
+      let error, bdu_handler, result =
+        AbstractWS.abstract_away_working_set_vars parameters error bdu_handler
+          static.global_static_information dynamic.local.fixpoint_result
+      in
+      let dynamic = set_mvbdu_handler bdu_handler dynamic in
+      error, dynamic, result
+
   let set_fixpoint_result result dynamic =
     set_local_dynamic_information
-      { (get_local_dynamic_information dynamic) with fixpoint_result = result }
+      {
+        (get_local_dynamic_information dynamic) with
+        fixpoint_result = result;
+        fixpoint_result_current_working_set = None;
+      }
       dynamic
 
   let get_ranges dynamic = (get_local_dynamic_information dynamic).ranges
@@ -403,6 +425,7 @@ module Domain = struct
         local =
           {
             fixpoint_result = init_fixpoint;
+            fixpoint_result_current_working_set = None;
             domain_dynamic_information = init_bdu_analysis_dynamic;
             subviews = None;
             ranges = None;
@@ -2328,7 +2351,10 @@ module Domain = struct
     let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
     (*-----------------------------------------------------------*)
     let kappa_handler = get_kappa_handler static in
-    let fixpoint_result = get_fixpoint_result dynamic in
+    let error, dynamic, fixpoint_result =
+      get_fixpoint_result_without_working_set_vars parameters error static
+        dynamic
+    in
     let dual_contact_map = get_store_dual_contact_map dynamic in
     let store_agent_name_from_pattern = get_agent_name_from_pattern static in
     let site_correspondence = get_remanent_triple static in
@@ -3383,7 +3409,10 @@ module Domain = struct
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let site_correspondence = get_site_correspondence_array static in
-    let fixpoint_result = get_fixpoint_result dynamic in
+    let error, dynamic, fixpoint_result =
+      get_fixpoint_result_without_working_set_vars parameters error static
+        dynamic
+    in
     let handler = get_mvbdu_handler dynamic in
     let compil = get_compil static in
     let error, handler =
@@ -3434,11 +3463,14 @@ module Domain = struct
           let _ = threshold in
           error, handler, [ a ]
         in
+        let error, dynamic, fixpoint_result =
+          get_fixpoint_result_without_working_set_vars parameters error static
+            dynamic
+        in
         let error, handler, output =
           smash_map f parameters handler error
             ~show_dep_with_dimmension_higher_than:1 handler_kappa
-            site_correspondence
-            (get_fixpoint_result dynamic)
+            site_correspondence fixpoint_result
         in
         let error, log_info, handler, bridges, transition_systems_length =
           if
@@ -3704,7 +3736,10 @@ module Domain = struct
     let parameters = get_parameter static in
     let handler_kappa = get_kappa_handler static in
     let site_correspondence = get_site_correspondence_array static in
-    let fixpoint_result = get_fixpoint_result dynamic in
+    let error, dynamic, fixpoint_result =
+      get_fixpoint_result_without_working_set_vars parameters error static
+        dynamic
+    in
     let og_restriction_bdu = get_restriction_mvbdu static in
     let i =
       Ckappa_sig.int_of_guard_parameter

@@ -400,23 +400,26 @@ module AbstractWSMap (MapT : Map_wrapper.S_with_logs) = struct
     let result, bdu_handler, error =
       let working_set_mvbdu = get_working_set_mvbdu global_static in
       let working_set_guards = get_working_set_guard_parameters global_static in
-      let error, bdu_handler, working_set_guards_hcons =
-        Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
-          working_set_guards
-      in
-      let current_working_set = MapT.Map.empty in
-      MapT.Map.fold
-        (fun rule_id mvbdu (current_working_set, bdu_handler, error) ->
-          let error, bdu_handler, mvbdu =
-            abstract_away_working_set_vars parameters error bdu_handler mvbdu
-              working_set_mvbdu working_set_guards_hcons
-          in
-          let error, current_working_set =
-            MapT.Map.add parameters error rule_id mvbdu current_working_set
-          in
-          current_working_set, bdu_handler, error)
-        dynamic_local
-        (current_working_set, bdu_handler, error)
+      if working_set_guards != [] then (
+        let error, bdu_handler, working_set_guards_hcons =
+          Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
+            working_set_guards
+        in
+        let current_working_set = MapT.Map.empty in
+        MapT.Map.fold
+          (fun rule_id mvbdu (current_working_set, bdu_handler, error) ->
+            let error, bdu_handler, mvbdu =
+              abstract_away_working_set_vars parameters error bdu_handler mvbdu
+                working_set_mvbdu working_set_guards_hcons
+            in
+            let error, current_working_set =
+              MapT.Map.add parameters error rule_id mvbdu current_working_set
+            in
+            current_working_set, bdu_handler, error)
+          dynamic_local
+          (current_working_set, bdu_handler, error)
+      ) else
+        dynamic_local, bdu_handler, error
     in
     error, bdu_handler, result
 end
