@@ -352,6 +352,49 @@ module Domain = struct
   let set_local_dynamic_information local dynamic = { dynamic with local }
   let get_value dynamic = (get_local_dynamic_information dynamic).store_value
 
+  let get_value_without_working_set_vars parameters error static dynamic =
+    match dynamic.local.store_value_current_working_set with
+    | Some result -> error, dynamic, result
+    | None ->
+      let result, bdu_handler, error =
+        let bdu_handler = get_mvbdu_handler dynamic in
+        let working_set_mvbdu =
+          Analyzer_headers.get_working_set_mvbdu
+            static.global_static_information
+        in
+        let working_set_guards =
+          Analyzer_headers.get_working_set_guard_parameters
+            static.global_static_information
+        in
+        let error, bdu_handler, working_set_guards_hcons =
+          Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
+            working_set_guards
+        in
+        let current_working_set =
+          Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map
+          .empty
+        in
+        Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
+          (fun rule_id mvbdu (current_working_set, bdu_handler, error) ->
+            let error, bdu_handler, mvbdu =
+              Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+                working_set_mvbdu
+            in
+            let error, bdu_handler, mvbdu =
+              Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters
+                bdu_handler error mvbdu working_set_guards_hcons
+            in
+            let error, current_working_set =
+              Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map
+              .add parameters error rule_id mvbdu current_working_set
+            in
+            current_working_set, bdu_handler, error)
+          dynamic.local.store_value
+          (current_working_set, bdu_handler, error)
+      in
+      let dynamic = set_mvbdu_handler bdu_handler dynamic in
+      error, dynamic, result
+
   let set_value value dynamic =
     set_local_dynamic_information
       { store_value = value; store_value_current_working_set = None }
@@ -887,12 +930,17 @@ module Domain = struct
     scan list dynamic error guard_bdu
 
   let whether_or_not_it_has_precondition parameters error bdu_false tuple_set
-      dynamic precondition guard_bdu =
+      static dynamic precondition guard_bdu current_ws =
     let list =
       Site_across_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set
       .elements tuple_set
     in
-    let store_value = get_value dynamic in
+    let error, dynamic, store_value =
+      if current_ws then
+        get_value_without_working_set_vars parameters error static dynamic
+      else
+        error, dynamic, get_value dynamic
+    in
     (*check if this pattern belong to the set of the patterns in the result*)
     let error, bool, dynamic, precondition_bdu =
       common_scan parameters error bdu_false dynamic store_value list guard_bdu
@@ -923,7 +971,7 @@ module Domain = struct
         .empty store_potential_tuple_pair_lhs
     in
     whether_or_not_it_has_precondition parameters error bdu_false tuple_set
-      dynamic precondition guard_bdu
+      static dynamic precondition guard_bdu false
 
   (***************************************************************************)
   (*MAY BE REACHABLE*)
@@ -960,7 +1008,7 @@ module Domain = struct
         tuple_set
     in
     whether_or_not_it_has_precondition parameters error bdu_false tuple_set
-      dynamic precondition bdu_true
+      static dynamic precondition bdu_true true
 
   (****************************************************************)
 
@@ -1688,7 +1736,9 @@ module Domain = struct
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let handler = get_mvbdu_handler dynamic in
-    let store_value = get_value dynamic in
+    let error, dynamic, store_value =
+      get_value_without_working_set_vars parameters error static dynamic
+    in
     let domain_name = "Connected agents" in
     let restriction_bdu = get_restriction_mvbdu static in
     let nsites = Handler.get_nsites kappa_handler in
@@ -1816,7 +1866,9 @@ module Domain = struct
         in
         (*--------------------------------------------------------*)
         (*print result*)
-        let store_value = get_value dynamic in
+        let error, _dynamic, store_value =
+          get_value_without_working_set_vars parameters error static dynamic
+        in
         let error, handler =
           Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
             (fun (x, y) mvbdu (error, handler) ->

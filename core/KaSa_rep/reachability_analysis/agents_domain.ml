@@ -551,10 +551,8 @@ module Domain = struct
     let error, dynamic, local =
       if current_ws then
         get_seen_agent_without_working_set_vars parameters error static dynamic
-      else (
-        let local = get_seen_agent dynamic in
-        error, dynamic, local
-      )
+      else
+        error, dynamic, get_seen_agent dynamic
     in
     let error, mvbdu =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameters
