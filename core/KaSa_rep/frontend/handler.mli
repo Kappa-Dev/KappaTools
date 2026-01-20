@@ -487,6 +487,14 @@ val get_nsites : Cckappa_sig.kappa_handler -> Ckappa_sig.c_site_name
 val get_nr_guard_parameters :
   Cckappa_sig.kappa_handler -> Ckappa_sig.c_guard_parameter
 
+val guard_of_string :
+  Remanent_parameters_sig.parameters ->
+  Cckappa_sig.kappa_handler ->
+  string ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Ckappa_sig.c_guard_parameter
+
 val mvbdu_to_string_formula :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->

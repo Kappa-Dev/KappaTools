@@ -1165,16 +1165,10 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
 
 let translate_guard parameters error handler guard =
   let convert (guard_p_name, loc) error =
-    let error, (bool, output) =
-      Ckappa_sig.Dictionary_of_guards.allocate_bool parameters error
-        Ckappa_sig.compare_unit_guard_parameter guard_p_name ()
-        Misc_sa.const_unit handler.Cckappa_sig.guard_parameters_dic
+    let error, i =
+      Handler.guard_of_string parameters handler guard_p_name error
     in
-    match bool, output with
-    | _, None | true, _ ->
-      Exception.warn parameters error __POS__ Exit
-        (Ckappa_sig.dummy_guard_parameter, loc)
-    | _, Some (i, _, _, _) -> error, (i, loc)
+    error, (i, loc)
   in
   match guard with
   | None -> error, None
@@ -2335,18 +2329,7 @@ let translate_c_compil parameters error handler compil =
       (List.rev c_perturbations)
   in
 
-  let convert_guard_p guard_p_name error =
-    let error, (bool, output) =
-      Ckappa_sig.Dictionary_of_guards.allocate_bool parameters error
-        Ckappa_sig.compare_unit_guard_parameter guard_p_name ()
-        Misc_sa.const_unit handler.Cckappa_sig.guard_parameters_dic
-    in
-    match bool, output with
-    | _, None | true, _ ->
-      Exception.warn parameters error __POS__ Exit
-        Ckappa_sig.dummy_guard_parameter
-    | _, Some (i, _, _, _) -> error, i
-  in
+  let convert_guard_p = Handler.guard_of_string parameters handler in
   let error, c_working_set_valuations =
     Mods.IntMap.fold
       (fun id bool (error, valuations) ->

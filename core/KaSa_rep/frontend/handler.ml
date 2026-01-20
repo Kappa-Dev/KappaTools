@@ -209,6 +209,18 @@ let string_of_guard parameters guardp kappa_handler error =
   in
   error, guard_param_name
 
+let guard_of_string parameters handler guard_p_name error =
+  let error, (bool, output) =
+    Ckappa_sig.Dictionary_of_guards.allocate_bool parameters error
+      Ckappa_sig.compare_unit_guard_parameter guard_p_name () Misc_sa.const_unit
+      handler.Cckappa_sig.guard_parameters_dic
+  in
+  match bool, output with
+  | _, None | true, _ ->
+    Exception.warn parameters error __POS__ Exit
+      Ckappa_sig.dummy_guard_parameter
+  | _, Some (i, _, _, _) -> error, i
+
 let info_of_rule parameters ?(with_rates = false) ?(original = false) error
     compiled (rule_id : Ckappa_sig.c_rule_id) =
   let rules = compiled.Cckappa_sig.rules in
