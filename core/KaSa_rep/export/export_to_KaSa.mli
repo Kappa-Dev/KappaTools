@@ -130,8 +130,10 @@ module type Type = sig
     * Remanent_state.separating_transitions option
     * int list option
 
-  val enable_rule : state -> string -> state
-  val disable_rule : state -> string -> state
+  val enable_rule : string -> state -> state
+  val disable_rule : string -> state -> state
+  val enable_rule_index : int -> state -> state
+  val disable_rule_index : int -> state -> state
 end
 
 module Export : functor (Reachability : Analyzer.Analyzer) -> Type

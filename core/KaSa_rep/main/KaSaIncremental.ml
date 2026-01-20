@@ -1,3 +1,29 @@
+type parsed_instruction =
+  | Add of string
+  | Enable_index of bool * int
+  | Enable of bool * string
+  | Parsing_error
+
+let parse_input s =
+  let s = String.trim s in
+  (* ---- ADD ---- *)
+  if String.starts_with ~prefix:"add" s then (
+    let s = String.trim (String.sub s 3 (String.length s - 3)) in
+    Add s
+  ) else if String.starts_with ~prefix:"enable" s then (
+    let s = String.trim (String.sub s 6 (String.length s - 3)) in
+    match int_of_string_opt s with
+    | None -> Parsing_error
+    | Some i -> Enable_index (true, i)
+  ) else if String.starts_with ~prefix:"disable" s then (
+    let s = String.trim (String.sub s 6 (String.length s - 3)) in
+    match int_of_string_opt s with
+    | None -> Parsing_error
+    | Some i -> Enable_index (false, i)
+  ) else
+    Parsing_error
+(*TODO enable 'label' *)
+
 let main () =
   let start_time = Sys.time () in
   let errors = Exception.empty_exceptions_caught_and_uncaught in
@@ -51,10 +77,14 @@ let main () =
         loop state
       | input ->
         let state =
-          match input with
-          | "add" -> state
-          | "disable" -> Export_to_KaSa.disable_rule state "" (*TODO*)
-          | "enable" -> Export_to_KaSa.enable_rule state ""
+          match parse_input input with
+          | Add _ ->
+            print_endline "TODO adding a rule was not implemented yet";
+            state
+          | Enable (false, i) -> Export_to_KaSa.disable_rule i state
+          | Enable (true, i) -> Export_to_KaSa.enable_rule i state
+          | Enable_index (false, i) -> Export_to_KaSa.disable_rule_index i state
+          | Enable_index (true, i) -> Export_to_KaSa.enable_rule_index i state
           | _ ->
             print_endline "??";
             state

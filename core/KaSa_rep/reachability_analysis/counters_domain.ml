@@ -1123,6 +1123,7 @@ functor
 
     let get_dead_rules _static _dynamic = Analyzer_headers.dummy_dead_rules
     let get_side_effects _static _dynamic = Analyzer_headers.dummy_side_effects
+    let enable_or_disable_rule static dynamic error _ = error, dynamic, static
   end
 
 module Domain_affine_equalities_and_intervalles = Functor (Mat_inter.Mat_int)

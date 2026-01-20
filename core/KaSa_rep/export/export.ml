@@ -2069,23 +2069,106 @@ functor
 
     let get_data = Remanent_state.get_data
 
-    let toggle_rule bool state rule_name =
-      let error = Remanent_state.get_errors state in
-      let bdu_handler = Remanent_state.get_bdu_handler state in
-      (* TODO compilation and refind_compilation and c_compil
-         let compilation = Remanent_state.get_compilation in *)
-      let state, (static, dynamic) = get_reachability_analysis state in
-      let error, static, dynamic, bdu_handler =
-        Reachability.enable_or_disable_rule static dynamic error bdu_handler
-          rule_name bool
-      in
-      (*TODO modify dead rules and dead agents*)
-      let state =
-        Remanent_state.set_reachability_result (static, dynamic) state
-      in
-      let state = Remanent_state.set_errors error state in
-      Remanent_state.set_bdu_handler bdu_handler state
+    let get_from_option parameters error opt message empty =
+      let message = message ^ "is None" in
+      match opt with
+      | Some c -> error, c
+      | None -> Exception.warn parameters error __POS__ ~message Exit empty
 
-    let enable_rule = toggle_rule true
-    let disable_rule = toggle_rule false
+    let toggle_working_set_boolean_parameter_in_compilation error bool state
+        working_set_index =
+      let guard_name =
+        Ast.working_set_index_to_string
+          (Ckappa_sig.int_of_working_set_index working_set_index)
+      in
+      let parameters = Remanent_state.get_parameters state in
+      let error, compilation =
+        get_from_option parameters error
+          (Remanent_state.get_compilation state)
+          "compilation" Ast.empty_compil
+      in
+      let error, old_bool =
+        get_from_option parameters error
+          (Mods.StringMap.find_option guard_name
+             compilation.Ast.guard_param_values)
+          "guard_param_values" bool
+      in
+      if old_bool = bool then
+        error, state, false
+      else (
+        let guard_param_values =
+          Mods.StringMap.add guard_name bool compilation.Ast.guard_param_values
+        in
+        let compilation = { compilation with guard_param_values } in
+        let state = Remanent_state.set_compilation compilation state in
+        let state =
+          match Remanent_state.get_refined_compil state with
+          | Some c ->
+            Remanent_state.set_refined_compil
+              { c with guard_param_values }
+              state
+          | None -> state
+        in
+        let error, state =
+          match Remanent_state.get_c_compil state with
+          | Some c ->
+            let working_set_valuations = c.Cckappa_sig.working_set_valuations in
+            let error, (guard_id, _) =
+              Ckappa_sig.Ws_index_map_and_set.Map.find_default parameters error
+                (Ckappa_sig.guard_parameter_of_int (-1), false)
+                working_set_index working_set_valuations
+            in
+            let error, working_set_valuations =
+              Ckappa_sig.Ws_index_map_and_set.Map.add_or_overwrite parameters
+                error working_set_index (guard_id, bool) working_set_valuations
+            in
+            ( error,
+              Remanent_state.set_c_compil
+                { c with working_set_valuations }
+                state )
+          | None -> error, state
+        in
+        error, state, true
+      )
+
+    let enable_or_disable_rule bool working_set_index state =
+      (* TODO check if the rule is in the working set *)
+      let error = Remanent_state.get_errors state in
+      let error, state, changed =
+        toggle_working_set_boolean_parameter_in_compilation error bool state
+          working_set_index
+      in
+      if changed then (
+        let state, (static, dynamic) = get_reachability_analysis state in
+        match Remanent_state.get_c_compil state with
+        | Some c_compil ->
+          let error, dynamic, static =
+            Reachability.enable_or_disable_rule static dynamic error c_compil
+          in
+          (* TODO modify dead rules and dead agents *)
+          let state =
+            Remanent_state.set_reachability_result (static, dynamic) state
+          in
+          Remanent_state.set_errors error state
+          (* TODO maybe necessary to take this from dynamic
+             Remanent_state.set_bdu_handler bdu_handler state *)
+        | None -> Remanent_state.set_errors error state
+      ) else
+        state
+
+    let ws_id_from_rule_name _rule_name =
+      (*TODO find rule by string*)
+      Ckappa_sig.working_set_index_of_int 0
+
+    let enable_rule name =
+      enable_or_disable_rule true (ws_id_from_rule_name name)
+
+    let disable_rule name =
+      enable_or_disable_rule false (ws_id_from_rule_name name)
+
+    let enable_rule_index index =
+      enable_or_disable_rule true (Ckappa_sig.working_set_index_of_int index)
+
+    let disable_rule_index index =
+      enable_or_disable_rule false (Ckappa_sig.working_set_index_of_int index)
   end

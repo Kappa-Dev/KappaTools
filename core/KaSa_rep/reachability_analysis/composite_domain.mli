@@ -88,6 +88,8 @@ module type Composite_domain = sig
     Analyzer_headers.global_dynamic_information ->
     dynamic_information ->
     dynamic_information
+
+  val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
 end
 
 module Make : functor (Domain : Analyzer_domain_sig.Domain) -> Composite_domain

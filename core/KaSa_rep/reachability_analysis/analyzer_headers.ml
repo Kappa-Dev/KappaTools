@@ -46,6 +46,13 @@ let get_wake_up_relation static = static.global_wake_up_relation
 let get_parameter static = static.global_parameter
 let get_compilation_information static = static.global_compilation_result
 
+let set_cc_compil cc_code static =
+  {
+    static with
+    global_compilation_result =
+      { static.global_compilation_result with cc_code };
+  }
+
 let get_kappa_handler static =
   (get_compilation_information static).kappa_handler
 

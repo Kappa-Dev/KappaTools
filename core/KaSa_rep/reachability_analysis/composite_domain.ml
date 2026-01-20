@@ -86,6 +86,8 @@ module type Composite_domain = sig
     Analyzer_headers.global_dynamic_information ->
     dynamic_information ->
     dynamic_information
+
+  val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
 end
 
 (****************************************************************************)
@@ -586,4 +588,16 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
   let maybe_reachable (static : static_information) dynamic error flag mixture =
     lift_ternary Domain.maybe_reachable static dynamic error flag mixture
       Communication.dummy_precondition
+
+  let enable_or_disable_rule
+      ((static_global, static_domain) : static_information) dynamic error
+      cc_compil =
+    let error, dynamic, domain_static =
+      lift_unary Domain.enable_or_disable_rule
+        (static_global, static_domain)
+        dynamic error cc_compil
+    in
+    ( error,
+      dynamic,
+      (Analyzer_headers.set_cc_compil cc_compil static_global, domain_static) )
 end

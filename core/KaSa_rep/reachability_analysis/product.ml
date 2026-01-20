@@ -328,4 +328,20 @@ module Product
       | None, output -> error, output
       | output, None -> error, output
       | Some _, Some _ -> Exception.warn parameter error __POS__ Exit None
+
+  let enable_or_disable_rule static dynamic error c_compil =
+    let error, underlying_domain_dynamic, underlying_static =
+      Underlying_domain.enable_or_disable_rule static.underlying_domain
+        (underlying_domain_dynamic_information dynamic)
+        error c_compil
+    in
+    let error, new_domain_dynamic, new_domain_static =
+      New_domain.enable_or_disable_rule static.new_domain
+        (new_domain_dynamic_information underlying_domain_dynamic dynamic)
+        error c_compil
+    in
+    ( error,
+      smash_dynamic underlying_domain_dynamic new_domain_dynamic,
+      { new_domain = new_domain_static; underlying_domain = underlying_static }
+    )
 end

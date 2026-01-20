@@ -60,6 +60,9 @@ val get_parameter :
 val get_compilation_information :
   global_static_information -> compilation_result
 
+val set_cc_compil :
+  Cckappa_sig.compil -> global_static_information -> global_static_information
+
 val get_common_views : global_static_information -> Common_static.common_views
 
 val set_common_views :

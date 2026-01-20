@@ -133,8 +133,10 @@ module type Type = sig
     * Remanent_state.separating_transitions option
     * int list option
 
-  val enable_rule : state -> string -> state
-  val disable_rule : state -> string -> state
+  val enable_rule : string -> state -> state
+  val disable_rule : string -> state -> state
+  val enable_rule_index : int -> state -> state
+  val disable_rule_index : int -> state -> state
 end
 
 module Export =
@@ -160,4 +162,6 @@ functor
     let empty_constraints_list = []
     let enable_rule = enable_rule
     let disable_rule = disable_rule
+    let enable_rule_index = enable_rule_index
+    let disable_rule_index = disable_rule_index
   end

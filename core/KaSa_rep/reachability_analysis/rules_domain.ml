@@ -574,4 +574,21 @@ module Domain = struct
         error, false
 
   let get_side_effects _static _dynamic = Analyzer_headers.dummy_side_effects
+
+  let enable_or_disable_rule static dynamic error cc_compil =
+    let static =
+      {
+        static with
+        global_static_information =
+          Analyzer_headers.set_cc_compil cc_compil
+            static.global_static_information;
+      }
+    in
+    let dynamic =
+      {
+        dynamic with
+        local = { dynamic.local with liveness_current_working_set = None };
+      }
+    in
+    error, dynamic, static
 end

@@ -59,13 +59,10 @@ module type Analyzer = sig
     static_information ->
     dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->
-    Ckappa_sig.Views_bdu.handler ->
-    string ->
-    bool ->
+    Cckappa_sig.compil ->
     Exception.exceptions_caught_and_uncaught
-    * static_information
     * dynamic_information
-    * Ckappa_sig.Views_bdu.handler
+    * static_information
 end
 
 (***************************************************************************)
@@ -248,6 +245,6 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     | None -> error, dynamic, false
     | Some _ -> error, dynamic, true
 
-  let enable_or_disable_rule static dynamic error bdu_handler _rule_name _bool =
-    error, static, dynamic, bdu_handler
+  let enable_or_disable_rule static dynamic error cc_compil =
+    Domain.enable_or_disable_rule static dynamic error cc_compil
 end

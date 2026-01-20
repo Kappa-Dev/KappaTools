@@ -214,4 +214,6 @@ module Domain = struct
     with
     | error, None -> Exception.warn parameters error __POS__ Exit None
     | error, Some b -> error, Some b
+
+  let enable_or_disable_rule static dynamic error _ = error, dynamic, static
 end
