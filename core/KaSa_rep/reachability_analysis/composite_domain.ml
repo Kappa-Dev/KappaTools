@@ -592,12 +592,10 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
   let enable_or_disable_rule
       ((static_global, static_domain) : static_information) dynamic error
       cc_compil =
-    let error, dynamic, domain_static =
+    let error, dynamic, static_domain =
       lift_unary Domain.enable_or_disable_rule
         (static_global, static_domain)
         dynamic error cc_compil
     in
-    ( error,
-      dynamic,
-      (Analyzer_headers.set_cc_compil cc_compil static_global, domain_static) )
+    error, dynamic, (static_global, static_domain)
 end

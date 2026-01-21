@@ -5,18 +5,17 @@ type parsed_instruction =
   | Parsing_error
 
 let parse_input s =
-  let s = String.trim s in
   (* ---- ADD ---- *)
   if String.starts_with ~prefix:"add" s then (
     let s = String.trim (String.sub s 3 (String.length s - 3)) in
     Add s
   ) else if String.starts_with ~prefix:"enable" s then (
-    let s = String.trim (String.sub s 6 (String.length s - 3)) in
+    let s = String.trim (String.sub s 6 (String.length s - 6)) in
     match int_of_string_opt s with
     | None -> Parsing_error
     | Some i -> Enable_index (true, i)
   ) else if String.starts_with ~prefix:"disable" s then (
-    let s = String.trim (String.sub s 6 (String.length s - 3)) in
+    let s = String.trim (String.sub s 7 (String.length s - 7)) in
     match int_of_string_opt s with
     | None -> Parsing_error
     | Some i -> Enable_index (false, i)
@@ -81,15 +80,33 @@ let main () =
           | Add _ ->
             print_endline "TODO adding a rule was not implemented yet";
             state
-          | Enable (false, i) -> Export_to_KaSa.disable_rule i state
-          | Enable (true, i) -> Export_to_KaSa.enable_rule i state
-          | Enable_index (false, i) -> Export_to_KaSa.disable_rule_index i state
-          | Enable_index (true, i) -> Export_to_KaSa.enable_rule_index i state
+          | Enable (false, i) ->
+            let () =
+              print_endline ("Disabling rule with label '" ^ i ^ "'...")
+            in
+            Export_to_KaSa.disable_rule i state
+          | Enable (true, i) ->
+            let () =
+              print_endline ("Enabling rule with label '" ^ i ^ "'...")
+            in
+            Export_to_KaSa.enable_rule i state
+          | Enable_index (false, i) ->
+            let () =
+              print_endline
+                ("Disabling rule at index " ^ string_of_int i ^ "...")
+            in
+            Export_to_KaSa.disable_rule_index i state
+          | Enable_index (true, i) ->
+            let () =
+              print_endline ("Enabling rule at index " ^ string_of_int i ^ "...")
+            in
+            Export_to_KaSa.enable_rule_index i state
           | _ ->
             print_endline "??";
             state
         in
-        print_endline "done";
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
         loop state
     with e ->
       print_endline "error TODO";

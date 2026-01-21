@@ -2070,17 +2070,14 @@ functor
     let get_data = Remanent_state.get_data
 
     let get_from_option parameters error opt message empty =
-      let message = message ^ "is None" in
+      let message = message ^ " is None" in
       match opt with
       | Some c -> error, c
       | None -> Exception.warn parameters error __POS__ ~message Exit empty
 
     let toggle_working_set_boolean_parameter_in_compilation error bool state
         working_set_index =
-      let guard_name =
-        Ast.working_set_index_to_string
-          (Ckappa_sig.int_of_working_set_index working_set_index)
-      in
+      let guard_int = Ckappa_sig.int_of_working_set_index working_set_index in
       let parameters = Remanent_state.get_parameters state in
       let error, compilation =
         get_from_option parameters error
@@ -2089,23 +2086,22 @@ functor
       in
       let error, old_bool =
         get_from_option parameters error
-          (Mods.StringMap.find_option guard_name
-             compilation.Ast.guard_param_values)
-          "guard_param_values" bool
+          (Mods.IntMap.find_option guard_int compilation.Ast.working_set_values)
+          "working_set_values" bool
       in
       if old_bool = bool then
         error, state, false
       else (
-        let guard_param_values =
-          Mods.StringMap.add guard_name bool compilation.Ast.guard_param_values
+        let working_set_values =
+          Mods.IntMap.add guard_int bool compilation.Ast.working_set_values
         in
-        let compilation = { compilation with guard_param_values } in
+        let compilation = { compilation with working_set_values } in
         let state = Remanent_state.set_compilation compilation state in
         let state =
           match Remanent_state.get_refined_compil state with
           | Some c ->
             Remanent_state.set_refined_compil
-              { c with guard_param_values }
+              { c with working_set_values }
               state
           | None -> state
         in
@@ -2153,8 +2149,9 @@ functor
           (* TODO maybe necessary to take this from dynamic
              Remanent_state.set_bdu_handler bdu_handler state *)
         | None -> Remanent_state.set_errors error state
-      ) else
-        state
+      ) else (
+        Remanent_state.set_errors error state
+      )
 
     let ws_id_from_rule_name _rule_name =
       (*TODO find rule by string*)

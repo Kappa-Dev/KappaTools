@@ -1731,18 +1731,15 @@ module Domain = struct
   let get_side_effects _static _dynamic = Analyzer_headers.dummy_side_effects
 
   let enable_or_disable_rule static dynamic error cc_compil =
-    let static =
-      {
-        static with
-        global_static_information =
-          Analyzer_headers.set_cc_compil cc_compil
-            static.global_static_information;
-      }
+    let error, global_dynamic, global_static_information =
+      Analyzer_headers.set_cc_compil cc_compil static.global_static_information
+        dynamic.global error
     in
+    let static = { static with global_static_information } in
     let dynamic =
       {
-        dynamic with
         local = { dynamic.local with store_value_current_working_set = None };
+        global = global_dynamic;
       }
     in
     error, dynamic, static

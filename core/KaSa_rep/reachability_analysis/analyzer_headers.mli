@@ -61,7 +61,13 @@ val get_compilation_information :
   global_static_information -> compilation_result
 
 val set_cc_compil :
-  Cckappa_sig.compil -> global_static_information -> global_static_information
+  Cckappa_sig.compil ->
+  global_static_information ->
+  global_dynamic_information ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * global_dynamic_information
+  * global_static_information
 
 val get_common_views : global_static_information -> Common_static.common_views
 
