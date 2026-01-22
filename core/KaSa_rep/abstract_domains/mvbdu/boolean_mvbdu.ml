@@ -104,6 +104,7 @@ type memo_tables = {
   boolean_mvbdu_width: int Hash_1.t;
   boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
   boolean_mvbdu_keep_head_only_with_threshold: bool Mvbdu_sig.mvbdu Hash_2.t;
+  boolean_mvbdu_keep_until: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_redefine: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_redefine_range: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_monotonicaly_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
@@ -322,6 +323,7 @@ let init_data parameters error =
   let error, mvbdu_keep_head_only_with_threshold =
     Hash_2.create parameters error (0, 0)
   in
+  let error, mvbdu_keep_until = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_width = Hash_1.create parameters error 0 in
   let error, mvbdu_height = Hash_1.create parameters error 0 in
   let error, mvbdu_and = Hash_2.create parameters error (0, 0) in
@@ -376,6 +378,7 @@ let init_data parameters error =
       boolean_mvbdu_keep_head_only = mvbdu_keep_head_only;
       boolean_mvbdu_keep_head_only_with_threshold =
         mvbdu_keep_head_only_with_threshold;
+      boolean_mvbdu_keep_until = mvbdu_keep_until;
       boolean_mvbdu_identity = id;
       boolean_mvbdu_height = mvbdu_height;
       boolean_mvbdu_width = mvbdu_width;
@@ -975,6 +978,54 @@ let memo_keep_head_only =
       | error, Some x -> error, (handler, Some x))
     (fun parameters error _h mvbdu ->
       Hash_1.set parameters error (Mvbdu_core.id_of_mvbdu mvbdu))
+
+let memo_keep_until =
+  Mvbdu_algebra.memoize_no_fun_with_threshold
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_keep_until)
+    (fun x h ->
+      {
+        h with
+        Memo_sig.data = { h.Memo_sig.data with boolean_mvbdu_keep_until = x };
+      })
+    (fun parameters error handler (int, mvbdu) d ->
+      let a, b =
+        Hash_2.unsafe_get parameters error (int, Mvbdu_core.id_of_mvbdu mvbdu) d
+      in
+      a, (handler, (b : bool Mvbdu_sig.mvbdu option)))
+    (fun parameters error _h (int, mvbdu') ->
+      Hash_2.set parameters error (int, Mvbdu_core.id_of_mvbdu mvbdu'))
+
+let keep_until parameters error handler threshold mvbdu =
+  Mvbdu_algebra.keep_until
+    (mvbdu_allocate parameters)
+    memo_keep_until boolean_mvbdu_true handler error parameters
+    (threshold, mvbdu)
+
+let memo_keep_until :
+    ( bool,
+      mvbdu_dic,
+      association_list_dic,
+      range_list_dic,
+      variables_list_dic,
+      'a,
+      memo_tables,
+      'b,
+      bool Mvbdu_sig.mvbdu )
+    Memo_sig.unary_with_threshold_memoized_fun =
+  Mvbdu_algebra.memoize_no_fun_with_threshold
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_keep_until)
+    (fun x h ->
+      {
+        h with
+        Memo_sig.data = { h.Memo_sig.data with boolean_mvbdu_keep_until = x };
+      })
+    (fun parameters error handler (int, mvbdu) d ->
+      let a, b =
+        Hash_2.unsafe_get parameters error (int, Mvbdu_core.id_of_mvbdu mvbdu) d
+      in
+      a, (handler, (b : bool Mvbdu_sig.mvbdu option)))
+    (fun parameters error _h (int, mvbdu') (b : bool Mvbdu_sig.mvbdu) ->
+      Hash_2.set parameters error (int, Mvbdu_core.id_of_mvbdu mvbdu') b)
 
 let memo_keep_head_only_with_threshold =
   Mvbdu_algebra.memoize_no_fun_with_threshold

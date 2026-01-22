@@ -2149,9 +2149,8 @@ functor
           (* TODO maybe necessary to take this from dynamic
              Remanent_state.set_bdu_handler bdu_handler state *)
         | None -> Remanent_state.set_errors error state
-      ) else (
+      ) else
         Remanent_state.set_errors error state
-      )
 
     let ws_id_from_rule_name _rule_name =
       (*TODO find rule by string*)

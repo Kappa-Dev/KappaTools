@@ -150,6 +150,8 @@ module type Mvbdu = sig
   val mvbdu_project_abstract_away :
     (mvbdu, hconsed_variables_list, mvbdu) binary
 
+  val mvbdu_project_keep_until : (int, mvbdu, mvbdu) binary
+
   val mvbdu_cartesian_decomposition_depth :
     (mvbdu, int, mvbdu option * mvbdu list) binary
 
@@ -713,7 +715,7 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
     match f parameters error handler a b with
     | error, (handler, Some a) -> error, handler, a
     | error, (handler, None) ->
-      let error, a = Exception.warn parameters error pos Exit a in
+      let error, a = Exception.warn parameters error pos Exit b in
       error, handler, a
 
   let (mvbdu_not : (mvbdu, mvbdu) unary) =
@@ -878,6 +880,8 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
   let mvbdu_keep_head_only_with_threshold =
     lift1_with_threshold __POS__ Boolean_mvbdu.keep_head_only_with_threshold
 
+  let mvbdu_project_keep_until = lift2five __POS__ Boolean_mvbdu.keep_until
+
   let mvbdu_cartesian_abstraction parameters handler error bdu =
     let error, handler, bdd_true = mvbdu_true parameters handler error in
     (*let error = Exception.check_point
@@ -1034,7 +1038,7 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
       error l1 l2
 
   let overwrite_association_lists parameters handler error l1 l2 =
-    lift2five __POS__ Boolean_mvbdu.overwrite_association_lists parameters
+    lift2four __POS__ Boolean_mvbdu.overwrite_association_lists parameters
       handler error l1 l2
 
   let nbr_variables parameter handler error l =
