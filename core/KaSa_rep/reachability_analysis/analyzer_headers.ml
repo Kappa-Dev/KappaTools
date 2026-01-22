@@ -410,14 +410,10 @@ module AbstractWSMap (MapT : Map_wrapper.S_with_logs) = struct
         let current_working_set = MapT.Map.empty in
         MapT.Map.fold
           (fun rule_id mvbdu (current_working_set, bdu_handler, error) ->
-            let () = print_endline "BEFORE abstraction" in
-            let () = Ckappa_sig.Views_bdu.print parameters mvbdu in
             let error, bdu_handler, mvbdu =
               abstract_away_working_set_vars parameters error bdu_handler mvbdu
                 working_set_mvbdu working_set_guard
             in
-            (* let () = print_endline "AFTER abstraction" in
-               let () = Ckappa_sig.Views_bdu.print parameters mvbdu in *)
             let error, current_working_set =
               MapT.Map.add parameters error rule_id mvbdu current_working_set
             in
