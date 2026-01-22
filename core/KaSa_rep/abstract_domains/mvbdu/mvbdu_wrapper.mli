@@ -152,7 +152,7 @@ module type Mvbdu = sig
   val mvbdu_project_abstract_away :
     (mvbdu, hconsed_variables_list, mvbdu) binary
 
-  val mvbdu_project_keep_until : (int, mvbdu, mvbdu) binary
+  val mvbdu_project_keep_until : (key, mvbdu, mvbdu) binary
 
   val mvbdu_cartesian_decomposition_depth :
     (mvbdu, int, mvbdu option * mvbdu list) binary
