@@ -2,26 +2,40 @@ type parsed_instruction =
   | Add of string
   | Enable_index of bool * int
   | Enable of bool * string
-  | Parsing_error
+  | Parsing_error of string
 
 let parse_input s =
+  let parse_enable_label s bool =
+    match s with
+    | "" -> Parsing_error "Empty rule name"
+    | s ->
+      let fst = String.sub s 0 1 in
+      if fst = "'" then
+        if String.sub s (String.length s - 1) 1 = "'" then
+          Enable (bool, String.sub s 1 (String.length s - 2))
+        else
+          Parsing_error "Label quotation marks were not closed"
+      else (
+        match int_of_string_opt s with
+        | None ->
+          Parsing_error
+            ("Invalid index: " ^ s
+           ^ ". Please put a label inside of quotation marks, e.g. 'label'.")
+        | Some i -> Enable_index (true, i)
+      )
+  in
   (* ---- ADD ---- *)
   if String.starts_with ~prefix:"add" s then (
     let s = String.trim (String.sub s 3 (String.length s - 3)) in
     Add s
   ) else if String.starts_with ~prefix:"enable" s then (
     let s = String.trim (String.sub s 6 (String.length s - 6)) in
-    match int_of_string_opt s with
-    | None -> Parsing_error
-    | Some i -> Enable_index (true, i)
+    parse_enable_label s true
   ) else if String.starts_with ~prefix:"disable" s then (
     let s = String.trim (String.sub s 7 (String.length s - 7)) in
-    match int_of_string_opt s with
-    | None -> Parsing_error
-    | Some i -> Enable_index (false, i)
+    parse_enable_label s false
   ) else
-    Parsing_error
-(*TODO enable 'label' *)
+    Parsing_error ("Unknown command: " ^ s)
 
 let main () =
   let start_time = Sys.time () in
@@ -101,8 +115,8 @@ let main () =
               print_endline ("Enabling rule at index " ^ string_of_int i ^ "...")
             in
             Export_to_KaSa.enable_rule_index i state
-          | _ ->
-            print_endline "??";
+          | Parsing_error s ->
+            print_endline ("ERROR: Parsing error:" ^ s);
             state
         in
         let error = Export_to_KaSa.get_errors state in

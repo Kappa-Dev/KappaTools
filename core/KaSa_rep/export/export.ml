@@ -2128,7 +2128,6 @@ functor
       )
 
     let enable_or_disable_rule bool working_set_index state =
-      (* TODO check if the rule is in the working set *)
       let error = Remanent_state.get_errors state in
       let error, state, changed =
         toggle_working_set_boolean_parameter_in_compilation error bool state
@@ -2141,19 +2140,19 @@ functor
           let error, dynamic, static =
             Reachability.enable_or_disable_rule static dynamic error c_compil
           in
-          (* TODO modify dead rules and dead agents *)
+          let error, dynamic, state =
+            Reachability.export static dynamic error state
+          in
           let state =
             Remanent_state.set_reachability_result (static, dynamic) state
           in
           Remanent_state.set_errors error state
-          (* TODO maybe necessary to take this from dynamic
-             Remanent_state.set_bdu_handler bdu_handler state *)
         | None -> Remanent_state.set_errors error state
       ) else
         Remanent_state.set_errors error state
 
     let ws_id_from_rule_name _rule_name =
-      (*TODO find rule by string*)
+      (*TODO find rule by string and check if it is in the working set*)
       Ckappa_sig.working_set_index_of_int 0
 
     let enable_rule name =
