@@ -21,7 +21,7 @@ let parse_input s =
           Parsing_error
             ("Invalid index: " ^ s
            ^ ". Please put a label inside of quotation marks, e.g. 'label'.")
-        | Some i -> Enable_index (true, i)
+        | Some i -> Enable_index (bool, i)
       )
   in
   (* ---- ADD ---- *)
@@ -116,7 +116,7 @@ let main () =
             in
             Export_to_KaSa.enable_rule_index i state
           | Parsing_error s ->
-            print_endline ("ERROR: Parsing error:" ^ s);
+            print_endline ("ERROR: Parsing error: " ^ s);
             state
         in
         let error = Export_to_KaSa.get_errors state in
