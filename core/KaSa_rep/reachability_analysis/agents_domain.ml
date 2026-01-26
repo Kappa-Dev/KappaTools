@@ -685,7 +685,6 @@ module Domain = struct
 
   let export static dynamic error kasa_state =
     let parameters = get_parameter static in
-    let handler = get_kappa_handler static in
     let compil = get_compil static in
     let error, dynamic, array =
       get_seen_agent_without_working_set_vars parameters error static dynamic
@@ -702,7 +701,7 @@ module Domain = struct
           in
           if not is_true then (
             let error, info =
-              Handler.info_of_agent parameters error handler compil agent
+              Handler.info_of_agent parameters error kappa_handler compil agent
             in
             let agent = Remanent_state.info_to_agent info in
             let error, dynamic, is_false =

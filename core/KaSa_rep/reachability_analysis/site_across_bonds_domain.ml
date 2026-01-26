@@ -331,11 +331,11 @@ module Domain = struct
   let get_mvbdu_handler dynamic =
     Analyzer_headers.get_mvbdu_handler (get_global_dynamic_information dynamic)
 
-  let set_mvbdu_handler handler dynamic =
+  let set_mvbdu_handler bdu_handler dynamic =
     {
       dynamic with
       global =
-        Analyzer_headers.set_mvbdu_handler handler
+        Analyzer_headers.set_mvbdu_handler bdu_handler
           (get_global_dynamic_information dynamic);
     }
 
@@ -397,12 +397,12 @@ module Domain = struct
     lift Analyzer_headers.get_restriction_mvbdu static
 
   let get_bdu_guard parameters dynamic error guard_mvbdus rule_id =
-    let handler = get_mvbdu_handler dynamic in
-    let error, handler, bdu_guard =
-      Bdu_static_views.get_bdu_guard guard_mvbdus rule_id parameters handler
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, bdu_guard =
+      Bdu_static_views.get_bdu_guard guard_mvbdus rule_id parameters bdu_handler
         error
     in
-    let dynamic = set_mvbdu_handler handler dynamic in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, bdu_guard
 
   (***************************************************************************)
@@ -806,22 +806,22 @@ module Domain = struct
     let kappa_handler = get_kappa_handler static in
     let nsites = Handler.get_nsites kappa_handler in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
-    let handler = get_mvbdu_handler dynamic in
+    let bdu_handler = get_mvbdu_handler dynamic in
     let restriction_bdu = get_restriction_mvbdu static in
-    let error, handler, mvbdu_guard =
-      Ckappa_sig.guard_to_bdu_opt parameters error handler
+    let error, bdu_handler, mvbdu_guard =
+      Ckappa_sig.guard_to_bdu_opt parameters error bdu_handler
         species.Cckappa_sig.e_init_guard restriction_bdu nsites
     in
     let error, tuple_init =
       Site_across_bonds_domain_static.build_potential_tuple_pair_set parameters
         error kappa_handler store_bonds_init store_views_init
     in
-    let error, handler, store_result =
+    let error, bdu_handler, store_result =
       Site_across_bonds_domain_static.collect_potential_tuple_pair_init
-        parameters error bdu_false handler kappa_handler tuple_init store_result
-        restriction_bdu mvbdu_guard
+        parameters error bdu_false bdu_handler kappa_handler tuple_init
+        store_result restriction_bdu mvbdu_guard
     in
-    let dynamic = set_mvbdu_handler handler dynamic in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     let dynamic = set_value store_result dynamic in
     let event_list = [] in
     error, dynamic, event_list
@@ -848,16 +848,17 @@ module Domain = struct
         Ckappa_sig.snd_site, pair_of_state2';
       ]
     in
-    let handler = get_mvbdu_handler dynamic in
-    let error, handler, mvbdu =
-      Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters handler error
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, mvbdu =
+      Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters bdu_handler error
         pair_list
     in
     (*intersection*)
-    let error, handler, new_mvbdu =
-      Ckappa_sig.Views_bdu.mvbdu_and parameters handler error mvbdu mvbdu_value
+    let error, bdu_handler, new_mvbdu =
+      Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error mvbdu
+        mvbdu_value
     in
-    let dynamic = set_mvbdu_handler handler dynamic in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, new_mvbdu
 
   let common_scan parameters error bdu_false dynamic store_value list guard_bdu
@@ -998,16 +999,16 @@ module Domain = struct
 
   let check_association_list parameters error bdu_false pair check dynamic =
     let store_result = get_value dynamic in
-    let handler = get_mvbdu_handler dynamic in
-    let error, handler, mvbdu =
-      Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters handler error
-        check
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, mvbdu =
+      Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters bdu_handler
+        error check
     in
-    let error, handler, bool =
-      Site_across_bonds_domain_type.check parameters error bdu_false handler
+    let error, bdu_handler, bool =
+      Site_across_bonds_domain_type.check parameters error bdu_false bdu_handler
         pair mvbdu store_result
     in
-    let dynamic = set_mvbdu_handler handler dynamic in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, bool
   (*there is an action binding in the domain of a rule*)
 
@@ -1015,21 +1016,22 @@ module Domain = struct
       dump_title bool modified_sites pair pair_list dynamic guard_bdu
       restriction_bdu =
     let store_result = get_value dynamic in
-    let handler = get_mvbdu_handler dynamic in
-    let error, handler, mvbdu =
-      Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters handler error
-        pair_list
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, mvbdu =
+      Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters bdu_handler
+        error pair_list
     in
-    let error, handler, mvbdu_with_guard =
-      Ckappa_sig.mvbdu_and_for_guards parameters handler error mvbdu guard_bdu
+    let error, bdu_handler, mvbdu_with_guard =
+      Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+        guard_bdu
     in
-    let error, bool, handler, modified_sites, store_result =
+    let error, bool, bdu_handler, modified_sites, store_result =
       Site_across_bonds_domain_type.add_link_and_check parameters error
-        bdu_false handler kappa_handler bool dump_title pair mvbdu_with_guard
-        modified_sites store_result restriction_bdu
+        bdu_false bdu_handler kappa_handler bool dump_title pair
+        mvbdu_with_guard modified_sites store_result restriction_bdu
     in
     let dynamic = set_value store_result dynamic in
-    let dynamic = set_mvbdu_handler handler dynamic in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, bool, dynamic, modified_sites
 
   let apply_rule_created_bonds static dynamic error bool dump_title rule_id rule
@@ -1508,7 +1510,7 @@ module Domain = struct
     (*-----------------------------------------------------------*)
     Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
       (fun (x, y) (error, bool, dynamic, modified_sites) ->
-        let handler = get_mvbdu_handler dynamic in
+        let bdu_handler = get_mvbdu_handler dynamic in
         let result = get_value dynamic in
         let error, mvbdu_opt =
           Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map
@@ -1522,29 +1524,31 @@ module Domain = struct
             | Fst -> Ckappa_sig.fst_site
             | Snd -> Ckappa_sig.snd_site
           in
-          let error, handler, cap =
-            Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters handler
-              error
+          let error, bdu_handler, cap =
+            Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters
+              bdu_handler error
               [ var, state' ]
           in
-          let error, handler, redefine =
-            Ckappa_sig.Views_bdu.build_association_list parameters handler error
+          let error, bdu_handler, redefine =
+            Ckappa_sig.Views_bdu.build_association_list parameters bdu_handler
+              error
               [ var, Ckappa_sig.dummy_state_index ]
           in
-          let error, handler, mvbdu_cap =
-            Ckappa_sig.Views_bdu.mvbdu_and parameters handler error mvbdu cap
+          let error, bdu_handler, mvbdu_cap =
+            Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error mvbdu
+              cap
           in
-          let error, handler, mvbdu' =
-            Ckappa_sig.Views_bdu.mvbdu_redefine parameters handler error
+          let error, bdu_handler, mvbdu' =
+            Ckappa_sig.Views_bdu.mvbdu_redefine parameters bdu_handler error
               mvbdu_cap redefine
           in
           (*check the freshness of the value *)
-          let error, bool, handler, modified_sites, result =
+          let error, bool, bdu_handler, modified_sites, result =
             Site_across_bonds_domain_type.add_link_and_check parameters error
-              bdu_false handler kappa_handler bool dump_title (x, y) mvbdu'
+              bdu_false bdu_handler kappa_handler bool dump_title (x, y) mvbdu'
               modified_sites result restriction_bdu
           in
-          let dynamic = set_mvbdu_handler handler dynamic in
+          let dynamic = set_mvbdu_handler bdu_handler dynamic in
           let dynamic = set_value result dynamic in
           error, bool, dynamic, modified_sites)
       potential_tuple_pair_set
@@ -1707,16 +1711,16 @@ module Domain = struct
   let export_aux ?(final_result = false) static dynamic error kasa_state =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    let handler = get_mvbdu_handler dynamic in
     let error, dynamic, store_value =
       get_value_without_working_set_vars parameters error static dynamic
     in
     let domain_name = "Connected agents" in
     let restriction_bdu = get_restriction_mvbdu static in
     let nsites = Handler.get_nsites kappa_handler in
-    let error, (handler, current_list) =
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, (bdu_handler, current_list) =
       Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
-        (fun tuple mvbdu (error, (handler, current_list)) ->
+        (fun tuple mvbdu (error, (bdu_handler, current_list)) ->
           let ( (agent_type1, site_type1, site_type1', _),
                 (agent_type2, site_type2, site_type2', _) ) =
             tuple
@@ -1727,28 +1731,28 @@ module Domain = struct
           in
           (*this test remove the relation: B.A*)
           if compare (agent1, site1, site1') (agent2, site2, site2') > 0 then
-            error, (handler, current_list)
+            error, (bdu_handler, current_list)
           else (
             (*this test remove the relation when their states are not the
               same: for instance: A(x~p), B(x~u)*)
-            let error, handler, non_relational =
+            let error, bdu_handler, non_relational =
               if final_result then
                 (*at the final result needs to check the non_relational
                   condition*)
                 Translation_in_natural_language.non_relational parameters
-                  handler error mvbdu
+                  bdu_handler error mvbdu
               else
                 (*other cases will by pass this test*)
-                error, handler, false
+                error, bdu_handler, false
             in
             if non_relational then
-              error, (handler, current_list)
+              error, (bdu_handler, current_list)
             else (
               (*----------------------------------------------------*)
               let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
-              let error, handler, pair_list =
+              let error, bdu_handler, pair_list =
                 Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters
-                  handler error ~threshold mvbdu
+                  bdu_handler error ~threshold mvbdu
               in
               match Remanent_parameters.get_backend_mode parameters with
               | Remanent_parameters_sig.Kappa | Remanent_parameters_sig.Raw ->
@@ -1768,9 +1772,9 @@ module Domain = struct
                 in
                 (*---------------------------------------------------*)
                 (*internal constraint list*)
-                let error, (handler, refine) =
+                let error, (bdu_handler, refine) =
                   Ckappa_site_graph.internal_pair_list_to_list parameters error
-                    handler kappa_handler pattern agent_id1 site_type1'
+                    bdu_handler kappa_handler pattern agent_id1 site_type1'
                     agent_id2 site_type2' pair_list restriction_bdu
                 in
                 let lemma_internal =
@@ -1778,16 +1782,16 @@ module Domain = struct
                 in
                 let current_list = lemma_internal :: current_list in
                 (*---------------------------------------------------*)
-                error, (handler, current_list)
+                error, (bdu_handler, current_list)
               | Remanent_parameters_sig.Natural_language ->
-                error, (handler, current_list)
+                error, (bdu_handler, current_list)
             )
           ))
         store_value
-        (error, (handler, []))
+        (error, (bdu_handler, []))
     in
     (*------------------------------------------------------------------*)
-    let dynamic = set_mvbdu_handler handler dynamic in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
     let internal_constraints_list =
@@ -1819,10 +1823,9 @@ module Domain = struct
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let restriction_bdu = get_restriction_mvbdu static in
-    let handler = get_mvbdu_handler dynamic in
     let log = loggers in
     (*--------------------------------------------------------*)
-    let error, handler =
+    let error, dynamic =
       if Remanent_parameters.get_dump_reachability_analysis_result parameters
       then (
         let () =
@@ -1841,21 +1844,21 @@ module Domain = struct
         let error, dynamic, store_value =
           get_value_without_working_set_vars parameters error static dynamic
         in
-        let handler = get_mvbdu_handler dynamic in
-        let error, handler =
+        let bdu_handler = get_mvbdu_handler dynamic in
+        let error, bdu_handler =
           Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
-            (fun (x, y) mvbdu (error, handler) ->
+            (fun (x, y) mvbdu (error, bdu_handler) ->
               Site_across_bonds_domain_type.print_site_across_bonds_domain
                 ~verbose:true ~sparse:true ~final_result:true ~dump_any:true
-                parameters error kappa_handler handler (x, y) mvbdu
+                parameters error kappa_handler bdu_handler (x, y) mvbdu
                 restriction_bdu)
-            store_value (error, handler)
+            store_value (error, bdu_handler)
         in
-        error, handler
+        let dynamic = set_mvbdu_handler bdu_handler dynamic in
+        error, dynamic
       ) else
-        error, handler
+        error, dynamic
     in
-    let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, ()
 
   let get_dead_rules _static _dynamic = Analyzer_headers.dummy_dead_rules

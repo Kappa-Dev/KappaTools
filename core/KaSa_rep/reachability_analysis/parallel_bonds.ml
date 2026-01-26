@@ -1456,10 +1456,9 @@ module Domain = struct
     let _ = dead_rules in
     let kappa_handler = get_kappa_handler static in
     let parameters = get_parameter static in
-    let bdu_handler = get_mvbdu_handler dynamic in
     let log = loggers in
     (*-------------------------------------------------------*)
-    let error, bdu_handler =
+    let error, dynamic =
       if Remanent_parameters.get_dump_reachability_analysis_result parameters
       then (
         let () =
@@ -1482,11 +1481,11 @@ module Domain = struct
                 kappa_handler tuple value bdu_handler restriction_bdu)
             store_value (error, bdu_handler)
         in
-        error, bdu_handler
+        let dynamic = set_mvbdu_handler bdu_handler dynamic in
+        error, dynamic
       ) else
-        error, bdu_handler
+        error, dynamic
     in
-    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, ()
 
   (***********************************************************)
