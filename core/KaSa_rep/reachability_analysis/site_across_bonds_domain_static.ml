@@ -465,10 +465,10 @@ let collect_rule_partition_modified_map_2 parameters error
 (*INITIAL STATE*)
 (***************************************************************)
 
-let collect_potential_tuple_pair_init parameters error bdu_false handler
+let collect_potential_tuple_pair_init parameters error bdu_false bdu_handler
     kappa_handler tuple_init store_result restriction_bdu guard_bdu =
   Site_across_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set.fold
-    (fun (x, y) (error, handler, store_result) ->
+    (fun (x, y) (error, bdu_handler, store_result) ->
       let agent_type, site_type1, site_type2, state1, pair_of_state2 = x in
       let agent_type', site_type1', site_type2', state1', pair_of_state2' = y in
       let pair_list =
@@ -477,20 +477,21 @@ let collect_potential_tuple_pair_init parameters error bdu_false handler
           Ckappa_sig.snd_site, pair_of_state2';
         ]
       in
-      let error, handler, mvbdu =
-        Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters handler error
+      let error, bdu_handler, mvbdu =
+        Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters bdu_handler error
           pair_list
       in
-      let error, handler, mvbdu_with_guard =
-        Ckappa_sig.mvbdu_and_for_guards parameters handler error mvbdu guard_bdu
+      let error, bdu_handler, mvbdu_with_guard =
+        Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+          guard_bdu
       in
-      let error, handler, store_result =
+      let error, bdu_handler, store_result =
         Site_across_bonds_domain_type.add_link parameters error bdu_false
-          handler kappa_handler
+          bdu_handler kappa_handler
           ( (agent_type, site_type1, site_type2, state1),
             (agent_type', site_type1', site_type2', state1') )
           mvbdu_with_guard store_result restriction_bdu
       in
-      error, handler, store_result)
+      error, bdu_handler, store_result)
     tuple_init
-    (error, handler, store_result)
+    (error, bdu_handler, store_result)

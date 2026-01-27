@@ -308,25 +308,25 @@ let project2 (x, y) = project x, project y
 (***************************************************************************)
 (*PRINT*)
 (***************************************************************************)
-let print_guard_mvbdu parameters error handler kappa_handler mvbdu
+let print_guard_mvbdu parameters error bdu_handler kappa_handler mvbdu
     restriction_bdu =
-  let error, handler, is_true =
-    Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
+  let error, bdu_handler, is_true =
+    Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
       restriction_bdu
   in
   if is_true then
-    error, handler
+    error, bdu_handler
   else (
-    let error, handler =
-      Handler.print_guard_option parameters error kappa_handler handler
+    let error, bdu_handler =
+      Handler.print_guard_option parameters error kappa_handler bdu_handler
         (Some mvbdu)
     in
-    error, handler
+    error, bdu_handler
   )
 
-let print_site_across_bonds_domain_raw parameters error kappa_handler handler
-    log final_result pair_list nsites agent_id1 site_type1' agent_id2
-    site_type2' pattern restriction_bdu =
+let print_site_across_bonds_domain_raw parameters error kappa_handler
+    bdu_handler log final_result pair_list nsites agent_id1 site_type1'
+    agent_id2 site_type2' pattern restriction_bdu =
   let error =
     (*do not print the precondition if it is not the final result*)
     if final_result then (
@@ -341,7 +341,7 @@ let print_site_across_bonds_domain_raw parameters error kappa_handler handler
   match pair_list with
   | [] ->
     let () = Loggers.fprintf log "" in
-    error, handler
+    error, bdu_handler
   | _ :: _ ->
     let () =
       if final_result then (
@@ -350,9 +350,9 @@ let print_site_across_bonds_domain_raw parameters error kappa_handler handler
       ) else
         ()
     in
-    let error, handler, _ =
+    let error, bdu_handler, _ =
       List.fold_left
-        (fun (error, handler, add_or) (l, mvbdu) ->
+        (fun (error, bdu_handler, add_or) (l, mvbdu) ->
           let () = Loggers.print_newline log in
           let () =
             Loggers.fprintf log
@@ -398,12 +398,13 @@ let print_site_across_bonds_domain_raw parameters error kappa_handler handler
           let error =
             Site_graphs.KaSa_site_graph.print log parameters error pattern
           in
-          let error, handler =
-            print_guard_mvbdu parameters error handler kappa_handler mvbdu
+          let error, bdu_handler =
+            print_guard_mvbdu parameters error bdu_handler kappa_handler mvbdu
               restriction_bdu
           in
-          error, handler, true)
-        (error, handler, false) pair_list
+          error, bdu_handler, true)
+        (error, bdu_handler, false)
+        pair_list
     in
     let () =
       if final_result then (
@@ -412,12 +413,12 @@ let print_site_across_bonds_domain_raw parameters error kappa_handler handler
         Loggers.print_newline log
       )
     in
-    error, handler
+    error, bdu_handler
 
 let print_site_across_bonds_domain_natural_language parameters error
-    kappa_handler handler log pair_list nsites prefix site1 site2 site1' agent1
-    site2' agent2 agent_type1 site_type1 agent_type2 site_type2 restriction_bdu
-    =
+    kappa_handler bdu_handler log pair_list nsites prefix site1 site2 site1'
+    agent1 site2' agent2 agent_type1 site_type1 agent_type2 site_type2
+    restriction_bdu =
   let () =
     Loggers.fprintf log
       "%sWhenever the site %s of %s and the site %s of %s are bound together, \
@@ -428,7 +429,7 @@ let print_site_across_bonds_domain_natural_language parameters error
   let () = Loggers.print_newline log in
   let prefix = prefix ^ "\t" in
   List.fold_left
-    (fun (error, handler) (l, mvbdu) ->
+    (fun (error, bdu_handler) (l, mvbdu) ->
       let () = Loggers.fprintf log "%s" prefix in
       let error, _ =
         List.fold_left
@@ -461,17 +462,17 @@ let print_site_across_bonds_domain_natural_language parameters error
             error, true)
           (error, false) l
       in
-      let error, handler =
-        print_guard_mvbdu parameters error handler kappa_handler mvbdu
+      let error, bdu_handler =
+        print_guard_mvbdu parameters error bdu_handler kappa_handler mvbdu
           restriction_bdu
       in
       let () = Loggers.print_newline log in
-      error, handler)
-    (error, handler) pair_list
+      error, bdu_handler)
+    (error, bdu_handler) pair_list
 
 let print_site_across_bonds_domain ?verbose:(_verbose = true) ?(sparse = false)
     ?(final_result = false) ?dump_any:(_dump_any = false) parameters error
-    kappa_handler handler tuple mvbdu restriction_bdu =
+    kappa_handler bdu_handler tuple mvbdu restriction_bdu =
   let prefix = Remanent_parameters.get_prefix parameters in
   let log = Remanent_parameters.get_logger parameters in
   let nsites = Handler.get_nsites kappa_handler in
@@ -485,33 +486,33 @@ let print_site_across_bonds_domain ?verbose:(_verbose = true) ?(sparse = false)
     convert_tuple parameters error kappa_handler tuple
   in
   if sparse && compare (agent1, site1, site1') (agent2, site2, site2') > 0 then
-    error, handler
+    error, bdu_handler
   else (
     (*only print the final_result in the case of final_result is set true*)
-    let error, handler, non_relational =
+    let error, bdu_handler, non_relational =
       if final_result then
         (*at the final result needs to check the non_relational condition*)
-        Translation_in_natural_language.non_relational parameters handler error
-          mvbdu
+        Translation_in_natural_language.non_relational parameters bdu_handler
+          error mvbdu
       else
         (*other cases will by pass this test*)
-        error, handler, false
+        error, bdu_handler, false
     in
     if non_relational then
-      error, handler
+      error, bdu_handler
     else (
       (*----------------------------------------------------*)
-      let error, handler, is_true =
-        Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
+      let error, bdu_handler, is_true =
+        Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
           restriction_bdu
       in
       if is_true then
-        error, handler
+        error, bdu_handler
       else (
         let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
-        let error, handler, pair_list =
-          Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters handler
-            error ~threshold mvbdu
+        let error, bdu_handler, pair_list =
+          Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters
+            bdu_handler error ~threshold mvbdu
         in
         (*----------------------------------------------------*)
         match Remanent_parameters.get_backend_mode parameters with
@@ -530,13 +531,13 @@ let print_site_across_bonds_domain ?verbose:(_verbose = true) ?(sparse = false)
               agent_id1 site_type1 agent_id2 site_type2 pattern
           in
           print_site_across_bonds_domain_raw parameters error kappa_handler
-            handler log final_result pair_list nsites agent_id1 site_type1'
+            bdu_handler log final_result pair_list nsites agent_id1 site_type1'
             agent_id2 site_type2' pattern restriction_bdu
         | Remanent_parameters_sig.Natural_language ->
           print_site_across_bonds_domain_natural_language parameters error
-            kappa_handler handler log pair_list nsites prefix site1 site2 site1'
-            agent1 site2' agent2 agent_type1 site_type1 agent_type2 site_type2
-            restriction_bdu
+            kappa_handler bdu_handler log pair_list nsites prefix site1 site2
+            site1' agent1 site2' agent2 agent_type1 site_type1 agent_type2
+            site_type2 restriction_bdu
       )
     )
   )
@@ -555,32 +556,32 @@ let get_mvbdu_from_tuple_pair parameters error tuple bdu_false store_value =
   in
   error, mvbdu_value
 
-let add_link parameter error bdu_false handler kappa_handler pair mvbdu
+let add_link parameter error bdu_false bdu_handler kappa_handler pair mvbdu
     store_result restriction_mvbdu =
   let error, bdu_old =
     get_mvbdu_from_tuple_pair parameter error pair bdu_false store_result
   in
   (*-----------------------------------------------------------*)
   (*new bdu, union*)
-  let error, handler, new_bdu =
-    Ckappa_sig.Views_bdu.mvbdu_or parameter handler error bdu_old mvbdu
+  let error, bdu_handler, new_bdu =
+    Ckappa_sig.Views_bdu.mvbdu_or parameter bdu_handler error bdu_old mvbdu
   in
   (*print each step*)
-  let error, handler =
+  let error, bdu_handler =
     if Remanent_parameters.get_dump_reachability_analysis_diff parameter then (
       let parameter =
         Remanent_parameters.update_prefix parameter "                "
       in
       print_site_across_bonds_domain ~verbose:false ~dump_any:true parameter
-        error kappa_handler handler pair mvbdu restriction_mvbdu
+        error kappa_handler bdu_handler pair mvbdu restriction_mvbdu
     ) else
-      error, handler
+      error, bdu_handler
   in
   let error, store_result =
     PairAgentSitesState_map_and_set.Map.add_or_overwrite parameter error pair
       new_bdu store_result
   in
-  error, handler, store_result
+  error, bdu_handler, store_result
 
 let add_sites_from_tuples parameters error tuple modified_sites =
   let (agent, site1, site2, _), (agent', site1', site2', _) = tuple in
@@ -590,37 +591,37 @@ let add_sites_from_tuples parameters error tuple modified_sites =
     (error, modified_sites)
     [ agent, site1; agent, site2; agent', site1'; agent', site2' ]
 
-let check parameters error bdu_false handler pair mvbdu store_result =
+let check parameters error bdu_false bdu_handler pair mvbdu store_result =
   let error, bdu_old =
     get_mvbdu_from_tuple_pair parameters error pair bdu_false store_result
   in
-  let error, handler, new_bdu =
-    Ckappa_sig.Views_bdu.mvbdu_and parameters handler error bdu_old mvbdu
+  let error, bdu_handler, new_bdu =
+    Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu_old mvbdu
   in
   if Ckappa_sig.Views_bdu.equal new_bdu bdu_false then
-    error, handler, false
+    error, bdu_handler, false
   else
-    error, handler, true
+    error, bdu_handler, true
 
-let add_link_and_check parameter error bdu_false handler kappa_handler bool
+let add_link_and_check parameter error bdu_false bdu_handler kappa_handler bool
     dump_title x mvbdu modified_sites store_result restriction_mvbdu =
   let error, bdu_old =
     get_mvbdu_from_tuple_pair parameter error x bdu_false store_result
   in
   (*-----------------------------------------------------------*)
   (*new bdu, union*)
-  let error, handler, new_bdu =
-    Ckappa_sig.Views_bdu.mvbdu_or parameter handler error bdu_old mvbdu
+  let error, bdu_handler, new_bdu =
+    Ckappa_sig.Views_bdu.mvbdu_or parameter bdu_handler error bdu_old mvbdu
   in
   (*-----------------------------------------------------------*)
   (*check the freshness of the pair*)
   (*compare mvbdu and old mvbdu*)
   if Ckappa_sig.Views_bdu.equal new_bdu bdu_old then
-    error, bool, handler, modified_sites, store_result
+    error, bool, bdu_handler, modified_sites, store_result
   else (
     (*-----------------------------------------------------------*)
     (*print each step*)
-    let error, handler =
+    let error, bdu_handler =
       if Remanent_parameters.get_dump_reachability_analysis_diff parameter then (
         let parameter = Remanent_parameters.update_prefix parameter "\t\t" in
         let () =
@@ -630,9 +631,9 @@ let add_link_and_check parameter error bdu_false handler kappa_handler bool
             dump_title ()
         in
         print_site_across_bonds_domain ~verbose:false ~dump_any:true parameter
-          error kappa_handler handler x mvbdu restriction_mvbdu
+          error kappa_handler bdu_handler x mvbdu restriction_mvbdu
       ) else
-        error, handler
+        error, bdu_handler
     in
     let error, store_result =
       PairAgentSitesState_map_and_set.Map.add_or_overwrite parameter error x
@@ -644,5 +645,5 @@ let add_link_and_check parameter error bdu_false handler kappa_handler bool
     let error =
       Exception.check_point Exception.warn parameter error error' __POS__ Exit
     in
-    error, true, handler, modified_sites, store_result
+    error, true, bdu_handler, modified_sites, store_result
   )

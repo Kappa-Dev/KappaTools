@@ -235,7 +235,7 @@ let store_update parameters log_info error store_test_modification_map
 (*compute dual in contact map to be used to check the bond in the pattern
   (lhs)*)
 
-let collect_dual_map parameters error handler store_result =
+let collect_dual_map parameters error kappa_handler store_result =
   let error, store_result =
     Ckappa_sig
     .Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
@@ -278,7 +278,7 @@ let collect_dual_map parameters error handler store_result =
             new_set store_result
         in
         error, store_result)
-      handler.Cckappa_sig.dual store_result
+      kappa_handler.Cckappa_sig.dual store_result
   in
   error, store_result
 

@@ -185,7 +185,7 @@ type local_influence_map_blackboard = {
 type ('static, 'dynamic) state = {
   parameters: Remanent_parameters_sig.parameters;
   log_info: StoryProfiling.StoryStats.log_info;
-  handler: Cckappa_sig.kappa_handler option;
+  kappa_handler: Cckappa_sig.kappa_handler option;
   init: init;
   env: Model.t option option;
   contact_map_int: Contact_map.t option option;
@@ -226,7 +226,7 @@ type ('static, 'dynamic) state = {
 }
 
 let get_data state =
-  ( state.handler,
+  ( state.kappa_handler,
     state.dead_rules,
     state.separating_transitions,
     state.transition_system_length )
@@ -248,7 +248,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
   {
     parameters;
     log_info = StoryProfiling.StoryStats.init_log_info ();
-    handler = None;
+    kappa_handler = None;
     init;
     env;
     contact_map_int = None;
@@ -455,7 +455,8 @@ let of_json = function
       with Not_found ->
         raise
           (Yojson.Basic.Util.Type_error
-             (JsonUtil.exn_msg_cant_import_from_json "no error handler", json))
+             ( JsonUtil.exn_msg_cant_import_from_json "no error kappa_handler",
+               json ))
     in
     let contact_maps =
       try
@@ -521,8 +522,11 @@ let set_compilation compilation state =
   { state with compilation = Some compilation }
 
 let get_compilation state = state.compilation
-let set_handler handler state = { state with handler = Some handler }
-let get_handler state = state.handler
+
+let set_handler kappa_handler state =
+  { state with kappa_handler = Some kappa_handler }
+
+let get_handler state = state.kappa_handler
 let set_c_compil c_compil state = { state with c_compil = Some c_compil }
 let get_c_compil state = state.c_compil
 

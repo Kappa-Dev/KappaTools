@@ -215,11 +215,11 @@ module Domain = struct
   let get_mvbdu_handler dynamic =
     Analyzer_headers.get_mvbdu_handler (get_global_dynamic_information dynamic)
 
-  let set_mvbdu_handler handler dynamic =
+  let set_mvbdu_handler bdu_handler dynamic =
     {
       dynamic with
       global =
-        Analyzer_headers.set_mvbdu_handler handler
+        Analyzer_headers.set_mvbdu_handler bdu_handler
           (get_global_dynamic_information dynamic);
     }
 
@@ -242,12 +242,12 @@ module Domain = struct
     error, set_mvbdu_handler bdu_handler dynamic, precondition
 
   let get_bdu_guard parameters dynamic error guard_mvbdus rule_id =
-    let handler = get_mvbdu_handler dynamic in
-    let error, handler, bdu_guard =
-      Bdu_static_views.get_bdu_guard guard_mvbdus rule_id parameters handler
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, bdu_guard =
+      Bdu_static_views.get_bdu_guard guard_mvbdus rule_id parameters bdu_handler
         error
     in
-    let dynamic = set_mvbdu_handler handler dynamic in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, bdu_guard
 
   let get_value dynamic = (get_local_dynamic_information dynamic).store_value

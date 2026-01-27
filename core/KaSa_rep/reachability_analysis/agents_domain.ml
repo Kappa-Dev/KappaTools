@@ -86,11 +86,11 @@ module Domain = struct
   let get_mvbdu_handler dynamic =
     Analyzer_headers.get_mvbdu_handler (get_global_dynamic_information dynamic)
 
-  let set_mvbdu_handler handler dynamic =
+  let set_mvbdu_handler bdu_handler dynamic =
     {
       dynamic with
       global =
-        Analyzer_headers.set_mvbdu_handler handler
+        Analyzer_headers.set_mvbdu_handler bdu_handler
           (get_global_dynamic_information dynamic);
     }
 
@@ -113,12 +113,12 @@ module Domain = struct
     error, set_mvbdu_handler bdu_handler dynamic, precondition
 
   let get_bdu_guard parameters dynamic error guard_mvbdus rule_id =
-    let handler = get_mvbdu_handler dynamic in
-    let error, handler, bdu_guard =
-      Bdu_static_views.get_bdu_guard guard_mvbdus rule_id parameters handler
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, bdu_guard =
+      Bdu_static_views.get_bdu_guard guard_mvbdus rule_id parameters bdu_handler
         error
     in
-    let dynamic = set_mvbdu_handler handler dynamic in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, bdu_guard
 
   (** dead rule local dynamic information*)
@@ -564,12 +564,12 @@ module Domain = struct
     let error, dynamic, guard_bdu =
       get_bdu_guard parameters dynamic error guard_mvbdus rule_id
     in
-    let error, handler, guard_bdu_inter =
+    let error, bdu_handler, guard_bdu_inter =
       Ckappa_sig.mvbdu_and_for_guards parameters
         (get_mvbdu_handler dynamic)
         error guard_bdu state_guard_parameters
     in
-    let dynamic = set_mvbdu_handler handler dynamic in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     match bot_or_not with
     | Usual_domains.Bot -> error, dynamic, None
     | Usual_domains.Not_bot l ->
@@ -746,7 +746,7 @@ module Domain = struct
     let error, dynamic, result =
       get_seen_agent_without_working_set_vars parameters error static dynamic
     in
-    let handler = get_kappa_handler static in
+    let kappa_handler = get_kappa_handler static in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
       let error, bool =
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
@@ -796,7 +796,7 @@ module Domain = struct
                  error, dynamic
                else (
                  let error', agent_string =
-                   try Handler.string_of_agent parameters error handler k
+                   try Handler.string_of_agent parameters error kappa_handler k
                    with _ ->
                      Exception.warn parameters error __POS__ Exit
                        (Ckappa_sig.string_of_agent_name k)
@@ -822,8 +822,8 @@ module Domain = struct
                      in
                      let bdu_handler = get_mvbdu_handler dynamic in
                      let error, bdu_handler, f =
-                       Handler.mvbdu_to_string_formula parameters error handler
-                         bdu_handler mvbdu (*restriction_bdu*)
+                       Handler.mvbdu_to_string_formula parameters error
+                         kappa_handler bdu_handler mvbdu (*restriction_bdu*)
                      in
                      let () = Handler.print_formula parameters f in
                      let dynamic = set_mvbdu_handler bdu_handler dynamic in

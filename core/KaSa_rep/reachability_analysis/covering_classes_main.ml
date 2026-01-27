@@ -200,8 +200,8 @@ let scan_rule_covering_classes parameters error kappa_handler rule classes =
 (***************************************************************************)
 (*RULES*)
 
-let scan_rule_set_covering_classes parameters error handler rules =
-  let n_agents = handler.Cckappa_sig.nagents in
+let scan_rule_set_covering_classes parameters error kappa_handler rules =
+  let n_agents = kappa_handler.Cckappa_sig.nagents in
   let error, init_modif_map =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif
     .create_biggest_key parameters error n_agents
@@ -218,7 +218,7 @@ let scan_rule_set_covering_classes parameters error handler rules =
         Ckappa_sig.Dictionary_of_sites.fold
           (fun _ _ b (error, init_class) ->
             let error, bool =
-              Handler.is_counter parameters error handler agent_type b
+              Handler.is_counter parameters error kappa_handler agent_type b
             in
             if bool then
               error, init_class
@@ -235,7 +235,7 @@ let scan_rule_set_covering_classes parameters error handler rules =
                 parameters error agent_type l' init_class
             ))
           b (error, init_class))
-      handler.Cckappa_sig.sites init_class
+      kappa_handler.Cckappa_sig.sites init_class
   in
   (*-----------------------------------------------------------------------*)
   (*init state of covering class*)
@@ -251,7 +251,7 @@ let scan_rule_set_covering_classes parameters error handler rules =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
       (fun parameters error _rule_id rule classes ->
         let error, result =
-          scan_rule_covering_classes parameters error handler
+          scan_rule_covering_classes parameters error kappa_handler
             rule.Cckappa_sig.e_rule_c_rule classes
         in
         error, result)
@@ -445,14 +445,14 @@ let clean_classes parameters error covering_classes modified_map
 (*-------------------------------------------------------------------------*)
 (*compute covering classes in the set of rules*)
 
-let scan_rule_set_remanent parameters error handler rules =
+let scan_rule_set_remanent parameters error kappa_handler rules =
   (*create a new initial state to store after cleaning the covering classes*)
   let error, init_result =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
       parameters error 0
   in
   let error, store_covering_classes =
-    scan_rule_set_covering_classes parameters error handler rules
+    scan_rule_set_covering_classes parameters error kappa_handler rules
   in
   let result_covering_classes =
     store_covering_classes.Covering_classes_type.store_covering_classes
@@ -476,7 +476,7 @@ let scan_rule_set_remanent parameters error handler rules =
         (*clean the covering classes, removed duplicate of covering classes*)
         let error, store_remanent_dic =
           clean_classes parameters error covering_class modified_map
-            (Handler.get_nr_guard_parameters handler)
+            (Handler.get_nr_guard_parameters kappa_handler)
         in
         (*---------------------------------------------------------------*)
         (*compute the number of covering classes*)
@@ -491,7 +491,7 @@ let scan_rule_set_remanent parameters error handler rules =
           if Remanent_parameters.get_dump_site_dependencies parameters then (
             let parameters = Remanent_parameters.update_prefix parameters "" in
             let error, agent_string =
-              Handler.string_of_agent parameters error handler agent_type
+              Handler.string_of_agent parameters error kappa_handler agent_type
             in
             let _ =
               Covering_classes_type.Dictionary_of_List_sites_or_guard.iter
@@ -518,7 +518,7 @@ let scan_rule_set_remanent parameters error handler rules =
                       (fun error site_type ->
                         let error, site_string =
                           Handler.string_of_site_or_guard parameters error
-                            handler agent_type site_type
+                            kappa_handler agent_type site_type
                         in
                         let () =
                           match site_type with
@@ -556,10 +556,11 @@ let scan_rule_set_remanent parameters error handler rules =
 (**************************************************************************)
 (*MAIN*)
 
-let covering_classes parameters error handler cc_compil =
+let covering_classes parameters error kappa_handler cc_compil =
   let parameters = Remanent_parameters.update_prefix parameters "agent_type:" in
   let error, result =
-    scan_rule_set_remanent parameters error handler cc_compil.Cckappa_sig.rules
+    scan_rule_set_remanent parameters error kappa_handler
+      cc_compil.Cckappa_sig.rules
   in
   error, result
 

@@ -252,13 +252,13 @@ let collect_agent_name_from_pattern parameters error pattern store_result =
 (*Side effects*)
 (**************************************************************************)
 
-let get_last_entry_in_state_dic parameters error (agent_type, site_type) handler
-    =
+let get_last_entry_in_state_dic parameters error (agent_type, site_type)
+    kappa_handler =
   let error, state_dic =
     Misc_sa.unsome
       (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
        .get parameters error (agent_type, site_type)
-         handler.Cckappa_sig.states_dic)
+         kappa_handler.Cckappa_sig.states_dic)
       (fun error ->
         Exception.warn parameters error __POS__ Exit
           (Ckappa_sig.Dictionary_of_States.init ()))
@@ -268,7 +268,7 @@ let get_last_entry_in_state_dic parameters error (agent_type, site_type) handler
   in
   error, last_entry
 
-let get_states_in_handler parameter error add handler state_op =
+let get_states_in_handler parameter error add kappa_handler state_op =
   let agent_type = add.Cckappa_sig.agent_type in
   let site_type = add.Cckappa_sig.site in
   (*state*)
@@ -277,7 +277,7 @@ let get_states_in_handler parameter error add handler state_op =
     | None ->
       let error, last_entry =
         get_last_entry_in_state_dic parameter error (agent_type, site_type)
-          handler
+          kappa_handler
       in
       error, (Some Ckappa_sig.dummy_state_index_1, Some last_entry)
     | Some interval ->
@@ -285,7 +285,8 @@ let get_states_in_handler parameter error add handler state_op =
   in
   error, (state_min, state_max)
 
-let half_break_action parameters error handler rule_id half_break store_result =
+let half_break_action parameters error kappa_handler rule_id half_break
+    store_result =
   (*module (agent_type, site) -> (rule_id, binding_state) list*)
   let error, store_result =
     List.fold_left
@@ -295,7 +296,8 @@ let half_break_action parameters error handler rule_id half_break store_result =
         let site_type = site_address.Cckappa_sig.site in
         (*state*)
         let error, (state_min, state_max) =
-          get_states_in_handler parameters error site_address handler state_op
+          get_states_in_handler parameters error site_address kappa_handler
+            state_op
         in
         (*-------------------------------------------------------------------*)
         (*return result*)
@@ -344,12 +346,12 @@ let remove_action parameters error rule_id remove store_result =
   in
   error, store_result
 
-let collect_side_effects parameter error handler rule_id half_break remove
+let collect_side_effects parameter error kappa_handler rule_id half_break remove
     store_result =
   let store_half_break_action, store_remove_action = store_result in
   (*if there is a half_break action*)
   let error, store_half_break_action =
-    half_break_action parameter error handler rule_id half_break
+    half_break_action parameter error kappa_handler rule_id half_break
       store_half_break_action
   in
   (*if there is a remove action*)
@@ -361,10 +363,10 @@ let collect_side_effects parameter error handler rule_id half_break remove
 (****************************************************************************)
 (*return a potential sites of side effects in the case of half break action*)
 
-let collect_potential_free_and_bind parameter error handler rule_id
+let collect_potential_free_and_bind parameter error kappa_handler rule_id
     (agent_id, agent_type, site_type) k store_result =
   (*potential partner*)
-  match Handler.dual parameter error handler agent_type site_type k with
+  match Handler.dual parameter error kappa_handler agent_type site_type k with
   | error, None -> error, store_result
   | error, Some (agent_type2, site2, state2) ->
     let error, store_potential_free =
@@ -383,7 +385,7 @@ let collect_potential_free_and_bind parameter error handler rule_id
     in
     error, (store_potential_free, store_potential_bind)
 
-let get_potential_partner parameter error handler rule_id
+let get_potential_partner parameter error kappa_handler rule_id
     (agent_id, agent_type, site_type) (state_min, state_max) store_result =
   let error, state_min =
     match state_min with
@@ -403,7 +405,7 @@ let get_potential_partner parameter error handler rule_id
     else (
       (*potential partner*)
       let error, (store_potential_free, store_potential_bind) =
-        collect_potential_free_and_bind parameter error handler rule_id
+        collect_potential_free_and_bind parameter error kappa_handler rule_id
           (agent_id, agent_type, site_type)
           k store_result
       in
@@ -414,7 +416,7 @@ let get_potential_partner parameter error handler rule_id
   in
   aux state_min (error, store_result)
 
-let store_potential_half_break parameter error handler rule_id half_break
+let store_potential_half_break parameter error kappa_handler rule_id half_break
     store_result =
   List.fold_left
     (fun (error, store_result) (add, state_op) ->
@@ -423,18 +425,19 @@ let store_potential_half_break parameter error handler rule_id half_break
       let site_type = add.Cckappa_sig.site in
       (*state*)
       let error, (state_min, state_max) =
-        get_states_in_handler parameter error add handler state_op
+        get_states_in_handler parameter error add kappa_handler state_op
       in
       (*--------------------------------------------------------------------*)
       let error, store_result =
-        get_potential_partner parameter error handler rule_id
+        get_potential_partner parameter error kappa_handler rule_id
           (agent_index, agent_type, site_type)
           (state_min, state_max) store_result
       in
       error, store_result)
     (error, store_result) half_break
 
-let store_potential_remove parameter error handler rule_id remove store_result =
+let store_potential_remove parameter error kappa_handler rule_id remove
+    store_result =
   List.fold_left
     (fun (error, store_result) (agent_index, agent, list_undoc) ->
       let agent_type = agent.Cckappa_sig.agent_name in
@@ -442,17 +445,17 @@ let store_potential_remove parameter error handler rule_id remove store_result =
         List.fold_left
           (fun (error, store_result) site_type ->
             let error, is_binding =
-              Handler.is_binding_site parameter error handler agent_type
+              Handler.is_binding_site parameter error kappa_handler agent_type
                 site_type
             in
             if is_binding then (
               let error, last_entry =
                 get_last_entry_in_state_dic parameter error
-                  (agent_type, site_type) handler
+                  (agent_type, site_type) kappa_handler
               in
               (*-----------------------------------------------------------*)
               let error, store_result =
-                get_potential_partner parameter error handler rule_id
+                get_potential_partner parameter error kappa_handler rule_id
                   (agent_index, agent_type, site_type)
                   (Some Ckappa_sig.dummy_state_index_1, Some last_entry)
                   store_result
@@ -493,15 +496,15 @@ let combine_half_break_and_remove parameter error fst_or_snd_store_result_hb
       error, store_result)
     fst_or_snd_store_result_hb fst_or_snd_store_result_remove store_result_map
 
-let collect_potential_side_effects_free parameter error handler rule_id
+let collect_potential_side_effects_free parameter error kappa_handler rule_id
     half_break remove store_result_map =
   let error, store_result_hb =
-    store_potential_half_break parameter error handler rule_id half_break
+    store_potential_half_break parameter error kappa_handler rule_id half_break
       ( Ckappa_sig.AgentRule_map_and_set.Map.empty,
         Ckappa_sig.AgentRule_map_and_set.Map.empty )
   in
   let error, store_result_remove =
-    store_potential_remove parameter error handler rule_id remove
+    store_potential_remove parameter error kappa_handler rule_id remove
       ( Ckappa_sig.AgentRule_map_and_set.Map.empty,
         Ckappa_sig.AgentRule_map_and_set.Map.empty )
   in
@@ -509,15 +512,15 @@ let collect_potential_side_effects_free parameter error handler rule_id
   combine_half_break_and_remove parameter error (fst store_result_hb)
     (fst store_result_remove) store_result_map
 
-let collect_potential_side_effects_bind parameter error handler rule_id
+let collect_potential_side_effects_bind parameter error kappa_handler rule_id
     half_break remove store_result_map =
   let error, store_result_hb =
-    store_potential_half_break parameter error handler rule_id half_break
+    store_potential_half_break parameter error kappa_handler rule_id half_break
       ( Ckappa_sig.AgentRule_map_and_set.Map.empty,
         Ckappa_sig.AgentRule_map_and_set.Map.empty )
   in
   let error, store_result_remove =
-    store_potential_remove parameter error handler rule_id remove
+    store_potential_remove parameter error kappa_handler rule_id remove
       ( Ckappa_sig.AgentRule_map_and_set.Map.empty,
         Ckappa_sig.AgentRule_map_and_set.Map.empty )
   in
@@ -525,10 +528,10 @@ let collect_potential_side_effects_bind parameter error handler rule_id
   combine_half_break_and_remove parameter error (snd store_result_hb)
     (snd store_result_remove) store_result_map
 
-let collect_potential_side_effects parameter error handler rule_id half_break
-    remove store_result =
+let collect_potential_side_effects parameter error kappa_handler rule_id
+    half_break remove store_result =
   let error, store_result =
-    collect_potential_side_effects_bind parameter error handler rule_id
+    collect_potential_side_effects_bind parameter error kappa_handler rule_id
       half_break remove store_result
   in
   error, store_result
@@ -731,8 +734,8 @@ let scan_rule_binding_views parameter error rule_id rule store_result =
 (*VIEWS*)
 (***************************************************************************)
 
-let collect_views_pattern_aux ?(init = false) parameter handler error views
-    store_result =
+let collect_views_pattern_aux ?(init = false) parameter kappa_handler error
+    views store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter
       error
@@ -750,8 +753,8 @@ let collect_views_pattern_aux ?(init = false) parameter handler error views
           Exception.warn parameter error __POS__ Exit store_result
         | Cckappa_sig.Dead_agent (agent, _, _, _) | Cckappa_sig.Agent agent ->
           let error, site_map =
-            Common_map.collect_site_map_for_views ~init parameter handler error
-              agent
+            Common_map.collect_site_map_for_views ~init parameter kappa_handler
+              error agent
           in
           let error, store_result =
             Ckappa_sig.Agent_id_map_and_set.Map.add parameter error agent_id
@@ -785,13 +788,13 @@ let collect_test_sites parameters error rule_id viewslhs store_result =
   in
   error, store_result
 
-let collect_views_aux parameter handler error rule_id views store_result =
+let collect_views_aux parameter kappa_handler error rule_id views store_result =
   let error, old_map =
     Common_map.get_rule_id_map_and_set parameter error rule_id
       Ckappa_sig.Agent_id_map_and_set.Map.empty store_result
   in
   let error, map =
-    collect_views_pattern_aux parameter handler error views old_map
+    collect_views_pattern_aux parameter kappa_handler error views old_map
   in
   let error, store_result =
     Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id map
@@ -799,21 +802,21 @@ let collect_views_aux parameter handler error rule_id views store_result =
   in
   error, store_result
 
-let collect_views_lhs parameter handler error rule_id rule store_result =
-  collect_views_aux parameter handler error rule_id
+let collect_views_lhs parameter kappa_handler error rule_id rule store_result =
+  collect_views_aux parameter kappa_handler error rule_id
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.views store_result
 
-let collect_views_rhs parameter handler error rule_id rule store_result =
-  collect_views_aux parameter handler error rule_id
+let collect_views_rhs parameter kappa_handler error rule_id rule store_result =
+  collect_views_aux parameter kappa_handler error rule_id
     rule.Cckappa_sig.rule_rhs.Cckappa_sig.views store_result
 
-let scan_rule_test parameters handler error rule_id rule store_result =
+let scan_rule_test parameters kappa_handler error rule_id rule store_result =
   let error, store_views_rhs =
-    collect_views_rhs parameters handler error rule_id rule
+    collect_views_rhs parameters kappa_handler error rule_id rule
       store_result.store_views_rhs
   in
   let error, store_views_lhs =
-    collect_views_lhs parameters handler error rule_id rule
+    collect_views_lhs parameters kappa_handler error rule_id rule
       store_result.store_views_lhs
   in
   let error, store_test_sites =
