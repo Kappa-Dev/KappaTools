@@ -378,48 +378,6 @@ let keep_head_only allocate memoized_fun bdu_true handler error parameters
       in
       aux handler error mvbdu_input)
 
-let keep_until allocate memoized_fun bdu_true handler error parameters
-    ((var_ref : int), (mvbdu_input : 'mvbdu)) =
-  match
-    memoized_fun.Memo_sig.get parameters error handler (var_ref, mvbdu_input)
-  with
-  | error, (handler, Some output) -> error, (handler, Some output)
-  | error, (handler, None) ->
-    let rec aux handler error mvbdu =
-      match mvbdu.Mvbdu_sig.value with
-      | Mvbdu_sig.Node x when x.Mvbdu_sig.variable < var_ref ->
-        let error, (handler, b_true) =
-          aux handler error x.Mvbdu_sig.branch_true
-        in
-        let error, (handler, b_false) =
-          aux handler error x.Mvbdu_sig.branch_false
-        in
-        (match b_true, b_false with
-        | Some b_true, Some b_false ->
-          (match
-             Mvbdu_core.compress_node allocate error handler
-               (Mvbdu_sig.Node
-                  {
-                    x with
-                    Mvbdu_sig.branch_true = b_true;
-                    Mvbdu_sig.branch_false = b_false;
-                  })
-           with
-          | error, None ->
-            Exception.warn parameters error __POS__ Exit (handler, None)
-          | error, Some (_, _, bdu, handler) -> error, (handler, Some bdu))
-        | None, _ | _, None -> error, (handler, None))
-      | Mvbdu_sig.Leaf _ -> error, (handler, Some mvbdu)
-      | Mvbdu_sig.Node _ ->
-        let error, (handler, output) =
-          bdu_true parameters handler error parameters
-        in
-        (match output with
-        | None -> Exception.warn parameters error __POS__ Exit (handler, None)
-        | Some a -> error, (handler, Some a))
-    in
-    aux handler error mvbdu_input
-
 let rec redefine_range allocate memoized_fun error parameters handler
     mvbdu_input list_input =
   match

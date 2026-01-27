@@ -56,7 +56,6 @@ type memo_tables = {
   boolean_mvbdu_width: int Hash_1.t;
   boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
   boolean_mvbdu_keep_head_only_with_threshold: bool Mvbdu_sig.mvbdu Hash_2.t;
-  boolean_mvbdu_keep_until: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_redefine: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_redefine_range: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_monotonicaly_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
@@ -300,18 +299,6 @@ val memo_keep_head_only :
   Memo_sig.unary_memoized_fun
 
 val memo_keep_head_only_with_threshold :
-  ( bool,
-    mvbdu_dic,
-    association_list_dic,
-    range_list_dic,
-    variables_list_dic,
-    'a,
-    memo_tables,
-    'b,
-    bool Mvbdu_sig.mvbdu )
-  Memo_sig.unary_with_threshold_memoized_fun
-
-val memo_keep_until :
   ( bool,
     mvbdu_dic,
     association_list_dic,
@@ -723,15 +710,6 @@ val keep_head_only_with_threshold :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   handler ->
   threshold:int ->
-  bool Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.exceptions_caught_and_uncaught
-  * (handler * bool Mvbdu_sig.mvbdu option)
-
-val keep_until :
-  Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught ->
-  handler ->
-  int ->
   bool Mvbdu_sig.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (handler * bool Mvbdu_sig.mvbdu option)

@@ -214,43 +214,6 @@ val keep_head_only_with_threshold :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
-val keep_until :
-  (Exception_without_parameter.exceptions_caught_and_uncaught ->
-  ('a -> 'a -> int) ->
-  ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
-  'c Mvbdu_sig.cell ->
-  (int -> 'c Mvbdu_sig.mvbdu) ->
-  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
-  Exception_without_parameter.exceptions_caught_and_uncaught
-  * (int
-    * 'c Mvbdu_sig.cell
-    * 'c Mvbdu_sig.mvbdu
-    * ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler)
-    option) ->
-  ( 'c,
-    'e,
-    'f,
-    'g,
-    'h,
-    'j,
-    int * 'c Mvbdu_sig.mvbdu,
-    'd,
-    'i,
-    'c Mvbdu_sig.mvbdu )
-  Memo_sig.memoized_fun ->
-  (Remanent_parameters_sig.parameters ->
-  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
-  Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught
-  * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)) ->
-  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
-  Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Remanent_parameters_sig.parameters ->
-  int * 'c Mvbdu_sig.mvbdu ->
-  Exception_without_parameter.exceptions_caught_and_uncaught
-  * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
-
 val redefine_range :
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
