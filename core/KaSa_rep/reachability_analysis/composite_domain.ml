@@ -578,12 +578,9 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     lift_unary Domain.export static dynamic error kasa_state
 
   let print static dynamic error loggers =
-    let dead_rules =
-      Domain.get_dead_rules
-        (get_domain_static_information static)
-        dynamic.domain
-    in
-    lift_unary (Domain.print ~dead_rules) static dynamic error loggers
+    lift_unary
+      (Domain.print ~dead_rules:Domain.get_dead_rules)
+      static dynamic error loggers
 
   let maybe_reachable (static : static_information) dynamic error flag mixture =
     lift_ternary Domain.maybe_reachable static dynamic error flag mixture

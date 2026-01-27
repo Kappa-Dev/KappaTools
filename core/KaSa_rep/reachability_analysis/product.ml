@@ -278,13 +278,42 @@ module Product
       kasa_state )
 
   let print ?dead_rules static dynamic error loggers =
+    let dead_rules_und =
+      Option.map
+        (fun dead_rules static_und dynamic_und parameters error rule_id ->
+          let error, dynamic, bool =
+            dead_rules
+              { static with underlying_domain = static_und }
+              (smash_dynamic dynamic_und
+                 (new_domain_dynamic_information dynamic_und dynamic))
+              parameters error rule_id
+          in
+          error, underlying_domain_dynamic_information dynamic, bool)
+        dead_rules
+    in
     let error, underlying_domain_dynamic_information, () =
-      Underlying_domain.print ?dead_rules static.underlying_domain
+      Underlying_domain.print ?dead_rules:dead_rules_und
+        static.underlying_domain
         (underlying_domain_dynamic_information dynamic)
         error loggers
     in
+    let dead_rules_new =
+      Option.map
+        (fun d static_new dynamic_new p e r ->
+          let e, d, b =
+            d
+              { static with new_domain = static_new }
+              (smash_dynamic underlying_domain_dynamic_information dynamic_new)
+              p e r
+          in
+          ( e,
+            new_domain_dynamic_information underlying_domain_dynamic_information
+              d,
+            b ))
+        dead_rules
+    in
     let error, new_domain_dynamic_information, () =
-      New_domain.print ?dead_rules static.new_domain
+      New_domain.print ?dead_rules:dead_rules_new static.new_domain
         (new_domain_dynamic_information underlying_domain_dynamic_information
            dynamic)
         error loggers
@@ -294,21 +323,23 @@ module Product
         new_domain_dynamic_information,
       () )
 
-  let get_dead_rules static dynamic =
+  let get_dead_rules static =
     let dead_rules =
       Underlying_domain.get_dead_rules static.underlying_domain
-        (underlying_domain_dynamic_information dynamic)
     in
-    let dead_rules' =
-      New_domain.get_dead_rules static.new_domain
-        (new_domain_dynamic_information
-           (underlying_domain_dynamic_information dynamic)
-           dynamic)
-    in
-    fun parameter error r_id ->
-      let error, b1 = dead_rules parameter error r_id in
-      let error, b2 = dead_rules' parameter error r_id in
-      error, b1 || b2
+    let dead_rules' = New_domain.get_dead_rules static.new_domain in
+    fun dynamic error parameter r_id ->
+      let error, dynamic1, b1 =
+        dead_rules
+          (underlying_domain_dynamic_information dynamic)
+          error parameter r_id
+      in
+      let error, dynamic2, b2 =
+        dead_rules'
+          (new_domain_dynamic_information dynamic1 dynamic)
+          error parameter r_id
+      in
+      error, smash_dynamic dynamic1 dynamic2, b1 || b2
 
   let get_side_effects static dynamic =
     let side_effects =

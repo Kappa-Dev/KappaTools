@@ -555,23 +555,27 @@ module Domain = struct
     let error, dynamic = print_dead_rule static dynamic error in
     error, dynamic, ()
 
-  let get_dead_rules static dynamic parameters error r_id =
+  let get_dead_rules static dynamic error parameters r_id =
     let error, dynamic, dead_rules =
       get_dead_rule_without_working_set_vars parameters error static dynamic
     in
-    match
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters error r_id
-        dead_rules
-    with
-    | error, None -> Exception.warn parameters error __POS__ Exit false
-    | error, Some b ->
-      let error, _, is_false =
-        is_false_mvbdu (get_parameter static) error dynamic b
-      in
-      if is_false then
-        error, true
-      else
-        error, false
+    let error, (dynamic, bool) =
+      match
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters error
+          r_id dead_rules
+      with
+      | error, None ->
+        Exception.warn parameters error __POS__ Exit (dynamic, false)
+      | error, Some b ->
+        let error, dynamic, is_false =
+          is_false_mvbdu (get_parameter static) error dynamic b
+        in
+        if is_false then
+          error, (dynamic, true)
+        else
+          error, (dynamic, false)
+    in
+    error, dynamic, bool
 
   let get_side_effects _static _dynamic = Analyzer_headers.dummy_side_effects
 

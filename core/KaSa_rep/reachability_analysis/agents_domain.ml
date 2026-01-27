@@ -748,24 +748,24 @@ module Domain = struct
     in
     let kappa_handler = get_kappa_handler static in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
-      let error, bool =
+      let error, (bool, dynamic) =
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
           error
-          (fun _parameters error _k mvbdu bool' ->
+          (fun _parameters error _k mvbdu (bool', dynamic) ->
             if not bool' then
-              error, false
+              error, (false, dynamic)
             else (
               let restriction_bdu = get_restriction_mvbdu static in
-              let error, _, is_true =
+              let error, dynamic, is_true =
                 is_true_mvbdu parameters error dynamic mvbdu restriction_bdu
               in
               ( error,
                 if is_true then
-                  bool'
+                  bool', dynamic
                 else
-                  false )
+                  false, dynamic )
             ))
-          result true
+          result (true, dynamic)
       in
       if not bool then (
         let parameters = Remanent_parameters.update_prefix parameters "" in
@@ -784,57 +784,56 @@ module Domain = struct
             "------------------------------------------------------------"
         in
         let () = Loggers.print_newline loggers in
-        fst
-        @@ Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold
-             parameters error
-             (fun parameters error k mvbdu dynamic ->
-               let restriction_bdu = get_restriction_mvbdu static in
-               let error, dynamic, is_true =
-                 is_true_mvbdu parameters error dynamic mvbdu restriction_bdu
-               in
-               if is_true then
-                 error, dynamic
-               else (
-                 let error', agent_string =
-                   try Handler.string_of_agent parameters error kappa_handler k
-                   with _ ->
-                     Exception.warn parameters error __POS__ Exit
-                       (Ckappa_sig.string_of_agent_name k)
-                 in
-                 let error =
-                   Exception.check_point Exception.warn parameters error error'
-                     __POS__ Exit
-                 in
-                 let error, dynamic, is_false =
-                   is_false_mvbdu parameters error dynamic mvbdu
-                 in
-                 let error, dynamic =
-                   if is_false then (
-                     let () =
-                       Loggers.fprintf loggers "%s cannot occur in the model"
-                         agent_string
-                     in
-                     error, dynamic
-                   ) else (
-                     let () =
-                       Loggers.fprintf loggers "%s can occur in the model if "
-                         agent_string
-                     in
-                     let bdu_handler = get_mvbdu_handler dynamic in
-                     let error, bdu_handler, f =
-                       Handler.mvbdu_to_string_formula parameters error
-                         kappa_handler bdu_handler mvbdu (*restriction_bdu*)
-                     in
-                     let () = Handler.print_formula parameters f in
-                     let dynamic = set_mvbdu_handler bdu_handler dynamic in
-                     let () = Loggers.fprintf loggers "." in
-                     error, dynamic
-                   )
-                 in
-                 let () = Loggers.print_newline loggers in
-                 error, dynamic
-               ))
-             result dynamic
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
+          error
+          (fun parameters error k mvbdu dynamic ->
+            let restriction_bdu = get_restriction_mvbdu static in
+            let error, dynamic, is_true =
+              is_true_mvbdu parameters error dynamic mvbdu restriction_bdu
+            in
+            if is_true then
+              error, dynamic
+            else (
+              let error', agent_string =
+                try Handler.string_of_agent parameters error kappa_handler k
+                with _ ->
+                  Exception.warn parameters error __POS__ Exit
+                    (Ckappa_sig.string_of_agent_name k)
+              in
+              let error =
+                Exception.check_point Exception.warn parameters error error'
+                  __POS__ Exit
+              in
+              let error, dynamic, is_false =
+                is_false_mvbdu parameters error dynamic mvbdu
+              in
+              let error, dynamic =
+                if is_false then (
+                  let () =
+                    Loggers.fprintf loggers "%s cannot occur in the model"
+                      agent_string
+                  in
+                  error, dynamic
+                ) else (
+                  let () =
+                    Loggers.fprintf loggers "%s can occur in the model if "
+                      agent_string
+                  in
+                  let bdu_handler = get_mvbdu_handler dynamic in
+                  let error, bdu_handler, f =
+                    Handler.mvbdu_to_string_formula parameters error
+                      kappa_handler bdu_handler mvbdu (*restriction_bdu*)
+                  in
+                  let () = Handler.print_formula parameters f in
+                  let dynamic = set_mvbdu_handler bdu_handler dynamic in
+                  let () = Loggers.fprintf loggers "." in
+                  error, dynamic
+                )
+              in
+              let () = Loggers.print_newline loggers in
+              error, dynamic
+            ))
+          result dynamic
       ) else (
         let () =
           Loggers.fprintf loggers
@@ -847,14 +846,14 @@ module Domain = struct
         let () =
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
         in
-        error
+        error, dynamic
       )
     ) else
-      error
+      error, dynamic
 
   let print ?dead_rules static dynamic error loggers =
     let _ = dead_rules in
-    let error = print_dead_agent loggers static dynamic error in
+    let error, dynamic = print_dead_agent loggers static dynamic error in
     error, dynamic, ()
 
   let _lkappa_mixture_is_reachable _static dynamic error _lkappa =
@@ -863,7 +862,7 @@ module Domain = struct
   let _cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
-  let get_dead_rules _static _dynamic = Analyzer_headers.dummy_dead_rules
+  let get_dead_rules _static = Analyzer_headers.dummy_dead_rules
   let get_side_effects _static _dynamic = Analyzer_headers.dummy_side_effects
 
   let enable_or_disable_rule static dynamic error cc_compil =
