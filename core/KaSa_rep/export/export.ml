@@ -2161,15 +2161,53 @@ functor
       ) else
         Remanent_state.set_errors error state
 
-    let ws_id_from_rule_name _rule_name =
-      (*TODO find rule by string and check if it is in the working set*)
-      Ckappa_sig.working_set_index_of_int 0
+    let ws_id_from_rule_name rule_name state =
+      let error = Remanent_state.get_errors state in
+      let parameters = Remanent_state.get_parameters state in
+      let error, ws_id =
+        match
+          Remanent_state.get_handler state, Remanent_state.get_c_compil state
+        with
+        | None, _ | _, None -> Exception.warn parameters error __POS__ Exit None
+        | Some kappa_handler, Some compil ->
+          (match
+             Ckappa_sig.Rule_label_map_and_set.Map.find_option parameters error
+               rule_name kappa_handler.Cckappa_sig.rules_label_map
+           with
+          | error, None ->
+            Exception.warn parameters error __POS__
+              ~message:("There is no rule with label '" ^ rule_name ^ "'")
+              Exit None
+          | error, Some rule_id ->
+            (match
+               Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters
+                 error rule_id compil.Cckappa_sig.rules
+             with
+            | error, None -> Exception.warn parameters error __POS__ Exit None
+            | error, Some enriched_rule ->
+              (match enriched_rule.Cckappa_sig.e_rule_working_set_id with
+              | None ->
+                Exception.warn parameters error __POS__
+                  ~message:
+                    ("The rule with label '" ^ rule_name
+                   ^ "' is not in the current working set")
+                  Exit None
+              | Some ws_id -> error, Some ws_id)))
+      in
+      let state = Remanent_state.set_errors error state in
+      state, ws_id
 
-    let enable_rule name =
-      enable_or_disable_rule true (ws_id_from_rule_name name)
+    let enable_rule name state =
+      let state, ws_id = ws_id_from_rule_name name state in
+      match ws_id with
+      | None -> state
+      | Some ws_id -> enable_or_disable_rule true ws_id state
 
-    let disable_rule name =
-      enable_or_disable_rule false (ws_id_from_rule_name name)
+    let disable_rule name state =
+      let state, ws_id = ws_id_from_rule_name name state in
+      match ws_id with
+      | None -> state
+      | Some ws_id -> enable_or_disable_rule false ws_id state
 
     let enable_rule_index index =
       enable_or_disable_rule true (Ckappa_sig.working_set_index_of_int index)
