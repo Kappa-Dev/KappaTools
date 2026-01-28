@@ -244,6 +244,9 @@ let agent_id_of_int (a : int) : c_agent_id = a
 let string_of_agent_id (a : c_agent_id) : string = string_of_int a
 let string_of_c_link_value (a : c_link_value) : string = string_of_int a
 
+let string_of_working_set_index (a : c_working_set_index) : string =
+  string_of_int a
+
 let bool_of_state_index parameter error (a : c_state) =
   match a with
   | 0 -> error, false

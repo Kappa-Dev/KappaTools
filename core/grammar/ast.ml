@@ -1197,12 +1197,12 @@ let print_parsing_compil_kappa f c =
     c.sequential_bonds
 
 let print_working_set f c =
-  Format.fprintf f "@[<v>%a@,@]@."
+  Format.fprintf f "@[<v>%a@]@."
     (Pp.list Pp.space (fun f (ws_id, s, guard, (r, _)) ->
          match ws_id with
          | None -> ()
          | Some id ->
-           Format.fprintf f "@[@[%s%a%a%a@]@]"
+           Format.fprintf f "@[%s%a%a%a@]"
              (print_working_set_prefix id c.working_set_values)
              (Pp.option ~with_space:false (fun f (s, _) ->
                   Format.fprintf f "'%s'@ " s))

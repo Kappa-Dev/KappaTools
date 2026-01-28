@@ -64,68 +64,66 @@ let main () =
   let rec loop state =
     print_string "> ";
     flush stdout;
-    (* let error_message s =
-         "Invalid input: " ^ s ^ ". Please try again. Type 'help' for help."
-       in *)
-    try
-      match String.trim (read_line ()) with
-      | "quit" -> ()
-      | "help" ->
-        print_endline "TODO";
-        loop state
-      | "print rules" ->
-        let state, compilation = Export_to_KaSa.get_compilation state in
-        let log = Remanent_parameters.get_logger parameters in
-        let () =
-          Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
-        in
-        loop state
-      | "print working set" | "print ws" ->
-        let state, compilation = Export_to_KaSa.get_compilation state in
-        let log = Remanent_parameters.get_logger parameters in
-        let () = Loggers.fprintf log "%a" Ast.print_working_set compilation in
-        loop state
-      | "print result" ->
-        let state = Export_to_KaSa.output_reachability_result state in
-        loop state
-      | input ->
-        let state =
-          match parse_input input with
-          | Add _ ->
-            print_endline "TODO adding a rule was not implemented yet";
-            state
-          | Enable (false, i) ->
-            let () =
-              print_endline ("Disabling rule with label '" ^ i ^ "'...")
-            in
-            Export_to_KaSa.disable_rule i state
-          | Enable (true, i) ->
-            let () =
-              print_endline ("Enabling rule with label '" ^ i ^ "'...")
-            in
-            Export_to_KaSa.enable_rule i state
-          | Enable_index (false, i) ->
-            let () =
-              print_endline
-                ("Disabling rule at index " ^ string_of_int i ^ "...")
-            in
-            Export_to_KaSa.disable_rule_index i state
-          | Enable_index (true, i) ->
-            let () =
-              print_endline ("Enabling rule at index " ^ string_of_int i ^ "...")
-            in
-            Export_to_KaSa.enable_rule_index i state
-          | Parsing_error s ->
-            print_endline ("ERROR: Parsing error: " ^ s);
-            state
-        in
-        let error = Export_to_KaSa.get_errors state in
-        let () = Exception.print parameters error in
-        loop state
-    with e ->
-      print_endline "error TODO";
-      prerr_endline (Printexc.to_string e);
-      prerr_endline (Printexc.get_backtrace ())
+    let state =
+      Export_to_KaSa.set_errors Exception.empty_exceptions_caught_and_uncaught
+        state
+    in
+    let log = Remanent_parameters.get_logger parameters in
+    match String.trim (read_line ()) with
+    | "quit" -> ()
+    | "help" ->
+      print_endline "TODO";
+      loop state
+    | "print rules" ->
+      let state, compilation = Export_to_KaSa.get_compilation state in
+      let () =
+        Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
+      in
+      let error = Export_to_KaSa.get_errors state in
+      let () = Exception.print parameters error in
+      loop state
+    | "print working set" | "print ws" ->
+      let state, compilation = Export_to_KaSa.get_compilation state in
+      let () = Loggers.fprintf log "%a" Ast.print_working_set compilation in
+      let error = Export_to_KaSa.get_errors state in
+      let () = Exception.print parameters error in
+      loop state
+    | "print result" ->
+      let state = Export_to_KaSa.output_reachability_result state in
+      let error = Export_to_KaSa.get_errors state in
+      let () = Exception.print parameters error in
+      loop state
+    | input ->
+      let state =
+        match parse_input input with
+        | Add _ ->
+          print_endline "TODO adding a rule was not implemented yet";
+          state
+        | Enable (false, i) ->
+          let () =
+            Loggers.fprintf log "Disabling rule with label '%s'...\n" i
+          in
+          Export_to_KaSa.disable_rule i state
+        | Enable (true, i) ->
+          let () = Loggers.fprintf log "Enabling rule with label '%s'...\n" i in
+          Export_to_KaSa.enable_rule i state
+        | Enable_index (false, i) ->
+          let () = Loggers.fprintf log "Disabling rule at index %d...\n" i in
+          Export_to_KaSa.disable_rule_index i state
+        | Enable_index (true, i) ->
+          let () = Loggers.fprintf log "Enabling rule at index %d...\n" i in
+          Export_to_KaSa.enable_rule_index i state
+        | Parsing_error s ->
+          let error = Export_to_KaSa.get_errors state in
+          let error, () =
+            Exception.warn parameters error __POS__
+              ~message:("Parsing error: " ^ s) Exit ()
+          in
+          Export_to_KaSa.set_errors error state
+      in
+      let error = Export_to_KaSa.get_errors state in
+      let () = Exception.print parameters error in
+      loop state
   in
   loop state
 

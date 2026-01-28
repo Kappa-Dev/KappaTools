@@ -47,6 +47,7 @@ val string_of_c_rule_id : ?len:int -> c_rule_id -> string
 val read_c_rule_id : Yojson.Safe.lexer_state -> Lexing.lexbuf -> c_rule_id
 val c_rule_id_of_string : string -> c_rule_id
 val string_of_c_link_value : c_link_value -> string
+val string_of_working_set_index : c_working_set_index -> string
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
 val dummy_guard_parameter : c_guard_parameter
