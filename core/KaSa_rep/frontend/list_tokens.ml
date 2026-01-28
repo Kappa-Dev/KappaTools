@@ -62,6 +62,7 @@ let empty_handler parameters error =
       Cckappa_sig.states_dic;
       Cckappa_sig.dual;
       Cckappa_sig.guard_parameters_dic = Ckappa_sig.Dictionary_of_guards.init ();
+      Cckappa_sig.rules_label_map = Ckappa_sig.Rule_label_map_and_set.Map.empty;
     } )
 
 let create_binding_state_dictionary parameters error =

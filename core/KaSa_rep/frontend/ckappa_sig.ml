@@ -20,6 +20,7 @@ let _ = local_trace
 type position = Loc.t
 type agent_name = string
 type guard_name = string
+type rule_label = string
 type site_name = string
 type internal_state = string
 type counter_name = string
@@ -942,6 +943,13 @@ module MvbduVar_map_and_set = Map_wrapper.Make (SetMap.Make (struct
 
   let compare = compare
   let print = Format.pp_print_int
+end))
+
+module Rule_label_map_and_set = Map_wrapper.Make (SetMap.Make (struct
+  type t = rule_label
+
+  let compare = compare
+  let print = Format.pp_print_string
 end))
 
 type c_interface = c_port Site_map_and_set.Map.t

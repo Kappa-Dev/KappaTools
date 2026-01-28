@@ -2329,12 +2329,13 @@ let translate_c_compil parameters error handler compil =
       (List.rev c_perturbations)
   in
 
-  let convert_guard_p = Handler.guard_of_string parameters handler in
   let error, c_working_set_valuations =
     Mods.IntMap.fold
       (fun id bool (error, valuations) ->
         let guard_name = Ast.working_set_index_to_string id in
-        let error, guard_p_id = convert_guard_p guard_name error in
+        let error, guard_p_id =
+          Handler.guard_of_string parameters handler guard_name error
+        in
         let id = Ckappa_sig.working_set_index_of_int id in
         Ckappa_sig.Ws_index_map_and_set.Map.add parameters error id
           (guard_p_id, bool) valuations)
@@ -2342,8 +2343,24 @@ let translate_c_compil parameters error handler compil =
       (error, Ckappa_sig.Ws_index_map_and_set.Map.empty)
   in
 
+  let error, rule_label_to_rule_id_map =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+      (fun parameters error rule_id enriched_rule rule_label_map ->
+        match enriched_rule.Cckappa_sig.e_rule_label with
+        | None -> error, rule_label_map
+        | Some (label, _) ->
+          Ckappa_sig.Rule_label_map_and_set.Map.add parameters error label
+            rule_id rule_label_map)
+      c_rules Ckappa_sig.Rule_label_map_and_set.Map.empty
+  in
+
   ( error,
-    { handler with Cckappa_sig.nrules = n_rules; Cckappa_sig.nvars = n_vars },
+    {
+      handler with
+      Cckappa_sig.nrules = n_rules;
+      Cckappa_sig.nvars = n_vars;
+      Cckappa_sig.rules_label_map = rule_label_to_rule_id_map;
+    },
     {
       Cckappa_sig.variables = c_variables;
       Cckappa_sig.signatures = c_signatures;

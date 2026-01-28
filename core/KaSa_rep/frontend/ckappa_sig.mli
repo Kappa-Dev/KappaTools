@@ -20,6 +20,7 @@ type position = Loc.t
 type agent_name = string
 type guard_name = string
 type site_name = string
+type rule_label = string
 type internal_state = string
 type counter_name = string
 type counter_state = int
@@ -424,6 +425,9 @@ module MvbduVar_map_and_set :
 
 module GuardP_map_and_set :
   Map_wrapper.S_with_logs with type elt = c_guard_parameter
+
+module Rule_label_map_and_set :
+  Map_wrapper.S_with_logs with type elt = rule_label
 
 type c_interface = c_port Site_map_and_set.Map.t
 
