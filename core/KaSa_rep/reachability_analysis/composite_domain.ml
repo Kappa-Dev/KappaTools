@@ -87,6 +87,7 @@ module type Composite_domain = sig
     dynamic_information ->
     dynamic_information
 
+  val get_parameters : static_information -> Remanent_parameters_sig.parameters
   val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
 end
 
@@ -595,4 +596,6 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
         dynamic error cc_compil
     in
     error, dynamic, (static_global, static_domain)
+
+  let get_parameters (_, static_domain) = Domain.get_parameter static_domain
 end

@@ -61,6 +61,9 @@ type step_kind =
   | Influence_map of string
   | Internal_influence_map of string
   | LKappa_signature
+  | Reachability_analysis
+  | Print_reachability_result
+  | Enable_or_disable_rule
 
 let string_of_step_kind x =
   match x with
@@ -108,6 +111,11 @@ let string_of_step_kind x =
   | Internal_influence_map string ->
     Printf.sprintf "Influence map (internal %s)" string
   | LKappa_signature -> Printf.sprintf "LKappa signature"
+  | Reachability_analysis ->
+    Printf.sprintf "Compute fixpoint of reachability analysis"
+  | Print_reachability_result ->
+    Printf.sprintf "Print result of reachability analysis"
+  | Enable_or_disable_rule -> Printf.sprintf "Enable or disable a rule"
 
 let print_step_kind parameters x =
   Loggers.print_cell
@@ -295,7 +303,8 @@ module StoryStats : StoryStats = struct
     | KaSa_precompilation | KaSa_lexing | KaSa_linking | LKappa_signature
     | Iteration _ | Story _ | Domain_initialization _ | Apply_rule _
     | Initial_state _ | Scan_rule_static _ | Scan_rule_dynamic _
-    | Influence_map _ | Internal_influence_map _ ->
+    | Influence_map _ | Internal_influence_map _ | Reachability_analysis
+    | Print_reachability_result | Enable_or_disable_rule ->
       false
 
   let add_event parameter error step_kind f log_info =

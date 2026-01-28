@@ -72,10 +72,6 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
   type static_information = Domain.static_information
   type dynamic_information = Domain.dynamic_information
 
-  let print static dynamic error loggers =
-    let error, dynamic, () = Domain.print static dynamic error loggers in
-    error, dynamic
-
   let get_log_info dynamic =
     Analyzer_headers.get_log_info
       (Domain.get_global_dynamic_information dynamic)
@@ -95,6 +91,19 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
 
   let add_event = lift StoryProfiling.StoryStats.add_event
   let close_event = lift StoryProfiling.StoryStats.close_event
+
+  let print static dynamic error loggers =
+    let parameters = Domain.get_parameters static in
+    let error, dynamic =
+      add_event parameters error StoryProfiling.Print_reachability_result None
+        dynamic
+    in
+    let error, dynamic, () = Domain.print static dynamic error loggers in
+    let error, dynamic =
+      close_event parameters error StoryProfiling.Print_reachability_result None
+        dynamic
+    in
+    error, dynamic
 
   let main parameters log_info error mvbdu_handler compil kappa_handler =
     let error, log_info =
@@ -140,6 +149,10 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
         (error, dynamic, 1) init
     in
     let log = Remanent_parameters.get_logger parameters in
+    let error, dynamic =
+      add_event parameters error StoryProfiling.Reachability_analysis None
+        dynamic
+    in
     let error, static, dynamic =
       let rec aux error dynamic =
         let error, dynamic, next_opt = Domain.next_rule static dynamic error in
@@ -210,6 +223,10 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       aux error dynamic
     in
     let error, dynamic, () = Domain.stabilize static dynamic error in
+    let error, dynamic =
+      close_event parameters error StoryProfiling.Reachability_analysis None
+        dynamic
+    in
     let error, dynamic = print static dynamic error log in
     let log_info =
       Analyzer_headers.get_log_info
@@ -246,5 +263,17 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     | Some _ -> error, dynamic, true
 
   let enable_or_disable_rule static dynamic error cc_compil =
-    Domain.enable_or_disable_rule static dynamic error cc_compil
+    let parameters = Domain.get_parameters static in
+    let error, dynamic =
+      add_event parameters error StoryProfiling.Enable_or_disable_rule None
+        dynamic
+    in
+    let error, dynamic, static =
+      Domain.enable_or_disable_rule static dynamic error cc_compil
+    in
+    let error, dynamic =
+      close_event parameters error StoryProfiling.Enable_or_disable_rule None
+        dynamic
+    in
+    error, dynamic, static
 end

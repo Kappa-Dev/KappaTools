@@ -2,7 +2,6 @@ module KaSaUtil (Export_to_KaSa : Export_to_KaSa.Type) = struct
   let print_analysis_result start_time state =
     let parameters = Export_to_KaSa.get_parameters state in
     (*-----------------------------------------------------------------------*)
-    (*WORK IN PROCESS:*)
     let state =
       if Remanent_parameters.get_do_scc parameters then (
         let accuracy_level_cm =

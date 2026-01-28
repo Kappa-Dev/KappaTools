@@ -89,6 +89,7 @@ module type Composite_domain = sig
     dynamic_information ->
     dynamic_information
 
+  val get_parameters : static_information -> Remanent_parameters_sig.parameters
   val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
 end
 

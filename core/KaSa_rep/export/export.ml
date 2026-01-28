@@ -2148,9 +2148,8 @@ functor
           in
           Remanent_state.set_errors error state
         | None -> Remanent_state.set_errors error state
-      ) else (
+      ) else
         Remanent_state.set_errors error state
-      )
 
     let ws_id_from_rule_name _rule_name =
       (*TODO find rule by string and check if it is in the working set*)
