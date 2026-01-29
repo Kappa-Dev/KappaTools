@@ -87,61 +87,65 @@ let main () =
       Export_to_KaSa.set_errors Exception.empty_exceptions_caught_and_uncaught
         state
     in
-    match String.trim (read_line ()) with
-    | "quit" | "q" -> ()
-    | "help" | "h" ->
-      Loggers.fprintf log "%s" help_message;
-      loop state
-    | "print rules" ->
-      let state, compilation = Export_to_KaSa.get_compilation state in
-      let () =
-        Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
-      in
-      let error = Export_to_KaSa.get_errors state in
-      let () = Exception.print parameters error in
-      loop state
-    | "print working set" | "print ws" ->
-      let state, compilation = Export_to_KaSa.get_compilation state in
-      let () = Loggers.fprintf log "%a" Ast.print_working_set compilation in
-      let error = Export_to_KaSa.get_errors state in
-      let () = Exception.print parameters error in
-      loop state
-    | "print result" ->
-      let state = Export_to_KaSa.output_reachability_result state in
-      let error = Export_to_KaSa.get_errors state in
-      let () = Exception.print parameters error in
-      loop state
-    | input ->
-      let state =
-        match parse_input input with
-        | Add _ ->
-          print_endline "TODO adding a rule was not implemented yet";
-          state
-        | Enable (false, i) ->
-          let () =
-            Loggers.fprintf log "Disabling rule with label '%s'...\n" i
-          in
-          Export_to_KaSa.disable_rule i state
-        | Enable (true, i) ->
-          let () = Loggers.fprintf log "Enabling rule with label '%s'...\n" i in
-          Export_to_KaSa.enable_rule i state
-        | Enable_index (false, i) ->
-          let () = Loggers.fprintf log "Disabling rule at index %d...\n" i in
-          Export_to_KaSa.disable_rule_index i state
-        | Enable_index (true, i) ->
-          let () = Loggers.fprintf log "Enabling rule at index %d...\n" i in
-          Export_to_KaSa.enable_rule_index i state
-        | Parsing_error s ->
-          let error = Export_to_KaSa.get_errors state in
-          let error, () =
-            Exception.warn parameters error __POS__
-              ~message:("Parsing error: " ^ s) Exit ()
-          in
-          Export_to_KaSa.set_errors error state
-      in
-      let error = Export_to_KaSa.get_errors state in
-      let () = Exception.print parameters error in
-      loop state
+    try
+      match String.trim (read_line ()) with
+      | "quit" | "q" -> ()
+      | "help" | "h" ->
+        Loggers.fprintf log "%s" help_message;
+        loop state
+      | "print rules" ->
+        let state, compilation = Export_to_KaSa.get_compilation state in
+        let () =
+          Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
+        in
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
+        loop state
+      | "print working set" | "print ws" ->
+        let state, compilation = Export_to_KaSa.get_compilation state in
+        let () = Loggers.fprintf log "%a" Ast.print_working_set compilation in
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
+        loop state
+      | "print result" ->
+        let state = Export_to_KaSa.output_reachability_result state in
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
+        loop state
+      | input ->
+        let state =
+          match parse_input input with
+          | Add _ ->
+            print_endline "TODO adding a rule was not implemented yet";
+            state
+          | Enable (false, i) ->
+            let () =
+              Loggers.fprintf log "Disabling rule with label '%s'...\n" i
+            in
+            Export_to_KaSa.disable_rule i state
+          | Enable (true, i) ->
+            let () =
+              Loggers.fprintf log "Enabling rule with label '%s'...\n" i
+            in
+            Export_to_KaSa.enable_rule i state
+          | Enable_index (false, i) ->
+            let () = Loggers.fprintf log "Disabling rule at index %d...\n" i in
+            Export_to_KaSa.disable_rule_index i state
+          | Enable_index (true, i) ->
+            let () = Loggers.fprintf log "Enabling rule at index %d...\n" i in
+            Export_to_KaSa.enable_rule_index i state
+          | Parsing_error s ->
+            let error = Export_to_KaSa.get_errors state in
+            let error, () =
+              Exception.warn parameters error __POS__
+                ~message:("Parsing error: " ^ s) Exit ()
+            in
+            Export_to_KaSa.set_errors error state
+        in
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
+        loop state
+    with End_of_file -> ()
   in
   loop state
 
