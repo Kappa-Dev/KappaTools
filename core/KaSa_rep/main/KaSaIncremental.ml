@@ -1,3 +1,21 @@
+let help_message =
+  "Available commands:\n\
+  \    quit/q\n\
+  \        Quits the program.\n\
+  \    help/h\n\
+  \        Prints this help message.\n\
+  \    print rules/working set/ws\n\
+  \        Prints all rules (or just the working set) with the indexes of each \
+   rule and an indication of which rules are enabled.\n\
+  \    print result\n\
+  \        Prints the KaSa reachability analysis result.\n\
+  \    enable/disable <index>\n\
+  \        Enables (or disables) the rule at index <index> in the working set.\n\
+  \    enable/disable <label>\n\
+  \        Enables (or disables) the rule with label <label> in the working set.\n\
+  \    add <rule>\n\
+  \        (Not implemented yet TODO) Adds a rule to the working set.\n"
+
 type parsed_instruction =
   | Add of string
   | Enable_index of bool * int
@@ -62,17 +80,17 @@ let main () =
   let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
   let state = KaSaUtil.print_analysis_result start_time state in
   let rec loop state =
-    print_string "> ";
-    flush stdout;
+    let log = Remanent_parameters.get_logger parameters in
+    Loggers.fprintf log "> ";
+    Loggers.flush_logger log;
     let state =
       Export_to_KaSa.set_errors Exception.empty_exceptions_caught_and_uncaught
         state
     in
-    let log = Remanent_parameters.get_logger parameters in
     match String.trim (read_line ()) with
-    | "quit" -> ()
-    | "help" ->
-      print_endline "TODO";
+    | "quit" | "q" -> ()
+    | "help" | "h" ->
+      Loggers.fprintf log "%s" help_message;
       loop state
     | "print rules" ->
       let state, compilation = Export_to_KaSa.get_compilation state in
