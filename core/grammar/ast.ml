@@ -1152,8 +1152,8 @@ let print_working_set_prefix id working_set_values =
   ^
   match Mods.IntMap.find_option id working_set_values with
   | None -> "[UNKNOWN] "
-  | Some true -> "[ACTIVE] "
-  | Some false -> "[INACTIVE] "
+  | Some true -> "[ENABLED] "
+  | Some false -> "[DISABLED] "
 
 let print_parsing_compil_kappa f c =
   Format.fprintf f
