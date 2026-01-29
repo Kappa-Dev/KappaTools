@@ -1,0 +1,211 @@
+#!/bin/bash
+
+DEBUG=false
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+KASA_BINARY="${SCRIPT_DIR}/../../../bin/KaSa"
+KASA_INC_BINARY="${SCRIPT_DIR}/../../../bin/KaSaIncremental"
+TEMP_FILE="${SCRIPT_DIR}/temp_experiment.ka"
+KAPPA_OUTPUT_DIR="${SCRIPT_DIR}/../../../output/"
+
+# default values for variables
+TIMEOUT=1m
+NR_WORKING_SET=10
+
+# help message
+print_help() {
+    cat << EOF
+Usage: ${0} [options]
+
+Options:
+  -t <timeout>   Set timeout value (default: 1 minute)
+  -w <integer>   Set number of working sets (default: 10)
+  -h             Show this help message and exit
+EOF
+}
+
+# parse arguments
+while getopts ":t:w:h" opt; do
+    case "$opt" in
+        t)
+            TIMEOUT="$OPTARG"
+            ;;
+        w)
+            NR_WORKING_SET="$OPTARG"
+            ;;
+        h)
+            print_help
+            exit 0
+            ;;
+        \?)
+            echo "Error: Invalid option -$OPTARG" >&2
+            print_help
+            exit 1
+            ;;
+        :)
+            echo "Error: Option -$OPTARG requires an argument" >&2
+            print_help
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+
+echo "Using a timeout of $TIMEOUT."
+echo "Using $NR_WORKING_SET_VAR rules in the working set."
+
+# models
+MODELS_DIRECTORY="${SCRIPT_DIR}/models/"
+ENSEMBLE="${MODELS_DIRECTORY}ensemble.ka"
+EGFR="${MODELS_DIRECTORY}causality_05_sos.ka"
+REPRESSILATOR="${MODELS_DIRECTORY}Repressilator.ka"
+FGF="${MODELS_DIRECTORY}fgf.ka"
+SFB="${MODELS_DIRECTORY}sfb.ka"
+
+OUTPUT_DIR="${SCRIPT_DIR}/output/"
+
+# Array of models
+MODELS=("ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB")
+
+AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
+AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
+
+# cd "${SCRIPT_DIR}/../../.."
+# # Install the dependencies
+# echo "Installing dependencies:"
+# opam install . --update-invariant
+
+if not DEBUG; then
+    echo
+    # Build Kappa
+    echo "Building the project:"
+    make all
+fi
+
+mkdir -p "${OUTPUT_DIR}"
+
+echo
+echo "Analyzing models: $AVAILABLE_MODELS"
+
+# Analyze each model
+for MODEL in "${MODELS[@]}"; do
+    EXAMPLE_MODEL=${!MODEL}
+
+    echo
+    echo "Processing model: $MODEL"
+
+    # If the current file contains the annotation //i for the current nr of working set vars, then the analysis is executed
+    if grep -q "//$NR_WORKING_SET" "$EXAMPLE_MODEL"; then
+
+        # Replace "//i" with "]//i" in the input file and replace "// working_set" with "%working_set:["
+        sed "s|// working_set|%working_set:[|g" "$EXAMPLE_MODEL" | sed "s|//$NR_WORKING_SET//|]|g" > "$TEMP_FILE"
+
+        # output files
+        OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_experiments_output"
+        i=0
+        while [ -e "$OUTPUT_FILE~$i.txt" ]; do
+            i=$((i + 1))
+        done
+        OUTPUT_FILE="$OUTPUT_FILE~$i.txt"
+
+        echo "Analysis of model $MODEL; Using a timeout of $TIMEOUT and $NR_WORKING_SET_VAR rules in the working set." >> "$OUTPUT_FILE"
+
+        for NR_DISABLED_RULES in 1 2 3 4 5 6 7 8 9 10; do
+            
+            # generate a new output file name for the stdout output of the analysis
+            STDOUT_OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_analysis_output$NR_DISABLED_RULES"
+            STDOUT_OUTPUT_FILE="${STDOUT_OUTPUT_FILE}~$i.txt"
+            STDOUT_OUTPUT_FILE_NON_INC="${STDOUT_OUTPUT_FILE}_non_inc~$i.txt"
+            PROFILING_OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_profiling$NR_DISABLED_RULES"
+            PROFILING_OUTPUT_FILE="${PROFILING_OUTPUT_FILE}~$i.html"
+
+
+            # INCREMENTAL ANALYSIS
+            if $DEBUG; then
+                echo "⚡️ Starting incremental analysis:"
+            fi
+
+            INPUT_INCREMENTAL=""
+            for ((k=0; k<NR_DISABLED_RULES; k++)); do
+                INPUT_INCREMENTAL+="disable $k"$'\n'
+                INPUT_INCREMENTAL+="print result"$'\n'
+            done
+
+            if $DEBUG; then
+                echo "INCREMENTAL COMMANDS:"
+                echo "$INPUT_INCREMENTAL"
+            fi
+
+            echo "INCREMENTAL: Runtime with $NR_DISABLED_RULES rules disabled:" >> "$OUTPUT_FILE"
+            { echo $INPUT_INCREMENTAL | time timeout "$TIMEOUT" "$KASA_INC_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+            EXIT_STATUS=$?
+
+            cp "${KAPPA_OUTPUT_DIR}profiling.html" "${PROFILING_OUTPUT_FILE}"
+
+            # CLASSICAL ANALYSIS
+            if $DEBUG; then
+                echo "⌛ Starting non-incremental analysis:"
+            fi
+
+            if $DEBUG; then
+                echo "Removing lines with //rule1//"
+            fi
+            grep -v "//rule1//" "$EXAMPLE_MODEL" > "$TEMP_FILE"
+            for ((k=2; k<=NR_DISABLED_RULES; k++)); do
+                grep -v "//rule$k//" "$TEMP_FILE" | sponge "$TEMP_FILE"
+                if $DEBUG; then
+                    echo "Removing lines with //rule$k//"
+                fi
+            done
+
+            echo "NON INCREMENTAL: Runtime with $NR_DISABLED_RULES rules disabled:" >> "$OUTPUT_FILE"
+            { time timeout "$TIMEOUT" "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+                EXIT_STATUS=$?
+
+            # Check if the program was killed by timeout
+            if [ $EXIT_STATUS -eq 124 ]; then
+                echo "⚠️ Timeout or memory overflow occurred for $MODEL with $NR_WORKING_SET rules in the working set." >> "$OUTPUT_FILE"
+                break
+            fi
+
+            # Remove $NR_WORKING_SET rules TODO
+
+            echo "Runtime with $NR_WORKING_SET rules in the working set:" >> "$OUTPUT_FILE"
+            { time timeout "$TIMEOUT" "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+            EXIT_STATUS=$?
+
+            # Check if the program was killed by timeout
+            if [ $EXIT_STATUS -eq 124 ]; then
+                echo "⚠️ Timeout or memory overflow occurred for $MODEL with $NR_WORKING_SET rules in the working set." >> "$OUTPUT_FILE"
+                break
+            fi
+        done
+        # Clean up temporary file
+        rm -f "$TEMP_FILE"
+
+        echo "✅ Completed: $MODEL"
+        echo "The results can be found in: $STDOUT_OUTPUT_FILE"
+        echo "The runtimes can be found in: $OUTPUT_FILE"
+
+        # Check for exceptions in STDOUT_OUTPUT_FILE
+        if grep -qi "exception:" "$STDOUT_OUTPUT_FILE"; then
+            echo "🚨 Exception raised during analysis of $MODEL."
+        else
+            echo "No exceptions during execution."
+        fi
+
+        # Check for exceptions in OUTPUT_FILE
+        if grep -qi "Killed" "$OUTPUT_FILE"; then
+            echo "⚠️ Some programs were killed (probably because they used too much memory)."
+        fi
+
+        # Check for timeouts
+        if grep -qi "Timeout or memory overflow occurred for" "$OUTPUT_FILE"; then
+            echo "⚠️ Some programs were killed by a timeout or a memory overflow."
+        fi
+    else
+        echo "🚨 ERROR: the entry //$NR_WORKING_SET was not found in the file $EXAMPLE_MODEL"
+    fi
+done
