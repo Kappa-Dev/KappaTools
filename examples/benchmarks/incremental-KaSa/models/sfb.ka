@@ -6,22 +6,22 @@
 
 // phase -> activated dimers
 // external dimers:
-'EGF_EGFR'  EGF(r[.]), EGFR(L[.],CR[.]) <-> EGF(r[1]), EGFR(L[1],CR[.]) @ 1
-'EGFR_EGFR' EGFR(L[_],CR[.]), EGFR(L[_],CR[.]) <-> EGFR(L[_],CR[1]), EGFR(L[_],CR[1]) @ 1
+'EGF_EGFR'  EGF(r[.]), EGFR(L[.],CR[.]) <-> EGF(r[1]), EGFR(L[1],CR[.]) @ 1//rule1//
+'EGFR_EGFR' EGFR(L[_],CR[.]), EGFR(L[_],CR[.]) <-> EGFR(L[_],CR[1]), EGFR(L[_],CR[1]) @ 1//rule2//
 // simplified phos (internal or external)
-'EGFR@992'  EGFR(CR[_],Y992{u}) -> EGFR(CR[_],Y992{p}) @ 1
-'EGFR@1068' EGFR(CR[_],Y1068{u}) -> EGFR(CR[_],Y1068{p}) @ 1
-'EGFR@1148' EGFR(CR[_],Y1148{u}) -> EGFR(CR[_],Y1148{p}) @ 1
+'EGFR@992'  EGFR(CR[_],Y992{u}) -> EGFR(CR[_],Y992{p}) @ 1//rule3//
+'EGFR@1068' EGFR(CR[_],Y1068{u}) -> EGFR(CR[_],Y1068{p}) @ 1//rule4//
+'EGFR@1148' EGFR(CR[_],Y1148{u}) -> EGFR(CR[_],Y1148{p}) @ 1//rule5//
 //05//
 // simplified dephos (internal or external)
-'992_op'    EGFR(Y992{p}) -> EGFR(Y992{u}) @ 1
-'1068_op'   EGFR(Y1068{p}) -> EGFR(Y1068{u}) @ 1
-'1148_op'   EGFR(Y1148{p}) -> EGFR(Y1148{u}) @ 1
+'992_op'    EGFR(Y992{p}) -> EGFR(Y992{u}) @ 1//rule6//
+'1068_op'   EGFR(Y1068{p}) -> EGFR(Y1068{u}) @ 1//rule7//
+'1148_op'   EGFR(Y1148{p}) -> EGFR(Y1148{u}) @ 1//rule8//
 
 // phase -> internalization, degradation and recycling
 // internalization:
-'int_monomer'  EGF(r[1]), EGFR(L[1],CR[.]) -> EGF(r[1]), EGFR(L[1],CR[.]) @ 0.02
-'int_dimer'    EGF(r[1]), EGFR(L[1],CR[2]), EGF(r[3]), EGFR(L[3],CR[2]) -> EGF(r[1]), EGFR(L[1],CR[2]), EGF(r[3]), EGFR(L[3],CR[2]) @ 0.02
+'int_monomer'  EGF(r[1]), EGFR(L[1],CR[.]) -> EGF(r[1]), EGFR(L[1],CR[.]) @ 0.02//rule9//
+'int_dimer'    EGF(r[1]), EGFR(L[1],CR[2]), EGF(r[3]), EGFR(L[3],CR[2]) -> EGF(r[1]), EGFR(L[1],CR[2]), EGF(r[3]), EGFR(L[3],CR[2]) @ 0.02//rule10//
 //10//
 // dissociation:
 'EGFR_EGFR_op' EGFR(L[_],CR[1]), EGFR(L[_],CR[1]) -> EGFR(L[_],CR[.]), EGFR(L[_],CR[.]) @ 1

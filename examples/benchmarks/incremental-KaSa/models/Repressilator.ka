@@ -55,23 +55,23 @@
     %var: 'k4' 'c4'*'rF'
 // working_set
 //00//
-    gTetR(lac1[.],lac2[.]) , pLacI(tet[.]) <-> gTetR(lac1[1],lac2[.]),pLacI(tet[1])        @'k0', 'k1'
-    gTetR(lac2[.],lac1[.]) , pLacI(tet[.]) <-> gTetR(lac2[1],lac1[.]),pLacI(tet[1])        @'k0', 'k1'
+    gTetR(lac1[.],lac2[.]) , pLacI(tet[.]) <-> gTetR(lac1[1],lac2[.]),pLacI(tet[1])        @'k0', 'k1'//rule1//
+    gTetR(lac2[.],lac1[.]) , pLacI(tet[.]) <-> gTetR(lac2[1],lac1[.]),pLacI(tet[1])        @'k0', 'k1'//rule2//
 
-    gTetR(lac1[_],lac2[.]) , pLacI(tet[.]) <-> gTetR(lac1[_],lac2[1]),pLacI(tet[1])    @'k0', 'k2'
+    gTetR(lac1[_],lac2[.]) , pLacI(tet[.]) <-> gTetR(lac1[_],lac2[1]),pLacI(tet[1])    @'k0', 'k2'//rule3//
 
-    gTetR(lac2[_],lac1[.]) , pLacI(tet[.]) <-> gTetR(lac2[_],lac1[1]),pLacI(tet[1])    @'k0', 'k2'
+    gTetR(lac2[_],lac1[.]) , pLacI(tet[.]) <-> gTetR(lac2[_],lac1[1]),pLacI(tet[1])    @'k0', 'k2'//rule4//
 
-    gTetR(lac1[.],lac2[.]),. -> gTetR(lac1[.],lac2[.]) , mTetR() @'k3'
+    gTetR(lac1[.],lac2[.]),. -> gTetR(lac1[.],lac2[.]) , mTetR() @'k3'//rule5//
 //05//
-    gTetR(lac1[_]),. -> gTetR(lac1[_]) , mTetR() @'k4'
+    gTetR(lac1[_]),. -> gTetR(lac1[_]) , mTetR() @'k4'//rule6//
 
-    gTetR(lac2[_]),. -> gTetR(lac2[_]) , mTetR() @'k4'
+    gTetR(lac2[_]),. -> gTetR(lac2[_]) , mTetR() @'k4'//rule7//
 
-    mTetR(),. -> mTetR() , pTetR(cI[.])                                    @'c5'/'rF'*'pF'
+    mTetR(),. -> mTetR() , pTetR(cI[.])                                    @'c5'/'rF'*'pF'//rule8//
 
-    mTetR() , Null() -> .,Null()                                           @'c6'{0}
-    pTetR(cI[.]) , Null() -> .,Null()                                         @'c7'{0}
+    mTetR() , Null() -> .,Null()                                           @'c6'{0}//rule9//
+    pTetR(cI[.]) , Null() -> .,Null()                                         @'c7'{0}//rule10//
 //10//
 
     gCI(tet1[.],tet2[.]) , pTetR(cI[.]) <-> gCI(tet1[1],tet2[.]),pTetR(cI[1]) @'l0', 'l1'

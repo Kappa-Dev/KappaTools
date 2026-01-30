@@ -61,37 +61,37 @@
 // Chapter 'Receptor and G protein'
 // working_set
 //00//
-'Pheromone.Ste2'
-  Pheromone(ste2[.]),Ste2(pheromone[.]), . ->
-  Pheromone(ste2[1]),Ste2(pheromone[1]),Pheromone(ste2[.]) @ 3e-05
-'Pheromone...Ste2'
-  Ste2(pheromone[1]),Pheromone(ste2[1]) ->
-  Ste2(pheromone[.]), . @ 0.015
-'Ste2.Gpa1'
-  Ste2(gpa1[.]),Gpa1(ste2[.]) ->
-  Ste2(gpa1[1]),Gpa1(ste2[1]) @ 0.001725
-'Ste2...Gpa1 Ref1'
-  Ste2(gpa1[1]),Gpa1(ste2[1] ste4[.]) ->
-  Ste2(gpa1[.]),Gpa1(ste2[.] ste4[.]) @ 0.15
-'Ste2...Gpa1 Ref2'
-  Ste2(gpa1[1]),Gpa1(ste2[1] ste4[2]),Ste4(gpa1[2]) ->
-  Ste2(gpa1[.]),Gpa1(ste2[.] ste4[2]),Ste4(gpa1[2]) @ 0.03
+'Pheromone.Ste2'//rule1//
+  Pheromone(ste2[.]),Ste2(pheromone[.]), . ->//rule1//
+  Pheromone(ste2[1]),Ste2(pheromone[1]),Pheromone(ste2[.]) @ 3e-05//rule1//
+'Pheromone...Ste2'//rule2//
+  Ste2(pheromone[1]),Pheromone(ste2[1]) ->//rule2//
+  Ste2(pheromone[.]), . @ 0.015//rule2//
+'Ste2.Gpa1'//rule3//
+  Ste2(gpa1[.]),Gpa1(ste2[.]) ->//rule3//
+  Ste2(gpa1[1]),Gpa1(ste2[1]) @ 0.001725//rule3//
+'Ste2...Gpa1 Ref1'//rule4//
+  Ste2(gpa1[1]),Gpa1(ste2[1] ste4[.]) ->//rule4//
+  Ste2(gpa1[.]),Gpa1(ste2[.] ste4[.]) @ 0.15//rule4//
+'Ste2...Gpa1 Ref2'//rule5//
+  Ste2(gpa1[1]),Gpa1(ste2[1] ste4[2]),Ste4(gpa1[2]) ->//rule5//
+  Ste2(gpa1[.]),Gpa1(ste2[.] ste4[2]),Ste4(gpa1[2]) @ 0.03//rule5//
 //05//
-'Gpa1.Ste4'
-  Gpa1(ste4[.]),Ste4(gpa1[.] ste5[.] ste20[.] state{reg}[.]) ->
-  Gpa1(ste4[1]),Ste4(gpa1[1] ste5[.] ste20[.] state{reg}[.]) @ 0.001725
-'Gpa1.Ste4 Ref1'
-  Gpa1(ste4[.]),Ste4(gpa1[.] ste5[.] ste20[.] state{synth}[.]) ->
-  Gpa1(ste4[1]),Ste4(gpa1[1] ste5[.] ste20[.] state{synth}[.]) @ 8.595e-08
-'Gpa1...Ste4 Ref1'
-  Ste4(gpa1[1]),Gpa1(ste4[1] ste2[.] nuc{GTP}[.]) ->
-  Ste4(gpa1[.]),Gpa1(ste4[.] ste2[.] nuc{GTP}[.]) @ 7.5
-'Gpa1...Ste4 Ref2'
-  Ste4(gpa1[1]),Gpa1(ste4[1] ste2[_] nuc{GTP}[.]) ->
-  Ste4(gpa1[.]),Gpa1(ste4[.] ste2[_] nuc{GTP}[.]) @ 1.5
-'Gpa1@nuc_GTP'
-  Pheromone(ste2[1]),Ste2(pheromone[1] gpa1[2]),Gpa1(nuc{GDP}[.] ste2[2]) ->
-  Pheromone(ste2[1]),Ste2(pheromone[1] gpa1[2]),Gpa1(nuc{GTP}[.] ste2[2]) @ 0.15
+'Gpa1.Ste4'//rule6//
+  Gpa1(ste4[.]),Ste4(gpa1[.] ste5[.] ste20[.] state{reg}[.]) ->//rule6//
+  Gpa1(ste4[1]),Ste4(gpa1[1] ste5[.] ste20[.] state{reg}[.]) @ 0.001725//rule6//
+'Gpa1.Ste4 Ref1'//rule7//
+  Gpa1(ste4[.]),Ste4(gpa1[.] ste5[.] ste20[.] state{synth}[.]) ->//rule7//
+  Gpa1(ste4[1]),Ste4(gpa1[1] ste5[.] ste20[.] state{synth}[.]) @ 8.595e-08//rule7//
+'Gpa1...Ste4 Ref1'//rule8//
+  Ste4(gpa1[1]),Gpa1(ste4[1] ste2[.] nuc{GTP}[.]) ->//rule8//
+  Ste4(gpa1[.]),Gpa1(ste4[.] ste2[.] nuc{GTP}[.]) @ 7.5//rule8//
+'Gpa1...Ste4 Ref2'//rule9//
+  Ste4(gpa1[1]),Gpa1(ste4[1] ste2[_] nuc{GTP}[.]) ->//rule9//
+  Ste4(gpa1[.]),Gpa1(ste4[.] ste2[_] nuc{GTP}[.]) @ 1.5//rule9//
+'Gpa1@nuc_GTP'//rule10//
+  Pheromone(ste2[1]),Ste2(pheromone[1] gpa1[2]),Gpa1(nuc{GDP}[.] ste2[2]) ->//rule10//
+  Pheromone(ste2[1]),Ste2(pheromone[1] gpa1[2]),Gpa1(nuc{GTP}[.] ste2[2]) @ 0.15//rule10//
 //10//
 'Sst2.Ste2'
   Ste2(sst2[.]),Sst2(ste2[.]) -> Ste2(sst2[1]),Sst2(ste2[1]) @ 0.0008595

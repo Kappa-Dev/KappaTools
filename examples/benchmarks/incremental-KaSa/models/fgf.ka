@@ -26,36 +26,36 @@
 //-------------- Rule List
 // 1. FGF(r):FGFR(l)
 // FGF --supp (--bind)
-'a' FGF(r[.]) , FGFR(l[.]) -> FGF(r[1]) , FGFR(l[1]) @ 1
-FGF(r[1]) , FGFR(l[1]) -> FGF(r[.]) , FGFR(l[.]) @ 1
+'a' FGF(r[.]) , FGFR(l[.]) -> FGF(r[1]) , FGFR(l[1]) @ 1//rule1//
+FGF(r[1]) , FGFR(l[1]) -> FGF(r[.]) , FGFR(l[.]) @ 1//rule2//
 
 // 2. FGF:FGFR self-mod FGFR(Y653,Y654)
 // FGF:FGFR --lens (--mod)
-FGF(r[1]) , FGFR(l[1],Y653{u}) -> FGF(r[1]) , FGFR(l[1],Y653{p}) @ 1
-FGF(r[1]) , FGFR(l[1],Y654{u}) -> FGF(r[1]) , FGFR(l[1],Y654{p}) @ 1
+FGF(r[1]) , FGFR(l[1],Y653{u}) -> FGF(r[1]) , FGFR(l[1],Y653{p}) @ 1//rule3//
+FGF(r[1]) , FGFR(l[1],Y654{u}) -> FGF(r[1]) , FGFR(l[1],Y654{p}) @ 1//rule4//
 
 // 3. FGFR(Y653{p},Y654{p}) self-mod at Y766
 // FGFR and not FGF --support --mod
 // FGFR does not have to be bound
 // FGFR mods (2 and 3) are never de-mod'ed; does that explain the need for removal ?
-FGFR(Y653{p},Y654{p},Y766{u}) -> FGFR(Y653{p},Y654{p},Y766{p}) @ 1
+FGFR(Y653{p},Y654{p},Y766{u}) -> FGFR(Y653{p},Y654{p},Y766{p}) @ 1//rule5//
 
 //05//
 
 // 9. PLC(d):FGFR(Y766), PLC deg's FGFR
 // Y766 may not be phos'ed, which seems utterly strange --so i am changing that
 // PLC --supp --bind
-PLC(d[.]) , FGFR(Y766{p}[.]) -> PLC(d[1]) , FGFR(Y766{p}[1]) @ 1
-PLC(d[1]) , FGFR(Y766{p}[1]) -> PLC(d[.]) , FGFR(Y766{p}[.]) @ 1
+PLC(d[.]) , FGFR(Y766{p}[.]) -> PLC(d[1]) , FGFR(Y766{p}[1]) @ 1//rule6//
+PLC(d[1]) , FGFR(Y766{p}[1]) -> PLC(d[.]) , FGFR(Y766{p}[.]) @ 1//rule7//
 // PLC --supp --del
 // open erasure/local semantics, having to write {u} is a bit strange
 // one has to be careful with the prefix convention here to correctly define the intact parts (longest common prefix)
-PLC(d[1]) , FGFR(Y766{p}[1]),. -> PLC(d[.]) ,., PLC_FGFR_deg(x{u}[.]) @ 1
+PLC(d[1]) , FGFR(Y766{p}[1]),. -> PLC(d[.]) ,., PLC_FGFR_deg(x{u}[.]) @ 1//rule8//
 
 // 4. FRS2(r):FGFR(f)
 // FRS2 and FGFR --bind --supp
-FGFR(f[.]) , FRS2(r[.]) -> FGFR(f[1]) , FRS2(r[1]) @ 1
-FGFR(f[1]) , FRS2(r[1]) -> FGFR(f[.]) , FRS2(r[.]) @ 1
+FGFR(f[.]) , FRS2(r[.]) -> FGFR(f[1]) , FRS2(r[1]) @ 1//rule9//
+FGFR(f[1]) , FRS2(r[1]) -> FGFR(f[.]) , FRS2(r[.]) @ 1//rule10//
 //10//
 
 // 5. FGFR mod FRS2 at Y196, Y306, Y471

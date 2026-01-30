@@ -61,15 +61,15 @@
   EGF(r[2]), EGFR(L[2],CR[1],N[.],C[.]), EGF(r[3]), EGFR(L[3],CR[1],N[.],C[.]) ->//rule2//
   EGF(r[2]), EGFR(L[2],CR[.],N[.],C[.]), EGF(r[3]), EGFR(L[3],CR[.],N[.],C[.]) @ 'k_off'/2//rule2//
 
-'EGF.EGFR' EGF(r[.]), EGFR(L[.],CR[.]) -> EGF(r[1]), EGFR(L[1],CR[.]) @ 'k_on'
-'EGF/EGFR' EGF(r[1]), EGFR(L[1],CR[.]) -> EGF(r[.]), EGFR(L[.],CR[.]) @ 'k_off'
-'Shc.Grb2' Shc(Y[.]{p}), Grb2(SH2[.]) -> Shc(Y[1]{p}), Grb2(SH2[1]) @ 5*'k_on'
+'EGF.EGFR' EGF(r[.]), EGFR(L[.],CR[.]) -> EGF(r[1]), EGFR(L[1],CR[.]) @ 'k_on'//rule3//
+'EGF/EGFR' EGF(r[1]), EGFR(L[1],CR[.]) -> EGF(r[.]), EGFR(L[.],CR[.]) @ 'k_off'//rule4//
+'Shc.Grb2' Shc(Y[.]{p}), Grb2(SH2[.]) -> Shc(Y[1]{p}), Grb2(SH2[1]) @ 5*'k_on'//rule5//
 //05//
-'Shc/Grb2' Shc(Y{p}[1]), Grb2(SH2[1]) -> Shc(Y{p}[.]), Grb2(SH2[.]) @ 'k_off'
-'EGFR.Grb2' EGFR(Y1092{p}[.]), Grb2(SH2[.]) -> EGFR(Y1092{p}[1]), Grb2(SH2[1]) @ 'k_on'
-'EGFR/Grb2' EGFR(Y1092{p}[1]), Grb2(SH2[1]) -> EGFR(Y1092{p}[.]), Grb2(SH2[.]) @ 'k_off'
-'EGFR.Shc' EGFR(Y1172{p}[.]), Shc(PTB[.]) -> EGFR(Y1172{p}[1]), Shc(PTB[1]) @ 'k_on'
-'EGFR/Shc' EGFR(Y1172{p}[1]), Shc(PTB[1]) -> EGFR(Y1172{p}[.]), Shc(PTB[.]) @ 'k_off'
+'Shc/Grb2' Shc(Y{p}[1]), Grb2(SH2[1]) -> Shc(Y{p}[.]), Grb2(SH2[.]) @ 'k_off'//rule6//
+'EGFR.Grb2' EGFR(Y1092{p}[.]), Grb2(SH2[.]) -> EGFR(Y1092{p}[1]), Grb2(SH2[1]) @ 'k_on'//rule7//
+'EGFR/Grb2' EGFR(Y1092{p}[1]), Grb2(SH2[1]) -> EGFR(Y1092{p}[.]), Grb2(SH2[.]) @ 'k_off'//rule8//
+'EGFR.Shc' EGFR(Y1172{p}[.]), Shc(PTB[.]) -> EGFR(Y1172{p}[1]), Shc(PTB[1]) @ 'k_on'//rule9//
+'EGFR/Shc' EGFR(Y1172{p}[1]), Shc(PTB[1]) -> EGFR(Y1172{p}[.]), Shc(PTB[.]) @ 'k_off'//rule10//
 //10//
 'Grb2.SoS' Grb2(SH3n[.]), SoS(PR[.],S[.]{u}) -> Grb2(SH3n[1]), SoS(PR[1],S[.]{u}) @ 'k_on'
 'Grb2/SoS' Grb2(SH3n[1]), SoS(PR[1]) -> Grb2(SH3n[.]), SoS(PR[.]) @ 'k_off'
