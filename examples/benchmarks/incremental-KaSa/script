@@ -1,12 +1,13 @@
 #!/bin/bash
 
-DEBUG=false
+DEBUG=true
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 KASA_BINARY="${SCRIPT_DIR}/../../../bin/KaSa"
 KASA_INC_BINARY="${SCRIPT_DIR}/../../../bin/KaSaIncremental"
 TEMP_FILE="${SCRIPT_DIR}/temp_experiment.ka"
+TEMP_FILE_NON_INC="${SCRIPT_DIR}/temp_experiment_non_incr.ka"
 KAPPA_OUTPUT_DIR="${SCRIPT_DIR}/../../../output/"
 
 # default values for variables
@@ -54,7 +55,7 @@ done
 shift $((OPTIND - 1))
 
 echo "Using a timeout of $TIMEOUT."
-echo "Using $NR_WORKING_SET_VAR rules in the working set."
+echo "Using $NR_WORKING_SET rules in the working set."
 
 # models
 MODELS_DIRECTORY="${SCRIPT_DIR}/models/"
@@ -68,6 +69,9 @@ OUTPUT_DIR="${SCRIPT_DIR}/output/"
 
 # Array of models
 MODELS=("ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB")
+if $DEBUG ; then
+    MODELS=("EGFR")
+fi
 
 AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
 AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
@@ -77,7 +81,7 @@ AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
 # echo "Installing dependencies:"
 # opam install . --update-invariant
 
-if not DEBUG; then
+if ! $DEBUG; then
     echo
     # Build Kappa
     echo "Building the project:"
@@ -109,6 +113,7 @@ for MODEL in "${MODELS[@]}"; do
             i=$((i + 1))
         done
         OUTPUT_FILE="$OUTPUT_FILE~$i.txt"
+        OUTPUT_FILE_NON_INC="${OUTPUT_FILE}_non_inc~$i.txt"
 
         echo "Analysis of model $MODEL; Using a timeout of $TIMEOUT and $NR_WORKING_SET_VAR rules in the working set." >> "$OUTPUT_FILE"
 
@@ -132,6 +137,8 @@ for MODEL in "${MODELS[@]}"; do
                 INPUT_INCREMENTAL+="disable $k"$'\n'
                 INPUT_INCREMENTAL+="print result"$'\n'
             done
+            INPUT_INCREMENTAL+="print rules"$'\n'
+            INPUT_INCREMENTAL+="q"
 
             if $DEBUG; then
                 echo "INCREMENTAL COMMANDS:"
@@ -139,8 +146,14 @@ for MODEL in "${MODELS[@]}"; do
             fi
 
             echo "INCREMENTAL: Runtime with $NR_DISABLED_RULES rules disabled:" >> "$OUTPUT_FILE"
-            { echo $INPUT_INCREMENTAL | time timeout "$TIMEOUT" "$KASA_INC_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+            { echo "$INPUT_INCREMENTAL" | time timeout "$TIMEOUT" "$KASA_INC_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
             EXIT_STATUS=$?
+
+            # Check if the program was killed by timeout
+            if [ $EXIT_STATUS -eq 124 ]; then
+                echo "⚠️ Timeout or memory overflow occurred for $MODEL with $NR_WORKING_SET rules in the working set." >> "$OUTPUT_FILE"
+                break
+            fi
 
             cp "${KAPPA_OUTPUT_DIR}profiling.html" "${PROFILING_OUTPUT_FILE}"
 
@@ -152,38 +165,27 @@ for MODEL in "${MODELS[@]}"; do
             if $DEBUG; then
                 echo "Removing lines with //rule1//"
             fi
-            grep -v "//rule1//" "$EXAMPLE_MODEL" > "$TEMP_FILE"
+            grep -v "//rule1//" "$EXAMPLE_MODEL" > "$TEMP_FILE_NON_INC"
             for ((k=2; k<=NR_DISABLED_RULES; k++)); do
-                grep -v "//rule$k//" "$TEMP_FILE" | sponge "$TEMP_FILE"
+                grep -v "//rule$k//" "$TEMP_FILE_NON_INC" | sponge "$TEMP_FILE_NON_INC"
                 if $DEBUG; then
                     echo "Removing lines with //rule$k//"
                 fi
             done
 
-            echo "NON INCREMENTAL: Runtime with $NR_DISABLED_RULES rules disabled:" >> "$OUTPUT_FILE"
-            { time timeout "$TIMEOUT" "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
-                EXIT_STATUS=$?
-
-            # Check if the program was killed by timeout
-            if [ $EXIT_STATUS -eq 124 ]; then
-                echo "⚠️ Timeout or memory overflow occurred for $MODEL with $NR_WORKING_SET rules in the working set." >> "$OUTPUT_FILE"
-                break
-            fi
-
-            # Remove $NR_WORKING_SET rules TODO
-
-            echo "Runtime with $NR_WORKING_SET rules in the working set:" >> "$OUTPUT_FILE"
-            { time timeout "$TIMEOUT" "$KASA_BINARY" "$TEMP_FILE"; } >> "$STDOUT_OUTPUT_FILE" 2>> "$OUTPUT_FILE"
+            echo "NON INCREMENTAL: Runtime with $NR_DISABLED_RULES rules disabled:" >> "$OUTPUT_FILE_NON_INC"
+            { time timeout "$TIMEOUT" "$KASA_BINARY" "$TEMP_FILE_NON_INC"; } >> "$STDOUT_OUTPUT_FILE_NON_INC" 2>> "$OUTPUT_FILE_NON_INC"
             EXIT_STATUS=$?
 
             # Check if the program was killed by timeout
             if [ $EXIT_STATUS -eq 124 ]; then
-                echo "⚠️ Timeout or memory overflow occurred for $MODEL with $NR_WORKING_SET rules in the working set." >> "$OUTPUT_FILE"
+                echo "⚠️ Timeout or memory overflow occurred for $MODEL with $NR_WORKING_SET rules in the working set." >> "$OUTPUT_FILE_NON_INC"
                 break
             fi
         done
-        # Clean up temporary file
+        # Clean up temporary files
         rm -f "$TEMP_FILE"
+        rm -f "$TEMP_FILE_NON_INC"
 
         echo "✅ Completed: $MODEL"
         echo "The results can be found in: $STDOUT_OUTPUT_FILE"
