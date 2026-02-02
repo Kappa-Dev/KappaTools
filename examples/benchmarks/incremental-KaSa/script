@@ -135,9 +135,9 @@ for MODEL in "${MODELS[@]}"; do
             INPUT_INCREMENTAL=""
             for ((k=0; k<NR_DISABLED_RULES; k++)); do
                 INPUT_INCREMENTAL+="disable $k"$'\n'
-                INPUT_INCREMENTAL+="print result"$'\n'
+                # INPUT_INCREMENTAL+="print result"$'\n'
             done
-            INPUT_INCREMENTAL+="print rules"$'\n'
+            INPUT_INCREMENTAL+="print result"$'\n'
             INPUT_INCREMENTAL+="q"
 
             if $DEBUG; then
