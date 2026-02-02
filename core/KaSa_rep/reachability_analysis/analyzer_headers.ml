@@ -413,7 +413,6 @@ module AbstractWSMap (MapT : Map_wrapper.S_with_logs) = struct
       Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
         working_set_guards
     in
-    let current_working_set = MapT.Map.empty in
     let result, bdu_handler, error =
       MapT.Map.fold
         (fun rule_id mvbdu (current_working_set, bdu_handler, error) ->
@@ -421,12 +420,12 @@ module AbstractWSMap (MapT : Map_wrapper.S_with_logs) = struct
             abstract_away_working_set_vars parameters error bdu_handler mvbdu
               working_set_mvbdu working_set_guards_hcons
           in
-          let error, current_working_set =
+          let error', current_working_set =
             MapT.Map.add parameters error rule_id mvbdu current_working_set
           in
           current_working_set, bdu_handler, error)
         dynamic_local
-        (current_working_set, bdu_handler, error)
+        (MapT.Map.empty, bdu_handler, error)
     in
     error, bdu_handler, result
 end

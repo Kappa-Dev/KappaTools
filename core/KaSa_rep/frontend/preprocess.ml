@@ -2349,8 +2349,11 @@ let translate_c_compil parameters error handler compil =
         match enriched_rule.Cckappa_sig.e_rule_label with
         | None -> error, rule_label_map
         | Some (label, _) ->
-          Ckappa_sig.Rule_label_map_and_set.Map.add parameters error label
-            rule_id rule_label_map)
+          let error, map =
+            Ckappa_sig.Rule_label_map_and_set.Map.add_or_overwrite parameters
+              error label rule_id rule_label_map
+          in
+          error, map)
       c_rules Ckappa_sig.Rule_label_map_and_set.Map.empty
   in
 

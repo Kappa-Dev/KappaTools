@@ -3264,10 +3264,9 @@ module Domain = struct
 
   let print_bdu_update_map_cartesian_abstraction parameters bdu_handler error
       handler_kappa with_threshold =
-    print_bdu_update_map_gen_decomposition ~sort:true
-      ~smash:true ~show_dep_with_dimmension_higher_than:1
-      mvbdu_cartesian_abstraction parameters bdu_handler error handler_kappa
-      with_threshold
+    print_bdu_update_map_gen_decomposition ~sort:true ~smash:true
+      ~show_dep_with_dimmension_higher_than:1 mvbdu_cartesian_abstraction
+      parameters bdu_handler error handler_kappa with_threshold
 
   (*****************************************************************)
   (*Print for relational properties*)
