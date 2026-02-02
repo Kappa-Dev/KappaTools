@@ -3265,7 +3265,7 @@ module Domain = struct
   let print_bdu_update_map_cartesian_abstraction parameters bdu_handler error
       handler_kappa with_threshold =
     print_bdu_update_map_gen_decomposition ~sort:true
-      ~smash:(not with_threshold) ~show_dep_with_dimmension_higher_than:1
+      ~smash:true ~show_dep_with_dimmension_higher_than:1
       mvbdu_cartesian_abstraction parameters bdu_handler error handler_kappa
       with_threshold
 
@@ -3284,7 +3284,7 @@ module Domain = struct
 
   let print_bdu_update_map_cartesian_decomposition parameters bdu_handler error
       handler_kappa with_threshold =
-    print_bdu_update_map_gen_decomposition ~smash:(not with_threshold)
+    print_bdu_update_map_gen_decomposition ~smash:true
       ~show_dep_with_dimmension_higher_than:
         (if
            Remanent_parameters
@@ -3716,7 +3716,7 @@ module Domain = struct
   let export_relation_properties parameters dynamic error handler_kappa
       restriction_bdu with_threshold =
     let domain_name = "Views domain - relational properties" in
-    export_relation_properties_aux ~sort:false ~smash:(not with_threshold)
+    export_relation_properties_aux ~sort:false ~smash:true
       ~show_dep_with_dimmension_higher_than:
         (if
            Remanent_parameters
@@ -3731,7 +3731,7 @@ module Domain = struct
   let export_non_relation_properties parameters dynamic error handler_kappa
       restriction_bdu with_threshold =
     let domain_name = "Views domain - non relational properties" in
-    export_relation_properties_aux ~sort:true ~smash:(not with_threshold)
+    export_relation_properties_aux ~sort:true ~smash:true
       ~show_dep_with_dimmension_higher_than:1 mvbdu_cartesian_abstraction
       domain_name parameters dynamic error handler_kappa restriction_bdu
       with_threshold
