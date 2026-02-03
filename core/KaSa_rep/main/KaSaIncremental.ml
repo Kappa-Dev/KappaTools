@@ -78,7 +78,6 @@ let main () =
       state
   in
   let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
-  let state = KaSaUtil.print_analysis_result start_time state in
   let rec loop state =
     let log = Remanent_parameters.get_logger parameters in
     Loggers.fprintf log "> ";
@@ -111,6 +110,9 @@ let main () =
         let state = Export_to_KaSa.output_reachability_result state in
         let error = Export_to_KaSa.get_errors state in
         let () = Exception.print parameters error in
+        loop state
+      | "print full result" ->
+        let state = KaSaUtil.print_analysis_result start_time state in
         loop state
       | input ->
         let state =
