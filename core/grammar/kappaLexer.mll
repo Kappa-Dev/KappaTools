@@ -200,6 +200,24 @@ and inline_comment = parse
 		   | '/' '*' {inline_comment lexbuf; inline_comment lexbuf}
 		   | _ {inline_comment lexbuf}
 {
+	let compute_ws_values compil =
+		let rules_rev, ws_values, _ =
+			List.fold_left
+			(fun (rules, ws_values, k) (ws_index, label, guard, rule) ->
+				match ws_index with
+				| None -> (ws_index, label, guard, rule) :: rules, ws_values, k
+				| Some _ ->
+				( (Some k, label, guard, rule) :: rules,
+					Mods.IntMap.add k true ws_values,
+					k + 1 ))
+			([], Mods.IntMap.empty, 0) compil.Ast.rules
+		in
+		{
+			compil with
+			Ast.working_set_values = ws_values;
+			Ast.rules = List.rev rules_rev;
+		}
+
   let compile logger compil file =
     let d = open_in file in
     let lexbuf = Lexing.from_channel d in
@@ -208,6 +226,7 @@ and inline_comment = parse
     try
       let () = Format.fprintf logger "Parsing %s...@." file in
       let out = KappaParser.start_rule token lexbuf compil in
+	  let out = compute_ws_values out in
       let () = Format.fprintf logger "done@." in
       let () = close_in d in out
     with ExceptionDefn.Syntax_Error (msg,pos) ->
