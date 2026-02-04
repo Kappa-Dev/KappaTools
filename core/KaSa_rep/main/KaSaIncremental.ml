@@ -108,7 +108,9 @@ let main () =
         let () = Exception.print parameters error in
         loop state
       | "print result" ->
-        let state = KaSaUtil.print_analysis_result start_time state in
+        let state = Export_to_KaSa.output_reachability_result state in
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
         loop state
       | input ->
         let state =
