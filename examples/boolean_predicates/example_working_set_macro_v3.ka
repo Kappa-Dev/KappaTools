@@ -1,0 +1,14 @@
+%guard_param: A [true]
+%guard_param: B [true]
+%guard_param: B [true]
+
+
+%working_set:[
+'create A' #[A && B] -> A(x~u) @ 1
+'phosphorization' #[C] A(x~u) -> A(x~p) @ 1
+'binding x' #[D] A(x), A(x) -> A(x!1), A(x!1) @ 1
+]
+'binding y' #[E] A(y), A(y) -> A(y!1), A(y!1) @ 1
+
+
+%obs: 'Ap' |A(x~p)|
