@@ -3093,7 +3093,11 @@ module Domain = struct
                   Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler
                     error mvbdu restriction_bdu
                 in
-                if is_true && with_threshold then
+                let error, bdu_handler, is_false =
+                  Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler
+                    error mvbdu
+                in
+                if (is_true && with_threshold) || is_false then
                   error, (bdu_handler, list)
                 else (
                   let error, bdu_handler =
