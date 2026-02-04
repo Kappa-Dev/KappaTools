@@ -125,6 +125,8 @@ rule token = parse
 	 | ',' {COMMA}
 	 | '(' {OP_PAR}
 	 | ')' {CL_PAR}
+	 | '[' { OP_BRA }
+  	 | ']' { CL_BRA }
 	 | '{' {OP_CUR}
 	 | '}' {CL_CUR}
 	 | '|' {PIPE}
@@ -147,6 +149,10 @@ rule token = parse
 		| "obs" -> OBS
 		| "def" -> CONFIG
 		| "token" -> TOKEN
+		| "guard_param" -> GUARD_PARAM
+		| "working_set" -> WORKING_SET
+		| "conflict" -> CONFLICT
+		| "sequential_bond" -> SEQUENTIAL_BOND
 		| _ as s ->
 		   raise (ExceptionDefn.Syntax_Error
 		   ("Instruction \""^s^"\" not recognized",
@@ -161,6 +167,7 @@ rule token = parse
 			       }
 	 | '?' {KAPPA_WLD}
 	 | '_' {KAPPA_SEMI}
+	 | "#[" {SHARP_OP_BRA}
 	 | blank  {token lexbuf}
 	 | eof {reach_eof lexbuf; EOF}
 	 | _ as c {

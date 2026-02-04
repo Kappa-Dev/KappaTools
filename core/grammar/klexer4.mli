@@ -1,6 +1,5 @@
 val model :
-  Lexing.lexbuf ->
-  (int * Ast.parsing_instruction list) * string Loc.annoted list
+  Lexing.lexbuf -> Ast.parsing_instruction list * string Loc.annoted list
 
 val compile :
   Format.formatter ->

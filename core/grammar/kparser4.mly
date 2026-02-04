@@ -15,16 +15,10 @@
   let end_pos = Parsing.rhs_end_pos
   let start_pos = Parsing.rhs_start_pos
 
-  let nr_working_set_rules = ref 0
-  let inc_working_set_rules () = nr_working_set_rules := !nr_working_set_rules + 1
-
   let internal_memory = ref []
   let add x = internal_memory := x :: !internal_memory
   let output () =
-    let o = (!nr_working_set_rules, List.rev !internal_memory) in 
-    let () = internal_memory := [] in 
-    let () = nr_working_set_rules := 0 in 
-    o
+    let o = List.rev !internal_memory in let () = internal_memory := [] in o
 %}
 
 %token EOF COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR OP_BRA CL_BRA AT SEMICOLON
@@ -33,7 +27,7 @@
 %token SHARP UNDERSCORE PIPE RAR LRAR LAR EMAX TMAX CPUTIME TIME EVENT NULL_EVENT
 %token COLON NEWLINE BACKSLASH SIGNATURE TOKEN INIT OBS PLOT PERT CONFIG APPLY
 %token DELETE INTRO SNAPSHOT STOP FLUX TRACK ASSIGN PRINTF PLOTENTRY SPECIES_OF
-%token DO REPEAT ALARM RUN LET GUARD_PARAM SHARP_OP_BRA IF CONFLICT WORKING_SET
+%token DO REPEAT ALARM RUN LET GUARD_PARAM SHARP_OP_BRA CONFLICT WORKING_SET
 %token SEQUENTIAL_BOND
 %token <int> INT
 %token <float> FLOAT
@@ -41,7 +35,7 @@
 %token <string> SPACE COMMENT
 
 %start model
-%type <int * Ast.parsing_instruction list> model
+%type <Ast.parsing_instruction list> model
 
 %start interactive_command
 %type <(Ast.mixture,Ast.mixture,string,Ast.rule) Ast.command> interactive_command
@@ -507,7 +501,7 @@ rule_content:
       (Ast.Edit {Ast.mix; Ast.delta_token},false,pend,an) }
   ;
 
-/*Boolean expression containing compiler parameters*/
+/*Boolean expression containing boolean parameters*/
 small_guard_bool_expr:
   | OP_PAR annoted guard_bool_expr CL_PAR annoted { $3 }
   | TRUE annoted { Logical_formulae.True }
@@ -820,8 +814,8 @@ perturbation_declaration:
 
 working_set_rule:
   | LABEL annoted rule 
-    {let guard, rule = $3 in add (Ast.RULE (Some ($1, rhs_pos 1), guard, rule, true)); inc_working_set_rules () }
-  | rule { let guard, rule = $1 in add (Ast.RULE (None, guard, rule, true)); inc_working_set_rules () }
+    {let guard, rule = $3 in add (Ast.RULE (Some ($1, rhs_pos 1), guard, rule, true))}
+  | rule {let guard, rule = $1 in add (Ast.RULE (None, guard, rule, true))}
 
 working_set:
   | working_set_rule working_set { }

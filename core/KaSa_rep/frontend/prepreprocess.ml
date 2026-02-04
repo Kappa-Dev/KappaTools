@@ -1040,6 +1040,17 @@ let translate_compil parameters error
         error, alg' :: list)
       (error, []) compil.Ast.observables
   in
+  let rules_rev, ws_values, _ =
+    List.fold_left
+      (fun (rules, ws_values, k) (ws_index, label, guard, rule) ->
+        match ws_index with
+        | None -> (ws_index, label, guard, rule) :: rules, ws_values, k
+        | Some _ ->
+          ( (Some k, label, guard, rule) :: rules,
+            Mods.IntMap.add k true ws_values,
+            k + 1 ))
+      ([], Mods.IntMap.empty, 0) compil.Ast.rules
+  in
   let error, _id_set, rules_rev =
     List.fold_left
       (fun (error, id_set, list) (ws_id, id, guard, (rule, p)) ->
@@ -1127,7 +1138,7 @@ let translate_compil parameters error
               :: list )
           ) else
             error, id_set, (ws_id, id, guard, (direct, p)) :: list)
-      (error, id_set, []) compil.Ast.rules
+      (error, id_set, []) rules_rev
   in
   let error, init_rev =
     List.fold_left
@@ -1221,7 +1232,7 @@ let translate_compil parameters error
       Ast.filenames = compil.Ast.filenames;
       Ast.variables = List.rev var_rev;
       Ast.signatures = List.rev signatures_rev;
-      Ast.rules = List.rev rules_rev;
+      Ast.rules = rules_rev;
       Ast.observables = List.rev observables_rev;
       Ast.init = List.rev init_rev;
       Ast.perturbations = List.rev perturbations_rev;
@@ -1229,7 +1240,7 @@ let translate_compil parameters error
       Ast.tokens = compil.Ast.tokens;
       Ast.volumes = compil.Ast.volumes;
       Ast.guard_param_values = compil.Ast.guard_param_values;
-      Ast.working_set_values = compil.Ast.working_set_values;
+      Ast.working_set_values = ws_values;
       Ast.conflicts = compil.Ast.conflicts;
       Ast.sequential_bonds = compil.Ast.sequential_bonds;
     } )

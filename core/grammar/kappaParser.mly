@@ -20,6 +20,8 @@
 %token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
 %token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG KAPPA_WLD KAPPA_SEMI
 %token FLUX ASSIGN PRINTF STOP SNAPSHOT RUN THEN ELSE ALARM APPLY
+%token GUARD_PARAM SHARP_OP_BRA OP_BRA CL_BRA CONFLICT WORKING_SET
+%token SEQUENTIAL_BOND
 %token <int> INT
 %token <string> ID
 %token <string> KAPPA_MRK LABEL
@@ -64,9 +66,14 @@ start_rule:
     | rule_expression newline
         {let (guard, rule) = $1 in
           fun c -> let r = $2 c in {r with Ast.rules = (None, None, guard, rule)::r.Ast.rules}}
+    | WORKING_SET OP_BRA working_set CL_BRA newline 
+        {let ws_rules = $3 []
+          in
+          fun c -> let r = $5 c in 
+          {r with Ast.rules = ws_rules @ r.Ast.rules} }
     | LABEL EQUAL alg_expr newline
         {let out = (($1,rhs_pos 1),$3) in
-	fun c -> let r = $4 c in {r with Ast.variables = out::r.Ast.variables}}
+	        fun c -> let r = $4 c in {r with Ast.variables = out::r.Ast.variables}}
     | instruction newline
 		  { fun c -> let r = $2 c in
 		      match $1 with
@@ -117,7 +124,7 @@ instruction:
     | SIGNATURE error {raise (ExceptionDefn.Syntax_Error
 				(add_pos "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
 
-    | INIT init_declaration {let a,i = $2 in Ast.INIT (None,a,i)}
+    | INIT init_with_guard {let guard,a,i = $2 in Ast.INIT (guard,a,i)}
     | INIT error
 	{ raise (ExceptionDefn.Syntax_Error
 		   (add_pos "Malformed initial condition"))}
@@ -130,6 +137,9 @@ instruction:
     | PERT perturbation_declaration {Ast.PERT (add_pos $2)}
     | CONFIG STRING value_list
 	     {Ast.CONFIG (($2,rhs_pos 2),$3)}
+    | GUARD_PARAM ID boolean {Ast.GUARD_PARAM (($2,rhs_pos 2), $3)}
+    | CONFLICT ID ID ID {Ast.CONFLICT (($2,rhs_pos 2), ($3,rhs_pos 3), ($4,rhs_pos 4))}
+    | SEQUENTIAL_BOND ID ID ID {Ast.SEQUENTIAL_BOND (($2,rhs_pos 2), ($3,rhs_pos 3), ($4,rhs_pos 4))}
     ;
 
 init_declaration:
@@ -139,6 +149,11 @@ init_declaration:
     { ($1,Ast.INIT_MIX ($3, rhs_pos 3)) }
     | ID LAR alg_expr {($3,Ast.INIT_TOK [$1,rhs_pos 1])}
     | alg_expr ID {($1,Ast.INIT_TOK [$2,rhs_pos 2])}
+    ;
+
+init_with_guard:
+    | guard init_declaration {let (alg,init) = $2 in (Some $1,alg,init)}
+    | init_declaration {let (alg,init) = $1 in (None,alg,init)}
     ;
 
 value_list:
@@ -315,6 +330,38 @@ sum_token:
     | alg_expr TYPE ID {[($1,($3,rhs_pos 3))]}
     | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,($3,rhs_pos 3))::l}
 
+
+/*Boolean expression containing compiler parameters*/
+small_guard_bool_expr:
+  | OP_PAR guard_bool_expr CL_PAR { $2 }
+  | TRUE { Logical_formulae.True }
+  | FALSE { Logical_formulae.False }
+  | ID { Logical_formulae.P ($1, rhs_pos 1) }
+  | NOT small_guard_bool_expr
+    { Logical_formulae.NOT $2 }
+  ;
+
+guard_bool_expr_no_or:
+  | small_guard_bool_expr { $1 }
+  | small_guard_bool_expr AND guard_bool_expr_no_or
+    { Logical_formulae.AND ($1, $3)}
+  ;
+
+guard_bool_expr:
+  | guard_bool_expr_no_or { $1 }
+  | guard_bool_expr_no_or OR guard_bool_expr
+    { Logical_formulae.OR ($1, $3) }
+  ;
+
+guard:
+  | SHARP_OP_BRA guard_bool_expr CL_BRA {$2}
+  ;
+
+rule_guard_and_content:
+  | guard rule_content {Some $1, $2 }
+  | rule_content { None, $1 }
+  ;
+
 rule_content:
   | pattern token_expr arrow pattern token_expr
     {Ast.Arrow {Ast.lhs=[$1]; Ast.rm_token = $2; Ast.rhs=[$4]; Ast.add_token = $5},
@@ -334,13 +381,26 @@ rule_content:
     { Ast.Edit {Ast.mix = []; Ast.delta_token = $2},false };
 
 rule_expression:
-  | rule_content birate
+  | rule_guard_and_content birate
     { let (k_def,k_un,k_op,k_op_un) = $2 in
-      let (rewrite,bidirectional) = $1 in
-      None, add_pos {
+      let guard,(rewrite,bidirectional) = $1 in
+      guard, ( {
         Ast.rewrite;Ast.bidirectional;
         Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
-      } };
+      }, Loc.of_pos (Parsing.rhs_start_pos 1) (Parsing.rhs_end_pos 2))};
+
+working_set_newline:
+    | NEWLINE working_set {$2}
+    | {fun c -> c};
+
+working_set:
+  | working_set_newline {$1}
+  | LABEL rule_expression working_set_newline 
+    {let guard, rule = $2 in 
+      fun c -> let r = $3 c in (Some 1, Some ($1, rhs_pos 1), guard, rule)::r }
+  | rule_expression working_set_newline 
+    {let guard, rule = $1 in
+      fun c -> let r = $2 c in (Some 1, None, guard, rule)::r }
 
 arrow:
     | KAPPA_RAR {false}
