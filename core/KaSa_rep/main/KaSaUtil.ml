@@ -3,9 +3,6 @@ module KaSaUtil (Export_to_KaSa : Export_to_KaSa.Type) = struct
     let end_time = Sys.time () in
     let cpu_time = end_time -. start_time in
     let () =
-      print_endline ("PRINTING LOGGER BACKDOOR 1:  " ^ string_of_float cpu_time)
-    in
-    let () =
       if cpu_time <= 1. then
         Loggers.fprintf
           (Remanent_parameters.get_logger_backdoor parameters)
