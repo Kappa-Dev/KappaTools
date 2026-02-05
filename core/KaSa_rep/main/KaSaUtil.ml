@@ -1,4 +1,30 @@
 module KaSaUtil (Export_to_KaSa : Export_to_KaSa.Type) = struct
+  let print_backdoor_timing parameters start_time =
+    let end_time = Sys.time () in
+    let cpu_time = end_time -. start_time in
+    let () =
+      print_endline ("PRINTING LOGGER BACKDOOR 1:  " ^ string_of_float cpu_time)
+    in
+    let () =
+      if cpu_time <= 1. then
+        Loggers.fprintf
+          (Remanent_parameters.get_logger_backdoor parameters)
+          "%0.3f" cpu_time
+      else if cpu_time <= 10. then
+        Loggers.fprintf
+          (Remanent_parameters.get_logger_backdoor parameters)
+          "%.2f" cpu_time
+      else if cpu_time <= 1000. then
+        Loggers.fprintf
+          (Remanent_parameters.get_logger_backdoor parameters)
+          "%3.0f" cpu_time
+      else
+        Loggers.fprintf
+          (Remanent_parameters.get_logger_backdoor parameters)
+          "%3.0g" cpu_time
+    in
+    ()
+
   let print_analysis_result start_time state =
     let parameters = Export_to_KaSa.get_parameters state in
     (*-----------------------------------------------------------------------*)
@@ -441,29 +467,8 @@ module KaSaUtil (Export_to_KaSa : Export_to_KaSa.Type) = struct
           )
         in
         let () =
-          if Remanent_parameters.get_backdoor_timing parameters then (
-            let end_time = Sys.time () in
-            let cpu_time = end_time -. start_time in
-            let () =
-              if cpu_time <= 1. then
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger_backdoor parameters)
-                  "%0.3f" cpu_time
-              else if cpu_time <= 10. then
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger_backdoor parameters)
-                  "%.2f" cpu_time
-              else if cpu_time <= 1000. then
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger_backdoor parameters)
-                  "%3.0f" cpu_time
-              else
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger_backdoor parameters)
-                  "%3.0g" cpu_time
-            in
-            ()
-          )
+          if Remanent_parameters.get_backdoor_timing parameters then
+            print_backdoor_timing parameters start_time
         in
         let () =
           Loggers.flush_logger
