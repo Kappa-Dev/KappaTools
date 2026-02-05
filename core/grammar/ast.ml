@@ -1761,6 +1761,9 @@ let compil_to_json c =
              (Loc.string_annoted_to_json ~filenames)
              (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
+      ( "working_set_values",
+        Mods.IntMap.to_json JsonUtil.of_int JsonUtil.of_bool
+          c.working_set_values );
       ( "guard_param_values",
         Mods.StringMap.to_json JsonUtil.of_string JsonUtil.of_bool
           c.guard_param_values );
@@ -1781,7 +1784,7 @@ let compil_to_json c =
     ]
 
 let compil_of_json = function
-  | `Assoc l as x when List.length l = 12 ->
+  | `Assoc l as x when List.length l = 13 ->
     let var_of_json = JsonUtil.to_string ?error_msg:None in
     (try
        let filenames =
