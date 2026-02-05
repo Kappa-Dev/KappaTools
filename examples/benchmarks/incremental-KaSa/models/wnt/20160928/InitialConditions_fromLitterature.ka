@@ -1,0 +1,35 @@
+%init: 'Init_Dsh3' Dsh3()
+%init: 'Init_APC' APC()
+%init: 'Init_GSK3B' GSK3B()
+%init: 'Init_Axin1' Axin1()
+%init: 'Init_CateninB' CateninB()
+%init: 'Init_Fzd' Fzd()
+%init: 'Init_LRP' LRP()
+%init: 'Init_KC1A' KC1A()
+
+%init: 'Init_PP1A' PP1A()
+%init: 'Init_PP2-B56a' PP2-B56a()
+%init: 'Init_PP2-B55a' PP2-B55a()
+%init: 'Init_BTRCP' BTRCP()
+%init: 'Init_Proteasome' Proteasome()
+%init: 'Init_PPx' PPx()
+%init: 'Init_KC1E' KC1E()
+%init: 'Init_KC1D' KC1D()
+
+%var: 'Init_Dsh3' 50 * 'Nano_Avo_Vol' * 'RescaleFactor' # 100 nmol of Dsh <10.1371/journal.pbio.0000010.st002>
+%var: 'Init_APC' 10 * 'Nano_Avo_Vol' * 'RescaleFactor' # 4 nmol of APC <10.1371/journal.pone.0031882>
+%var: 'Init_GSK3B' 50 * 'Nano_Avo_Vol' * 'RescaleFactor' # 70 nmol of GSK3 <10.1371/journal.pone.0031882>
+%var: 'Init_Axin1' 30 * 'Nano_Avo_Vol' * 'RescaleFactor' # 150 nmol of Axin <10.1371/journal.pone.0031882>, or 0.02nmol <10.1371/journal.pbio.0000010.st002>
+%var: 'Init_CateninB' 300 * 'Nano_Avo_Vol' * 'RescaleFactor' # 490 nmol of Cat-b <10.1371/journal.pone.0031882>
+%var: 'Init_Fzd' 10 * 'Nano_Avo_Vol' * 'RescaleFactor' # 5nmol of Fzld Arbitrary Concentration
+%var: 'Init_LRP' 10 * 'Nano_Avo_Vol' * 'RescaleFactor' # 5nmol of LRP Arbitrary Concentration
+%var: 'Init_KC1A' 10 * 'Nano_Avo_Vol' * 'RescaleFactor' # 50nmol of CK1a Arbitrary Concentration
+
+%var: 'Init_PP1A' 5 * 'Nano_Avo_Vol' * 'RescaleFactor' # 5nmol of PP1a Arbitrary Concentration
+%var: 'Init_PP2-B56a' 5 * 'Nano_Avo_Vol' * 'RescaleFactor' # 5nmol of PP2-B56a Arbitrary Concentration
+%var: 'Init_PP2-B55a' 5 * 'Nano_Avo_Vol' * 'RescaleFactor' # 5nmol of PP2-B55a Arbitrary Concentration
+%var: 'Init_BTRCP' 10 * 'Nano_Avo_Vol' * 'RescaleFactor'  # 100 nmol of the E2 ligase according to <10.1016/S1097-2765(00)80446-3>. We are assuming this is representative of the active E3 complex
+%var: 'Init_Proteasome' 15 * 'Nano_Avo_Vol' * 'RescaleFactor'  # 15nmol of 26s Proteasome, arbitrary concentration
+%var: 'Init_PPx' 20 * 'Nano_Avo_Vol' * 'RescaleFactor' # 20nmol of Mystery Phosphatase Arbitrary Concentration
+%var: 'Init_KC1E' 20 * 'Nano_Avo_Vol' * 'RescaleFactor' # 20nmol of CK1e Arbitrary Concentration
+%var: 'Init_KC1D' 20 * 'Nano_Avo_Vol' * 'RescaleFactor' # 20nmol of CK1d Arbitrary Concentration
