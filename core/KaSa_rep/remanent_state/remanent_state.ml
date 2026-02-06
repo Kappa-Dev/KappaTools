@@ -722,7 +722,7 @@ let get_working_set_rules state =
               Public_data.rule_id = ws_id;
               Public_data.rule_label =
                 (match label with
-                | None -> string_of_int ws_id
+                | None -> ""
                 | Some (l, _) -> l);
               Public_data.rule_ast = "";
               Public_data.rule_position = loc;

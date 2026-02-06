@@ -425,7 +425,7 @@ class virtual new_client ~is_running ~post mailbox =
                   (JsonUtil.of_option Public_data.accuracy_to_json accuracy_scc));
             ])
 
-    method get_working_set_rules =
+    method get_working_set_rules () =
       self#message Rules_kasa (fun b ->
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "WORKING_SET_RULES") ])

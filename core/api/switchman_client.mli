@@ -123,7 +123,7 @@ object
     Lwt.t
 
   method get_working_set_rules :
-    (Public_data.rule list, Result_util.message list) Result_util.t Lwt.t
+    unit -> (Public_data.rule list, Result_util.message list) Result_util.t Lwt.t
 
   method get_previous_node :
     Public_data.short_influence_node option ->

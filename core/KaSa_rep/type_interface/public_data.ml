@@ -790,7 +790,7 @@ let dead_rules_to_json json =
   `Assoc [ dead_rules, JsonUtil.of_list rule_to_json json ]
 
 let dead_rules_of_json = function
-  | `Assoc [ (s, json) ] as x when s = dead_rules ->
+  | `Assoc [ (s, json) ] as x when s = dead_rules || s = working_set_rules ->
     (try JsonUtil.to_list json_to_rule json
      with Not_found ->
        raise
