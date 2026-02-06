@@ -156,6 +156,11 @@ val conditionally_dead_rules_of_json :
 val conditionally_dead_rules_to_json :
   rule_deadness_conditions -> Yojson.Basic.t
 
+type working_set_rules = rule list
+
+val working_set_rules_of_json : Yojson.Basic.t -> working_set_rules
+val working_set_rules_to_json : working_set_rules -> Yojson.Basic.t
+
 type agent_kind = {
   agent_id: int;
   agent_ast: string;

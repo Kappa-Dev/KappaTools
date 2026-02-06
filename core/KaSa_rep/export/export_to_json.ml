@@ -60,6 +60,7 @@ module type Type = sig
   val get_conditionally_dead_rules : state -> state * Yojson.Basic.t
   val get_dead_agents : state -> state * Yojson.Basic.t
   val get_conditionally_dead_agents : state -> state * Yojson.Basic.t
+  val get_working_set_rules : state -> state * Yojson.Basic.t
   val get_separating_transitions : state -> state * Yojson.Basic.t
   val get_constraints_list : state -> state * Yojson.Basic.t
 
@@ -208,6 +209,10 @@ functor
     let get_conditionally_dead_agents state =
       let state, agents = get_conditionally_dead_agents state in
       state, Public_data.conditionally_dead_agents_to_json agents
+
+    let get_working_set_rules state =
+      let rules = get_working_set_rules state in
+      state, Public_data.working_set_rules_to_json rules
 
     let get_separating_transitions state =
       let state, separating_transitions = get_separating_transitions state in

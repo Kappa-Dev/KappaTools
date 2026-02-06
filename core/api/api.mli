@@ -162,6 +162,8 @@ class type manager_static_analysis = object
     (Public_data.accuracy_level * Public_data.accuracy_level * Public_data.scc)
     result
     Lwt.t
+
+  method get_working_set_rules : Public_data.working_set_rules result Lwt.t
 end
 
 class type virtual manager_stories = object

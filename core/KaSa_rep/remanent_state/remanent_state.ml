@@ -707,3 +707,26 @@ let info_to_agent (agent_name, pos, agent_id) =
     Public_data.agent_ast = agent_name;
     Public_data.agent_position = pos;
   }
+
+let get_working_set_rules state =
+  match state.compilation with
+  | None -> []
+  | Some compilation ->
+    List.filter_map
+      (fun (ws_id, label, _, (_, loc)) ->
+        match ws_id with
+        | None -> None
+        | Some ws_id ->
+          Some
+            {
+              Public_data.rule_id = ws_id;
+              Public_data.rule_label =
+                (match label with
+                | None -> string_of_int ws_id
+                | Some (l, _) -> l);
+              Public_data.rule_ast = "";
+              Public_data.rule_position = loc;
+              Public_data.rule_direction = Public_data.Dummy_rule_direction;
+              Public_data.rule_hidden = false;
+            })
+      compilation.Ast.rules

@@ -1932,6 +1932,8 @@ functor
         Remanent_state.get_conditionally_dead_agents
         compute_conditionally_dead_agents
 
+    let get_working_set_rules = Remanent_state.get_working_set_rules
+
     (****************************************************************)
     (*constraints_list*)
     (****************************************************************)

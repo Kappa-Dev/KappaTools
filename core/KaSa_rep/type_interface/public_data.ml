@@ -41,6 +41,7 @@ let position = "location"
 let position_list = "location list"
 let variable = "variable"
 let rule = "rule"
+let working_set_rules = "working set rules"
 let direct = "direct"
 let side_effect = "side effect"
 let source = "source"
@@ -826,6 +827,27 @@ let conditionally_dead_rules_of_json = function
     raise
       (Yojson.Basic.Util.Type_error
          (JsonUtil.exn_msg_cant_import_from_json conditionally_dead_rules, x))
+
+(*********************)
+(* working set rules *)
+(*********************)
+
+type working_set_rules = rule list
+
+let working_set_rules_of_json = function
+  | `Assoc [ (s, json) ] as x when s = working_set_rules ->
+    (try JsonUtil.to_list json_to_rule json
+     with Not_found ->
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json working_set_rules, x)))
+  | x ->
+    raise
+      (Yojson.Basic.Util.Type_error
+         (JsonUtil.exn_msg_cant_import_from_json working_set_rules, x))
+
+let working_set_rules_to_json json =
+  `Assoc [ working_set_rules, JsonUtil.of_list rule_to_json json ]
 
 (***************)
 (* dead agents *)

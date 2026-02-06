@@ -435,3 +435,6 @@ val get_data :
   * Public_data.dead_rules option
   * separating_transitions option
   * int list option
+
+val get_working_set_rules :
+  ('static, 'compile) state -> Public_data.working_set_rules

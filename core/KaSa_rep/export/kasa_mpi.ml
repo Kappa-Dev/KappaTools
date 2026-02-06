@@ -212,6 +212,12 @@ let on_message post text =
     in
     let () = gState := state in
     send_response post id out
+  | Some
+      (id, (`List [ `String "WORKING_SET_RULES" ] | `String "WORKING_SET_RULES"))
+    ->
+    let state, out = get_working_set_rules !gState in
+    let () = gState := state in
+    send_response post id out
   | Some (id, `List [ `String "POLYMERS"; acc_cm; acc_scc ]) ->
     let accuracy_level_cm = Public_data.accuracy_of_json acc_cm in
     let accuracy_level_scc = Public_data.accuracy_of_json acc_scc in

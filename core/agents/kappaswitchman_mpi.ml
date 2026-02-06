@@ -287,6 +287,9 @@ let on_message exec_command message_delimiter =
                        manager#get_potential_polymers accuracy_cm accuracy_scc
                        >>= fun out ->
                        Lwt.return (B (Polymers_kasa, msg_id, out))
+                     | "WORKING_SET_RULES" ->
+                       manager#get_working_set_rules >>= fun out ->
+                       Lwt.return (B (Rules_kasa, msg_id, out))
                      (* KaSim *)
                      | "ProjectParse" ->
                        let patternSharing =
