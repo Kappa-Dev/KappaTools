@@ -163,7 +163,8 @@ class type manager_static_analysis = object
     result
     Lwt.t
 
-  method get_working_set_rules : unit -> Public_data.working_set_rules result Lwt.t
+  method get_working_set_rules :
+    unit -> Public_data.working_set_rules result Lwt.t
 end
 
 class type virtual manager_stories = object

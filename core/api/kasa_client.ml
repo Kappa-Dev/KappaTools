@@ -252,5 +252,6 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       let request = `List [ `String "WORKING_SET_RULES" ] in
       self#message request
       >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
-              Public_data.working_set_rules_of_json x |> Result_util.ok |> Lwt.return)
+              Public_data.working_set_rules_of_json x
+              |> Result_util.ok |> Lwt.return)
   end
