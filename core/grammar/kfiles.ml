@@ -122,6 +122,7 @@ let parse yield catalog =
             lexbuf.Lexing.lex_curr_p <-
               { lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = x }
           in
+          let ws_file = (*rTODO find out if the checkbox is checked*) false in
           acc >>= fun (compile, err) ->
           let compile =
             { compile with Ast.filenames = x :: compile.Ast.filenames }
@@ -130,7 +131,9 @@ let parse yield catalog =
             (fun () ->
               Lwt.wrap1 Klexer4.model lexbuf >>= fun (insts, err') ->
               yield () >>= fun () ->
-              Lwt.return (Cst.append_to_ast_compil insts compile, err' @ err))
+              Lwt.return
+                ( Cst.append_to_ast_compil insts ~all_rules_in_ws:ws_file compile,
+                  err' @ err ))
             (function
               | ExceptionDefn.Syntax_Error (message, range)
               | ExceptionDefn.Malformed_Decl (message, range)

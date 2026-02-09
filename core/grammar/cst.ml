@@ -6,7 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let append_to_ast_compil rev_instr compil =
+let append_to_ast_compil rev_instr ?(all_rules_in_ws = false)
+    ?(rules_in_ws = []) ?(removed_rules = []) compil =
   let compil =
     List.fold_left
       (fun r -> function
@@ -66,16 +67,29 @@ let append_to_ast_compil rev_instr compil =
           })
       compil (List.rev rev_instr)
   in
-  let rules_rev, ws_values, _ =
+  let rules_rev, ws_values, _, _ =
     List.fold_left
-      (fun (rules, ws_values, k) (ws_index, label, guard, rule) ->
-        match ws_index with
-        | None -> (ws_index, label, guard, rule) :: rules, ws_values, k
-        | Some _ ->
-          ( (Some k, label, guard, rule) :: rules,
-            Mods.IntMap.add k true ws_values,
-            k + 1 ))
-      ([], Mods.IntMap.empty, 0) compil.Ast.rules
+      (fun (rules, ws_values, k, i) (ws_index, label, guard, rule) ->
+        if List.exists (( = ) i) removed_rules then
+          rules, ws_values, k, i + 1
+        else (
+          match ws_index with
+          | None ->
+            if all_rules_in_ws || List.exists (( = ) i) rules_in_ws then
+              ( (Some k, label, guard, rule) :: rules,
+                Mods.IntMap.add k true ws_values,
+                k + 1,
+                i + 1 )
+            else
+              (ws_index, label, guard, rule) :: rules, ws_values, k, i + 1
+          | Some _ ->
+            ( (Some k, label, guard, rule) :: rules,
+              Mods.IntMap.add k true ws_values,
+              k + 1,
+              i + 1 )
+        ))
+      ([], Mods.IntMap.empty, 0, 0)
+      compil.Ast.rules
   in
   {
     compil with
