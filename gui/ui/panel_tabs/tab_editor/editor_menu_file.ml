@@ -11,6 +11,7 @@ module Html = Tyxml_js.Html5
 let file_new_modal_id = "menu-editor-file-new-modal"
 let file_new_input_id = "menu-editor-file-new-input"
 let file_dropdown_menu_id = "menu-editor-file-dropdown-menu"
+let file_dropdown_menu_id2 = "menu-editor-file-dropdown-menu-ws"
 let file_new_li_id = "menu-editor-file-new-li"
 let file_open_li_id = "menu-editor-file-open-li"
 let file_open_selector_id = "menu-editor-open-selector-id"
@@ -68,14 +69,14 @@ let open_input =
       ]
     ()
 
-let dropdown (model : State_file.model) =
+let hide_on_empty model l =
+  if Mods.IntMap.is_empty model.State_file.directory then
+    []
+  else
+    l
+
+let dropdown_files (model : State_file.model) =
   (* directories *)
-  let hide_on_empty l =
-    if Mods.IntMap.is_empty model.State_file.directory then
-      []
-    else
-      l
-  in
   let file_li =
     let current_file_pos =
       Option_util.map
@@ -118,8 +119,12 @@ let dropdown (model : State_file.model) =
           ])
       (Mods.IntMap.bindings model.State_file.directory)
   in
+  [] @ file_li
+
+let dropdown (model : State_file.model) =
+  let dropdown_files = dropdown_files model in
   let separator_li =
-    hide_on_empty
+    hide_on_empty model
       [
         Html.li
           ~a:
@@ -151,7 +156,7 @@ let dropdown (model : State_file.model) =
   in
 
   let close_li =
-    hide_on_empty
+    hide_on_empty model
       [
         Html.li
           ~a:[ Html.a_class [ "ui-sort-disabled"; "ui-sort-bottom-anchor" ] ]
@@ -159,57 +164,205 @@ let dropdown (model : State_file.model) =
       ]
   in
   let export_li =
-    hide_on_empty
+    hide_on_empty model
       [
         Html.li
           ~a:[ Html.a_class [ "ui-sort-disabled"; "ui-sort-bottom-anchor" ] ]
           [ Html.a ~a:[ Html.a_id file_export_li_id ] [ Html.cdata "Export" ] ];
       ]
   in
-  [] @ file_li @ separator_li @ new_li @ open_li @ close_li @ export_li
+  dropdown_files @ separator_li @ new_li @ open_li @ close_li @ export_li
+
+let dropdown_rules manager () =
+  let open Lwt.Syntax in
+  let* rules = manager#get_working_set_rules () in
+  let rules =
+    match rules.Result_util.value with
+    | Ok r -> r
+    | Error _ -> []
+  in
+  let file_li =
+    List.map
+      (fun rule ->
+        let rule_id = "rule-" ^ string_of_int rule.Public_data.rule_id in
+        let rule_name =
+          "Rule "
+          ^ string_of_int rule.Public_data.rule_id
+          ^
+          match rule.Public_data.rule_label with
+          | "" -> ""
+          | label -> " ('" ^ label ^ "')"
+        in
+        Html.li
+          ~a:
+            [
+              Html.a_class [ "active"; "ui-state-sortable" ];
+              element_set_filename rule_id;
+            ]
+          [
+            Html.a
+              ~a:[ element_set_filename rule_id ]
+              [
+                Html.div
+                  ~a:
+                    [
+                      Html.a_class [ "checkbox-control-div" ];
+                      element_set_filename rule_id;
+                    ]
+                  [
+                    file_checkbox rule_id true;
+                    Html.span
+                      ~a:
+                        [
+                          Html.a_class [ "checkbox-control-label" ];
+                          element_set_filename rule_id;
+                        ]
+                      [ Html.cdata rule_name ];
+                  ];
+              ];
+          ])
+      rules
+  in
+  Lwt.return ([] @ file_li)
 
 let content =
   let li_list =
     ReactiveData.RList.from_signal
       (React.S.map (fun model -> dropdown model) State_file.model)
   in
+  let li_list_files =
+    ReactiveData.RList.from_signal
+      (React.S.map (fun model -> dropdown_files model) State_file.model)
+  in
+  let li_list_rules =
+    ReactiveData.RList.from_signal
+      (State_project.on_project_change_async ~on:(React.S.const true) ()
+         (React.S.const ()) [] dropdown_rules)
+  in
   [
-    Html.button
-      ~a:
-        [
-          Html.Unsafe.string_attrib "type" "button";
-          Html.a_class [ "btn btn-default"; "dropdown-toggle" ];
-          Html.Unsafe.string_attrib "data-toggle" "dropdown";
-          Html.Unsafe.string_attrib "aria-haspopup" "true";
-          Html.Unsafe.string_attrib "aria-expanded" "false";
-          Tyxml_js.R.filter_attrib (Html.a_disabled ())
-            (React.S.l2
-               (fun model file ->
-                 match model.State_project.model_current_id with
-                 | None -> true
-                 | Some _ ->
-                   (match file.State_file.current with
-                   | None -> false
-                   | Some { State_file.out_of_sync; _ } -> out_of_sync))
-               State_project.model State_file.model);
-        ]
-      [ Html.txt "File"; Html.span ~a:[ Html.a_class [ "caret" ] ] [] ];
-    Tyxml_js.R.Html.ul
-      ~a:[ Html.a_id file_dropdown_menu_id; Html.a_class [ "dropdown-menu" ] ]
-      li_list;
-    Ui_common.create_modal_text_input ~id:file_new_modal_id
-      ~title_label:"New File"
-      ~body:
-        [ [%html {|<div class="input-group">|} [ file_new_input ] {|</div>|}] ]
-      ~submit_label:"Create File"
-      ~submit:
-        (Dom_html.handler (fun _ ->
-             let filename : string = Js.to_string file_new_input_dom##.value in
-             let () = Editor_menu_file_controller.create_file filename in
-             let () =
-               Common.modal ~id:("#" ^ file_new_modal_id) ~action:"hide"
-             in
-             Js._false));
+    Html.div
+      ~a:[ Html.a_class [ "btn-group" ] ]
+      [
+        Html.div
+          ~a:[ Html.a_class [ "choose-file" ] ]
+          [
+            Html.button
+              ~a:
+                [
+                  Html.Unsafe.string_attrib "type" "button";
+                  Html.a_class [ "btn btn-default"; "dropdown-toggle" ];
+                  Html.Unsafe.string_attrib "data-toggle" "dropdown";
+                  Html.Unsafe.string_attrib "aria-haspopup" "true";
+                  Html.Unsafe.string_attrib "aria-expanded" "false";
+                  Tyxml_js.R.filter_attrib (Html.a_disabled ())
+                    (React.S.l2
+                       (fun model file ->
+                         match model.State_project.model_current_id with
+                         | None -> true
+                         | Some _ ->
+                           (match file.State_file.current with
+                           | None -> false
+                           | Some { State_file.out_of_sync; _ } -> out_of_sync))
+                       State_project.model State_file.model);
+                ]
+              [ Html.txt "File"; Html.span ~a:[ Html.a_class [ "caret" ] ] [] ];
+            Tyxml_js.R.Html.ul
+              ~a:
+                [
+                  Html.a_id file_dropdown_menu_id;
+                  Html.a_class [ "dropdown-menu" ];
+                ]
+              li_list;
+            Ui_common.create_modal_text_input ~id:file_new_modal_id
+              ~title_label:"New File"
+              ~body:
+                [
+                  [%html
+                    {|<div class="input-group">|} [ file_new_input ] {|</div>|}];
+                ]
+              ~submit_label:"Create File"
+              ~submit:
+                (Dom_html.handler (fun _ ->
+                     let filename : string =
+                       Js.to_string file_new_input_dom##.value
+                     in
+                     let () =
+                       Editor_menu_file_controller.create_file filename
+                     in
+                     let () =
+                       Common.modal ~id:("#" ^ file_new_modal_id) ~action:"hide"
+                     in
+                     Js._false));
+          ];
+        Html.div
+          ~a:[ Html.a_class [ "choose-working-set" ] ]
+          [
+            Html.button
+              ~a:
+                [
+                  Html.Unsafe.string_attrib "type" "button";
+                  Html.a_class [ "btn btn-default"; "dropdown-toggle" ];
+                  Html.Unsafe.string_attrib "data-toggle" "dropdown";
+                  Html.Unsafe.string_attrib "aria-haspopup" "true";
+                  Html.Unsafe.string_attrib "aria-expanded" "false";
+                  Tyxml_js.R.filter_attrib (Html.a_disabled ())
+                    (React.S.l2
+                       (fun model file ->
+                         match model.State_project.model_current_id with
+                         | None -> true
+                         | Some _ ->
+                           (match file.State_file.current with
+                           | None -> false
+                           | Some { State_file.out_of_sync; _ } -> out_of_sync))
+                       State_project.model State_file.model);
+                ]
+              [
+                Html.txt "Working_set";
+                Html.span ~a:[ Html.a_class [ "caret" ] ] [];
+              ];
+            Tyxml_js.R.Html.ul
+              ~a:
+                [
+                  Html.a_id file_dropdown_menu_id2;
+                  Html.a_class [ "dropdown-menu" ];
+                ]
+              li_list_files;
+          ];
+        Html.div
+          ~a:[ Html.a_class [ "choose-enabled-rules" ] ]
+          [
+            Html.button
+              ~a:
+                [
+                  Html.Unsafe.string_attrib "type" "button";
+                  Html.a_class [ "btn btn-default"; "dropdown-toggle" ];
+                  Html.Unsafe.string_attrib "data-toggle" "dropdown";
+                  Html.Unsafe.string_attrib "aria-haspopup" "true";
+                  Html.Unsafe.string_attrib "aria-expanded" "false";
+                  Tyxml_js.R.filter_attrib (Html.a_disabled ())
+                    (React.S.l2
+                       (fun model file ->
+                         match model.State_project.model_current_id with
+                         | None -> true
+                         | Some _ ->
+                           (match file.State_file.current with
+                           | None -> false
+                           | Some { State_file.out_of_sync; _ } -> out_of_sync))
+                       State_project.model State_file.model);
+                ]
+              [
+                Html.txt "Enabled Rules";
+                Html.span ~a:[ Html.a_class [ "caret" ] ] [];
+              ];
+            Tyxml_js.R.Html.ul
+              ~a:
+                [
+                  Html.a_id file_dropdown_menu_id2;
+                  Html.a_class [ "dropdown-menu" ];
+                ]
+              li_list_rules;
+          ];
+      ];
   ]
 
 let order_files (element : Dom_html.element Js.t) =
