@@ -173,9 +173,9 @@ let dropdown (model : State_file.model) =
   in
   dropdown_files @ separator_li @ new_li @ open_li @ close_li @ export_li
 
-let dropdown_rules manager () =
+let dropdown_rules (manager : Api.concrete_manager) () =
   let open Lwt.Syntax in
-  let* rules = manager#get_working_set_rules () in
+  let* rules = manager#get_working_set_rules in
   let rules =
     match rules.Result_util.value with
     | Ok r -> r
