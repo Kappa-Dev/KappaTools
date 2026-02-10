@@ -159,9 +159,16 @@ for MODEL in "${MODELS[@]}"; do
             echo "⌛ Starting non-incremental analysis:"
         fi
 
-        COMMAND="timeout $TIMEOUT $KASA_BINARY $EXAMPLE_MODEL -syntax $SYNTAX $OPTIONS"
-        echo "$COMMAND"
-        { eval "$COMMAND"; } >> "$STDOUT_OUTPUT_FILE_FULL"
+        cmd=(
+            timeout "$TIMEOUT"
+            "$KASA_BINARY"
+            "$EXAMPLE_MODEL"
+            -syntax "$SYNTAX"
+            $OPTIONS
+            )
+        printf '%q ' "${cmd[@]}"
+        printf '\n'
+        { ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_FULL"
         EXIT_STATUS=$?
 
         echo "<h4>FULL NON INCREMENTAL ANALYSIS</h4><table>" >> "${OUTPUT_FILE}"
@@ -185,9 +192,17 @@ for MODEL in "${MODELS[@]}"; do
             echo "Random list of rules that are removed: $random_rules"
         fi
 
-        COMMAND="timeout $TIMEOUT $KASA_BINARY $EXAMPLE_MODEL -syntax $SYNTAX $OPTIONS --remove-rules $random_rules"
-        echo "$COMMAND"
-        { eval "$COMMAND"; } >> "$STDOUT_OUTPUT_FILE_REMOVED_RULES"
+        cmd=(
+        timeout "$TIMEOUT"
+        "$KASA_BINARY"
+        "$EXAMPLE_MODEL"
+        -syntax "$SYNTAX"
+        $OPTIONS
+        --remove-rules "$random_rules"
+        )
+        printf '%q ' "${cmd[@]}"
+        printf '\n'
+        { ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_REMOVED_RULES"
         EXIT_STATUS=$?
 
         echo "<h4>NON INCREMENTAL ANALYSIS WITH REMOVED RULES</h4><table>" >> "${OUTPUT_FILE}"
@@ -220,9 +235,17 @@ for MODEL in "${MODELS[@]}"; do
             cat "$INPUT_INCREMENTAL_TMP"
         fi
 
-        COMMAND="cat $INPUT_INCREMENTAL_TMP | timeout $TIMEOUT $KASA_INC_BINARY $EXAMPLE_MODEL -syntax $SYNTAX $OPTIONS --rules-in-working-set $random_rules"
-        echo "$COMMAND"
-        { eval "$COMMAND"; } >> "$STDOUT_OUTPUT_FILE_INCREMENTAL"
+        cmd=(
+        timeout "$TIMEOUT"
+        "$KASA_INC_BINARY"
+        "$EXAMPLE_MODEL"
+        -syntax "$SYNTAX"
+        $OPTIONS
+        --rules-in-working-set "$random_rules"
+        )
+        printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
+        printf '\n'
+        { cat "$INPUT_INCREMENTAL_TMP" | ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_INCREMENTAL"
         EXIT_STATUS=$?
 
         # Check if the program was killed by timeout
