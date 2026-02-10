@@ -67,6 +67,8 @@ let widget_update_from_spec (a : Superarg.t) =
           (match !r with
           | None -> ""
           | Some i -> string_of_int i)
+      | Superarg.Int_list r ->
+        set key (String.concat "," (List.map string_of_int !r))
       | Superarg.String r -> set key !r
       | Superarg.String_opt r ->
         set key
@@ -150,12 +152,14 @@ let widget_update_from_cmd (a : Superarg.t) l =
               when opt = key ->
               set key v;
               rem
-            | (Superarg.String_list _ | Superarg.StringNbr_list _), v :: rem
+            | ( ( Superarg.Int_list _ | Superarg.String_list _
+                | Superarg.StringNbr_list _ ),
+                v :: rem )
               when opt = key ->
               set key (get key ^ " " ^ v);
               rem
-            | ( ( Superarg.Int _ | Superarg.Int_opt _ | Superarg.String _
-                | Superarg.String_opt _ | Superarg.Float _
+            | ( ( Superarg.Int _ | Superarg.Int_opt _ | Superarg.Int_list _
+                | Superarg.String _ | Superarg.String_opt _ | Superarg.Float _
                 | Superarg.Float_opt _ | Superarg.Choice _
                 | Superarg.String_list _ | Superarg.StringNbr_list _ ),
                 rem ) ->
@@ -230,6 +234,13 @@ let cmd_of_widget (a : Superarg.t) short =
             key :: v :: accum
           else
             accum
+        | Superarg.Int_list r ->
+          let v = get key in
+          let s = String.split_on_char ',' v in
+          if List.map int_of_string s = !r && short then
+            accum
+          else
+            v :: accum
         | Superarg.String r ->
           let v = get key in
           if v = "" && (!r <> "" || not short) then
@@ -336,12 +347,13 @@ let widget_of_spec (a : Superarg.t) key spec msg lvl parent =
     let lbl = Label.create ~text:" " ~padx:20 f in
     pack ~side:`Left ~expand:true ~fill:`X ~anchor:`W [ coe lbl ];
     Balloon.put ~on:(coe lbl) ~ms:balloon_delay msg
-  | Superarg.Int _ | Superarg.Int_opt _ | Superarg.String _
-  | Superarg.String_opt _ | Superarg.String_list _ | Superarg.StringNbr_list _
-  | Superarg.Float _ | Superarg.Float_opt _ ->
+  | Superarg.Int _ | Superarg.Int_opt _ | Superarg.Int_list _
+  | Superarg.String _ | Superarg.String_opt _ | Superarg.String_list _
+  | Superarg.StringNbr_list _ | Superarg.Float _ | Superarg.Float_opt _ ->
     let ext =
       match spec with
       | Superarg.Int _ | Superarg.Int_opt _ -> "<int>"
+      | Superarg.Int_list _ -> "<int>,..."
       | Superarg.String _ | Superarg.String_opt _ -> "<name>"
       | Superarg.String_list _ | Superarg.StringNbr_list _ -> "<names> ..."
       | Superarg.Float _ | Superarg.Float_opt _ -> "<float>"
