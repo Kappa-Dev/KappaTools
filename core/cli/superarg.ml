@@ -239,9 +239,9 @@ let print_option verbose f (key, spec, msg, _cat, _lvl) =
     | Some i -> Format.fprintf f "  %s <int>   (default: %i)@." key2 i)
   | Int_list r ->
     (match !r with
-    | [] -> Format.fprintf f "  %s <ints>,...   (default: empty)@." key2
+    | [] -> Format.fprintf f "  %s <ints>,...   (default: disabled)@." key
     | l ->
-      Format.fprintf f "  %s <ints>,...   (default %a)@." key2
+      Format.fprintf f "  %s <ints>,...   (default %a)@." key
         (Pp.list Pp.space Format.pp_print_int)
         l)
   | String r ->
