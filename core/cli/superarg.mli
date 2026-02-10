@@ -15,6 +15,7 @@ type spec =
   | Bool of bool ref (* Sets a boolean value *)
   | Int of int ref (* Sets an integer value *)
   | Int_opt of int option ref (* Sets an optional integer value *)
+  | Int_list of int list ref (* Sets a list of integers *)
   | String of string ref (* Sets a string value *)
   | String_opt of string option ref (* Sets an optional string value *)
   | String_list of string list ref (* Sets a list of strings *)

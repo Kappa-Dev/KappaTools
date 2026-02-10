@@ -71,6 +71,7 @@ type spec =
   | Bool of bool ref (* Sets a boolean value *)
   | Int of int ref (* Sets an integer value *)
   | Int_opt of int option ref (* Sets an optional integer value *)
+  | Int_list of int list ref
   | String of string ref (* Sets a string value *)
   | String_opt of string option ref (* Sets an optional string value *)
   | String_list of string list ref (* Sets a list of strings *)
@@ -206,8 +207,8 @@ let check (a : t) =
         in
         f a;
         f b
-      | Void | Int _ | Float _ | Choice _ | Bool _ | Int_opt _ | String _
-      | StringNbr_list _ | String_opt _ | String_list _ | Float_opt _
+      | Void | Int _ | Float _ | Choice _ | Bool _ | Int_opt _ | Int_list _
+      | String _ | StringNbr_list _ | String_opt _ | String_list _ | Float_opt _
       | Choice_list (_, _)
       | MultiExt _ ->
         ())
@@ -236,6 +237,13 @@ let print_option verbose f (key, spec, msg, _cat, _lvl) =
     (match !r with
     | None -> Format.fprintf f "  %s <int>   (default: disabled)@." key2
     | Some i -> Format.fprintf f "  %s <int>   (default: %i)@." key2 i)
+  | Int_list r ->
+    (match !r with
+    | [] -> Format.fprintf f "  %s <ints>,...   (default: empty)@." key2
+    | l ->
+      Format.fprintf f "  %s <ints>,...   (default %a)@." key2
+        (Pp.list Pp.space Format.pp_print_int)
+        l)
   | String r ->
     (match !r with
     | "" -> Format.fprintf f "  %s <name>   (default: disabled)@." key
@@ -394,6 +402,10 @@ let parse_list ~with_tk ?title (a : t) (l : string list) : string list =
             | Int_opt r, rem ->
               r := None;
               rem
+            | Int_list r, v :: rem when opt = key ->
+              let ints = List.map int_of_string (String.split_on_char ',' v) in
+              r := !r @ ints;
+              rem
             | String r, v :: rem when opt = key ->
               r := v;
               rem
@@ -472,7 +484,8 @@ let parse_list ~with_tk ?title (a : t) (l : string list) : string list =
                    (fun _ (l, s) -> doit [] [ nokey l; s ])
                    accum l);
               rem
-            | Multi _, [] | (Void | Int _ | Float _ | Choice _), _ ->
+            | Multi _, [] | (Void | Int _ | Int_list _ | Float _ | Choice _), _
+              ->
               failwith "invalid option or argument"
           with _ ->
             Format.printf "Wrong option or argument for %s@.%a" opt

@@ -1,5 +1,7 @@
 val compile :
   Format.formatter ->
+  rules_in_ws:int list ->
+  removed_rules:int list ->
   ( Ast.agent,
     Ast.agent_sig,
     Ast.mixture,

@@ -42,7 +42,11 @@ val get_compilation :
   compilation_result
 
 val get_ast_from_list_of_files :
-  Ast.syntax_version -> string list -> Ast.parsing_compil
+  rules_in_ws:int list ->
+  removed_rules:int list ->
+  Ast.syntax_version ->
+  string list ->
+  Ast.parsing_compil
 
 val get_ast_from_cli_args : Run_cli_args.t -> Ast.parsing_compil
 

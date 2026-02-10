@@ -109,7 +109,7 @@ functor
       | Remanent_parameters_sig.KaSa -> true
 
     let compute_show_title do_we_show_title log_title state =
-      let parameters = Remanent_state.get_parameters state in
+      let parameters = get_parameters state in
       if do_we_show_title parameters then (
         match log_title with
         | None -> ()
@@ -155,7 +155,7 @@ functor
       (*------------------------------------------------------*)
       match get state with
       | None ->
-        let parameters = Remanent_state.get_parameters state in
+        let parameters = get_parameters state in
         let parameters' =
           Remanent_parameters.update_call_stack parameters debug_mode
             stack_title
@@ -212,17 +212,27 @@ functor
           ( Reachability.static_information,
             Reachability.dynamic_information )
           Remanent_state.state) =
+      let parameters = get_parameters state in
       match Remanent_state.get_init state with
       | Remanent_state.Compil _ -> state, None, None, None
       | Remanent_state.Files files ->
         let () = show_title state in
         let cli = Run_cli_args.default in
         let syntax_version =
-          Remanent_parameters.get_syntax_version
-            (Remanent_state.get_parameters state)
+          Remanent_parameters.get_syntax_version parameters
+        in
+        let rules_in_working_set =
+          Remanent_parameters.get_rules_in_working_set parameters
+        in
+        let rules_to_remove =
+          Remanent_parameters.get_rules_to_remove parameters
         in
         let () = cli.Run_cli_args.syntaxVersion <- syntax_version in
         let () = cli.Run_cli_args.inputKappaFileNames <- files in
+        let () =
+          cli.Run_cli_args.rules_in_working_set <- rules_in_working_set
+        in
+        let () = cli.Run_cli_args.rules_to_remove <- rules_to_remove in
         let compilation_result : Cli_init.compilation_result =
           Cli_init.get_compilation
             ~warning:(fun ~pos:_ _msg -> ())
@@ -262,12 +272,17 @@ functor
     let compute_compilation show_title state =
       let parameters = get_parameters state in
       let syntax_version = Remanent_parameters.get_syntax_version parameters in
+      let removed_rules = Remanent_parameters.get_rules_to_remove parameters in
+      let rules_in_ws =
+        Remanent_parameters.get_rules_in_working_set parameters
+      in
       let compil =
         match Remanent_state.get_init state with
         | Remanent_state.Compil compil -> compil
         | Remanent_state.Files files ->
           let () = show_title state in
-          Cli_init.get_ast_from_list_of_files syntax_version files
+          Cli_init.get_ast_from_list_of_files ~rules_in_ws ~removed_rules
+            syntax_version files
       in
       let state = Remanent_state.set_compilation compil state in
       state, compil

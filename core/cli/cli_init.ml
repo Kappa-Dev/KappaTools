@@ -38,6 +38,8 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
   in
   let () = Format.printf "+ Sanity checks@." in
   let syntax_version = cli_args.Run_cli_args.syntaxVersion in
+  let rules_in_ws = cli_args.Run_cli_args.rules_in_working_set in
+  let removed_rules = cli_args.Run_cli_args.rules_to_remove in
   let var_overwrite, initialMix =
     match kasim_args with
     | None -> [], None
@@ -54,9 +56,12 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
     | Some file ->
       let compil =
         match syntax_version with
-        | Ast.V4 -> Klexer4.compile Format.std_formatter Ast.empty_compil file
+        | Ast.V4 ->
+          Klexer4.compile Format.std_formatter Ast.empty_compil ~rules_in_ws
+            ~removed_rules file
         | Ast.V3 ->
-          KappaLexer.compile Format.std_formatter Ast.empty_compil file
+          KappaLexer.compile Format.std_formatter Ast.empty_compil ~rules_in_ws
+            ~removed_rules file
       in
       let conf, _, _, _ = Configuration.parse compil.Ast.configurations in
       ( Some
@@ -78,16 +83,21 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
     overwrite_t0;
   }
 
-let get_ast_from_list_of_files syntax_version file_list =
+let get_ast_from_list_of_files ~rules_in_ws ~removed_rules syntax_version
+    file_list =
   let compiling_function =
     match syntax_version with
-    | Ast.V4 -> Klexer4.compile Format.std_formatter
-    | Ast.V3 -> KappaLexer.compile Format.std_formatter
+    | Ast.V4 -> Klexer4.compile Format.std_formatter ~rules_in_ws ~removed_rules
+    | Ast.V3 ->
+      KappaLexer.compile Format.std_formatter ~rules_in_ws ~removed_rules
   in
   List.fold_left compiling_function Ast.empty_compil file_list
 
 let get_ast_from_cli_args cli_args =
-  get_ast_from_list_of_files cli_args.Run_cli_args.syntaxVersion
+  get_ast_from_list_of_files
+    ~rules_in_ws:cli_args.Run_cli_args.rules_in_working_set
+    ~removed_rules:cli_args.Run_cli_args.rules_to_remove
+    cli_args.Run_cli_args.syntaxVersion
     cli_args.Run_cli_args.inputKappaFileNames
 
 let get_preprocessed_ast_from_cli_args ~warning ~debug_mode
@@ -100,7 +110,10 @@ let get_preprocessed_ast_from_cli_args ~warning ~debug_mode
         string,
         Ast.rule )
       Ast.compil =
-    get_ast_from_list_of_files cli_args.Run_cli_args.syntaxVersion
+    get_ast_from_list_of_files
+      ~rules_in_ws:cli_args.Run_cli_args.rules_in_working_set
+      ~removed_rules:cli_args.Run_cli_args.rules_to_remove
+      cli_args.Run_cli_args.syntaxVersion
       cli_args.Run_cli_args.inputKappaFileNames
   in
   preprocess_ast ~warning ~debug_mode cli_args ~kasim_args ast
@@ -180,7 +193,10 @@ let get_pack_from_marshalizedfile ~warning kasim_args cli_args marshalized_file
     | None -> { compilation_result; alg_overwrite; overwrite_t0 = None }
     | Some file ->
       let compil =
-        get_ast_from_list_of_files cli_args.Run_cli_args.syntaxVersion [ file ]
+        get_ast_from_list_of_files
+          ~rules_in_ws:cli_args.Run_cli_args.rules_in_working_set
+          ~removed_rules:cli_args.Run_cli_args.rules_to_remove
+          cli_args.Run_cli_args.syntaxVersion [ file ]
       in
       let overwrite_t0 : float option =
         (Configuration.parse compil.Ast.configurations |> fun (a, _, _, _) -> a)

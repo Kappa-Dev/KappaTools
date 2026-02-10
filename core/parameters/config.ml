@@ -146,3 +146,5 @@ let backdoor_nbr_of_non_weakly_reversible_transitions = ref false
 let backdoor_timing = ref false
 let backdoor_file = ref "benchmark.tex"
 let backdoor_directory = ref ""
+let rules_in_working_set = ref ([] : int list)
+let rules_to_remove = ref ([] : int list)

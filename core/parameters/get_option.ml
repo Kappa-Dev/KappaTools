@@ -494,6 +494,18 @@ let options =
         "select the directory for the file to dump backdoor information",
         [],
         Hidden );
+      ( "--rules-in-working-set",
+        Int_list Config.rules_in_working_set,
+        "Comma-separated list of rule indexes that should be added in the \
+         working set",
+        [],
+        Hidden );
+      ( "--remove-rules",
+        Int_list Config.rules_to_remove,
+        "Comma-separated list of rule indexes that should be removed from the \
+         model",
+        [],
+        Hidden );
     ]
 
 let get_option error =

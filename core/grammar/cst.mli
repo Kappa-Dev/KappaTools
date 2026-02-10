@@ -5,6 +5,12 @@
 (* | . \  * This file is distributed under the terms of the                   *)
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
+val compute_ws_values :
+  all_rules_in_ws:bool ->
+  rules_in_ws:int list ->
+  removed_rules:int list ->
+  Ast.parsing_compil ->
+  Ast.parsing_compil
 
 val append_to_ast_compil :
   Ast.parsing_instruction list ->

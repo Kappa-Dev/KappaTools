@@ -16,6 +16,8 @@ type t = {
   mutable batchmode: bool;
   mutable interactive: bool;
   mutable syntaxVersion: Ast.syntax_version;
+  mutable rules_to_remove: int list;
+  mutable rules_in_working_set: int list;
 }
 
 type t_gui = {
@@ -40,6 +42,8 @@ let default : t =
     syntaxVersion = Ast.V4;
     batchmode = false;
     interactive = false;
+    rules_to_remove = [];
+    rules_in_working_set = [];
   }
 
 let default_gui =
@@ -80,6 +84,8 @@ let get_from_gui t_gui =
       | _s -> Ast.V4);
     batchmode = Tools.lowercase !(t_gui.batchmode_gui) = "batch";
     interactive = Tools.lowercase !(t_gui.batchmode_gui) = "interactive";
+    rules_in_working_set = [];
+    rules_to_remove = [];
   }
 
 let copy_from_gui t_gui t =
@@ -92,7 +98,9 @@ let copy_from_gui t_gui t =
   t.outputDirectory <- t_tmp.outputDirectory;
   t.syntaxVersion <- t_tmp.syntaxVersion;
   t.batchmode <- t_tmp.batchmode;
-  t.interactive <- t_tmp.interactive
+  t.interactive <- t_tmp.interactive;
+  t.rules_in_working_set <- t_tmp.rules_in_working_set;
+  t.rules_to_remove <- t_tmp.rules_to_remove
 
 let options_gen (t : t) (t_gui : t_gui) :
     (string

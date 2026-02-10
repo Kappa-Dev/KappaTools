@@ -154,6 +154,8 @@ type marshalisable_parameters = {
   tk_interface: bool;
   html_mode: bool;
   empty_hashtbl_size: int;
+  rules_to_remove: int list;
+  rules_in_working_set: int list;
   backdoors: backdoors;
 }
 

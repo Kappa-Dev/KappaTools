@@ -371,6 +371,8 @@ val reset_current_phase_title :
   Remanent_parameters_sig.parameters -> unit -> unit
 
 val get_empty_hashtbl_size : Remanent_parameters_sig.parameters -> int
+val get_rules_to_remove : Remanent_parameters_sig.parameters -> int list
+val get_rules_in_working_set : Remanent_parameters_sig.parameters -> int list
 
 val get_open_int_interval_inclusive_symbol :
   Remanent_parameters_sig.parameters -> string

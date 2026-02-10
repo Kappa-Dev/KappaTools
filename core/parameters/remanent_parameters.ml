@@ -387,6 +387,8 @@ let get_parameters ?(html_mode = true) ~called_from () =
         false || html_mode,
         Sys.argv )
   in
+  let rules_to_remove = !Config.rules_to_remove in
+  let rules_in_working_set = !Config.rules_in_working_set in
   {
     Remanent_parameters_sig.marshalisable_parameters =
       {
@@ -452,6 +454,8 @@ let get_parameters ?(html_mode = true) ~called_from () =
         Remanent_parameters_sig.called_from;
         Remanent_parameters_sig.html_mode;
         Remanent_parameters_sig.empty_hashtbl_size = 1;
+        Remanent_parameters_sig.rules_to_remove;
+        Remanent_parameters_sig.rules_in_working_set;
         Remanent_parameters_sig.backdoors = fetch_backdoors ();
       };
     Remanent_parameters_sig.save_error_list = (fun _ -> ());
@@ -720,6 +724,12 @@ let get_rate_convention_1 marshalisable =
 let get_empty_hashtbl_size_1 marshalisable =
   marshalisable.Remanent_parameters_sig.empty_hashtbl_size
 
+let get_rules_to_remove_1 marshalisable =
+  marshalisable.Remanent_parameters_sig.rules_to_remove
+
+let get_rules_in_working_set_1 marshalisable =
+  marshalisable.Remanent_parameters_sig.rules_in_working_set
+
 let get_symbols_1 marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1 marshalisable = marshalisable.Remanent_parameters_sig.file
 
@@ -895,6 +905,11 @@ let get_view_accuracy_level =
   upgrade_from_marshal_field get_view_accuracy_level_1
 
 let get_empty_hashtbl_size = upgrade_from_marshal_field get_empty_hashtbl_size_1
+
+let get_rules_in_working_set =
+  upgrade_from_marshal_field get_rules_in_working_set_1
+
+let get_rules_to_remove = upgrade_from_marshal_field get_rules_to_remove_1
 let upgrade_from_influence_map_field f = compose f get_influence_map
 let upgrade_from_contact_map_field f = compose f get_contact_map
 let upgrade_from_symbols_field f = compose f get_symbols

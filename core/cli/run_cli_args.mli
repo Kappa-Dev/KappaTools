@@ -8,6 +8,8 @@ type t = {
   mutable batchmode: bool;
   mutable interactive: bool;
   mutable syntaxVersion: Ast.syntax_version;
+  mutable rules_to_remove: int list;
+  mutable rules_in_working_set: int list;
 }
 
 type t_gui = {
