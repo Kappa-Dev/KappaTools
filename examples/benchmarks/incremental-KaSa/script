@@ -7,9 +7,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 KASA_BINARY="${SCRIPT_DIR}/../../../bin/KaSa"
 KASA_INC_BINARY="${SCRIPT_DIR}/../../../bin/KaSaIncremental"
 KAPPA_OUTPUT_DIR="${SCRIPT_DIR}/../../../output/"
+INPUT_INCREMENTAL_TMP="${MODELS_DIRECTORY}inc_analysis_input_tmp.txt"
 
 # default values for variables
 TIMEOUT=3m
+REPS=2 # how often to repeat each experiment
+NR_RULES=10 # how many rules to remove
 
 # help message
 print_help() {
@@ -18,15 +21,23 @@ Usage: ${0} [options]
 
 Options:
   -t <timeout>   Set timeout value (default: $TIMEOUT)
+  -r <int>       Set how many reps to do for each experiment (default: $REPS)
+  -s <int>       Set how many rules to remove in each experiment (default: $NR_RULES)
   -h             Show this help message and exit
 EOF
 }
 
 # parse arguments
-while getopts ":t:h" opt; do
+while getopts ":t:r:s:h" opt; do
     case "$opt" in
         t)
             TIMEOUT="$OPTARG"
+            ;;
+        r)
+            REPS="$OPTARG"
+            ;;
+        s)
+            NR_RULES="$OPTARG"
             ;;
         h)
             print_help
@@ -48,7 +59,8 @@ done
 shift $((OPTIND - 1))
 
 echo "Using a timeout of $TIMEOUT."
-echo "Using 10 rules in the working set."
+echo "Using $NR_RULES rules in the working set."
+echo "Performing $REPS repetitions for each experiment."
 
 OPTIONS="--reset-all --compute-reachability-analysis --enable-every-domain"
 # models
@@ -75,10 +87,17 @@ korkut_20170113="${MODELS_DIRECTORY}korkut/20170113/prior_model.ka"
 wnt_20170322="${MODELS_DIRECTORY}wnt/20170322/full_model.ka"
 wnt_20151228="${MODELS_DIRECTORY}wnt/20151228/model_bigwnt.ka"
 
+# To find the number of rules (not fool-proo):
+# grep -v "^#" model | grep -c "->" -
+korkut_20170206_nr_rules=5750
+korkut_20170113_nr_rules=3916
+wnt_20170322_nr_rules=1470
+wnt_20151228_nr_rules=356
+egfr_net_nr_rules=23
+
 # Array of models
 MODELS=("korkut_20170113" "korkut_20170206" "wnt_20151228" "wnt_20170322")
-OTHER_AVAILABLE_MODELS=("egfr_net" "fceri_fyn" "fceri_fyn_lig" "fceri_fyn_trimer" "fceri_gamma2")
-TODO_MODELS=("ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB" "fceri_ji" "machine" "ensemble")
+OTHER_AVAILABLE_MODELS=("egfr_net" "fceri_fyn" "fceri_fyn_lig" "fceri_fyn_trimer" "fceri_gamma2" "ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB" "fceri_ji" "machine" "ensemble")
 
 OUTPUT_DIR="${SCRIPT_DIR}/output/"
 PROFILING_FILE="${KAPPA_OUTPUT_DIR}profiling.html"
@@ -110,9 +129,12 @@ echo "Analyzing models: $AVAILABLE_MODELS"
 # Analyze each model
 for MODEL in "${MODELS[@]}"; do
     EXAMPLE_MODEL=${!MODEL}
+    var_tmp="${MODEL}_nr_rules"
+    value_tmp=${!var_tmp}
+    NR_RULES_MODEL=$(($value_tmp-1))
 
     echo
-    echo "Processing model: $MODEL"
+    echo "Processing model: $MODEL ($value_tmp rules)"
 
     # output files
     OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_experiments_output"
@@ -130,76 +152,94 @@ for MODEL in "${MODELS[@]}"; do
         SYNTAX="V3"
     fi
 
-    # CLASSICAL ANALYSIS
-    if $DEBUG; then
-        echo "⌛ Starting non-incremental analysis:"
-    fi
+    for (( i=1; i<=$REPS; i++ ))
+    do
+        # CLASSICAL ANALYSIS
+        if $DEBUG; then
+            echo "⌛ Starting non-incremental analysis:"
+        fi
 
-    echo "timeout "$TIMEOUT" "$KASA_BINARY" "$EXAMPLE_MODEL" -syntax $SYNTAX"
-    { timeout "$TIMEOUT" "$KASA_BINARY" "$EXAMPLE_MODEL" -syntax $SYNTAX; } >> "$STDOUT_OUTPUT_FILE_FULL"
-    EXIT_STATUS=$?
+        COMMAND="timeout $TIMEOUT $KASA_BINARY $EXAMPLE_MODEL -syntax $SYNTAX $OPTIONS"
+        echo "$COMMAND"
+        { eval "$COMMAND"; } >> "$STDOUT_OUTPUT_FILE_FULL"
+        EXIT_STATUS=$?
 
-    
-    echo "<h4>FULL NON INCREMENTAL ANALYSIS</h4><table>" > "${OUTPUT_FILE}"
-    grep "Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-    grep "Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-    echo "</table>" >> "${OUTPUT_FILE}"
+        echo "<h4>FULL NON INCREMENTAL ANALYSIS</h4><table>" >> "${OUTPUT_FILE}"
+        grep "Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep "Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        echo "</table>" >> "${OUTPUT_FILE}"
 
-    # Check if the program was killed by timeout
-    if [ $EXIT_STATUS -eq 124 ]; then
-        echo "⚠️ Timeout or memory overflow occurred for $MODEL (non-incremental analysis 1)."
-        break
-    fi
+        # Check if the program was killed by timeout
+        if [ $EXIT_STATUS -eq 124 ]; then
+            echo "⚠️ Timeout or memory overflow occurred for $MODEL (non-incremental analysis 1)."
+            break
+        fi
 
-    if $DEBUG; then
-        echo "⌛ Starting non-incremental analysiswith removed rules:"
-    fi
+        if $DEBUG; then
+            echo "⌛ Starting non-incremental analysis with removed rules:"
+        fi
 
-    echo "timeout "$TIMEOUT" "$KASA_BINARY" "${EXAMPLE_MODEL}_removed_rules.ka" -syntax $SYNTAX $OPTIONS"
-    { timeout "$TIMEOUT" "$KASA_BINARY" "${EXAMPLE_MODEL}_removed_rules.ka" -syntax $SYNTAX $OPTIONS; } >> "$STDOUT_OUTPUT_FILE_REMOVED_RULES"
-    EXIT_STATUS=$?
+        random_rules=$(shuf -i 0-$NR_RULES_MODEL -n $NR_RULES | paste -sd,)
 
-    echo "<h4>NON INCREMENTAL ANALYSIS WITH REMOVED RULES</h4><table>" >> "${OUTPUT_FILE}"
-    grep "Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-    grep "Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-    echo "</table>" >> "${OUTPUT_FILE}"
+        if $DEBUG; then
+            echo "Random list of rules that are removed: $random_rules"
+        fi
+
+        COMMAND="timeout $TIMEOUT $KASA_BINARY $EXAMPLE_MODEL -syntax $SYNTAX $OPTIONS --remove-rules $random_rules"
+        echo "$COMMAND"
+        { eval "$COMMAND"; } >> "$STDOUT_OUTPUT_FILE_REMOVED_RULES"
+        EXIT_STATUS=$?
+
+        echo "<h4>NON INCREMENTAL ANALYSIS WITH REMOVED RULES</h4><table>" >> "${OUTPUT_FILE}"
+        grep "Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep "Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        echo "</table>" >> "${OUTPUT_FILE}"
 
 
-    # Check if the program was killed by timeout
-    if [ $EXIT_STATUS -eq 124 ]; then
-        echo "⚠️ Timeout or memory overflow occurred for $MODEL (non-incremental analysis 2)."
-        break
-    fi
+        # Check if the program was killed by timeout
+        if [ $EXIT_STATUS -eq 124 ]; then
+            echo "⚠️ Timeout or memory overflow occurred for $MODEL (non-incremental analysis 2)."
+            break
+        fi
 
-    # INCREMENTAL ANALYSIS
-    if $DEBUG; then
-        echo "⚡️ Starting incremental analysis:"
-    fi
+        # INCREMENTAL ANALYSIS
+        if $DEBUG; then
+            echo "⚡️ Starting incremental analysis:"
+        fi
 
-    INPUT_INCREMENTAL="${V3_MODELS_DIRECTORY}inc_analysis_input.txt"
-    
-    if $DEBUG; then
-        echo "INCREMENTAL COMMANDS:"
-        cat "$INPUT_INCREMENTAL"
-    fi
+        > "$INPUT_INCREMENTAL_TMP"
+        for (( jj=0; jj<$NR_RULES; jj++ ))
+        do
+            echo "disable $jj" >> "$INPUT_INCREMENTAL_TMP"
+        done
+        echo "print result" >> "$INPUT_INCREMENTAL_TMP"
+        echo "q" >> "$INPUT_INCREMENTAL_TMP"
+        
+        if $DEBUG; then
+            echo "INCREMENTAL COMMANDS:"
+            cat "$INPUT_INCREMENTAL_TMP"
+        fi
 
-    echo "cat "$INPUT_INCREMENTAL" | timeout "$TIMEOUT" "$KASA_INC_BINARY" "${EXAMPLE_MODEL}_ws.ka"  -syntax $SYNTAX"
-    { cat "$INPUT_INCREMENTAL" | timeout "$TIMEOUT" "$KASA_INC_BINARY" "${EXAMPLE_MODEL}_ws.ka"  -syntax $SYNTAX; } >> "$STDOUT_OUTPUT_FILE_INCREMENTAL"
-    EXIT_STATUS=$?
+        COMMAND="cat $INPUT_INCREMENTAL_TMP | timeout $TIMEOUT $KASA_INC_BINARY $EXAMPLE_MODEL -syntax $SYNTAX $OPTIONS --rules-in-working-set $random_rules"
+        echo "$COMMAND"
+        { eval "$COMMAND"; } >> "$STDOUT_OUTPUT_FILE_INCREMENTAL"
+        EXIT_STATUS=$?
 
-    # Check if the program was killed by timeout
-    if [ $EXIT_STATUS -eq 124 ]; then
-        echo "⚠️ Timeout or memory overflow occurred for $MODEL in the incremental analysis."
-        break
-    fi
+        # Check if the program was killed by timeout
+        if [ $EXIT_STATUS -eq 124 ]; then
+            echo "⚠️ Timeout or memory overflow occurred for $MODEL in the incremental analysis."
+            break
+        fi
 
-    echo "<h4>INCREMENTAL ANALYSIS</h4><table>" >> "${OUTPUT_FILE}"
-    grep -m 2 "Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-    grep -m 2 "Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-    grep "Enable or disable a rule" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-    grep "Print result of reachability analysis" "$PROFILING_FILE" | tail -2 >> "${OUTPUT_FILE}"
-    echo "</table>" >> "${OUTPUT_FILE}"
+        echo "<h4>INCREMENTAL ANALYSIS</h4><table>" >> "${OUTPUT_FILE}"
+        grep -m 2 "Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep -m 2 "Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep "Enable or disable a rule" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep "Print result of reachability analysis" "$PROFILING_FILE" | tail -2 >> "${OUTPUT_FILE}"
+        echo "</table>" >> "${OUTPUT_FILE}"
+    done
 
+    rm $INPUT_INCREMENTAL_TMP
 
     echo "✅ Completed: $MODEL"
     echo "The results of the incremental analysis can be found in: $STDOUT_OUTPUT_FILE_INCREMENTAL"
@@ -209,16 +249,12 @@ for MODEL in "${MODELS[@]}"; do
     # Check for exceptions in STDOUT_OUTPUT_FILE
     if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_FULL"; then
         echo "🚨 Exception raised during analysis of $MODEL 1."
-    else
-        if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_REMOVED_RULES"; then
-            echo "🚨 Exception raised during analysis of $MODEL 2."
-        else 
-            if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_INCREMENTAL"; then
-                echo "🚨 Exception raised during analysis of $MODEL 3."
-            else 
-                echo "No exceptions during execution."
-            fi
-        fi
     fi
+    if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_REMOVED_RULES"; then
+        echo "🚨 Exception raised during analysis of $MODEL 2."
+    fi
+    if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_INCREMENTAL"; then
+        echo "🚨 Exception raised during analysis of $MODEL 3."
+    fi 
 
 done
