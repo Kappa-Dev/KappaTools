@@ -18,7 +18,7 @@ let help_message =
 
 type parsed_instruction =
   | Add of string
-  | Enable_index of bool * int
+  | Enable_index of bool * int list
   | Enable of bool * string
   | Parsing_error of string
 
@@ -28,27 +28,35 @@ let parse_input s =
     | "" -> Parsing_error "Empty rule name"
     | s ->
       let fst = String.sub s 0 1 in
+      (*labeled rule*)
       if fst = "'" then
         if String.sub s (String.length s - 1) 1 = "'" then
           Enable (bool, String.sub s 1 (String.length s - 2))
         else
           Parsing_error "Label quotation marks were not closed"
-      else (
-        match int_of_string_opt s with
-        | None ->
-          Parsing_error
-            ("Invalid index: " ^ s
-           ^ ". Please put a label inside of quotation marks, e.g. 'label'.")
-        | Some i -> Enable_index (bool, i)
-      )
+      else
+        List.fold_left
+          (fun e i ->
+            match e with
+            | Enable_index (bool, l) ->
+              (match int_of_string_opt i with
+              | None ->
+                Parsing_error
+                  ("Invalid index list: " ^ s
+                 ^ ". Please put a label inside of quotation marks, e.g. \
+                    'label'.")
+              | Some i -> Enable_index (bool, i :: l))
+            | e -> e)
+          (Enable_index (bool, []))
+          (String.split_on_char ',' s)
   in
   (* ---- ADD ---- *)
   if String.starts_with ~prefix:"add" s then (
     let s = String.trim (String.sub s 3 (String.length s - 3)) in
-    Add s
+    Add s (* ---- ENABLE ---- *)
   ) else if String.starts_with ~prefix:"enable" s then (
     let s = String.trim (String.sub s 6 (String.length s - 6)) in
-    parse_enable_label s true
+    parse_enable_label s true (* ---- DISABLE ---- *)
   ) else if String.starts_with ~prefix:"disable" s then (
     let s = String.trim (String.sub s 7 (String.length s - 7)) in
     parse_enable_label s false
@@ -129,10 +137,16 @@ let main () =
             in
             Export_to_KaSa.enable_rule i state
           | Enable_index (false, i) ->
-            let () = Loggers.fprintf log "Disabling rule at index %d...\n" i in
+            let () =
+              Loggers.fprintf log "Disabling rules at index %s...\n"
+                (String.concat "," (List.map string_of_int (List.rev i)))
+            in
             Export_to_KaSa.disable_rule_index i state
           | Enable_index (true, i) ->
-            let () = Loggers.fprintf log "Enabling rule at index %d...\n" i in
+            let () =
+              Loggers.fprintf log "Enabling rules at index %s...\n"
+                (String.concat "," (List.map string_of_int (List.rev i)))
+            in
             Export_to_KaSa.enable_rule_index i state
           | Parsing_error s ->
             let error = Export_to_KaSa.get_errors state in

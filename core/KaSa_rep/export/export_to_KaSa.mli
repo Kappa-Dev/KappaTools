@@ -132,8 +132,8 @@ module type Type = sig
 
   val enable_rule : string -> state -> state
   val disable_rule : string -> state -> state
-  val enable_rule_index : int -> state -> state
-  val disable_rule_index : int -> state -> state
+  val enable_rule_index : int list -> state -> state
+  val disable_rule_index : int list -> state -> state
 end
 
 module Export : functor (Reachability : Analyzer.Analyzer) -> Type

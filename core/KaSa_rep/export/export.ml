@@ -2086,9 +2086,8 @@ functor
 
     let get_data = Remanent_state.get_data
 
-    let toggle_working_set_boolean_parameter_in_compilation error bool state
-        working_set_index =
-      let guard_int = Ckappa_sig.int_of_working_set_index working_set_index in
+    let toggle_working_set_boolean_parameters_in_compilation error bool state
+        working_set_indexes =
       let parameters = Remanent_state.get_parameters state in
       match Remanent_state.get_compilation state with
       | None ->
@@ -2098,28 +2097,68 @@ functor
         in
         error, state, false
       | Some compilation ->
-        (match
-           Mods.IntMap.find_option guard_int compilation.Ast.working_set_values
-         with
-        | None ->
-          let error, () =
-            Exception.warn parameters error __POS__
-              ~message:
-                ("Index out of bounds: there is no rule with index "
-                ^ Ckappa_sig.string_of_working_set_index working_set_index
-                ^ " in the working set")
-              Exit ()
+        (match Remanent_state.get_c_compil state with
+        | None -> error, state, false
+        | Some c_compil ->
+          let rec toggle_parameters = function
+            | [] ->
+              ( error,
+                compilation.Ast.working_set_values,
+                c_compil.Cckappa_sig.working_set_valuations,
+                false )
+            | working_set_index :: indexes ->
+              let error, working_set_values, working_set_valuations, changed =
+                toggle_parameters indexes
+              in
+              let guard_int =
+                Ckappa_sig.int_of_working_set_index working_set_index
+              in
+              (match Mods.IntMap.find_option guard_int working_set_values with
+              | None ->
+                let error, () =
+                  Exception.warn parameters error __POS__
+                    ~message:
+                      ("Index out of bounds: there is no rule with index "
+                      ^ Ckappa_sig.string_of_working_set_index working_set_index
+                      ^ " in the working set")
+                    Exit ()
+                in
+                error, working_set_values, working_set_valuations, false
+              | Some old_bool ->
+                if old_bool = bool then
+                  error, working_set_values, working_set_valuations, changed
+                else (
+                  let working_set_values =
+                    Mods.IntMap.add guard_int bool working_set_values
+                  in
+                  let error, (guard_id, _) =
+                    Ckappa_sig.Ws_index_map_and_set.Map.find_default parameters
+                      error
+                      (Ckappa_sig.guard_parameter_of_int (-1), false)
+                      working_set_index working_set_valuations
+                  in
+                  let error, working_set_valuations =
+                    Ckappa_sig.Ws_index_map_and_set.Map.add_or_overwrite
+                      parameters error working_set_index (guard_id, bool)
+                      working_set_valuations
+                  in
+                  error, working_set_values, working_set_valuations, true
+                ))
           in
-          error, state, false
-        | Some old_bool ->
-          if old_bool = bool then
-            error, state, false
-          else (
-            let working_set_values =
-              Mods.IntMap.add guard_int bool compilation.Ast.working_set_values
+          let error, working_set_values, working_set_valuations, changed =
+            toggle_parameters working_set_indexes
+          in
+          if changed then (
+            let state =
+              Remanent_state.set_compilation
+                { compilation with working_set_values }
+                state
             in
-            let compilation = { compilation with working_set_values } in
-            let state = Remanent_state.set_compilation compilation state in
+            let state =
+              Remanent_state.set_c_compil
+                { c_compil with working_set_valuations }
+                state
+            in
             let state =
               match Remanent_state.get_refined_compil state with
               | Some c ->
@@ -2128,37 +2167,15 @@ functor
                   state
               | None -> state
             in
-            let error, state =
-              match Remanent_state.get_c_compil state with
-              | Some c ->
-                let working_set_valuations =
-                  c.Cckappa_sig.working_set_valuations
-                in
-                let error, (guard_id, _) =
-                  Ckappa_sig.Ws_index_map_and_set.Map.find_default parameters
-                    error
-                    (Ckappa_sig.guard_parameter_of_int (-1), false)
-                    working_set_index working_set_valuations
-                in
-                let error, working_set_valuations =
-                  Ckappa_sig.Ws_index_map_and_set.Map.add_or_overwrite
-                    parameters error working_set_index (guard_id, bool)
-                    working_set_valuations
-                in
-                ( error,
-                  Remanent_state.set_c_compil
-                    { c with working_set_valuations }
-                    state )
-              | None -> error, state
-            in
             error, state, true
-          ))
+          ) else
+            error, state, false)
 
-    let enable_or_disable_rule bool working_set_index state =
+    let enable_or_disable_rule bool working_set_indexes state =
       let error = Remanent_state.get_errors state in
       let error, state, changed =
-        toggle_working_set_boolean_parameter_in_compilation error bool state
-          working_set_index
+        toggle_working_set_boolean_parameters_in_compilation error bool state
+          working_set_indexes
       in
       if changed then (
         let state, (static, dynamic) = get_reachability_analysis state in
@@ -2218,17 +2235,19 @@ functor
       let state, ws_id = ws_id_from_rule_name name state in
       match ws_id with
       | None -> state
-      | Some ws_id -> enable_or_disable_rule true ws_id state
+      | Some ws_id -> enable_or_disable_rule true [ ws_id ] state
 
     let disable_rule name state =
       let state, ws_id = ws_id_from_rule_name name state in
       match ws_id with
       | None -> state
-      | Some ws_id -> enable_or_disable_rule false ws_id state
+      | Some ws_id -> enable_or_disable_rule false [ ws_id ] state
 
     let enable_rule_index index =
-      enable_or_disable_rule true (Ckappa_sig.working_set_index_of_int index)
+      enable_or_disable_rule true
+        (List.map Ckappa_sig.working_set_index_of_int index)
 
     let disable_rule_index index =
-      enable_or_disable_rule false (Ckappa_sig.working_set_index_of_int index)
+      enable_or_disable_rule false
+        (List.map Ckappa_sig.working_set_index_of_int index)
   end
