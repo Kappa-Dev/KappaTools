@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val create_file : filename:string -> content:string -> unit Api.lwt_result
+val create_file : filename:string -> content:string -> working_set:bool -> unit Api.lwt_result
 (** Create a file *)
 
 val select_file : string -> int option -> unit Api.lwt_result

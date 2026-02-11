@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val create_file : ?text:Js.js_string Js.t Lwt.t -> string -> unit
+val create_file : ?text:Js.js_string Js.t Lwt.t -> ?working_set:bool -> string -> unit
 val set_file : string -> unit
 val close_file : unit -> unit
 val export_current_file : unit -> unit

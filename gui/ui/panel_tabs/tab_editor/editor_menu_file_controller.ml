@@ -8,12 +8,12 @@
 
 open Lwt.Infix
 
-let create_file ?(text = Lwt.return (Js.string "")) (file_id : string) : unit =
+let create_file ?(text = Lwt.return (Js.string "")) ?(working_set=false) (file_id : string) : unit =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__
         ( text >>= fun txt ->
           let content = Js.to_string txt in
-          State_file.create_file ~filename:file_id ~content
+          State_file.create_file ~filename:file_id ~content ~working_set
           >>= (* get new contact map *)
           fun r ->
           State_project.sync () >>= fun r' ->

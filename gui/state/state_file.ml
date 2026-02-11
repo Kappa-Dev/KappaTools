@@ -108,7 +108,7 @@ let update_directory ~reset current catalog =
   in
   set_directory_state { current; directory }
 
-let create_file ~(filename : string) ~(content : string) : unit Api.lwt_result =
+let create_file ~(filename : string) ~(content : string) ~(working_set : bool) : unit Api.lwt_result =
   State_project.eval_with_project ~label:"create_file" (fun manager ->
       manager#file_catalog
       >>= Api_common.result_bind_with_lwt ~ok:(fun catalog ->
@@ -124,7 +124,7 @@ let create_file ~(filename : string) ~(content : string) : unit Api.lwt_result =
                     (fun acc { Kfiles.position; _ } -> max acc position)
                     0 catalog
                 in
-                manager#file_create (succ max_pos) filename content
+                manager#file_create (succ max_pos) filename content working_set
                 >>= Api_common.result_bind_with_lwt ~ok:(fun () ->
                         manager#file_catalog
                         >>= Api_common.result_bind_with_lwt ~ok:(fun catalog' ->
@@ -221,7 +221,7 @@ let set_compile file_id (compile : bool) : unit Api.lwt_result =
       in
       let () = set_directory_state { current = state.current; directory } in
       State_project.eval_with_project ~label:"set_compile" (fun manager ->
-          manager#file_create rank name content)
+          manager#file_create rank name content false)
     ) else
       Lwt.return (Result_util.ok ())
   | Some (rank, { local = None; name }) ->
@@ -376,7 +376,7 @@ let sync ?(reset = false) () : unit Api.lwt_result =
               send_refresh None))
 
 let load_default () : unit Lwt.t =
-  create_file ~filename:"model.ka" ~content:""
+  create_file ~filename:"model.ka" ~content:"" ~working_set:false
   >>= Result_util.fold
         ~ok:(fun () -> Lwt.return_unit)
         ~error:(fun errors ->
@@ -422,11 +422,11 @@ let load_models () : unit Lwt.t =
                 let filecontent : string =
                   content.Js_of_ocaml_lwt.XmlHttpRequest.content
                 in
-                Lwt.return (Result_util.ok (filename, filecontent))
+                Lwt.return (Result_util.ok (filename, filecontent)) 
             ))
       >>= (* add content *)
       Api_common.result_bind_with_lwt ~ok:(fun (filename, content) ->
-          create_file ~filename ~content
+          create_file ~filename ~content ~working_set:false
           >>= Api_common.result_bind_with_lwt ~ok:(fun () ->
                   Lwt.return (Result_util.ok filename)))
       >>= (* select model if needed *)
