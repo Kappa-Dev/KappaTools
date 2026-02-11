@@ -126,6 +126,9 @@ mkdir -p "${OUTPUT_DIR}"
 echo
 echo "Analyzing models: $AVAILABLE_MODELS"
 
+GLOBAL_OUTPUT_FILE="${OUTPUT_DIR}experiments_output.csv"
+echo "model,nr_rules,analysis_type,step_name,rep,nr_removed_rules,time" > "$GLOBAL_OUTPUT_FILE"
+
 # Analyze each model
 for MODEL in "${MODELS[@]}"; do
     EXAMPLE_MODEL=${!MODEL}
@@ -173,7 +176,9 @@ for MODEL in "${MODELS[@]}"; do
 
         echo "<h4>FULL NON INCREMENTAL ANALYSIS</h4><table>" >> "${OUTPUT_FILE}"
         grep "Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,full,fixpoint,$i,$NR_RULES,&/g" >> "${GLOBAL_OUTPUT_FILE}"
         grep "Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,full,print,$i,$NR_RULES,&/g" >> "${GLOBAL_OUTPUT_FILE}"
         echo "</table>" >> "${OUTPUT_FILE}"
 
         # Check if the program was killed by timeout
@@ -207,7 +212,9 @@ for MODEL in "${MODELS[@]}"; do
 
         echo "<h4>NON INCREMENTAL ANALYSIS WITH REMOVED RULES</h4><table>" >> "${OUTPUT_FILE}"
         grep "Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,partial,fixpoint,$i,$NR_RULES,&/g" >> "${GLOBAL_OUTPUT_FILE}"
         grep "Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,partial,print,$i,$NR_RULES,&/g" >> "${GLOBAL_OUTPUT_FILE}"
         echo "</table>" >> "${OUTPUT_FILE}"
 
 
@@ -222,11 +229,12 @@ for MODEL in "${MODELS[@]}"; do
             echo "⚡️ Starting incremental analysis:"
         fi
 
-        > "$INPUT_INCREMENTAL_TMP"
-        for (( jj=0; jj<$NR_RULES; jj++ ))
+        echo -n "disable 0" > "$INPUT_INCREMENTAL_TMP"
+        for (( jj=1; jj<$NR_RULES; jj++ ))
         do
-            echo "disable $jj" >> "$INPUT_INCREMENTAL_TMP"
+            echo -n  ",$jj" >> "$INPUT_INCREMENTAL_TMP"
         done
+        echo "" >> "$INPUT_INCREMENTAL_TMP"
         echo "print result" >> "$INPUT_INCREMENTAL_TMP"
         echo "q" >> "$INPUT_INCREMENTAL_TMP"
         
@@ -255,11 +263,20 @@ for MODEL in "${MODELS[@]}"; do
         fi
 
         echo "<h4>INCREMENTAL ANALYSIS</h4><table>" >> "${OUTPUT_FILE}"
+
         grep -m 2 "Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep -m 1 "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,incremental,fixpoint,$i,$NR_RULES,&/g" >> "${GLOBAL_OUTPUT_FILE}"
+
         grep -m 2 "Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep -m 1 "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,incremental,print1,$i,$NR_RULES,&/g" >> "${GLOBAL_OUTPUT_FILE}"
+
         grep "Enable or disable a rule" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        grep "End</TD><TD>Enable or disable a rule" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,incremental,disable,$i,$NR_RULES,&/g" >> "${GLOBAL_OUTPUT_FILE}"
+
         grep "Print result of reachability analysis" "$PROFILING_FILE" | tail -2 >> "${OUTPUT_FILE}"
         echo "</table>" >> "${OUTPUT_FILE}"
+        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | tail -1 | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,incremental,print2,$i,$NR_RULES,&/g" >> "${GLOBAL_OUTPUT_FILE}"
+
     done
 
     rm $INPUT_INCREMENTAL_TMP
