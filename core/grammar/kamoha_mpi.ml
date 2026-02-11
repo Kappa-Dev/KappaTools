@@ -65,8 +65,12 @@ let on_message yield post =
                        let content =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
+                       let working_set =
+                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
+                       in
                        let out =
-                         Kfiles.file_create ~position ~id ~content catalog
+                         Kfiles.file_create ~position ~id ~content ~working_set
+                           catalog
                        in
                        Lwt.return (B (Nothing, msg_id, lift_answer out))
                      | "FileGet" ->
@@ -93,6 +97,17 @@ let on_message yield post =
                        in
                        let out = Kfiles.file_patch ~id content catalog in
                        Lwt.return (B (Nothing, msg_id, lift_answer out))
+                     | "FileUpdateWS" ->
+                       let id =
+                         JsonUtil.read_next_item Yojson.Basic.read_string st b
+                       in
+                       let working_set =
+                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
+                       in
+                       let out =
+                         Kfiles.file_set_working_set ~id working_set catalog
+                       in
+                       Lwt.return (B (Nothing, msg_id, lift_answer out))
                      | "FileDelete" ->
                        let id =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
@@ -109,7 +124,12 @@ let on_message yield post =
                        let content =
                          JsonUtil.read_next_item Ast.read_parsing_compil st b
                        in
-                       let () = Kfiles.overwrite id content catalog in
+                       let working_set =
+                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
+                       in
+                       let () =
+                         Kfiles.overwrite id ~working_set content catalog
+                       in
                        Lwt.return (B (Nothing, msg_id, Result_util.ok ()))
                      | x ->
                        Lwt.return

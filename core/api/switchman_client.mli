@@ -18,6 +18,7 @@ object
     int ->
     string ->
     string ->
+    bool ->
     (unit, Result_util.message list) Result_util.t Lwt.t
 
   method file_delete :
@@ -31,6 +32,9 @@ object
 
   method file_update :
     string -> string -> (unit, Result_util.message list) Result_util.t Lwt.t
+
+  method file_update_ws :
+    string -> bool -> (unit, Result_util.message list) Result_util.t Lwt.t
 
   method get_constraints_list :
     ( (string * Public_data.agent list Public_data.lemma list) list,
@@ -148,6 +152,7 @@ object
   method project_overwrite :
     string ->
     Kappa_grammar.Ast.parsing_compil ->
+    bool ->
     (unit, Result_util.message list) Result_util.t Lwt.t
 
   method project_parse :

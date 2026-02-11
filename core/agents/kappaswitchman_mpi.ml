@@ -111,8 +111,11 @@ let on_message exec_command message_delimiter =
                        let content =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
-                       manager#file_create position id content >>= fun out ->
-                       Lwt.return (B (Nothing, msg_id, out))
+                       let working_set =
+                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
+                       in
+                       manager#file_create position id content working_set
+                       >>= fun out -> Lwt.return (B (Nothing, msg_id, out))
                      | "FileGet" ->
                        let id =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
@@ -137,6 +140,15 @@ let on_message exec_command message_delimiter =
                        in
                        manager#file_update id content >>= fun out ->
                        Lwt.return (B (Nothing, msg_id, out))
+                     | "FileUpdateWS" ->
+                       let id =
+                         JsonUtil.read_next_item Yojson.Basic.read_string st b
+                       in
+                       let working_set =
+                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
+                       in
+                       manager#file_update_ws id working_set >>= fun out ->
+                       Lwt.return (B (Nothing, msg_id, out))
                      | "FileDelete" ->
                        let id =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
@@ -150,8 +162,11 @@ let on_message exec_command message_delimiter =
                        let content =
                          JsonUtil.read_next_item Ast.read_parsing_compil st b
                        in
-                       manager#project_overwrite id content >>= fun out ->
-                       Lwt.return (B (Nothing, msg_id, out))
+                       let working_set =
+                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
+                       in
+                       manager#project_overwrite id content working_set
+                       >>= fun out -> Lwt.return (B (Nothing, msg_id, out))
                      (* KaSa *)
                      | "INIT" ->
                        let compil =

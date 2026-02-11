@@ -101,6 +101,15 @@ class virtual new_client ~post mailbox : Api.manager_model =
               (fun b -> Yojson.Basic.write_string b file_content);
             ])
 
+    method file_update_ws file_id working_set =
+      self#message Nothing (fun b ->
+          JsonUtil.write_sequence b
+            [
+              (fun b -> Yojson.Basic.write_string b "FileUpdateWS");
+              (fun b -> Yojson.Basic.write_string b file_id);
+              (fun b -> Yojson.Basic.write_bool b working_set);
+            ])
+
     method file_move file_position file_id =
       self#message Nothing (fun b ->
           JsonUtil.write_sequence b
@@ -118,7 +127,7 @@ class virtual new_client ~post mailbox : Api.manager_model =
               (fun b -> Yojson.Basic.write_string b file_id);
             ])
 
-    method file_create file_position file_id file_content =
+    method file_create file_position file_id file_content working_set =
       self#message Nothing (fun b ->
           JsonUtil.write_sequence b
             [
@@ -126,6 +135,7 @@ class virtual new_client ~post mailbox : Api.manager_model =
               (fun b -> Yojson.Basic.write_int b file_position);
               (fun b -> Yojson.Basic.write_string b file_id);
               (fun b -> Yojson.Basic.write_string b file_content);
+              (fun b -> Yojson.Basic.write_bool b working_set);
             ])
 
     method file_catalog =
@@ -138,12 +148,13 @@ class virtual new_client ~post mailbox : Api.manager_model =
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "ProjectParse") ])
 
-    method project_overwrite file_id ast =
+    method project_overwrite file_id ast working_set =
       self#message Nothing (fun b ->
           JsonUtil.write_sequence b
             [
               (fun b -> Yojson.Basic.write_string b "ProjectOverwrite");
               (fun b -> Yojson.Basic.write_string b file_id);
               (fun b -> Ast.write_parsing_compil b ast);
+              (fun b -> Yojson.Basic.write_bool b working_set);
             ])
   end

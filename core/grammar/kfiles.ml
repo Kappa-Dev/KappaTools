@@ -8,7 +8,7 @@
 
 open Lwt.Infix
 
-type item = { rank: int; content: string }
+type item = { rank: int; content: string; working_set: bool }
 
 type catalog = {
   elements: (string, item) Hashtbl.t;
@@ -47,8 +47,8 @@ let create () =
     ast = ref None;
   }
 
-let put ~position:rank ~id ~content catalog =
-  let () = Hashtbl.replace catalog.elements id { rank; content } in
+let put ~position:rank ~id ~content ~working_set catalog =
+  let () = Hashtbl.replace catalog.elements id { rank; content; working_set } in
   match Mods.DynArray.get catalog.index rank with
   | None ->
     let () = Mods.DynArray.set catalog.index rank (Some id) in
@@ -59,27 +59,40 @@ let put ~position:rank ~id ~content catalog =
       ("Slot " ^ string_of_int rank ^ " is not available. There is already "
      ^ aie)
 
-let file_create ~position ~id ~content catalog =
+let file_create ~position ~id ~content ~working_set catalog =
   if Hashtbl.mem catalog.elements id then
     Result.Error
       ("A file called \"" ^ id ^ "\" is already present in the catalog")
   else
-    put ~position ~id ~content catalog
+    put ~position ~id ~content ~working_set catalog
 
 let file_move ~position ~id catalog =
   match Hashtbl.find_all catalog.elements id with
   | [] -> Result.Error ("Missing file \"" ^ id ^ "\" in the catalog")
   | _ :: _ :: _ -> Result.Error "File catalog has serious problems"
-  | [ { rank; content } ] ->
+  | [ { rank; content; working_set } ] ->
     let () = Mods.DynArray.set catalog.index rank None in
-    put ~position ~id ~content catalog
+    put ~position ~id ~content ~working_set catalog
 
 let file_patch ~id content catalog =
   match Hashtbl.find_all catalog.elements id with
   | [] -> Result.Error ("Unknown file \"" ^ id ^ "\"")
   | _ :: _ :: _ -> Result.Error "Serious problems in file catalog"
-  | [ { rank; _ } ] ->
-    let () = Hashtbl.replace catalog.elements id { rank; content } in
+  | [ { rank; content = _; working_set } ] ->
+    let () =
+      Hashtbl.replace catalog.elements id { rank; content; working_set }
+    in
+    let () = catalog.ast := None in
+    Result.Ok ()
+
+let file_set_working_set ~id working_set catalog =
+  match Hashtbl.find_all catalog.elements id with
+  | [] -> Result.Error ("Unknown file \"" ^ id ^ "\"")
+  | _ :: _ :: _ -> Result.Error "Serious problems in file catalog"
+  | [ { rank; content; _ } ] ->
+    let () =
+      Hashtbl.replace catalog.elements id { rank; content; working_set }
+    in
     let () = catalog.ast := None in
     Result.Ok ()
 
@@ -97,7 +110,7 @@ let file_get ~id catalog =
   match Hashtbl.find_all catalog.elements id with
   | [] -> Result.Error ("File \"" ^ id ^ "\" does not exist")
   | _ :: _ :: _ -> Result.Error "Corrupted file catalog"
-  | [ { rank; content } ] -> Result.Ok (content, rank)
+  | [ { rank; content; _ } ] -> Result.Ok (content, rank)
 
 let catalog catalog =
   Mods.DynArray.fold_righti
@@ -122,7 +135,6 @@ let parse yield catalog =
             lexbuf.Lexing.lex_curr_p <-
               { lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = x }
           in
-          let ws_file = (*rTODO find out if the checkbox is checked*) false in
           acc >>= fun (compile, err) ->
           let compile =
             { compile with Ast.filenames = x :: compile.Ast.filenames }
@@ -132,7 +144,8 @@ let parse yield catalog =
               Lwt.wrap1 Klexer4.model lexbuf >>= fun (insts, err') ->
               yield () >>= fun () ->
               Lwt.return
-                ( Cst.append_to_ast_compil insts ~all_rules_in_ws:ws_file compile,
+                ( Cst.append_to_ast_compil insts
+                    ~all_rules_in_ws:file.working_set compile,
                   err' @ err ))
             (function
               | ExceptionDefn.Syntax_Error (message, range)
@@ -167,9 +180,9 @@ let parse yield catalog =
       in
       Lwt.return (Result_util.error err) )
 
-let overwrite filename ast catalog =
+let overwrite filename ~working_set ast catalog =
   let content = Format.asprintf "%a" Ast.print_parsing_compil_kappa ast in
-  let it = { rank = 0; content } in
+  let it = { rank = 0; content; working_set } in
   let () = Hashtbl.reset catalog.elements in
   let () = Hashtbl.add catalog.elements filename it in
   let () =
