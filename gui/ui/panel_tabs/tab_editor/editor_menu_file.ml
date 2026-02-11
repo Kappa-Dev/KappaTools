@@ -25,8 +25,8 @@ let element_get_filename (element : Dom_html.element Js.t) :
     Js.js_string Js.t Js.opt =
   Common.element_data (element : Dom_html.element Js.t) "file-id"
 
-let element_set_filename ~suffix (name : string) =
-  Html.Unsafe.string_attrib "data-file-id" (name ^ suffix)
+let element_set_filename (name : string) =
+  Html.Unsafe.string_attrib "data-file-id" name
 
 let file_new_input =
   Html.input
@@ -52,7 +52,7 @@ let file_new_input_working_set_checkbox =
 let file_new_input_dom = Tyxml_js.To_dom.of_input file_new_input
 let file_new_input_ws_dom = Tyxml_js.To_dom.of_input file_new_input_working_set_checkbox
 
-let file_checkbox file_id ?(suffix="") is_checked =
+let file_checkbox file_id is_checked =
   let checked_attribute =
     if is_checked then
       [ Html.a_checked () ]
@@ -64,7 +64,7 @@ let file_checkbox file_id ?(suffix="") is_checked =
       ([
          Html.a_input_type `Checkbox;
          Html.a_class [ file_compile_checkbox ];
-         element_set_filename ~suffix file_id;
+         element_set_filename file_id;
        ]
       @ checked_attribute)
     ()
@@ -86,7 +86,7 @@ let hide_on_empty model l =
   else
     l
 
-let dropdown_files ?(suffix="") (model : State_file.model) =
+let dropdown_files (model : State_file.model) =
   (* directories *)
   let file_li =
     let current_file_pos =
@@ -105,24 +105,24 @@ let dropdown_files ?(suffix="") (model : State_file.model) =
           @ [ "ui-state-sortable" ]
         in
         Html.li
-          ~a:[ Html.a_class li_class; element_set_filename ~suffix name ]
+          ~a:[ Html.a_class li_class; element_set_filename name ]
           [
             Html.a
-              ~a:[ element_set_filename ~suffix name ]
+              ~a:[ element_set_filename name ]
               [
                 Html.div
                   ~a:
                     [
                       Html.a_class [ "checkbox-control-div" ];
-                      element_set_filename ~suffix name;
+                      element_set_filename name;
                     ]
                   [
-                    file_checkbox name ~suffix compile;
+                    file_checkbox name compile;
                     Html.span
                       ~a:
                         [
                           Html.a_class [ "checkbox-control-label" ];
-                          element_set_filename ~suffix name;
+                          element_set_filename name;
                         ]
                       [ Html.cdata name ];
                   ];
@@ -185,7 +185,6 @@ let dropdown (model : State_file.model) =
   dropdown_files @ separator_li @ new_li @ open_li @ close_li @ export_li
 
 let dropdown_rules (manager : Api.concrete_manager) () =
-  let suffix = "_rule" in
   let open Lwt.Syntax in
   let* rules = manager#get_working_set_rules in
   let rules =
@@ -209,17 +208,17 @@ let dropdown_rules (manager : Api.concrete_manager) () =
           ~a:
             [
               Html.a_class [ "active"; "ui-state-sortable" ];
-              element_set_filename ~suffix rule_id;
+              element_set_filename rule_id;
             ]
           [
             Html.a
-              ~a:[ element_set_filename ~suffix rule_id ]
+              ~a:[ element_set_filename rule_id ]
               [
                 Html.div
                   ~a:
                     [
                       Html.a_class [ "checkbox-control-div" ];
-                      element_set_filename ~suffix rule_id;
+                      element_set_filename rule_id;
                     ]
                   [
                     file_checkbox rule_id true;
@@ -227,7 +226,7 @@ let dropdown_rules (manager : Api.concrete_manager) () =
                       ~a:
                         [
                           Html.a_class [ "checkbox-control-label" ];
-                          element_set_filename ~suffix rule_id;
+                          element_set_filename rule_id;
                         ]
                       [ Html.cdata rule_name ];
                   ];
@@ -244,7 +243,7 @@ let content =
   in
   let li_list_files =
     ReactiveData.RList.from_signal
-      (React.S.map (fun model -> dropdown_files ~suffix:"_ws" model) State_file.model)
+      (React.S.map (fun model -> dropdown_files model) State_file.model)
   in
   let li_list_rules =
     ReactiveData.RList.from_signal
