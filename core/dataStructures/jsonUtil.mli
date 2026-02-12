@@ -117,6 +117,22 @@ val read_compact_pair :
   Lexing.lexbuf ->
   'a * 'b
 
+val write_compact_triple :
+  (Buffer.t -> 'a -> unit) ->
+  (Buffer.t -> 'b -> unit) ->
+  (Buffer.t -> 'c -> unit) ->
+  Buffer.t ->
+  'a * 'b * 'c ->
+  unit
+
+val read_compact_triple :
+  (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
+  (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'b) ->
+  (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'c) ->
+  Yojson.Basic.lexer_state ->
+  Lexing.lexbuf ->
+  'a * 'b * 'c
+
 val compact_to_pair :
   (Yojson.Basic.t -> 'a) -> (Yojson.Basic.t -> 'b) -> Yojson.Basic.t -> 'a * 'b
 

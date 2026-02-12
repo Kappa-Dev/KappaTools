@@ -9,7 +9,7 @@
 type _ handle =
   | Nothing : unit handle
   | Catalog : Kfiles.catalog_item list handle
-  | Info : (string * int) handle
+  | Info : (string * int * bool) handle
   | Ast : Ast.parsing_compil handle
 
 type box =
@@ -39,8 +39,8 @@ let receive mailbox x =
            | B (Info, thread) ->
              Lwt.wakeup thread
                (read_result
-                  (JsonUtil.read_compact_pair Yojson.Basic.read_string
-                     Yojson.Basic.read_int)
+                  (JsonUtil.read_compact_triple Yojson.Basic.read_string
+                     Yojson.Basic.read_int Yojson.Basic.read_bool)
                   p lb)
            | B (Ast, thread) ->
              Lwt.wakeup thread (read_result Ast.read_parsing_compil p lb)

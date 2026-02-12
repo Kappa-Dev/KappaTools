@@ -25,7 +25,8 @@ object
     string -> (unit, Result_util.message list) Result_util.t Lwt.t
 
   method file_get :
-    string -> (string * int, Result_util.message list) Result_util.t Lwt.t
+    string ->
+    (string * int * bool, Result_util.message list) Result_util.t Lwt.t
 
   method file_move :
     int -> string -> (unit, Result_util.message list) Result_util.t Lwt.t

@@ -110,7 +110,7 @@ let file_get ~id catalog =
   match Hashtbl.find_all catalog.elements id with
   | [] -> Result.Error ("File \"" ^ id ^ "\" does not exist")
   | _ :: _ :: _ -> Result.Error "Corrupted file catalog"
-  | [ { rank; content; _ } ] -> Result.Ok (content, rank)
+  | [ { rank; content; working_set } ] -> Result.Ok (content, rank, working_set)
 
 let catalog catalog =
   Mods.DynArray.fold_righti

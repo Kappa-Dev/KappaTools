@@ -16,7 +16,7 @@ type _ handle =
   | String : string handle
   | Strings : string list handle
   | Catalog : Kfiles.catalog_item list handle
-  | Info : (string * int) handle
+  | Info : (string * int * bool) handle
   | Ast : Ast.parsing_compil handle
   | JSON : Yojson.Basic.t handle
   | Influence_map
@@ -436,8 +436,8 @@ let on_message exec_command message_delimiter =
           | B (JSON, msg_id, x) -> reply post Yojson.Basic.write_json msg_id x
           | B (Info, msg_id, x) ->
             reply post
-              (JsonUtil.write_compact_pair Yojson.Basic.write_string
-                 Yojson.Basic.write_int)
+              (JsonUtil.write_compact_triple Yojson.Basic.write_string
+                 Yojson.Basic.write_int Yojson.Basic.write_bool)
               msg_id x
           | B (Influence_map, msg_id, x) ->
             reply post

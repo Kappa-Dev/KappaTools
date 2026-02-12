@@ -30,7 +30,8 @@ val file_patch : id:string -> string -> catalog -> (unit, string) Result.result
 val file_set_working_set : id:string -> bool -> catalog -> (unit, string) result
 val file_delete : id:string -> catalog -> (unit, string) Result.result
 
-val file_get : id:string -> catalog -> (string * int, string) Result.result
+val file_get :
+  id:string -> catalog -> (string * int * bool, string) Result.result
 (** @return (content, position) *)
 
 val catalog : catalog -> catalog_item list

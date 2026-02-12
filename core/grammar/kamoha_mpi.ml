@@ -11,7 +11,7 @@ let catalog = Kfiles.create ()
 type _ handle =
   | Nothing : unit handle
   | Catalog : Kfiles.catalog_item list handle
-  | Info : (string * int) handle
+  | Info : (string * int * bool) handle
   | Ast : Ast.parsing_compil handle
 
 type box =
@@ -155,8 +155,8 @@ let on_message yield post =
           | B (Ast, msg_id, x) -> reply post Ast.write_parsing_compil msg_id x
           | B (Info, msg_id, x) ->
             reply post
-              (JsonUtil.write_compact_pair Yojson.Basic.write_string
-                 Yojson.Basic.write_int)
+              (JsonUtil.write_compact_triple Yojson.Basic.write_string
+                 Yojson.Basic.write_int Yojson.Basic.write_bool)
               msg_id x)
     with e ->
       (match !current_id with
