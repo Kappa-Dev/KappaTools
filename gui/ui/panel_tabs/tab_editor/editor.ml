@@ -167,7 +167,7 @@ let onload () : unit =
   let () =
     Editor_controller.with_file
       (Result_util.fold
-         ~ok:(fun (content, id) ->
+         ~ok:(fun (content, id, _) ->
            let () = set_filename (Some id) in
            let () = codemirror##setValue (Js.string content) in
            Lwt.return (Result_util.ok ()))

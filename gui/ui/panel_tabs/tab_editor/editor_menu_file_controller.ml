@@ -8,7 +8,8 @@
 
 open Lwt.Infix
 
-let create_file ?(text = Lwt.return (Js.string "")) ?(working_set=false) (file_id : string) : unit =
+let create_file ?(text = Lwt.return (Js.string "")) ?(working_set = false)
+    (file_id : string) : unit =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__
         ( text >>= fun txt ->
@@ -53,6 +54,15 @@ let set_file_compile rank (compile : bool) : unit =
       (* get new contact map *)
       >>= fun _ -> Lwt.return_unit)
 
+let set_file_working_set rank (is_in_ws : bool) : unit =
+  Common.async __LOC__ (fun () ->
+      State_error.wrap __LOC__
+        ( State_file.set_working_set rank is_in_ws >>= fun r ->
+          State_project.sync () >>= fun r' ->
+          Lwt.return (Api_common.result_combine [ r; r' ]) )
+      (* get new contact map *)
+      >>= fun _ -> Lwt.return_unit)
+
 let order_files (filenames : string list) : unit =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__
@@ -66,7 +76,7 @@ let export_current_file () =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__ (State_file.get_file ())
       >>= Result_util.fold
-            ~ok:(fun (data, filename) ->
+            ~ok:(fun (data, filename, _) ->
               let () =
                 Common.saveFile ~data:(Js.string data)
                   ~mime:"application/octet-stream" ~filename

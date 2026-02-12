@@ -8,7 +8,7 @@
 
 open Lwt.Infix
 
-type slot = { local: string option; name: string }
+type slot = { local: string option; name: string; working_set: bool }
 type active = { rank: int; cursor_pos: Loc.position; out_of_sync: bool }
 type model = { current: active option; directory: slot Mods.IntMap.t }
 
@@ -62,19 +62,21 @@ let with_current_file f =
       Lwt.return (Api_common.err_result_of_string error_msg)
     | Some x -> f state active x)
 
-let get_file () : (string * string) Api.lwt_result =
+let get_file () : (string * string * bool) Api.lwt_result =
   with_current_file (fun _state active -> function
-    | { local = None; name } ->
+    | { local = None; name; _ } ->
       State_project.eval_with_project ~label:"get_file" (fun manager ->
           manager#file_get name
-          >>= Api_common.result_bind_with_lwt ~ok:(fun (text, rank') ->
+          >>= Api_common.result_bind_with_lwt
+                ~ok:(fun (text, rank', working_set) ->
                   if active.rank = rank' then
-                    Lwt.return (Result_util.ok (text, name))
+                    Lwt.return (Result_util.ok (text, name, working_set))
                   else (
                     let error_msg = "Inconsistency in rank while get_file." in
                     Lwt.return (Api_common.err_result_of_string error_msg)
                   )))
-    | { local = Some text; name } -> Lwt.return (Result_util.ok (text, name)))
+    | { local = Some text; name; working_set } ->
+      Lwt.return (Result_util.ok (text, name, working_set)))
 
 let send_refresh (line : int option) : unit Api.lwt_result =
   (* only send refresh if there is a current file *)
@@ -87,19 +89,21 @@ let send_refresh (line : int option) : unit Api.lwt_result =
            "File was not in sync. Switching may lead to data lost.")
     else
       get_file ()
-      >>= Api_common.result_bind_with_lwt ~ok:(fun (content, filename) ->
+      >>= Api_common.result_bind_with_lwt
+            ~ok:(fun (content, filename, _working_set) ->
+              (*rTODO remember the working set in refresh?*)
               let () = Common.log_group "Refresh file" in
               let () = Common.debug ~loc:__LOC__ content in
               let () = Common.log_group_end () in
               let () = refresh_file_hook_send { filename; content; line } in
               Lwt.return (Result_util.ok ()))
 
-let update_directory ~reset current catalog =
+let update_directory ~reset ~working_set current catalog =
   let state = React.S.value model in
   let directory =
     List.fold_left
       (fun acc { Kfiles.position; id } ->
-        Mods.IntMap.add position { name = id; local = None } acc)
+        Mods.IntMap.add position { name = id; local = None; working_set } acc)
       (if reset then
          Mods.IntMap.empty
        else
@@ -108,7 +112,8 @@ let update_directory ~reset current catalog =
   in
   set_directory_state { current; directory }
 
-let create_file ~(filename : string) ~(content : string) ~(working_set : bool) : unit Api.lwt_result =
+let create_file ~(filename : string) ~(content : string) ~(working_set : bool) :
+    unit Api.lwt_result =
   State_project.eval_with_project ~label:"create_file" (fun manager ->
       manager#file_catalog
       >>= Api_common.result_bind_with_lwt ~ok:(fun catalog ->
@@ -137,7 +142,7 @@ let create_file ~(filename : string) ~(content : string) ~(working_set : bool) :
                           (Result_util.ok (catalog, metadata.Kfiles.position))))
               >>= Api_common.result_bind_with_lwt ~ok:(fun (catalog, current) ->
                       let () =
-                        update_directory ~reset:false
+                        update_directory ~reset:false ~working_set
                           (Some
                              {
                                rank = current;
@@ -167,7 +172,7 @@ let select_file (filename : string) (line : int option) : unit Api.lwt_result =
               Api_common.result_bind_with_lwt
                 ~ok:(fun rank ->
                   let () =
-                    update_directory ~reset:false
+                    update_directory ~reset:false ~working_set:false
                       (Some
                          {
                            rank;
@@ -181,15 +186,15 @@ let select_file (filename : string) (line : int option) : unit Api.lwt_result =
 
 let set_content (content : string) : unit Api.lwt_result =
   with_current_file (fun state active -> function
-    | { local = Some _; name } ->
+    | { local = Some _; name; working_set } ->
       let directory =
         Mods.IntMap.add active.rank
-          { local = Some content; name }
+          { local = Some content; name; working_set }
           state.directory
       in
       let () = set_directory_state { current = state.current; directory } in
       Lwt.return (Result_util.ok ())
-    | { local = None; name } ->
+    | { local = None; name; _ } ->
       let () =
         set_directory_state
           {
@@ -214,27 +219,28 @@ let set_compile file_id (compile : bool) : unit Api.lwt_result =
   | None ->
     let error_msg = "Internal inconsistency: No file " ^ file_id in
     Lwt.return (Api_common.err_result_of_string error_msg)
-  | Some (rank, { local = Some content; name }) ->
+  | Some (rank, { local = Some content; name; working_set }) ->
     if compile then (
       let directory =
-        Mods.IntMap.add rank { local = None; name } state.directory
+        Mods.IntMap.add rank { local = None; name; working_set } state.directory
       in
       let () = set_directory_state { current = state.current; directory } in
       State_project.eval_with_project ~label:"set_compile" (fun manager ->
-          manager#file_create rank name content false)
+          manager#file_create rank name content working_set)
     ) else
       Lwt.return (Result_util.ok ())
-  | Some (rank, { local = None; name }) ->
+  | Some (rank, { local = None; name; _ }) ->
     if compile then
       Lwt.return (Result_util.ok ())
     else
       State_project.eval_with_project ~label:"set_compile" (fun manager ->
           manager#file_get name
-          >>= Api_common.result_bind_with_lwt ~ok:(fun (content, rank') ->
+          >>= Api_common.result_bind_with_lwt
+                ~ok:(fun (content, rank', working_set) ->
                   if rank = rank' then (
                     let directory =
                       Mods.IntMap.add rank
-                        { local = Some content; name }
+                        { local = Some content; name; working_set }
                         state.directory
                     in
                     let () =
@@ -249,8 +255,46 @@ let set_compile file_id (compile : bool) : unit Api.lwt_result =
                     Lwt.return (Api_common.err_result_of_string error_msg)
                   )))
 
+let set_working_set file_id (working_set : bool) : unit Api.lwt_result =
+  let state = React.S.value model in
+  match
+    Mods.IntMap.filter_one (fun _ { name; _ } -> name = file_id) state.directory
+  with
+  | None ->
+    let error_msg = "Internal inconsistency: No file " ^ file_id in
+    Lwt.return (Api_common.err_result_of_string error_msg)
+  | Some (rank, { local = Some content; name; _ }) ->
+    let directory =
+      Mods.IntMap.add rank
+        { local = Some content; name; working_set }
+        state.directory
+    in
+    let () = set_directory_state { current = state.current; directory } in
+    State_project.eval_with_project ~label:"set_working_set" (fun manager ->
+        manager#file_update_ws name working_set)
+  | Some (rank, { local = None; name; _ }) ->
+    State_project.eval_with_project ~label:"set_working_set" (fun manager ->
+        manager#file_get name
+        >>= Api_common.result_bind_with_lwt
+              ~ok:(fun (content, rank', working_set) ->
+                if rank = rank' then (
+                  let directory =
+                    Mods.IntMap.add rank
+                      { local = Some content; name; working_set }
+                      state.directory
+                  in
+                  let () =
+                    set_directory_state { current = state.current; directory }
+                  in
+                  State_project.eval_with_project ~label:"set_working_set'"
+                    (fun manager -> manager#file_update_ws name working_set)
+                ) else (
+                  let error_msg = "Inconsistency in rank while set_working_set." in
+                  Lwt.return (Api_common.err_result_of_string error_msg)
+                )))
+
 let remove_file () : unit Api.lwt_result =
-  with_current_file (fun state active { local; name } ->
+  with_current_file (fun state active { local; name; _ } ->
       let directory = Mods.IntMap.remove active.rank state.directory in
       let current =
         Option_util.map
@@ -372,7 +416,8 @@ let sync ?(reset = false) () : unit Api.lwt_result =
                 ) else
                   cand
               in
-              let () = update_directory ~reset pos catalog in
+              let () = update_directory ~reset ~working_set:false pos catalog in
+              (*rTODO?*)
               send_refresh None))
 
 let load_default () : unit Lwt.t =
@@ -422,7 +467,7 @@ let load_models () : unit Lwt.t =
                 let filecontent : string =
                   content.Js_of_ocaml_lwt.XmlHttpRequest.content
                 in
-                Lwt.return (Result_util.ok (filename, filecontent)) 
+                Lwt.return (Result_util.ok (filename, filecontent))
             ))
       >>= (* add content *)
       Api_common.result_bind_with_lwt ~ok:(fun (filename, content) ->

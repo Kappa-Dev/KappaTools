@@ -19,6 +19,8 @@ let file_open_selector_id = "menu-editor-open-selector-id"
 let file_close_li_id = "menu-editor-file-close-li"
 let file_export_li_id = "menu-editor-file-export-li"
 let file_compile_checkbox = "menu-editor-file-compile-checkbox"
+let file_ws_checkbox = "menu-editor-file-working-set-checkbox"
+let rule_enabled_checkbox = "menu-editor-rule-enabled-checkbox"
 
 (* list filename annotation *)
 let element_get_filename (element : Dom_html.element Js.t) :
@@ -27,6 +29,9 @@ let element_get_filename (element : Dom_html.element Js.t) :
 
 let element_set_filename (name : string) =
   Html.Unsafe.string_attrib "data-file-id" name
+
+let element_set_rulename (name : string) =
+  Html.Unsafe.string_attrib "data-rule-id" name
 
 let file_new_input =
   Html.input
@@ -42,17 +47,15 @@ let file_new_input =
 
 let file_new_input_working_set_checkbox =
   Html.input
-    ~a:
-      [
-        Html.a_id file_new_input_ws_id;
-        Html.a_input_type `Checkbox;
-      ]
+    ~a:[ Html.a_id file_new_input_ws_id; Html.a_input_type `Checkbox ]
     ()
 
 let file_new_input_dom = Tyxml_js.To_dom.of_input file_new_input
-let file_new_input_ws_dom = Tyxml_js.To_dom.of_input file_new_input_working_set_checkbox
 
-let file_checkbox file_id is_checked =
+let file_new_input_ws_dom =
+  Tyxml_js.To_dom.of_input file_new_input_working_set_checkbox
+
+let file_checkbox file_id is_checked checkbox_class =
   let checked_attribute =
     if is_checked then
       [ Html.a_checked () ]
@@ -63,8 +66,25 @@ let file_checkbox file_id is_checked =
     ~a:
       ([
          Html.a_input_type `Checkbox;
-         Html.a_class [ file_compile_checkbox ];
+         Html.a_class [ checkbox_class ];
          element_set_filename file_id;
+       ]
+      @ checked_attribute)
+    ()
+
+let rule_checkbox rule_id is_checked =
+  let checked_attribute =
+    if is_checked then
+      [ Html.a_checked () ]
+    else
+      []
+  in
+  Html.input
+    ~a:
+      ([
+         Html.a_input_type `Checkbox;
+         Html.a_class [ rule_enabled_checkbox ];
+         element_set_rulename rule_id;
        ]
       @ checked_attribute)
     ()
@@ -86,7 +106,7 @@ let hide_on_empty model l =
   else
     l
 
-let dropdown_files (model : State_file.model) =
+let dropdown_files (model : State_file.model) ~called_from_working_set =
   (* directories *)
   let file_li =
     let current_file_pos =
@@ -95,14 +115,25 @@ let dropdown_files (model : State_file.model) =
         model.State_file.current
     in
     List.map
-      (fun (rank, { State_file.name; State_file.local }) ->
-        let compile = local = None in
+      (fun (rank, { State_file.name; State_file.local; working_set }) ->
+        let compile =
+          if called_from_working_set then
+            working_set
+          else
+            local = None
+        in
         let li_class =
           (if current_file_pos = Some rank then
              [ "active" ]
            else
              [])
           @ [ "ui-state-sortable" ]
+        in
+        let checkbox_class =
+          if called_from_working_set then
+            file_ws_checkbox
+          else
+            file_compile_checkbox
         in
         Html.li
           ~a:[ Html.a_class li_class; element_set_filename name ]
@@ -117,7 +148,7 @@ let dropdown_files (model : State_file.model) =
                       element_set_filename name;
                     ]
                   [
-                    file_checkbox name compile;
+                    file_checkbox name compile checkbox_class;
                     Html.span
                       ~a:
                         [
@@ -133,7 +164,7 @@ let dropdown_files (model : State_file.model) =
   [] @ file_li
 
 let dropdown (model : State_file.model) =
-  let dropdown_files = dropdown_files model in
+  let dropdown_files = dropdown_files ~called_from_working_set:false model in
   let separator_li =
     hide_on_empty model
       [
@@ -208,25 +239,25 @@ let dropdown_rules (manager : Api.concrete_manager) () =
           ~a:
             [
               Html.a_class [ "active"; "ui-state-sortable" ];
-              element_set_filename rule_id;
+              element_set_rulename rule_id;
             ]
           [
             Html.a
-              ~a:[ element_set_filename rule_id ]
+              ~a:[ element_set_rulename rule_id ]
               [
                 Html.div
                   ~a:
                     [
                       Html.a_class [ "checkbox-control-div" ];
-                      element_set_filename rule_id;
+                      element_set_rulename rule_id;
                     ]
                   [
-                    file_checkbox rule_id true;
+                    rule_checkbox rule_id true;
                     Html.span
                       ~a:
                         [
                           Html.a_class [ "checkbox-control-label" ];
-                          element_set_filename rule_id;
+                          element_set_rulename rule_id;
                         ]
                       [ Html.cdata rule_name ];
                   ];
@@ -243,7 +274,9 @@ let content =
   in
   let li_list_files =
     ReactiveData.RList.from_signal
-      (React.S.map (fun model -> dropdown_files model) State_file.model)
+      (React.S.map
+         (fun model -> dropdown_files ~called_from_working_set:true model)
+         State_file.model)
   in
   let li_list_rules =
     ReactiveData.RList.from_signal
@@ -291,7 +324,7 @@ let content =
                   [%html
                     {|<div class="input-group">|} [ file_new_input ] {|</div>|}];
                   file_new_input_working_set_checkbox;
-                 Html.txt "Add rules of this file to the working set"; 
+                  Html.txt "Add rules of this file to the working set";
                 ]
               ~submit_label:"Create File"
               ~submit:
@@ -299,10 +332,12 @@ let content =
                      let filename : string =
                        Js.to_string file_new_input_dom##.value
                      in
-                     let working_set : bool = 
-                      Js.to_bool file_new_input_ws_dom##.checked in
+                     let working_set : bool =
+                       Js.to_bool file_new_input_ws_dom##.checked
+                     in
                      let () =
-                       Editor_menu_file_controller.create_file filename ~working_set
+                       Editor_menu_file_controller.create_file filename
+                         ~working_set
                      in
                      let () =
                        Common.modal ~id:("#" ^ file_new_modal_id) ~action:"hide"
@@ -501,6 +536,42 @@ let onload () =
                  let () = Common.log_group_end () in
                  let () =
                    Editor_menu_file_controller.set_file_compile
+                     (Js.to_string file_id) is_checked
+                 in
+                 ())
+           in
+           Js._false))
+  in
+  let () =
+    Common.jquery_on
+      (Format.sprintf "input.%s" file_ws_checkbox)
+      "change"
+      (Dom_html.handler (fun event ->
+           let target : Dom_html.element Js.t Js.opt = event##.target in
+           let file_id : Js.js_string Js.t Js.opt =
+             Js.Opt.bind target (fun (element : Dom_html.element Js.t) ->
+                 element_get_filename element)
+           in
+           let is_checked : bool =
+             Js.to_bool
+               (Js.Opt.case target
+                  (fun _ -> Js._false)
+                  (fun (element : Dom_html.element Js.t) ->
+                    (Js.Unsafe.coerce element : Dom_html.inputElement Js.t)##.checked))
+           in
+           let () =
+             Js.Opt.case file_id
+               (fun _ -> ())
+               (fun file_id ->
+                 let () =
+                   Common.log_group
+                     "[Editor_menu_file] triggered input.file_ws_checkbox, \
+                      file_id:"
+                 in
+                 let () = Common.debug ~loc:__LOC__ file_id in
+                 let () = Common.log_group_end () in
+                 let () =
+                   Editor_menu_file_controller.set_file_working_set
                      (Js.to_string file_id) is_checked
                  in
                  ())

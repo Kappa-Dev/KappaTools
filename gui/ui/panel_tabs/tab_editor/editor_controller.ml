@@ -8,14 +8,15 @@
 
 open Lwt.Infix
 
-let with_file (handler : (string * string) Api.result -> unit Api.lwt_result) =
+let with_file
+    (handler : (string * string * bool) Api.result -> unit Api.lwt_result) =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__ (State_file.get_file () >>= handler) >>= fun _ ->
       Lwt.return_unit)
 
 let set_content ~(filename : string) ~(filecontent : string) : unit =
   with_file
-    (Api_common.result_bind_with_lwt ~ok:(fun (_, current_filename) ->
+    (Api_common.result_bind_with_lwt ~ok:(fun (_, current_filename, _) ->
          if filename = current_filename then
            State_file.set_content filecontent >>= fun r ->
            State_project.sync () >>= fun r' ->

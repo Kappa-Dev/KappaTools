@@ -7,4 +7,6 @@
 (******************************************************************************)
 
 val set_content : filename:string -> filecontent:string -> unit
-val with_file : ((string * string) Api.result -> unit Api.lwt_result) -> unit
+
+val with_file :
+  ((string * string * bool) Api.result -> unit Api.lwt_result) -> unit
