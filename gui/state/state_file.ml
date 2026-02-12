@@ -64,13 +64,17 @@ let with_current_file f =
 
 let get_file () : (string * string * bool) Api.lwt_result =
   with_current_file (fun _state active -> function
-    | { local = None; name; _ } ->
+    | { local = None; name; working_set } ->
       State_project.eval_with_project ~label:"get_file" (fun manager ->
           manager#file_get name
           >>= Api_common.result_bind_with_lwt
-                ~ok:(fun (text, rank', working_set) ->
+                ~ok:(fun (text, rank', api_working_set) ->
                   if active.rank = rank' then
+                    if working_set = api_working_set then
                     Lwt.return (Result_util.ok (text, name, working_set))
+                    else 
+                      let error_msg = "Inconsistency in working_set bool while get_file." in
+                    Lwt.return (Api_common.err_result_of_string error_msg)
                   else (
                     let error_msg = "Inconsistency in rank while get_file." in
                     Lwt.return (Api_common.err_result_of_string error_msg)
@@ -276,7 +280,7 @@ let set_working_set file_id (working_set : bool) : unit Api.lwt_result =
     State_project.eval_with_project ~label:"set_working_set" (fun manager ->
         manager#file_get name
         >>= Api_common.result_bind_with_lwt
-              ~ok:(fun (content, rank', working_set) ->
+              ~ok:(fun (content, rank', _) ->
                 if rank = rank' then (
                   let directory =
                     Mods.IntMap.add rank
