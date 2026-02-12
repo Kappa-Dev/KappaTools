@@ -32,7 +32,10 @@ object
     int -> string -> (unit, Result_util.message list) Result_util.t Lwt.t
 
   method file_update :
-    string -> string -> (unit, Result_util.message list) Result_util.t Lwt.t
+    string ->
+    string ->
+    bool option ->
+    (unit, Result_util.message list) Result_util.t Lwt.t
 
   method file_update_ws :
     string -> bool -> (unit, Result_util.message list) Result_util.t Lwt.t

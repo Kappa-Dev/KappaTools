@@ -74,11 +74,16 @@ let file_move ~position ~id catalog =
     let () = Mods.DynArray.set catalog.index rank None in
     put ~position ~id ~content ~working_set catalog
 
-let file_patch ~id content catalog =
+let file_patch ~id ~working_set content catalog =
   match Hashtbl.find_all catalog.elements id with
   | [] -> Result.Error ("Unknown file \"" ^ id ^ "\"")
   | _ :: _ :: _ -> Result.Error "Serious problems in file catalog"
-  | [ { rank; content = _; working_set } ] ->
+  | [ { rank; content = _; working_set = old_ws } ] ->
+    let working_set =
+      match working_set with
+      | None -> old_ws
+      | Some ws -> ws
+    in
     let () =
       Hashtbl.replace catalog.elements id { rank; content; working_set }
     in

@@ -95,7 +95,14 @@ let on_message yield post =
                        let content =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
-                       let out = Kfiles.file_patch ~id content catalog in
+                       let working_set =
+                         JsonUtil.read_next_item
+                           (JsonUtil.read_option Yojson.Basic.read_bool)
+                           st b
+                       in
+                       let out =
+                         Kfiles.file_patch ~id ~working_set content catalog
+                       in
                        Lwt.return (B (Nothing, msg_id, lift_answer out))
                      | "FileUpdateWS" ->
                        let id =

@@ -138,7 +138,12 @@ let on_message exec_command message_delimiter =
                        let content =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
-                       manager#file_update id content >>= fun out ->
+                       let working_set =
+                         JsonUtil.read_next_item
+                           (JsonUtil.read_option Yojson.Basic.read_bool)
+                           st b
+                       in
+                       manager#file_update id content working_set >>= fun out ->
                        Lwt.return (B (Nothing, msg_id, out))
                      | "FileUpdateWS" ->
                        let id =

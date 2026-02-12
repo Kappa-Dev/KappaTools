@@ -214,13 +214,16 @@ class virtual new_client ~is_running ~post mailbox =
               (fun b -> Yojson.Basic.write_string b file_id);
             ])
 
-    method file_update file_id file_content =
+    method file_update file_id file_content working_set_opt =
       self#message Nothing (fun b ->
           JsonUtil.write_sequence b
             [
               (fun b -> Yojson.Basic.write_string b "FileUpdate");
               (fun b -> Yojson.Basic.write_string b file_id);
               (fun b -> Yojson.Basic.write_string b file_content);
+              (fun b ->
+                (JsonUtil.write_option Yojson.Basic.write_bool)
+                  b working_set_opt);
             ])
 
     method file_update_ws file_id working_set =

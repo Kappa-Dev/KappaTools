@@ -136,7 +136,7 @@ let create_file ~(filename : string) ~(content : string) ~(working_set : bool) :
                                 Lwt.return
                                   (Result_util.ok (catalog', succ max_pos))))
               | metadata :: _ ->
-                manager#file_update filename content
+                manager#file_update filename content (Some working_set)
                 >>= Api_common.result_bind_with_lwt ~ok:(fun () ->
                         Lwt.return
                           (Result_util.ok (catalog, metadata.Kfiles.position))))
@@ -209,7 +209,7 @@ let set_content (content : string) : unit Api.lwt_result =
           }
       in
       State_project.eval_with_project ~label:"set_content" (fun manager ->
-          manager#file_update name content))
+          manager#file_update name content None))
 
 let set_compile file_id (compile : bool) : unit Api.lwt_result =
   let state = React.S.value model in
@@ -289,7 +289,9 @@ let set_working_set file_id (working_set : bool) : unit Api.lwt_result =
                   State_project.eval_with_project ~label:"set_working_set'"
                     (fun manager -> manager#file_update_ws name working_set)
                 ) else (
-                  let error_msg = "Inconsistency in rank while set_working_set." in
+                  let error_msg =
+                    "Inconsistency in rank while set_working_set."
+                  in
                   Lwt.return (Api_common.err_result_of_string error_msg)
                 )))
 

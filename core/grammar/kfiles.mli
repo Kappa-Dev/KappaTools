@@ -26,7 +26,13 @@ val file_move :
   position:int -> id:string -> catalog -> (unit, string) Result.result
 (** Fails if [position] is not available *)
 
-val file_patch : id:string -> string -> catalog -> (unit, string) Result.result
+val file_patch :
+  id:string ->
+  working_set:bool option ->
+  string ->
+  catalog ->
+  (unit, string) Result.result
+
 val file_set_working_set : id:string -> bool -> catalog -> (unit, string) result
 val file_delete : id:string -> catalog -> (unit, string) Result.result
 

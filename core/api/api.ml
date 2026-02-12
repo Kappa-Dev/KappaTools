@@ -34,7 +34,7 @@ class type virtual manager_model = object
   method file_catalog : Kfiles.catalog_item list result Lwt.t
   method file_create : int -> string -> string -> bool -> unit result Lwt.t
   method file_get : string -> (string * int * bool) result Lwt.t
-  method file_update : string -> string -> unit result Lwt.t
+  method file_update : string -> string -> bool option -> unit result Lwt.t
   method file_update_ws : string -> bool -> unit result Lwt.t
   method file_move : int -> string -> unit result Lwt.t
   method file_delete : string -> unit result Lwt.t
