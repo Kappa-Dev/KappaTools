@@ -9,6 +9,7 @@ val compute_ws_values :
   all_rules_in_ws:bool ->
   rules_in_ws:int list ->
   removed_rules:int list ->
+  Ast.rule Ast.compil_rule list ->
   Ast.parsing_compil ->
   Ast.parsing_compil
 
