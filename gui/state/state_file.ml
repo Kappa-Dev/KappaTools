@@ -71,10 +71,13 @@ let get_file () : (string * string * bool) Api.lwt_result =
                 ~ok:(fun (text, rank', api_working_set) ->
                   if active.rank = rank' then
                     if working_set = api_working_set then
-                    Lwt.return (Result_util.ok (text, name, working_set))
-                    else 
-                      let error_msg = "Inconsistency in working_set bool while get_file." in
-                    Lwt.return (Api_common.err_result_of_string error_msg)
+                      Lwt.return (Result_util.ok (text, name, working_set))
+                    else (
+                      let error_msg =
+                        "Inconsistency in working_set bool while get_file."
+                      in
+                      Lwt.return (Api_common.err_result_of_string error_msg)
+                    )
                   else (
                     let error_msg = "Inconsistency in rank while get_file." in
                     Lwt.return (Api_common.err_result_of_string error_msg)
@@ -231,6 +234,9 @@ let set_compile file_id (compile : bool) : unit Api.lwt_result =
       let () = set_directory_state { current = state.current; directory } in
       State_project.eval_with_project ~label:"set_compile" (fun manager ->
           manager#file_create rank name content working_set)
+    ) else if working_set = true then (
+      let error_msg = "Working_set should not be true for a deleted file." in
+      Lwt.return (Api_common.err_result_of_string error_msg)
     ) else
       Lwt.return (Result_util.ok ())
   | Some (rank, { local = None; name; _ }) ->
@@ -239,12 +245,11 @@ let set_compile file_id (compile : bool) : unit Api.lwt_result =
     else
       State_project.eval_with_project ~label:"set_compile" (fun manager ->
           manager#file_get name
-          >>= Api_common.result_bind_with_lwt
-                ~ok:(fun (content, rank', working_set) ->
+          >>= Api_common.result_bind_with_lwt ~ok:(fun (content, rank', _) ->
                   if rank = rank' then (
                     let directory =
                       Mods.IntMap.add rank
-                        { local = Some content; name; working_set }
+                        { local = Some content; name; working_set = false }
                         state.directory
                     in
                     let () =
@@ -267,37 +272,25 @@ let set_working_set file_id (working_set : bool) : unit Api.lwt_result =
   | None ->
     let error_msg = "Internal inconsistency: No file " ^ file_id in
     Lwt.return (Api_common.err_result_of_string error_msg)
-  | Some (rank, { local = Some content; name; _ }) ->
-    let directory =
-      Mods.IntMap.add rank
-        { local = Some content; name; working_set }
-        state.directory
-    in
-    let () = set_directory_state { current = state.current; directory } in
-    State_project.eval_with_project ~label:"set_working_set" (fun manager ->
-        manager#file_update_ws name working_set)
-  | Some (rank, { local = None; name; _ }) ->
-    State_project.eval_with_project ~label:"set_working_set" (fun manager ->
-        manager#file_get name
-        >>= Api_common.result_bind_with_lwt
-              ~ok:(fun (content, rank', _) ->
-                if rank = rank' then (
-                  let directory =
-                    Mods.IntMap.add rank
-                      { local = Some content; name; working_set }
-                      state.directory
-                  in
-                  let () =
-                    set_directory_state { current = state.current; directory }
-                  in
-                  State_project.eval_with_project ~label:"set_working_set'"
-                    (fun manager -> manager#file_update_ws name working_set)
-                ) else (
-                  let error_msg =
-                    "Inconsistency in rank while set_working_set."
-                  in
-                  Lwt.return (Api_common.err_result_of_string error_msg)
-                )))
+  | Some (_, { local = Some _; _ }) ->
+    if working_set = true then (
+      let error_msg =
+        "Working_set should not be turned to true for a deleted file."
+      in
+      Lwt.return (Api_common.err_result_of_string error_msg)
+    ) else
+      Lwt.return (Result_util.ok ())
+  | Some (rank, { local = None; name; working_set = old_ws }) ->
+    if old_ws = working_set then
+      Lwt.return (Result_util.ok ())
+    else (
+      let directory =
+        Mods.IntMap.add rank { local = None; name; working_set } state.directory
+      in
+      let () = set_directory_state { current = state.current; directory } in
+      State_project.eval_with_project ~label:"set_working_set" (fun manager ->
+          manager#file_update_ws name working_set)
+    )
 
 let remove_file () : unit Api.lwt_result =
   with_current_file (fun state active { local; name; _ } ->

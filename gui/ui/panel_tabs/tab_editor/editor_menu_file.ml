@@ -30,6 +30,17 @@ let element_get_filename (element : Dom_html.element Js.t) :
 let element_set_filename (name : string) =
   Html.Unsafe.string_attrib "data-file-id" name
 
+let element_set_ws_filename (name : string) =
+  Html.Unsafe.string_attrib "data-ws-file-id" name
+
+let element_get_ws_filename (element : Dom_html.element Js.t) :
+    Js.js_string Js.t Js.opt =
+  Common.element_data (element : Dom_html.element Js.t) "ws-file-id"
+
+let _element_get_rulename (element : Dom_html.element Js.t) :
+    Js.js_string Js.t Js.opt =
+  Common.element_data (element : Dom_html.element Js.t) "rule-id"
+
 let element_set_rulename (name : string) =
   Html.Unsafe.string_attrib "data-rule-id" name
 
@@ -55,7 +66,7 @@ let file_new_input_dom = Tyxml_js.To_dom.of_input file_new_input
 let file_new_input_ws_dom =
   Tyxml_js.To_dom.of_input file_new_input_working_set_checkbox
 
-let file_checkbox file_id is_checked checkbox_class =
+let file_checkbox file_id is_checked checkbox_class set_filename =
   let checked_attribute =
     if is_checked then
       [ Html.a_checked () ]
@@ -67,7 +78,7 @@ let file_checkbox file_id is_checked checkbox_class =
       ([
          Html.a_input_type `Checkbox;
          Html.a_class [ checkbox_class ];
-         element_set_filename file_id;
+         set_filename file_id;
        ]
       @ checked_attribute)
     ()
@@ -114,16 +125,23 @@ let dropdown_files (model : State_file.model) ~called_from_working_set =
         (fun { State_file.rank; _ } -> rank)
         model.State_file.current
     in
-    List.map
+    let element_set_filename =
+      if called_from_working_set then
+        element_set_ws_filename
+      else
+        element_set_filename
+    in
+    List.filter_map
       (fun (rank, { State_file.name; State_file.local; working_set }) ->
-        let compile =
+        let compile = local = None in
+        let checked =
           if called_from_working_set then
             working_set
           else
-            local = None
+            compile
         in
         let li_class =
-          (if current_file_pos = Some rank then
+          (if current_file_pos = Some rank && not called_from_working_set then
              [ "active" ]
            else
              [])
@@ -135,30 +153,35 @@ let dropdown_files (model : State_file.model) ~called_from_working_set =
           else
             file_compile_checkbox
         in
-        Html.li
-          ~a:[ Html.a_class li_class; element_set_filename name ]
-          [
-            Html.a
-              ~a:[ element_set_filename name ]
-              [
-                Html.div
-                  ~a:
-                    [
-                      Html.a_class [ "checkbox-control-div" ];
-                      element_set_filename name;
-                    ]
-                  [
-                    file_checkbox name compile checkbox_class;
-                    Html.span
-                      ~a:
-                        [
-                          Html.a_class [ "checkbox-control-label" ];
-                          element_set_filename name;
-                        ]
-                      [ Html.cdata name ];
-                  ];
-              ];
-          ])
+        if called_from_working_set && not compile then
+          None
+        else
+          Some
+            (Html.li
+               ~a:[ Html.a_class li_class; element_set_filename name ]
+               [
+                 Html.a
+                   ~a:[ element_set_filename name ]
+                   [
+                     Html.div
+                       ~a:
+                         [
+                           Html.a_class [ "checkbox-control-div" ];
+                           element_set_filename name;
+                         ]
+                       [
+                         file_checkbox name checked checkbox_class
+                           element_set_filename;
+                         Html.span
+                           ~a:
+                             [
+                               Html.a_class [ "checkbox-control-label" ];
+                               element_set_filename name;
+                             ]
+                           [ Html.cdata name ];
+                       ];
+                   ];
+               ]))
       (Mods.IntMap.bindings model.State_file.directory)
   in
   [] @ file_li
@@ -550,7 +573,7 @@ let onload () =
            let target : Dom_html.element Js.t Js.opt = event##.target in
            let file_id : Js.js_string Js.t Js.opt =
              Js.Opt.bind target (fun (element : Dom_html.element Js.t) ->
-                 element_get_filename element)
+                 element_get_ws_filename element)
            in
            let is_checked : bool =
              Js.to_bool
