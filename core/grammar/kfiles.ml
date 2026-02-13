@@ -16,29 +16,35 @@ type catalog = {
   ast: Ast.parsing_compil option ref;
 }
 
-type catalog_item = { position: int; id: string }
+type catalog_item = { position: int; id: string; working_set: bool }
 
-let write_catalog_item ob { position; id } =
+let write_catalog_item ob { position; id; working_set } =
   let () = Buffer.add_char ob '{' in
   let () = JsonUtil.write_field "id" Yojson.Basic.write_string ob id in
   let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field "position" Yojson.Basic.write_int ob position in
+  let () = JsonUtil.write_comma ob in
+  let () =
+    JsonUtil.write_field "working_set" Yojson.Basic.write_bool ob working_set
+  in
   Buffer.add_char ob '}'
 
 let read_catalog_item p lb =
-  let position, id, count =
+  let position, id, working_set, count =
     Yojson.Basic.read_fields
-      (fun (pos, i, c) key p lb ->
-        if key = "position" then
-          Yojson.Basic.read_int p lb, i, succ c
+      (fun (pos, i, working_set, c) key p lb ->
+        if key = "working_set" then
+          pos, i, Yojson.Basic.read_bool p lb, succ c
+        else if key = "position" then
+          Yojson.Basic.read_int p lb, i, working_set, succ c
         else (
           let () = assert (key = "id") in
-          pos, Yojson.Basic.read_string p lb, succ c
+          pos, Yojson.Basic.read_string p lb, working_set, succ c
         ))
-      (-1, "", 0) p lb
+      (-1, "", false, 0) p lb
   in
-  let () = assert (count = 2) in
-  { position; id }
+  let () = assert (count = 3) in
+  { position; id; working_set }
 
 let create () =
   {
@@ -122,7 +128,9 @@ let catalog catalog =
     (fun position x acc ->
       match x with
       | None -> acc
-      | Some id -> { position; id } :: acc)
+      | Some id ->
+        let file = Hashtbl.find catalog.elements id in
+        { position; id; working_set = file.working_set } :: acc)
     catalog.index []
 
 let parse yield catalog =

@@ -98,18 +98,17 @@ let send_refresh (line : int option) : unit Api.lwt_result =
       get_file ()
       >>= Api_common.result_bind_with_lwt
             ~ok:(fun (content, filename, _working_set) ->
-              (*rTODO remember the working set in refresh?*)
               let () = Common.log_group "Refresh file" in
               let () = Common.debug ~loc:__LOC__ content in
               let () = Common.log_group_end () in
               let () = refresh_file_hook_send { filename; content; line } in
               Lwt.return (Result_util.ok ()))
 
-let update_directory ~reset ~working_set current catalog =
+let update_directory ~reset current catalog =
   let state = React.S.value model in
   let directory =
     List.fold_left
-      (fun acc { Kfiles.position; id } ->
+      (fun acc { Kfiles.position; id; working_set } ->
         Mods.IntMap.add position { name = id; local = None; working_set } acc)
       (if reset then
          Mods.IntMap.empty
@@ -149,7 +148,7 @@ let create_file ~(filename : string) ~(content : string) ~(working_set : bool) :
                           (Result_util.ok (catalog, metadata.Kfiles.position))))
               >>= Api_common.result_bind_with_lwt ~ok:(fun (catalog, current) ->
                       let () =
-                        update_directory ~reset:false ~working_set
+                        update_directory ~reset:false
                           (Some
                              {
                                rank = current;
@@ -166,7 +165,7 @@ let rec choose_file choice = function
       Format.sprintf "Failed to switch file %s." choice
     in
     Api_common.err_result_of_string error_msg
-  | { Kfiles.id; position } :: t ->
+  | { Kfiles.id; position; _ } :: t ->
     if choice = id then
       Result_util.ok position
     else
@@ -179,7 +178,7 @@ let select_file (filename : string) (line : int option) : unit Api.lwt_result =
               Api_common.result_bind_with_lwt
                 ~ok:(fun rank ->
                   let () =
-                    update_directory ~reset:false ~working_set:false
+                    update_directory ~reset:false
                       (Some
                          {
                            rank;
@@ -415,8 +414,7 @@ let sync ?(reset = false) () : unit Api.lwt_result =
                 ) else
                   cand
               in
-              let () = update_directory ~reset ~working_set:false pos catalog in
-              (*rTODO?*)
+              let () = update_directory ~reset pos catalog in
               send_refresh None))
 
 let load_default () : unit Lwt.t =
