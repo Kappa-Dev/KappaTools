@@ -2808,6 +2808,7 @@ let compil_of_ast ~warning ~debug_mode ~syntax_version ~var_overwrite ast_compil
         configurations = ast_compil.configurations;
         guard_param_values = ast_compil.guard_param_values;
         working_set_values = ast_compil.working_set_values;
+        nr_working_set_params = ast_compil.nr_working_set_params;
         conflicts;
         sequential_bonds;
       };

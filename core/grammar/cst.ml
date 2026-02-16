@@ -8,7 +8,7 @@
 
 let compute_ws_values ~all_rules_in_ws ~rules_in_ws ~removed_rules rules compil
     =
-  let rules_rev, working_set_values, _, _ =
+  let rules_rev, working_set_values, nr_working_set_params, _ =
     List.fold_left
       (fun (rules, ws_values, k, i) (ws_index, label, guard, rule) ->
         if List.exists (( = ) i) removed_rules then
@@ -29,13 +29,17 @@ let compute_ws_values ~all_rules_in_ws ~rules_in_ws ~removed_rules rules compil
               k + 1,
               i + 1 )
         ))
-      ([], compil.Ast.working_set_values, 0, 0)
+      ( [],
+        compil.Ast.working_set_values,
+        compil.nr_working_set_params,
+        List.length compil.rules )
       rules
   in
   {
     compil with
     rules = List.rev rules_rev @ compil.Ast.rules;
     working_set_values;
+    nr_working_set_params;
   }
 
 let append_to_ast_compil rev_instr ?(all_rules_in_ws = false)

@@ -1230,6 +1230,7 @@ let translate_compil parameters error
       Ast.volumes = compil.Ast.volumes;
       Ast.guard_param_values = compil.Ast.guard_param_values;
       Ast.working_set_values = compil.Ast.working_set_values;
+      Ast.nr_working_set_params = compil.Ast.nr_working_set_params;
       Ast.conflicts = compil.Ast.conflicts;
       Ast.sequential_bonds = compil.Ast.sequential_bonds;
     } )

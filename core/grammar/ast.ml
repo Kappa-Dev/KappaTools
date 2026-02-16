@@ -207,6 +207,8 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
       (** The guard parameters that have a defined value (true or false).*)
   working_set_values: bool Mods.IntMap.t;
       (** Maps each rule in the working set to true if it is enabled or false if it is disabled.*)
+  nr_working_set_params: int;
+      (** Number of rules that are currently in the working set. *)
   conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
       (** A conflict (A, s1, s2) states that there might be a conflict between the two sites s1, s2 of the agent A.*)
   sequential_bonds: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
@@ -254,6 +256,7 @@ let empty_compil =
     volumes = [];
     guard_param_values = Mods.StringMap.empty;
     working_set_values = Mods.IntMap.empty;
+    nr_working_set_params = 0;
     conflicts = [];
     sequential_bonds = [];
   }
@@ -1764,6 +1767,7 @@ let compil_to_json c =
       ( "working_set_values",
         Mods.IntMap.to_json JsonUtil.of_int JsonUtil.of_bool
           c.working_set_values );
+      "nr_working_set_params", JsonUtil.of_int c.nr_working_set_params;
       ( "guard_param_values",
         Mods.StringMap.to_json JsonUtil.of_string JsonUtil.of_bool
           c.guard_param_values );
@@ -1784,7 +1788,7 @@ let compil_to_json c =
     ]
 
 let compil_of_json = function
-  | `Assoc l as x when List.length l = 13 ->
+  | `Assoc l as x when List.length l = 14 ->
     let var_of_json = JsonUtil.to_string ?error_msg:None in
     (try
        let filenames =
@@ -1887,6 +1891,12 @@ let compil_of_json = function
                   (JsonUtil.exn_msg_cant_import_from_json
                      "AST working_set_values boolean value"))
              (List.assoc "working_set_values" l);
+         nr_working_set_params =
+           JsonUtil.to_int
+             ~error_msg:
+               (JsonUtil.exn_msg_cant_import_from_json
+                  "AST nr_working_set_params sig")
+             (List.assoc "nr_working_set_params" l);
          guard_param_values =
            Mods.StringMap.of_json
              (JsonUtil.to_string

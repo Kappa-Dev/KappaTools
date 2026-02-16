@@ -186,6 +186,8 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
       (** The guard parameters that have a defined value (true or false).*)
   working_set_values: bool Mods.IntMap.t;
       (** Maps each rule in the working set to true if it is enabled or false if it is disabled.*)
+  nr_working_set_params: int;
+      (** Number of rules that are currently in the working set. *)
   conflicts: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
       (** A conflict (A, s1, s2) states that there might be a conflict between the two sites s1, s2 of the agent A.*)
   sequential_bonds: ('id Loc.annoted * 'id Loc.annoted * 'id Loc.annoted) list;
