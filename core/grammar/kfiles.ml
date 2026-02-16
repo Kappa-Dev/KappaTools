@@ -107,6 +107,23 @@ let file_set_working_set ~id working_set catalog =
     let () = catalog.ast := None in
     Result.Ok ()
 
+(* let enable_or_disable_rule rule_id enable catalog = (*rTODO*)
+   match !(catalog.ast) with
+   | None -> Result.Error ("Compiled AST missing")
+   | Some ast ->
+   match Mods.IntMap.find_option rule_id ast.working_set_values with
+               | None ->
+                 Result.Error ("No rule with id "^ string_of_int rule_id ^" was found.")
+               | Some old_bool ->
+                 if old_bool = enable then
+                    Result.Ok ()
+                 else
+                   let working_set_values =
+                     Mods.IntMap.add rule_id enable ast.working_set_values
+                   in
+                   let () = catalog.ast := Some {ast with working_set_values} in
+     Result.Ok () *)
+
 let file_delete ~id catalog =
   match Hashtbl.find_all catalog.elements id with
   | [] -> Result.Error ("No file \"" ^ id ^ "\"")

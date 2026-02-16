@@ -444,6 +444,15 @@ class virtual new_client ~is_running ~post mailbox =
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "WORKING_SET_RULES") ])
 
+    method enable_or_disable_rule rule_id enable =
+      self#message Nothing (fun b ->
+          JsonUtil.write_sequence b
+            [
+              (fun b -> Yojson.Basic.write_string b "RULE_ENABLE_OR_DISABLE");
+              (fun b -> Yojson.Basic.write_int b rule_id);
+              (fun b -> Yojson.Basic.write_bool b enable);
+            ])
+
     (* KaSim *)
     method secret_simulation_load (_ : Pattern.sharing_level)
         (_ : Ast.parsing_compil) (_ : (string * Nbr.t) list)

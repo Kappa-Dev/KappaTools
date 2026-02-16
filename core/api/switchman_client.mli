@@ -133,6 +133,9 @@ object
   method get_working_set_rules :
     (Public_data.rule list, Result_util.message list) Result_util.t Lwt.t
 
+  method enable_or_disable_rule :
+    int -> bool -> (unit, Result_util.message list) Result_util.t Lwt.t
+
   method get_previous_node :
     Public_data.short_influence_node option ->
     ( Public_data.refined_influence_node option,

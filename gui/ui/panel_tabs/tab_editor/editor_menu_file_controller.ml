@@ -63,6 +63,15 @@ let set_file_working_set rank (is_in_ws : bool) : unit =
       (* get new contact map *)
       >>= fun _ -> Lwt.return_unit)
 
+let enable_or_disable_rule rule_id (enable : bool) =
+  let rule_id = int_of_string rule_id in
+  Common.async __LOC__ (fun () ->
+      State_error.wrap __LOC__
+        (State_project.eval_with_project ~label:__LOC__ (fun manager ->
+             manager#enable_or_disable_rule rule_id enable))
+      (* get new contact map *)
+      >>= fun _ -> Lwt.return_unit)
+
 let order_files (filenames : string list) : unit =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__

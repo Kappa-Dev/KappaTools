@@ -61,6 +61,7 @@ module type Type = sig
   val get_dead_agents : state -> state * Yojson.Basic.t
   val get_conditionally_dead_agents : state -> state * Yojson.Basic.t
   val get_working_set_rules : state -> state * Yojson.Basic.t
+  val enable_or_disable_rule : state -> int -> bool -> state
   val get_separating_transitions : state -> state * Yojson.Basic.t
   val get_constraints_list : state -> state * Yojson.Basic.t
 
@@ -213,6 +214,11 @@ functor
     let get_working_set_rules state =
       let rules = get_working_set_rules state in
       state, Public_data.working_set_rules_to_json rules
+
+    let enable_or_disable_rule state ws_id bool =
+      enable_or_disable_rule bool
+        [ Ckappa_sig.working_set_index_of_int ws_id ]
+        state
 
     let get_separating_transitions state =
       let state, separating_transitions = get_separating_transitions state in

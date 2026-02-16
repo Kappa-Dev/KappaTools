@@ -254,4 +254,17 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
               Public_data.working_set_rules_of_json x
               |> Result_util.ok |> Lwt.return)
+
+    method enable_or_disable_rule rule_id enable =
+      let request =
+        `List
+          [
+            `String "RULE_ENABLE_OR_DISABLE";
+            JsonUtil.of_int rule_id;
+            JsonUtil.of_bool enable;
+          ]
+      in
+      self#message request
+      >>= Api_common.result_bind_with_lwt ~ok:(fun _ ->
+              Result_util.ok () |> Lwt.return)
   end

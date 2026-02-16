@@ -37,12 +37,10 @@ let element_get_ws_filename (element : Dom_html.element Js.t) :
     Js.js_string Js.t Js.opt =
   Common.element_data (element : Dom_html.element Js.t) "ws-file-id"
 
-let _element_get_rulename (element : Dom_html.element Js.t) :
-    Js.js_string Js.t Js.opt =
-  Common.element_data (element : Dom_html.element Js.t) "rule-id"
+let element_get_rulename (elt : Dom_html.element Js.t) =
+  elt##getAttribute (Js.string "data-rule-id")
 
-let element_set_rulename (name : string) =
-  Html.Unsafe.string_attrib "data-rule-id" name
+let element_set_rulename rule_id = Html.a_user_data "rule-id" rule_id
 
 let file_new_input =
   Html.input
@@ -249,7 +247,7 @@ let dropdown_rules (manager : Api.concrete_manager) () =
   let file_li =
     List.map
       (fun rule ->
-        let rule_id = "rule-" ^ string_of_int rule.Public_data.rule_id in
+        let rule_id = string_of_int rule.Public_data.rule_id in
         let rule_name =
           "Rule "
           ^ string_of_int rule.Public_data.rule_id
@@ -596,6 +594,42 @@ let onload () =
                  let () =
                    Editor_menu_file_controller.set_file_working_set
                      (Js.to_string file_id) is_checked
+                 in
+                 ())
+           in
+           Js._false))
+  in
+  let () =
+    Common.jquery_on
+      (Format.sprintf "input.%s" rule_enabled_checkbox)
+      "change"
+      (Dom_html.handler (fun event ->
+           let target : Dom_html.element Js.t Js.opt = event##.target in
+           let rule_id : Js.js_string Js.t Js.opt =
+             Js.Opt.bind target (fun (element : Dom_html.element Js.t) ->
+                 element_get_rulename element)
+           in
+           let is_checked : bool =
+             Js.to_bool
+               (Js.Opt.case target
+                  (fun _ -> Js._false)
+                  (fun (element : Dom_html.element Js.t) ->
+                    (Js.Unsafe.coerce element : Dom_html.inputElement Js.t)##.checked))
+           in
+           let () =
+             Js.Opt.case rule_id
+               (fun _ -> ())
+               (fun rule_id ->
+                 let () =
+                   Common.log_group
+                     "[Editor_menu_file] triggered \
+                      input.rule_enabled_checkbox, rule_id:"
+                 in
+                 let () = Common.debug ~loc:__LOC__ rule_id in
+                 let () = Common.log_group_end () in
+                 let () =
+                   Editor_menu_file_controller.enable_or_disable_rule
+                     (Js.to_string rule_id) is_checked
                  in
                  ())
            in

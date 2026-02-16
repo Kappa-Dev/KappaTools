@@ -218,6 +218,12 @@ let on_message post text =
     let state, out = get_working_set_rules !gState in
     let () = gState := state in
     send_response post id out
+  | Some (id, `List [ `String "RULE_ENABLE_OR_DISABLE"; rule_id; enable ]) ->
+    let rule_id = JsonUtil.to_int rule_id in
+    let enable = JsonUtil.to_bool enable in
+    let state = enable_or_disable_rule !gState rule_id enable in
+    let () = gState := state in
+    send_response post id `Null
   | Some (id, `List [ `String "POLYMERS"; acc_cm; acc_scc ]) ->
     let accuracy_level_cm = Public_data.accuracy_of_json acc_cm in
     let accuracy_level_scc = Public_data.accuracy_of_json acc_scc in

@@ -310,6 +310,15 @@ let on_message exec_command message_delimiter =
                      | "WORKING_SET_RULES" ->
                        manager#get_working_set_rules >>= fun out ->
                        Lwt.return (B (Rules_kasa, msg_id, out))
+                     | "RULE_ENABLE_OR_DISABLE" ->
+                       let rule_id =
+                         JsonUtil.read_next_item Yojson.Basic.read_int st b
+                       in
+                       let enable =
+                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
+                       in
+                       manager#enable_or_disable_rule rule_id enable
+                       >>= fun out -> Lwt.return (B (Nothing, msg_id, out))
                      (* KaSim *)
                      | "ProjectParse" ->
                        let patternSharing =
