@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DEBUG=false
+INSTALL_DEPS=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -23,6 +24,8 @@ Options:
   -t <timeout>   Set timeout value (default: $TIMEOUT)
   -r <int>       Set how many reps to do for each experiment (default: $REPS)
   -s <int>       Set how many rules to remove in each experiment (default: $NR_RULES)
+  -i             Install dependencies before building and running
+  -d             Set DEBUG to true
   -h             Show this help message and exit
 EOF
 }
@@ -38,6 +41,12 @@ while getopts ":t:r:s:h" opt; do
             ;;
         s)
             NR_RULES="$OPTARG"
+            ;;
+        i)
+            INSTALL_DEPS=true
+            ;;
+        d)
+            DEBUG=true
             ;;
         h)
             print_help
@@ -109,10 +118,12 @@ fi
 AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
 AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
 
-# cd "${SCRIPT_DIR}/../../.."
-# # Install the dependencies
-# echo "Installing dependencies:"
-# opam install . --update-invariant
+if INSTALL_DEPS; then
+    cd "${SCRIPT_DIR}/../../.."
+    # Install the dependencies
+    echo "Installing dependencies:"
+    opam install . --update-invariant
+fi
 
 if ! $DEBUG; then
     echo
