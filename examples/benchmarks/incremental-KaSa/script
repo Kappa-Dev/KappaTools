@@ -118,7 +118,7 @@ fi
 AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
 AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
 
-if INSTALL_DEPS; then
+if $INSTALL_DEPS; then
     cd "${SCRIPT_DIR}/../../.."
     # Install the dependencies
     echo "Installing dependencies:"
@@ -310,4 +310,4 @@ for MODEL in "${MODELS[@]}"; do
 
 done
 
-python examples/benchmarks/incremental-KaSa/mean_of_reps.py
+python3 examples/benchmarks/incremental-KaSa/mean_of_reps.py
