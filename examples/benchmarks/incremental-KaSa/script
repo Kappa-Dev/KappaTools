@@ -31,7 +31,7 @@ EOF
 }
 
 # parse arguments
-while getopts ":t:r:s:h" opt; do
+while getopts ":t:r:s:i:d:h" opt; do
     case "$opt" in
         t)
             TIMEOUT="$OPTARG"
