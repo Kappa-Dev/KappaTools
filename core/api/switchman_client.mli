@@ -131,7 +131,8 @@ object
     Lwt.t
 
   method get_working_set_rules :
-    (Public_data.rule list, Result_util.message list) Result_util.t Lwt.t
+    (Public_data.working_set_rules, Result_util.message list) Result_util.t
+    Lwt.t
 
   method enable_or_disable_rule :
     int -> bool -> (unit, Result_util.message list) Result_util.t Lwt.t

@@ -36,6 +36,7 @@ type _ handle =
         * (Public_data.rule, Public_data.var) Public_data.influence_node list)
         handle
   | Rules_kasa : Public_data.rule list handle
+  | Ws_rules_kasa : Public_data.working_set_rules handle
   | Agents_kasa : Public_data.dead_agents handle
   | Rules_kasa_with_conditions : Public_data.rule_deadness_conditions handle
   | Agents_kasa_with_conditions : Public_data.agent_deadness_conditions handle
@@ -309,7 +310,7 @@ let on_message exec_command message_delimiter =
                        Lwt.return (B (Polymers_kasa, msg_id, out))
                      | "WORKING_SET_RULES" ->
                        manager#get_working_set_rules >>= fun out ->
-                       Lwt.return (B (Rules_kasa, msg_id, out))
+                       Lwt.return (B (Ws_rules_kasa, msg_id, out))
                      | "RULE_ENABLE_OR_DISABLE" ->
                        let rule_id =
                          JsonUtil.read_next_item Yojson.Basic.read_int st b
@@ -481,6 +482,12 @@ let on_message exec_command message_delimiter =
             reply post
               (fun b n ->
                 Yojson.Basic.write_json b (Public_data.dead_rules_to_json n))
+              msg_id x
+          | B (Ws_rules_kasa, msg_id, x) ->
+            reply post
+              (fun b n ->
+                Yojson.Basic.write_json b
+                  (Public_data.working_set_rules_to_json n))
               msg_id x
           | B (Agents_kasa, msg_id, x) ->
             reply post

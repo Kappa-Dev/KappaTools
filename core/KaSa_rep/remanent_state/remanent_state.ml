@@ -717,16 +717,21 @@ let get_working_set_rules state =
         match ws_id with
         | None -> None
         | Some ws_id ->
+          let enabled =
+            match
+              Mods.IntMap.find_option ws_id compilation.Ast.working_set_values
+            with
+            | None -> false
+            | Some b -> b
+          in
           Some
             {
-              Public_data.rule_id = ws_id;
-              Public_data.rule_label =
+              Public_data.rule_ws_id = ws_id;
+              Public_data.rule_ws_label =
                 (match label with
                 | None -> ""
                 | Some (l, _) -> l);
-              Public_data.rule_ast = "";
-              Public_data.rule_position = loc;
-              Public_data.rule_direction = Public_data.Dummy_rule_direction;
-              Public_data.rule_hidden = false;
+              Public_data.rule_ws_position = loc;
+              Public_data.rule_ws_enabled = enabled;
             })
       compilation.Ast.rules

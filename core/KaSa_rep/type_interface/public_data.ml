@@ -61,6 +61,7 @@ let bwd_string = "bwd"
 let origin = "origin"
 let direction = "direction"
 let rule_hidden = "hidden"
+let rule_enabled = "enabled"
 let scc = "scc"
 let accuracy_cm = "accuracy_cm"
 let accuracy_scc = "accuracy_scc"
@@ -375,6 +376,13 @@ type rule = {
   rule_hidden: bool;
 }
 
+type rule_in_working_set = {
+  rule_ws_id: int;
+  rule_ws_label: string;
+  rule_ws_position: Loc.t;
+  rule_ws_enabled: bool;
+}
+
 let direction_to_json d =
   match d with
   | Direct_rule -> `String "direct"
@@ -425,6 +433,37 @@ let json_to_rule = function
          (Yojson.Basic.Util.Type_error
             (JsonUtil.exn_msg_cant_import_from_json " rule", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("rule", x))
+
+let ws_rule_to_json rule =
+  `Assoc
+    [
+      rule_id, JsonUtil.of_int rule.rule_ws_id;
+      label, JsonUtil.of_string rule.rule_ws_label;
+      ( position,
+        Loc.yojson_of_annoted JsonUtil.of_unit ((), rule.rule_ws_position) );
+      rule_enabled, JsonUtil.of_bool rule.rule_ws_enabled;
+    ]
+
+let json_to_ws_rule = function
+  | `Assoc l as x when List.length l = 4 ->
+    (try
+       {
+         rule_ws_id = JsonUtil.to_int (List.assoc rule_id l);
+         rule_ws_label = JsonUtil.to_string (List.assoc label l);
+         rule_ws_position =
+           snd
+             (Loc.annoted_of_yojson
+                (JsonUtil.to_unit
+                   ~error_msg:
+                     (JsonUtil.exn_msg_cant_import_from_json "locality"))
+                (List.assoc position l));
+         rule_ws_enabled = JsonUtil.to_bool (List.assoc rule_enabled l);
+       }
+     with Not_found ->
+       raise
+         (Yojson.Basic.Util.Type_error
+            (JsonUtil.exn_msg_cant_import_from_json " working set rule", x)))
+  | x -> raise (Yojson.Basic.Util.Type_error ("working set rule", x))
 
 type var = {
   var_id: int;
@@ -790,7 +829,7 @@ let dead_rules_to_json json =
   `Assoc [ dead_rules, JsonUtil.of_list rule_to_json json ]
 
 let dead_rules_of_json = function
-  | `Assoc [ (s, json) ] as x when s = dead_rules || s = working_set_rules ->
+  | `Assoc [ (s, json) ] as x when s = dead_rules ->
     (try JsonUtil.to_list json_to_rule json
      with Not_found ->
        raise
@@ -832,11 +871,11 @@ let conditionally_dead_rules_of_json = function
 (* working set rules *)
 (*********************)
 
-type working_set_rules = rule list
+type working_set_rules = rule_in_working_set list
 
 let working_set_rules_of_json = function
   | `Assoc [ (s, json) ] as x when s = working_set_rules ->
-    (try JsonUtil.to_list json_to_rule json
+    (try JsonUtil.to_list json_to_ws_rule json
      with Not_found ->
        raise
          (Yojson.Basic.Util.Type_error
@@ -847,7 +886,7 @@ let working_set_rules_of_json = function
          (JsonUtil.exn_msg_cant_import_from_json working_set_rules, x))
 
 let working_set_rules_to_json json =
-  `Assoc [ working_set_rules, JsonUtil.of_list rule_to_json json ]
+  `Assoc [ working_set_rules, JsonUtil.of_list ws_rule_to_json json ]
 
 (***************)
 (* dead agents *)

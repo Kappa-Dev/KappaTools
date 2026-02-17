@@ -48,6 +48,9 @@ val init : string list -> unit Lwt.t
 val sync : unit -> unit Api.lwt_result
 (* to sync state of application with runtime *)
 
+val sync_no_compilation : unit -> unit Api.lwt_result
+(* to sync state of application with runtime but without recompiling the project. *)
+
 val eval_with_project :
   label:string ->
   (Api.concrete_manager -> 'a Api.lwt_result) ->

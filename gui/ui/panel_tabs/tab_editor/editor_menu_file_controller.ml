@@ -67,8 +67,11 @@ let enable_or_disable_rule rule_id (enable : bool) =
   let rule_id = int_of_string rule_id in
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__
-        (State_project.eval_with_project ~label:__LOC__ (fun manager ->
-             manager#enable_or_disable_rule rule_id enable))
+        ( State_project.eval_with_project ~label:__LOC__ (fun manager ->
+              manager#enable_or_disable_rule rule_id enable)
+        >>= fun r ->
+          State_project.sync_no_compilation () >>= fun r' ->
+          Lwt.return (Api_common.result_combine [ r; r' ]) )
       (* get new contact map *)
       >>= fun _ -> Lwt.return_unit)
 

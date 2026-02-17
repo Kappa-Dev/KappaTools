@@ -322,6 +322,14 @@ let sync () : unit Api.lwt_result =
     let () = set_state { st with project_version = succ st.project_version } in
     Lwt.return out
 
+let sync_no_compilation () : unit Api.lwt_result =
+  match (React.S.value state).project_current with
+  | None -> Lwt.return (Result_util.ok ())
+  | Some _ ->
+    let st = React.S.value state in
+    let () = set_state { st with project_version = succ st.project_version } in
+    Lwt.return (Result_util.ok ())
+
 let remove_files manager =
   manager#file_catalog
   >>= Api_common.result_bind_with_lwt ~ok:(fun catalog ->
