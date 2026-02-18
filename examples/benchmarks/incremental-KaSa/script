@@ -332,7 +332,13 @@ echo "📝 The mean of all runtimes can be found in: $OUTPUT_MEAN_RUNTIMES"
 
 OUTPUT_LATEX_RUNTIMES="${OUTPUT_DIR}experiments_output.tex"
 
-python3 examples/benchmarks/incremental-KaSa/latex_table_of_runtimes.py $OUTPUT_MEAN_RUNTIMES $OUTPUT_LATEX_RUNTIMES
+cmd=(python3 
+    "${SCRIPT_DIR}/../../../examples/benchmarks/incremental-KaSa/latex_table_of_runtimes.py" 
+    $OUTPUT_MEAN_RUNTIMES $OUTPUT_LATEX_RUNTIMES
+    )
+        printf '%q ' "${cmd[@]}"
+        printf '\n'
+        { ${cmd[@]}; }
 
 echo "📊 The latex table of the runtimes can be found in: $OUTPUT_LATEX_RUNTIMES"
 
