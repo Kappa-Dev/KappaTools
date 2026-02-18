@@ -131,7 +131,7 @@ def main(inp_path, out_path):
     start = 2
     for a, steps in analysis_steps_ordered.items():
         end = start + len(steps) - 1
-        lines.append(r"\cmidrule(lr){" + f"{start}-{end}" + r"}")
+        lines.append(r"\cmidrule(lr){{{}-{}}}".format(start, end))
         start = end + 1
 
     # Second header row
