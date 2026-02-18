@@ -735,3 +735,25 @@ let get_working_set_rules state =
               Public_data.rule_ws_enabled = enabled;
             })
       compilation.Ast.rules
+
+let reset_reachability_memoized_values state =
+  {
+    state with
+    ctmc_flow = None;
+    internal_influence_map =
+      Public_data.AccuracyMap.remove Public_data.Full
+        (Public_data.AccuracyMap.remove Public_data.High
+           state.internal_influence_map);
+    influence_map = Public_data.AccuracyMap.empty;
+    bidirectional_influence_map = Public_data.AccuracyMap.empty;
+    local_influence_map_blackboard = None;
+    internal_contact_map =
+      Public_data.AccuracyMap.remove Public_data.Full
+        (Public_data.AccuracyMap.remove Public_data.High
+           state.internal_contact_map);
+    contact_map = Public_data.AccuracyMap.empty;
+    internal_scc_decomposition = Public_data.AccuracyMap.empty;
+    scc_decomposition = Public_data.AccuracyMap.empty;
+    signature = None;
+    constraints_list = None;
+  }

@@ -438,3 +438,6 @@ val get_data :
 
 val get_working_set_rules :
   ('static, 'compile) state -> Public_data.working_set_rules
+
+val reset_reachability_memoized_values :
+  ('static, 'compile) state -> ('static, 'compile) state

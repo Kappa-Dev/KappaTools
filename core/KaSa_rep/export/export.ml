@@ -2190,6 +2190,7 @@ functor
           let state =
             Remanent_state.set_reachability_result (static, dynamic) state
           in
+          let state = Remanent_state.reset_reachability_memoized_values state in
           Remanent_state.set_errors error state
         | None -> Remanent_state.set_errors error state
       ) else
