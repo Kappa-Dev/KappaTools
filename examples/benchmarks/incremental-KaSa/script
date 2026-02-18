@@ -82,7 +82,7 @@ REPRESSILATOR="${MODELS_DIRECTORY}Repressilator.ka"
 FGF="${MODELS_DIRECTORY}fgf.ka"
 SFB="${MODELS_DIRECTORY}sfb.ka"
 
-egfr_net="${V3_MODELS_DIRECTORY}BNGL/egfr_net.ka"
+egfr_net="${MODELS_DIRECTORY}egfr_net.ka"
 fceri_fyn="${V3_MODELS_DIRECTORY}BNGL/fceri_fyn.ka"
 fceri_fyn_lig="${V3_MODELS_DIRECTORY}BNGL/fceri_fyn_lig.ka"
 fceri_fyn_trimer="${V3_MODELS_DIRECTORY}BNGL/fceri_fyn_trimer.ka"
