@@ -114,10 +114,6 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       Analyzer_headers.initialize_global_information parameters log_info error
         mvbdu_handler compil kappa_handler
     in
-    let error, log_info =
-      StoryProfiling.StoryStats.close_event parameters error
-        StoryProfiling.Global_initialization None log_info
-    in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
     let error, init = Analyzer_headers.compute_initial_state error static in
     let log_info = Analyzer_headers.get_log_info dynamic in
@@ -130,6 +126,13 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     let error, dynamic =
       close_event parameters error StoryProfiling.Domains_initialization None
         dynamic
+    in
+    let error, dynamic =
+      close_event parameters error StoryProfiling.Global_initialization None
+        dynamic
+    in
+    let error, dynamic =
+      add_event parameters error StoryProfiling.Initial_states None dynamic
     in
     let error, dynamic, _ =
       List.fold_left
@@ -147,6 +150,9 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
           in
           error, dynamic, i + 1)
         (error, dynamic, 1) init
+    in
+    let error, dynamic =
+      close_event parameters error StoryProfiling.Initial_states None dynamic
     in
     let log = Remanent_parameters.get_logger parameters in
     let error, dynamic =

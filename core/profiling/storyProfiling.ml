@@ -49,6 +49,7 @@ type step_kind =
   | Domain_initialization of string
   | Apply_rule of int
   | Initial_state of int
+  | Initial_states
   | Scan_rule_static of int
   | Scan_rule_dynamic of int
   | Regular_influences
@@ -97,6 +98,7 @@ let string_of_step_kind x =
     Printf.sprintf "Domain initialization (%s)" string
   | Apply_rule int -> Printf.sprintf "Apply rule %i" int
   | Initial_state int -> Printf.sprintf "Initial state %i" int
+  | Initial_states -> Printf.sprintf "Initial states computation"
   | Scan_rule_static int -> Printf.sprintf "Scan rule %i (static)" int
   | Scan_rule_dynamic int -> Printf.sprintf "Scan rule %i (dynamic)" int
   | Regular_influences -> Printf.sprintf "Regular influences computation"
@@ -302,9 +304,10 @@ module StoryStats : StoryStats = struct
     | Side_effects_influences | Merge_influences | KaSim_compilation
     | KaSa_precompilation | KaSa_lexing | KaSa_linking | LKappa_signature
     | Iteration _ | Story _ | Domain_initialization _ | Apply_rule _
-    | Initial_state _ | Scan_rule_static _ | Scan_rule_dynamic _
-    | Influence_map _ | Internal_influence_map _ | Reachability_analysis
-    | Print_reachability_result | Enable_or_disable_rule ->
+    | Initial_state _ | Initial_states | Scan_rule_static _
+    | Scan_rule_dynamic _ | Influence_map _ | Internal_influence_map _
+    | Reachability_analysis | Print_reachability_result | Enable_or_disable_rule
+      ->
       false
 
   let add_event parameter error step_kind f log_info =
