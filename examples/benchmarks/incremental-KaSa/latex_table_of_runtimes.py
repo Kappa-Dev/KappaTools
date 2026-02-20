@@ -21,7 +21,6 @@ from collections import defaultdict, OrderedDict
 def latex_escape(s: str) -> str:
     # minimal escaping for LaTeX special chars
     replace = {
-        '\\': r'\textbackslash{}',
         '&': r'\&',
         '%': r'\%',
         '$': r'\$',
@@ -93,20 +92,8 @@ def main(inp_path, out_path):
             if model not in model_nr_rules:
                 model_nr_rules[model] = nr_rules
 
-    # determine analysis order by index
-    analyses = sorted(analysis_idx_map.items(), key=lambda x: x[1])
-    analysis_names_ordered = [name for name, _ in analyses]
-
-    # for each analysis, determine ordered steps
-    analysis_steps_ordered = OrderedDict()
-    for a in analysis_names_ordered:
-        steps = step_idx_map.get(a, {})
-        ordered_steps = [name for name, _ in sorted(steps.items(), key=lambda x: x[1])]
-        analysis_steps_ordered[a] = ordered_steps
-
-    # prepare column format: l c + one 'c' per step
-    total_step_count = sum(len(v) for v in analysis_steps_ordered.values())
-    col_spec = "l " + " ".join(["c"] * total_step_count)
+    total_step_count = 10
+    col_spec = "l c " + " ".join(["c"] * total_step_count)
 
     # Build LaTeX
     lines = []
@@ -120,36 +107,21 @@ def main(inp_path, out_path):
     lines.append(r"\begin{tabular}{" + col_spec + "}")
     lines.append(r"\toprule")
 
-    # First header row: Model & nr_rules & \multicolumn{..}{c}{analysis} ...
-    header_first = []
-    header_first.append(r"\textbf{Model}")
-    # header_first.append(r"\textbf{nr\_rules}")
-    for a, steps in analysis_steps_ordered.items():
-        header_first.append(r"\multicolumn{" + str(len(steps)) + r"}{c}{\textbf{" + latex_escape(a) + "}}")
-    lines.append(" & ".join(header_first) + r" \\")
-    # compute columns ranges for cmidrule (2..)
-    start = 2
-    for a, steps in analysis_steps_ordered.items():
-        end = start + len(steps) - 1
-        lines.append(r"\cmidrule(lr){{{}-{}}}".format(start, end))
-        start = end + 1
-
+    # First header row
+    lines.append(r"\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{3}{c}{\textbf{full}} & \multicolumn{3}{c}{\textbf{partial}} & \multicolumn{4}{c}{\textbf{incremental}} \\")
+    lines.append(r"\cmidrule(lr){3-5}")
+    lines.append(r"\cmidrule(lr){6-8}")
+    lines.append(r"\cmidrule(lr){9-12}")
     # Second header row
-    header_second = []
-    header_second.append("")  # model
-    #header_second.append("")  # nr_rules
-    for a, steps in analysis_steps_ordered.items():
-        for s in steps:
-            header_second.append(r"\textbf{" + latex_escape(s) + "}")
-    lines.append(" & ".join(header_second) + r" \\")
+    lines.append(r"& & \bfseries\shortstack{Domain\\initialization} & \bfseries\shortstack{Initial\\state} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Domain\\initialization} & \bfseries\shortstack{Initial\\state} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Domain\\initialization} & \bfseries\shortstack{Initial\\state} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Disable\\rules} \\")
     lines.append(r"\midrule")
 
-    # Data rows: one per model (sorted by model name)
     for model in sorted(data.keys()):
         row_elems = []
         row_elems.append(r"\texttt{" + latex_escape(model) + "}")
-        #row_elems.append(latex_escape(model_nr_rules.get(model, "")))
-        for a, steps in analysis_steps_ordered.items():
+        row_elems.append(latex_escape(model_nr_rules.get(model, "")))
+        analysis_items = {"full":["initialization", "initial_state", "fixpoint"], "partial":["initialization", "initial_state", "fixpoint"], "incremental":["initialization", "initial_state", "fixpoint", "disable"]}
+        for a, steps in analysis_items.items():
             for s in steps:
                 val = data[model].get(a, {}).get(s, "")
                 if val == "":
