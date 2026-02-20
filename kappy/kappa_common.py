@@ -29,8 +29,8 @@ class FileMetadata(object):
     """An object to hold the metadata for a file.
 
     Note that it is commmon to initialized this function with a dict, in the
-    form FileMetaData(**metadata). If so, the dict must have arguments
-    matching those below, including at least 'id' and 'position'.
+    form FileMetadata(**metadata). If so, the dict must have arguments
+    matching those below, including at least 'id', 'position' and 'working_set'.
 
     :param id: The id of corresponding file.
 
@@ -40,11 +40,15 @@ class FileMetadata(object):
         indeed at position 'i' and all the files at position 'j>=i'
         are pushed at position 'j+1'.
 
+    :param working_set: whether all rules of the file 
+        should be added to the working set or not.
+
     """
 
-    def __init__(self, id, position):
+    def __init__(self, id, position, working_set):
         self.id = id
         self.position = position
+        self.working_set = working_set
         return
 
     @classmethod
@@ -79,7 +83,7 @@ class File(object):
         return
 
     @classmethod
-    def from_string(cls, content, position=1, file_id=None):
+    def from_string(cls, content, position=1, file_id=None, working_set=False):
         """Convenience method to create a file from a string.
 
         This file object's metadata will have the id 'inlined_input'.
@@ -91,13 +95,16 @@ class File(object):
 
         :param file_id: the file_id that will be used by kappa.
 
+        :param working_set: (default = False) whether all rules of the file 
+            should be added to the working set or not.
+
         """
         if file_id is None:
             file_id = 'inlined_input'
-        return cls(FileMetadata(file_id, position), content)
+        return cls(FileMetadata(file_id, position, working_set), content)
 
     @classmethod
-    def from_file(cls, fpath, position=1, file_id=None):
+    def from_file(cls, fpath, position=1, file_id=None, working_set=False):
         """Convience method to create a kappa file object from a file on disk
 
         :param fpath: path to the file on disk
@@ -108,13 +115,15 @@ class File(object):
         :param file_id: (default = fpath) the file_id that will be
         used by kappa.
 
+        :param working_set: (default = False) whether all rules of the file 
+            should be added to the working set or not.
         """
         if file_id is None:
             file_id = fpath
         with open(fpath) as f:
             code = f.read()
             file_content = str(code)
-            file_metadata = FileMetadata(file_id, position)
+            file_metadata = FileMetadata(file_id, position, working_set)
             return cls(file_metadata, file_content)
 
     def get_id(self):
@@ -128,6 +137,10 @@ class File(object):
     def get_content(self):
         """Get the file's contents."""
         return self.file_content
+
+    def get_working_set(self):
+        """Get the bool that says if all the rules of the file are added to the working set."""
+        return self.file_metadata.working_set
 
 
 class SimulationParameter(object):
@@ -311,7 +324,7 @@ class KappaApi(ABC):
     # is used as a decorator for the class.
 
     @abc.abstractmethod
-    def project_overwrite(self, ast, file_id="model.ka"):
+    def project_overwrite(self, ast, file_id="model.ka", working_set=False):
         """Overwrite the project with the given AST
 
         :param ast: the ast in the format returned by project_parse
