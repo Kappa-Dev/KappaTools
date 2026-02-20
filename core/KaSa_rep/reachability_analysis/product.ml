@@ -279,17 +279,20 @@ module Product
 
   let print ?dead_rules static dynamic error loggers =
     let dead_rules_und =
-      Option.map
-        (fun dead_rules static_und dynamic_und parameters error rule_id ->
-          let error, dynamic, bool =
-            dead_rules
-              { static with underlying_domain = static_und }
-              (smash_dynamic dynamic_und
-                 (new_domain_dynamic_information dynamic_und dynamic))
-              parameters error rule_id
-          in
-          error, underlying_domain_dynamic_information dynamic, bool)
-        dead_rules
+      match dead_rules with
+      | None -> None
+      | Some dead_rules ->
+        Some
+          ((fun dead_rules static_und dynamic_und parameters error rule_id ->
+             let error, dynamic, bool =
+               dead_rules
+                 { static with underlying_domain = static_und }
+                 (smash_dynamic dynamic_und
+                    (new_domain_dynamic_information dynamic_und dynamic))
+                 parameters error rule_id
+             in
+             error, underlying_domain_dynamic_information dynamic, bool)
+             dead_rules)
     in
     let error, underlying_domain_dynamic_information, () =
       Underlying_domain.print ?dead_rules:dead_rules_und
@@ -298,19 +301,23 @@ module Product
         error loggers
     in
     let dead_rules_new =
-      Option.map
-        (fun d static_new dynamic_new p e r ->
-          let e, d, b =
-            d
-              { static with new_domain = static_new }
-              (smash_dynamic underlying_domain_dynamic_information dynamic_new)
-              p e r
-          in
-          ( e,
-            new_domain_dynamic_information underlying_domain_dynamic_information
-              d,
-            b ))
-        dead_rules
+      match dead_rules with
+      | None -> None
+      | Some dead_rules ->
+        Some
+          ((fun d static_new dynamic_new p e r ->
+             let e, d, b =
+               d
+                 { static with new_domain = static_new }
+                 (smash_dynamic underlying_domain_dynamic_information
+                    dynamic_new)
+                 p e r
+             in
+             ( e,
+               new_domain_dynamic_information
+                 underlying_domain_dynamic_information d,
+               b ))
+             dead_rules)
     in
     let error, new_domain_dynamic_information, () =
       New_domain.print ?dead_rules:dead_rules_new static.new_domain

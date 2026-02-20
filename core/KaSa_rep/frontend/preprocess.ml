@@ -2068,7 +2068,9 @@ let translate_rule parameters error handler rule =
       Cckappa_sig.e_rule_initial_direction = direction;
       Cckappa_sig.e_rule_guard_string = guard_string;
       Cckappa_sig.e_rule_working_set_id =
-        Option.map Ckappa_sig.working_set_index_of_int ws_id;
+        (match ws_id with
+        | None -> None
+        | Some ws_id -> Some (Ckappa_sig.working_set_index_of_int ws_id));
       Cckappa_sig.e_rule_rule = rule;
       Cckappa_sig.e_rule_c_rule =
         {
