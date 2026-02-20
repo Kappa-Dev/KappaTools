@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage[margin=1in,landscape]{geometry}
+\begin{document}
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{l c c c c c c c c c c c c c}
+\toprule
+\textbf{Model} & \multicolumn{4}{c}{\textbf{full}} & \multicolumn{4}{c}{\textbf{partial}} & \multicolumn{5}{c}{\textbf{incremental}} \\
+\cmidrule(lr){2-5}
+\cmidrule(lr){6-9}
+\cmidrule(lr){10-14}
+ & \textbf{init} & \textbf{init2} & \textbf{fixpoint} & \textbf{print} & \textbf{init} & \textbf{init2} & \textbf{fixpoint} & \textbf{print} & \textbf{init} & \textbf{init2} & \textbf{fixpoint} & \textbf{print} & \textbf{disable} \\
+\midrule
+\texttt{korkut\textbackslash\{\}_20170113} & 13.9 & 4.17 & 6.08 & 0.302 & 13.9 & 4.13 & 6.03 & 0.31 & 15.2 & 4.43 & 6.51 & 0.334 & 0.0004 \\
+\texttt{korkut\textbackslash\{\}_20170206} & 119 & 23.7 & 53.4 & 0.818 & 119 & 23 & 52.7 & 0.843 & 388 & 26.5 & 59.4 & 0.833 & 0.0016 \\
+\texttt{wnt\textbackslash\{\}_20151228} & 1.52 & 0.0832 & 1.76 & 2.44 & 1.47 & 0.0796 & 1.6 & 1.77 & 2.21 & 0.0872 & 2.64 & 0.028 & 0.0012 \\
+\texttt{wnt\textbackslash\{\}_20170322} & 11 & 0.845 & 14.7 & 0.0352 & 10.9 & 0.85 & 14.7 & 0.0376 & 14.4 & 0.888 & 15.9 & 0.0164 & 0 \\
+\bottomrule
+\end{tabular}
+\caption{Timing table}
+\end{table}
+\end{document}
