@@ -393,15 +393,13 @@ let empty_rule parameters error _r_id rule =
   else
     error, b
 
-let build_support parameters error kappa_handler bdu_handler rules dead_rules =
+let build_support parameters error kappa_handler rules dead_rules =
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
-    (fun parameters error r_id rule (map, creation, degradation, bdu_handler) ->
-      let error, bdu_handler, b =
-        dead_rules bdu_handler error parameters r_id
-      in
+    (fun parameters error r_id rule (map, creation, degradation) ->
+      let error, b = dead_rules error parameters r_id in
       let error, b' = empty_rule parameters error r_id rule in
       if b || b' then
-        error, (map, creation, degradation, bdu_handler)
+        error, (map, creation, degradation)
       else (
         let error, (map, creation, degradation) =
           Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -477,13 +475,12 @@ let build_support parameters error kappa_handler bdu_handler rules dead_rules =
               .Cckappa_sig.views
             (map, creation, degradation)
         in
-        error, (map, creation, degradation, bdu_handler)
+        error, (map, creation, degradation)
       ))
     rules
     ( Ckappa_sig.Agent_map_and_set.Map.empty,
       Ckappa_sig.Agent_map_and_set.Map.empty,
-      Ckappa_sig.Agent_map_and_set.Map.empty,
-      bdu_handler )
+      Ckappa_sig.Agent_map_and_set.Map.empty )
 
 let pw parameters error list =
   let error, map =
@@ -504,18 +501,16 @@ let pw parameters error list =
           acc acc)
       map [ [] ] )
 
-let smash_side_effect parameters error static dead_rules bdu_handler =
+let smash_side_effect parameters error static dead_rules =
   let error, init =
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters
       error 0
   in
   Ckappa_sig.AgentRule_map_and_set.Map.fold
-    (fun (agent_name, rule_id) _ (error, bdu_handler, map) ->
-      let error, bdu_handler, b =
-        dead_rules bdu_handler error parameters rule_id
-      in
+    (fun (agent_name, rule_id) _ (error, map) ->
+      let error, b = dead_rules error parameters rule_id in
       if b then
-        error, bdu_handler, map
+        error, map
       else (
         let error, old_asso =
           match
@@ -532,10 +527,10 @@ let smash_side_effect parameters error static dead_rules bdu_handler =
           Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set parameters
             error agent_name new_asso map
         in
-        error, bdu_handler, map
+        error, map
       ))
     (Analyzer_headers.get_potential_side_effects static)
-    (error, bdu_handler, init)
+    (error, init)
 
 let build_side_effect parameters error static agent_name site_set smashed_map =
   let error, init =
@@ -1124,13 +1119,25 @@ let agent_trace parameters log_info error dead_rules bdu_handler static
   let error, scc = Graphs.Nodearray.create parameters error 1 in
   let rules = compil.Cckappa_sig.rules in
   let init = compil.Cckappa_sig.init in
-  let error, bdu_handler, side_effects =
-    smash_side_effect parameters error static dead_rules bdu_handler
-  in
-  let error, (support, creation, degradation, bdu_handler) =
-    build_support parameters error kappa_handler bdu_handler rules dead_rules
-  in
   let () = Ckappa_sig.Views_intbdu.import_handler bdu_handler in
+  let dead_rules error parameters rule_id =
+    let error, bdu_handler =
+      match Ckappa_sig.Views_intbdu.export_handler error with
+      | error, Some h -> error, h
+      | error, None -> Exception.warn parameters error __POS__ Exit bdu_handler
+    in
+    let error, bdu_handler, b =
+      dead_rules bdu_handler error parameters rule_id
+    in
+    let () = Ckappa_sig.Views_intbdu.import_handler bdu_handler in
+    error, b
+  in
+  let error, side_effects =
+    smash_side_effect parameters error static dead_rules
+  in
+  let error, (support, creation, degradation) =
+    build_support parameters error kappa_handler rules dead_rules
+  in
   let error, init =
     Int_storage.Nearly_inf_Imperatif.fold parameters error
       (fun parameters error i_id init init_map ->
