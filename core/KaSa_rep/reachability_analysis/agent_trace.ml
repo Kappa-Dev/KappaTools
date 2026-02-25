@@ -396,87 +396,81 @@ let empty_rule parameters error _r_id rule =
 let build_support parameters error kappa_handler rules dead_rules =
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
     (fun parameters error r_id rule (map, creation, degradation) ->
-      let error, b = dead_rules error parameters r_id in
+      let error, b = dead_rules parameters error r_id in
       let error, b' = empty_rule parameters error r_id rule in
       if b || b' then
         error, (map, creation, degradation)
-      else (
-        let error, (map, creation, degradation) =
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-            parameters error
-            (fun parameters error ag_id _ (map, creation, degradation) ->
-              match
-                compute_full_support parameters error kappa_handler ag_id rule
-              with
-              | error, Nil -> error, (map, creation, degradation)
-              | error, Creation (agent_name, _, asso) ->
-                let error', old_list =
-                  Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
-                    parameters error [] agent_name creation
-                in
-                let error =
-                  Exception.check_point Exception.warn parameters error error'
-                    __POS__ Exit
-                in
-                let error, creation =
-                  Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite parameters
-                    error agent_name
-                    (((Rule r_id, ag_id), asso) :: old_list)
-                    creation
-                in
-                error, (map, creation, degradation)
-              | error, Degradation (agent_name, _, mvbdu) ->
-                let error', old_map =
-                  Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
-                    parameters error LabelMap.empty agent_name degradation
-                in
-                let error =
-                  Exception.check_point Exception.warn parameters error error'
-                    __POS__ Exit
-                in
-                let error', new_map =
-                  LabelMap.add parameters error (Rule r_id, ag_id, 0) mvbdu
-                    old_map
-                in
-                let error =
-                  Exception.check_point Exception.warn parameters error error'
-                    __POS__ Exit
-                in
-                let error, degradation =
-                  Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite parameters
-                    error agent_name new_map degradation
-                in
-                error, (map, creation, degradation)
-              | error, Mod (agent_name, set_test, asso_test, set_mod, asso_mod)
-                ->
-                let error', old_map =
-                  Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
-                    parameters error LabelMap.empty agent_name map
-                in
-                let error =
-                  Exception.check_point Exception.warn parameters error error'
-                    __POS__ Exit
-                in
-                let error', new_map =
-                  LabelMap.add parameters error (Rule r_id, ag_id, 0)
-                    (set_test, asso_test, set_mod, asso_mod)
-                    old_map
-                in
-                let error =
-                  Exception.check_point Exception.warn parameters error error'
-                    __POS__ Exit
-                in
-                let error, map =
-                  Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite parameters
-                    error agent_name new_map map
-                in
-                error, (map, creation, degradation))
-            rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs
-              .Cckappa_sig.views
-            (map, creation, degradation)
-        in
-        error, (map, creation, degradation)
-      ))
+      else
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+          parameters error
+          (fun parameters error ag_id _ (map, creation, degradation) ->
+            match
+              compute_full_support parameters error kappa_handler ag_id rule
+            with
+            | error, Nil -> error, (map, creation, degradation)
+            | error, Creation (agent_name, _, asso) ->
+              let error', old_list =
+                Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
+                  parameters error [] agent_name creation
+              in
+              let error =
+                Exception.check_point Exception.warn parameters error error'
+                  __POS__ Exit
+              in
+              let error, creation =
+                Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite parameters
+                  error agent_name
+                  (((Rule r_id, ag_id), asso) :: old_list)
+                  creation
+              in
+              error, (map, creation, degradation)
+            | error, Degradation (agent_name, _, mvbdu) ->
+              let error', old_map =
+                Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
+                  parameters error LabelMap.empty agent_name degradation
+              in
+              let error =
+                Exception.check_point Exception.warn parameters error error'
+                  __POS__ Exit
+              in
+              let error', new_map =
+                LabelMap.add parameters error (Rule r_id, ag_id, 0) mvbdu
+                  old_map
+              in
+              let error =
+                Exception.check_point Exception.warn parameters error error'
+                  __POS__ Exit
+              in
+              let error, degradation =
+                Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite parameters
+                  error agent_name new_map degradation
+              in
+              error, (map, creation, degradation)
+            | error, Mod (agent_name, set_test, asso_test, set_mod, asso_mod) ->
+              let error', old_map =
+                Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
+                  parameters error LabelMap.empty agent_name map
+              in
+              let error =
+                Exception.check_point Exception.warn parameters error error'
+                  __POS__ Exit
+              in
+              let error', new_map =
+                LabelMap.add parameters error (Rule r_id, ag_id, 0)
+                  (set_test, asso_test, set_mod, asso_mod)
+                  old_map
+              in
+              let error =
+                Exception.check_point Exception.warn parameters error error'
+                  __POS__ Exit
+              in
+              let error, map =
+                Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite parameters
+                  error agent_name new_map map
+              in
+              error, (map, creation, degradation))
+          rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+          (map, creation, degradation))
     rules
     ( Ckappa_sig.Agent_map_and_set.Map.empty,
       Ckappa_sig.Agent_map_and_set.Map.empty,
@@ -508,7 +502,7 @@ let smash_side_effect parameters error static dead_rules =
   in
   Ckappa_sig.AgentRule_map_and_set.Map.fold
     (fun (agent_name, rule_id) _ (error, map) ->
-      let error, b = dead_rules error parameters rule_id in
+      let error, b = dead_rules parameters error rule_id in
       if b then
         error, map
       else (
@@ -1120,18 +1114,6 @@ let agent_trace parameters log_info error dead_rules bdu_handler static
   let rules = compil.Cckappa_sig.rules in
   let init = compil.Cckappa_sig.init in
   let () = Ckappa_sig.Views_intbdu.import_handler bdu_handler in
-  let dead_rules error parameters rule_id =
-    let error, bdu_handler =
-      match Ckappa_sig.Views_intbdu.export_handler error with
-      | error, Some h -> error, h
-      | error, None -> Exception.warn parameters error __POS__ Exit bdu_handler
-    in
-    let error, bdu_handler, b =
-      dead_rules bdu_handler error parameters rule_id
-    in
-    let () = Ckappa_sig.Views_intbdu.import_handler bdu_handler in
-    error, b
-  in
   let error, side_effects =
     smash_side_effect parameters error static dead_rules
   in

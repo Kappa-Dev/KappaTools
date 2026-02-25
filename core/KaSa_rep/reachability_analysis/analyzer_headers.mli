@@ -259,11 +259,10 @@ val set_log_info :
   global_dynamic_information
 
 val dummy_dead_rules :
-  'a ->
-  Exception.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
+  Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_rule_id ->
-  Exception.exceptions_caught_and_uncaught * 'a * bool
+  Exception.exceptions_caught_and_uncaught * bool
 
 val dummy_side_effects :
   Remanent_parameters_sig.parameters ->

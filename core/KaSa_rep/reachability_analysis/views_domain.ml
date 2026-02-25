@@ -3460,16 +3460,8 @@ module Domain = struct
   let print ?dead_rules static dynamic error loggers =
     let dead_rules =
       match dead_rules with
-      | None -> fun _ -> Analyzer_headers.dummy_dead_rules
+      | None -> Analyzer_headers.dummy_dead_rules
       | Some f -> f
-    in
-    let dead_rules bdu_handler error parameters rule_id =
-      let dynamic = set_mvbdu_handler bdu_handler dynamic in
-      let error, dynamic, bool =
-        dead_rules static dynamic error parameters rule_id
-      in
-      let bdu_handler = get_mvbdu_handler dynamic in
-      error, bdu_handler, bool
     in
     let parameters = get_parameter static in
     let error, dynamic =
@@ -3857,7 +3849,7 @@ module Domain = struct
     let dynamic = set_ranges ranges dynamic in
     error, set_mvbdu_handler bdu_handler dynamic, ()
 
-  let get_dead_rules _static = Analyzer_headers.dummy_dead_rules
+  let get_dead_rules _static _dynamic = Analyzer_headers.dummy_dead_rules
   let get_side_effects _static _dynamic = Analyzer_headers.dummy_side_effects
 
   let enable_or_disable_rule static dynamic error cc_compil =

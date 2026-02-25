@@ -116,7 +116,10 @@ module type Domain = sig
 
   val print :
     ?dead_rules:
-      (Remanent_parameters_sig.parameters, Ckappa_sig.c_rule_id, bool) binary ->
+      (Remanent_parameters_sig.parameters ->
+      Exception.exceptions_caught_and_uncaught ->
+      Ckappa_sig.c_rule_id ->
+      Exception.exceptions_caught_and_uncaught * bool) ->
     (Loggers.t, unit) unary
 
   val maybe_reachable :
@@ -127,7 +130,12 @@ module type Domain = sig
     ternary
 
   val get_dead_rules :
-    (Remanent_parameters_sig.parameters, Ckappa_sig.c_rule_id, bool) binary
+    static_information ->
+    dynamic_information ->
+    Remanent_parameters_sig.parameters ->
+    Exception.exceptions_caught_and_uncaught ->
+    Ckappa_sig.c_rule_id ->
+    Exception.exceptions_caught_and_uncaught * bool
 
   val get_side_effects :
     static_information ->

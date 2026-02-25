@@ -356,7 +356,7 @@ let initialize_global_information parameters log_info error mvbdu_handler
   let init_dynamic = { dynamic_dummy = (); mvbdu_handler; log_info } in
   error, static, init_dynamic
 
-let dummy_dead_rules bdu_handler error _ _ = error, bdu_handler, false
+let dummy_dead_rules _ error _ = error, false
 let dummy_side_effects _ error _ = error, None
 
 let abstract_away_working_set_vars parameters error bdu_handler mvbdu

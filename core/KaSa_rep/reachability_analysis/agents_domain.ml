@@ -862,7 +862,7 @@ module Domain = struct
   let _cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
-  let get_dead_rules _static = Analyzer_headers.dummy_dead_rules
+  let get_dead_rules _static _dynamic = Analyzer_headers.dummy_dead_rules
   let get_side_effects _static _dynamic = Analyzer_headers.dummy_side_effects
 
   let enable_or_disable_rule static dynamic error cc_compil =
