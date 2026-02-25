@@ -12,9 +12,9 @@
 %plot: [T]
 %plot: Ap
 
-'create A' #[ @rule-0 && A && B ] A(x{u}[.] y[.])+ @ 1
-'phosphorization' #[ @rule-1 ] A(x{u/p}[#]) @ 1
-'binding x' #[ @rule-2 ] A(x[./1]), A(x[./1]) @ 1
+'create A' #[ A && B ] A(x{u}[.] y[.])+ @ 1
+'phosphorization' A(x{u/p}[#]) @ 1
+'binding x' A(x[./1]), A(x[./1]) @ 1
 'binding y' A(y[./1]), A(y[./1]) @ 1
 
 

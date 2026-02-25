@@ -956,7 +956,6 @@ Id=114
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=146
  Node(site_type:1<0)
@@ -983,13 +982,13 @@ Id=146
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=58
- Node(site_type:2<0)
+Id=38
+ Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
-   Node(site_type:2<2)
+  Id=37
+   Node(site_type:0<2)
     Id=3
      Node(site_type:3<0)
       Id=0
@@ -1013,7 +1012,6 @@ A(y) => [ A(y[.]) v A(y[y.A]) ]
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=146
  Node(site_type:1<0)
@@ -1040,13 +1038,13 @@ Id=146
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=58
- Node(site_type:2<0)
+Id=38
+ Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
-   Node(site_type:2<2)
+  Id=37
+   Node(site_type:0<2)
     Id=3
      Node(site_type:3<0)
       Id=0
@@ -1074,7 +1072,6 @@ A(x[2],y[1]),A(y[1]),A(x[2]) => .not.P
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=146
  Node(site_type:1<0)
@@ -1101,13 +1098,13 @@ Id=146
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=58
- Node(site_type:2<0)
+Id=38
+ Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
-   Node(site_type:2<2)
+  Id=37
+   Node(site_type:0<2)
     Id=3
      Node(site_type:3<0)
       Id=0
@@ -1125,7 +1122,6 @@ Id=58
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=146
  Node(site_type:1<0)
@@ -1152,13 +1148,13 @@ Id=146
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=58
- Node(site_type:2<0)
+Id=38
+ Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
-   Node(site_type:2<2)
+  Id=37
+   Node(site_type:0<2)
     Id=3
      Node(site_type:3<0)
       Id=0
