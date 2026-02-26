@@ -25,6 +25,10 @@ let option_seed_input =
 let option_withtrace = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 let option_withdeadrules = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 let option_withdeadagents = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
+
+let option_withdeactivatedrules =
+  Html.input ~a:[ Html.a_input_type `Checkbox ] ()
+
 let option_withirreversible = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 
 let decrease_font =
@@ -113,6 +117,12 @@ let%html bodies =
     </div>
     <div class="form-group">
     <div class="col-md-offset-2 col-md-5 checkbox"><label>|}
+    [ option_withdeactivatedrules ]
+    {|Show deactivated rules
+    </label></div>
+    </div>
+    <div class="form-group">
+    <div class="col-md-offset-2 col-md-5 checkbox"><label>|}
     [ option_withirreversible ]
     {|Show non weakly reversible transitions
     </label></div>
@@ -197,6 +207,9 @@ let set_action () =
     (Js.to_bool (Tyxml_js.To_dom.of_input option_withdeadrules)##.checked);
   State_project.set_show_dead_agents
     (Js.to_bool (Tyxml_js.To_dom.of_input option_withdeadagents)##.checked);
+  State_project.set_show_deactivated_rules
+    (Js.to_bool
+       (Tyxml_js.To_dom.of_input option_withdeactivatedrules)##.checked);
   State_project.set_show_non_weakly_reversible_transitions
     (Js.to_bool (Tyxml_js.To_dom.of_input option_withirreversible)##.checked);
 
@@ -238,6 +251,10 @@ let onload () =
          (Tyxml_js.To_dom.of_input option_withdeadrules)##.checked
          := Js.bool
               sp.State_project.model_parameters.State_project.show_dead_rules;
+         (Tyxml_js.To_dom.of_input option_withdeactivatedrules)##.checked
+         := Js.bool
+              sp.State_project.model_parameters
+                .State_project.show_deactivated_rules;
          (Tyxml_js.To_dom.of_input option_withirreversible)##.checked
          := Js.bool
               sp.State_project.model_parameters

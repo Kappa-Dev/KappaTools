@@ -736,6 +736,11 @@ let get_working_set_rules state =
             })
       compilation.Ast.rules
 
+let get_deactivated_rules_in_working_set state =
+  List.filter
+    (fun x -> not x.Public_data.rule_ws_enabled)
+    (get_working_set_rules state)
+
 let reset_reachability_memoized_values state =
   {
     state with
