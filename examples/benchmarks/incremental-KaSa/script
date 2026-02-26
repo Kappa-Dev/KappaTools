@@ -244,12 +244,7 @@ for MODEL in "${MODELS[@]}"; do
             echo "⚡️ Starting incremental analysis:"
         fi
 
-        echo -n "disable 0" > "$INPUT_INCREMENTAL_TMP"
-        for (( jj=1; jj<$NR_RULES; jj++ ))
-        do
-            echo -n  ",$jj" >> "$INPUT_INCREMENTAL_TMP"
-        done
-        echo "" >> "$INPUT_INCREMENTAL_TMP"
+        echo "disable $random_rules" > "$INPUT_INCREMENTAL_TMP"
         echo "print result" >> "$INPUT_INCREMENTAL_TMP"
         echo "q" >> "$INPUT_INCREMENTAL_TMP"
         
