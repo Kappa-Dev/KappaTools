@@ -277,6 +277,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     let error, dynamic, static =
       Domain.enable_or_disable_rule static dynamic error cc_compil
     in
+    let error, dynamic, () = Domain.stabilize static dynamic error in
     let error, dynamic =
       close_event parameters error StoryProfiling.Enable_or_disable_rule None
         dynamic

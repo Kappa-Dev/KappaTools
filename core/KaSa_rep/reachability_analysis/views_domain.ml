@@ -3837,9 +3837,12 @@ module Domain = struct
   let stabilize static dynamic error =
     let dim_min = 2 in
     let parameters = get_parameter static in
-    let bdu_handler = get_mvbdu_handler dynamic in
     let handler_kappa = get_kappa_handler static in
-    let result = get_fixpoint_result dynamic in
+    let error, dynamic, result =
+      get_fixpoint_result_without_working_set_vars parameters error static
+        dynamic
+    in
+    let bdu_handler = get_mvbdu_handler dynamic in
     let site_correspondence = get_site_correspondence_array static in
     let error, bdu_handler, ranges =
       smash_map mvbdu_cartesian_abstraction
