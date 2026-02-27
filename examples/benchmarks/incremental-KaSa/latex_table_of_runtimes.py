@@ -120,8 +120,8 @@ def main(inp_path, out_path):
         row_elems = []
         row_elems.append(r"\texttt{" + latex_escape(model) + "}")
         row_elems.append(latex_escape(model_nr_rules.get(model, "")))
-        analysis_items = {"full":["initialization", "initial_state", "fixpoint"], "partial":["initialization", "initial_state", "fixpoint"], "incremental":["initialization", "initial_state", "fixpoint", "disable"]}
-        for a, steps in analysis_items.items():
+        analysis_items = [("full",["initialization", "initial_state", "fixpoint"]), ("partial",["initialization", "initial_state", "fixpoint"]), ("incremental",["initialization", "initial_state", "fixpoint", "disable"])]
+        for a, steps in analysis_items:
             for s in steps:
                 val = data[model].get(a, {}).get(s, "")
                 if val == "":
