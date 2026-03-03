@@ -389,7 +389,7 @@ let content =
                        State_project.model State_file.model);
                 ]
               [
-                Html.txt "Working_set";
+                Html.txt "Working set";
                 Html.span ~a:[ Html.a_class [ "caret" ] ] [];
               ];
             Tyxml_js.R.Html.ul
@@ -423,7 +423,7 @@ let content =
                        State_project.model State_file.model);
                 ]
               [
-                Html.txt "Enabled Rules";
+                Html.txt "Activated Rules";
                 Html.span ~a:[ Html.a_class [ "caret" ] ] [];
               ];
             Tyxml_js.R.Html.ul
