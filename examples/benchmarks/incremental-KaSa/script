@@ -95,17 +95,22 @@ korkut_20170206="${MODELS_DIRECTORY}korkut/20170206/korkut_model.ka"
 korkut_20170113="${MODELS_DIRECTORY}korkut/20170113/prior_model.ka"
 wnt_20170322="${MODELS_DIRECTORY}wnt/20170322/full_model.ka"
 wnt_20151228="${MODELS_DIRECTORY}wnt/20151228/model_bigwnt.ka"
+tgf_v19="${MODELS_DIRECTORY}tgf/V19/NTactivationTGF_19.ka"
+tgf_20180419="${MODELS_DIRECTORY}tgf/20180419/full.ka"
 
-# To find the number of rules (not fool-proo):
-# grep -v "^#" model | grep -c "->" -
+
+# To find the number of rules (not fool-proof):
+# grep -v "^/\*" model | grep -v "^#" - | grep -c -- "->" -
 korkut_20170206_nr_rules=5750
 korkut_20170113_nr_rules=3916
 wnt_20170322_nr_rules=1470
 wnt_20151228_nr_rules=356
 egfr_net_nr_rules=23
+tgf_20180419_nr_rules=292
+tgf_v19_nr_rules=97
 
 # Array of models
-MODELS=("korkut_20170113" "korkut_20170206" "wnt_20151228" "wnt_20170322")
+MODELS=("tgf_v19" "tgf_20180419" "wnt_20151228" "wnt_20170322" "korkut_20170113" "korkut_20170206")
 OTHER_AVAILABLE_MODELS=("egfr_net" "fceri_fyn" "fceri_fyn_lig" "fceri_fyn_trimer" "fceri_gamma2" "ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB" "fceri_ji" "machine" "ensemble")
 
 OUTPUT_DIR="${SCRIPT_DIR}/output/"
@@ -162,7 +167,7 @@ for MODEL in "${MODELS[@]}"; do
     OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_runtimes~$i.html"
 
     SYNTAX="V4"
-    if grep -qi "!1" "$EXAMPLE_MODEL"; then
+    if grep -v "^/\*" "$EXAMPLE_MODEL" | grep -qi "!1" -; then
         SYNTAX="V3"
     fi
 
