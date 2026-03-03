@@ -8,7 +8,7 @@ Assumptions about CSV columns (no header):
     0: model (string)
     1: nr_rules (int or string)
     2: analysis_type (like "1_full")
-    3: step_name     (like "1_initialization")
+    3: step_name     (like "1_init")
     4: nr_removed_rules  (ignored)
     5: time (float)
 
@@ -92,7 +92,7 @@ def main(inp_path, out_path):
             if model not in model_nr_rules:
                 model_nr_rules[model] = nr_rules
 
-    total_step_count = 10
+    total_step_count = 11
     col_spec = "l c " + " ".join(["c"] * total_step_count)
 
     # Build LaTeX
@@ -108,19 +108,19 @@ def main(inp_path, out_path):
     lines.append(r"\toprule")
 
     # First header row
-    lines.append(r"\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{3}{c}{\textbf{full}} & \multicolumn{3}{c}{\textbf{partial}} & \multicolumn{4}{c}{\textbf{incremental}} \\")
+    lines.append(r"\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{3}{c}{\textbf{full}} & \multicolumn{3}{c}{\textbf{partial}} & \multicolumn{5}{c}{\textbf{incremental}} \\")
     lines.append(r"\cmidrule(lr){3-5}")
     lines.append(r"\cmidrule(lr){6-8}")
-    lines.append(r"\cmidrule(lr){9-12}")
+    lines.append(r"\cmidrule(lr){9-13}")
     # Second header row
-    lines.append(r"& & \bfseries\shortstack{Domain\\initialization} & \bfseries\shortstack{Initial\\state} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Domain\\initialization} & \bfseries\shortstack{Initial\\state} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Domain\\initialization} & \bfseries\shortstack{Initial\\state} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Disable\\rules} \\")
+    lines.append(r"& & \bfseries\shortstack{Init} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Print} & \bfseries\shortstack{Init} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Print} & \bfseries\shortstack{Init} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Print} & \bfseries\shortstack{Disable\\rules} & \bfseries\shortstack{Print} \\")
     lines.append(r"\midrule")
 
     for model in sorted(data.keys()):
         row_elems = []
         row_elems.append(r"\texttt{" + latex_escape(model) + "}")
         row_elems.append(latex_escape(model_nr_rules.get(model, "")))
-        analysis_items = [("full",["initialization", "initial_state", "fixpoint"]), ("partial",["initialization", "initial_state", "fixpoint"]), ("incremental",["initialization", "initial_state", "fixpoint", "disable"])]
+        analysis_items = [("full",["init", "fixpoint","print"]), ("partial",["init", "fixpoint","print"]), ("incremental",["init", "fixpoint","print1", "disable","print2"])]
         for a, steps in analysis_items:
             for s in steps:
                 val = data[model].get(a, {}).get(s, "")
