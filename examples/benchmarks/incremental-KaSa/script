@@ -110,8 +110,8 @@ tgf_20180419_nr_rules=292
 tgf_v19_nr_rules=97
 
 # Array of models
-MODELS=("tgf_v19" "tgf_20180419" "wnt_20151228" )
-OTHER_AVAILABLE_MODELS=("wnt_20170322" "korkut_20170113" "korkut_20170206" "egfr_net" "fceri_fyn" "fceri_fyn_lig" "fceri_fyn_trimer" "fceri_gamma2" "ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB" "fceri_ji" "machine" "ensemble")
+MODELS=("tgf_v19" "tgf_20180419" "wnt_20151228" "wnt_20170322" "korkut_20170113" "korkut_20170206")
+OTHER_AVAILABLE_MODELS=("egfr_net" "fceri_fyn" "fceri_fyn_lig" "fceri_fyn_trimer" "fceri_gamma2" "ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB" "fceri_ji" "machine" "ensemble")
 
 OUTPUT_DIR="${SCRIPT_DIR}/output/"
 PROFILING_FILE="${KAPPA_OUTPUT_DIR}profiling.html"
