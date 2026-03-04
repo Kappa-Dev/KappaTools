@@ -196,7 +196,7 @@ for MODEL in "${MODELS[@]}"; do
         grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,1_init,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
         grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,2_fixpoint,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,1_init,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
         echo "</table>" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,3_print,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
@@ -236,7 +236,7 @@ for MODEL in "${MODELS[@]}"; do
         grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_partial,1_init,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
         grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_partial,2_fixpoint,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_partial,1_init,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
         echo "</table>" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_partial,3_print,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
@@ -294,7 +294,7 @@ for MODEL in "${MODELS[@]}"; do
         grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,1_init,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
         grep -m 1 "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep -m 1 "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,2_fixpoint,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+        grep -m 1 "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,1_init,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
         grep -m 1 "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep -m 1 "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,3_print1,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
