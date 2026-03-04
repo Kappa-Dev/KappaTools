@@ -134,7 +134,7 @@ for ((NR_RULES=MIN_NR_RULES; NR_RULES <= MAX_NR_RULES; NR_RULES=NR_RULES+STEP)) 
     done
     STDOUT_OUTPUT_FILE_FULL="${OUTPUT_FILE}_full~$i.txt"
     STDOUT_OUTPUT_FILE_INCREMENTAL="${OUTPUT_FILE}_incremental~$i.txt"
-    OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_runtimes~$i.html"
+    OUTPUT_FILE="${OUTPUT_DIR}${NR_RULES}_rules_in_ws_runtimes~$i.html"
 
     SYNTAX="V4"
     if grep -v "^/\*" "$EXAMPLE_MODEL" | grep -qi "!1" -; then
