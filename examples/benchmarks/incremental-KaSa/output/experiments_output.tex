@@ -5,18 +5,20 @@
 \begin{table}[ht]
 \centering
 \small
-\begin{tabular}{l c c c c c c c c c c c}
+\begin{tabular}{l c c c c c c c c c c c c}
 \toprule
-\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{3}{c}{\textbf{full}} & \multicolumn{3}{c}{\textbf{partial}} & \multicolumn{4}{c}{\textbf{incremental}} \\
+\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{3}{c}{\textbf{full}} & \multicolumn{3}{c}{\textbf{partial}} & \multicolumn{5}{c}{\textbf{incremental}} \\
 \cmidrule(lr){3-5}
 \cmidrule(lr){6-8}
-\cmidrule(lr){9-12}
-& & \bfseries\shortstack{Domain\\initialization} & \bfseries\shortstack{Initial\\state} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Domain\\initialization} & \bfseries\shortstack{Initial\\state} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Domain\\initialization} & \bfseries\shortstack{Initial\\state} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Disable\\rules} \\
+\cmidrule(lr){9-13}
+& & \bfseries\shortstack{Init} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Print} & \bfseries\shortstack{Init} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Print} & \bfseries\shortstack{Init} & \bfseries\shortstack{Fixpoint} & \bfseries\shortstack{Print} & \bfseries\shortstack{Disable\\rules} & \bfseries\shortstack{Print} \\
 \midrule
-\texttt{korkut\_20170113} & 3915 & 14.3 & 4.23 & 6.31 & 14.2 & 4.22 & 6.27 & 18.8 & 4.9 & 7.63 & 0.0236 \\
-\texttt{korkut\_20170206} & 5749 & 118 & 23.8 & 54.2 & 114 & 23.2 & 53 & 1.1e+03 & 33.9 & 69.9 & 0.0768 \\
-\texttt{wnt\_20151228} & 355 & 1.58 & 0.0916 & 1.86 & 1.38 & 0.08 & 1.41 & 3.76 & 0.0868 & 5.62 & 0.844 \\
-\texttt{wnt\_20170322} & 1469 & 11.4 & 0.939 & 15.7 & 11.1 & 0.926 & 13 & 21.7 & 0.858 & 18.5 & 0.252 \\
+\texttt{korkut\_20170113} & 3915 & 18.5 & 6.31 & 0.296 & 18.4 & 6.25 & 0.308 & 19.8 & 6.47 & 0.324 & 0.0192 & 0.323 \\
+\texttt{korkut\_20170206} & 5749 & 142 & 54.7 & 0.85 & 142 & 54.3 & 0.86 & 413 & 58.2 & 0.833 & 0.0376 & 0.827 \\
+\texttt{tgf\_20180419} & 291 & 1.38 & 0.744 & 0.0112 & 1.27 & 0.662 & 0.0152 & 3.39 & 1.01 & 0.0176 & 0.024 & 0.0084 \\
+\texttt{tgf\_v19} & 96 & 0.417 & 0.288 & 0.0144 & 0.312 & 0.218 & 0.0124 & 0.869 & 0.601 & 0.0316 & 0.0776 & 0.0076 \\
+\texttt{wnt\_20151228} & 355 & 1.68 & 1.86 & 2.59 & 1.59 & 1.73 & 1.81 & 2.28 & 2.6 & 2.91 & 0.434 & 0.028 \\
+\texttt{wnt\_20170322} & 1469 & 12.3 & 15.7 & 0.0328 & 12.3 & 15.6 & 0.0456 & 15.1 & 16.6 & 0.0612 & 0.0988 & 0.0172 \\
 \bottomrule
 \end{tabular}
 \caption{Timing table}
