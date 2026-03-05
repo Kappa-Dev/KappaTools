@@ -1,0 +1,25 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage[margin=1in,landscape]{geometry}
+\begin{document}
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{c c c c c}
+\toprule
+\bfseries\shortstack{Nr. of rules\\in working set} & \multicolumn{2}{c}{\textbf{non-incremental}} & \multicolumn{2}{c}{\textbf{incremental}}\\
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+& \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} \\
+\midrule
+10 & 198 & 0.83 & 474 & 0.838 \\
+20 & 198 & 0.856 & 822 & 0.832 \\
+30 & 198 & 0.841 & 1210 & 0.814 \\
+40 & 197 & 0.851 & 1670 & 0.764 \\
+50 & 197 & 0.861 & 2130 & 0.694 \\
+60 & 198 & 0.826 & 2540 & 0.685 \\
+\bottomrule
+\end{tabular}
+\caption{Timing table}
+\end{table}
+\end{document}
