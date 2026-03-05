@@ -53,7 +53,7 @@ def format_time(t):
         f = float(t)
     except Exception:
         return latex_escape(str(t))
-    return "{:.3g}".format(f)
+    return "{:.4g}".format(f)
 
 def main(inp_path, out_path):
     # data[nr_removed_rules][analysis_name][step_name] = time
@@ -85,7 +85,7 @@ def main(inp_path, out_path):
 
             data[model][a_name][s_name] = time_val
 
-    total_step_count = 4
+    total_step_count = 2
     col_spec = "c " + " ".join(["c"] * total_step_count)
 
     # Build LaTeX
@@ -100,17 +100,14 @@ def main(inp_path, out_path):
     lines.append(r"\begin{tabular}{" + col_spec + "}")
     lines.append(r"\toprule")
     # First header row
-    lines.append(r"\bfseries\shortstack{Nr. of rules\\in working set} & \multicolumn{2}{c}{\textbf{non-incremental}} & \multicolumn{2}{c}{\textbf{incremental}}\\")
-    lines.append(r"\cmidrule(lr){2-3}")
-    lines.append(r"\cmidrule(lr){4-5}")
+    lines.append(r"\bfseries\shortstack{Nr. of rules\\in working set} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result}\\")
     # Second header row
-    lines.append(r"& \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} \\")
     lines.append(r"\midrule")
 
     for model in sorted(data.keys()):
         row_elems = []
         row_elems.append(latex_escape(model))
-        analysis_items = [("full",["init", "print"]), ("incremental",["init", "print1"])]
+        analysis_items = [("incremental",["init", "print1"])]
         for a, steps in analysis_items:
             for s in steps:
                 val = data[model].get(a, {}).get(s, "")

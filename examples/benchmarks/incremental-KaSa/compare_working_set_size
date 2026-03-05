@@ -5,7 +5,6 @@ INSTALL_DEPS=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-KASA_BINARY="${SCRIPT_DIR}/../../../bin/KaSa"
 KASA_INC_BINARY="${SCRIPT_DIR}/../../../bin/KaSaIncremental"
 KAPPA_OUTPUT_DIR="${SCRIPT_DIR}/../../../output/"
 INPUT_INCREMENTAL_TMP="${MODELS_DIRECTORY}inc_analysis_input_tmp.txt"
@@ -62,8 +61,8 @@ done
 
 shift $((OPTIND - 1))
 
-MIN_NR_RULES=10
-MAX_NR_RULES=100
+MIN_NR_RULES=0
+MAX_NR_RULES=60
 STEP=10
 
 if $DEBUG; then
@@ -129,10 +128,9 @@ for ((NR_RULES=MIN_NR_RULES; NR_RULES <= MAX_NR_RULES; NR_RULES=NR_RULES+STEP)) 
     # output files
     OUTPUT_FILE="${OUTPUT_DIR}${NR_RULES}_rules_in_ws_experiments_output"
     i=0
-    while [ -e "${OUTPUT_FILE}_full~$i.txt" ]; do
+    while [ -e "${OUTPUT_FILE}_incremental~$i.txt" ]; do
         i=$((i + 1))
     done
-    STDOUT_OUTPUT_FILE_FULL="${OUTPUT_FILE}_full~$i.txt"
     STDOUT_OUTPUT_FILE_INCREMENTAL="${OUTPUT_FILE}_incremental~$i.txt"
     OUTPUT_FILE="${OUTPUT_DIR}${NR_RULES}_rules_in_ws_runtimes~$i.html"
 
@@ -143,42 +141,6 @@ for ((NR_RULES=MIN_NR_RULES; NR_RULES <= MAX_NR_RULES; NR_RULES=NR_RULES+STEP)) 
 
     for (( i=1; i<=REPS; i++ ))
     do
-        # CLASSICAL ANALYSIS
-        if $DEBUG; then
-            echo "⌛ Starting non-incremental analysis:"
-        fi
-
-        cmd=(
-            timeout "$TIMEOUT"
-            "$KASA_BINARY"
-            "$EXAMPLE_MODEL"
-            -syntax "$SYNTAX"
-            $OPTIONS
-            )
-        printf '%q ' "${cmd[@]}"
-        printf '\n'
-        { ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_FULL"
-        EXIT_STATUS=$?
-
-        echo "<h4>FULL NON INCREMENTAL ANALYSIS</h4><table>" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Global initialization" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Global initialization" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/1_full,1_init,1_initialization,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/1_full,1_init,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/1_full,1_init,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        echo "</table>" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/1_full,3_print,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-
-        # Check if the program was killed by timeout
-        if [ $EXIT_STATUS -eq 124 ]; then
-            echo "⚠️ Timeout or memory overflow occurred for $MODEL with $NR_RULES rules in the working set (non-incremental analysis 1)."
-            break
-        fi
-
-        random_rules=$(shuf -i "0-$NR_RULES_MODEL" -n $NR_RULES | paste -sd,)
-
         # INCREMENTAL ANALYSIS
         if $DEBUG; then
             echo "⚡️ Starting incremental analysis:"
@@ -191,14 +153,25 @@ for ((NR_RULES=MIN_NR_RULES; NR_RULES <= MAX_NR_RULES; NR_RULES=NR_RULES+STEP)) 
             cat "$INPUT_INCREMENTAL_TMP"
         fi
 
-        cmd=(
-        timeout "$TIMEOUT"
-        "$KASA_INC_BINARY"
-        "$EXAMPLE_MODEL"
-        -syntax "$SYNTAX"
-        $OPTIONS
-        --rules-in-working-set "$random_rules"
-        )
+        if ((NR_RULES==0)) then 
+            cmd=(
+            timeout "$TIMEOUT"
+            "$KASA_INC_BINARY"
+            "$EXAMPLE_MODEL"
+            -syntax "$SYNTAX"
+            $OPTIONS
+            )
+        else 
+            random_rules=$(shuf -i "0-$NR_RULES_MODEL" -n $NR_RULES | paste -sd,)
+            cmd=(
+            timeout "$TIMEOUT"
+            "$KASA_INC_BINARY"
+            "$EXAMPLE_MODEL"
+            -syntax "$SYNTAX"
+            $OPTIONS
+            --rules-in-working-set "$random_rules"
+            )
+        fi
         printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
         printf '\n'
         { cat "$INPUT_INCREMENTAL_TMP" | ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_INCREMENTAL"
@@ -229,13 +202,9 @@ for ((NR_RULES=MIN_NR_RULES; NR_RULES <= MAX_NR_RULES; NR_RULES=NR_RULES+STEP)) 
 
     echo "✅ Completed: $MODEL"
     echo "The results of the incremental analysis can be found in: $STDOUT_OUTPUT_FILE_INCREMENTAL"
-    echo "And those of the non-incremental analysis in: $STDOUT_OUTPUT_FILE_FULL and $STDOUT_OUTPUT_FILE_REMOVED_RULES"
     echo "The runtimes can be found in: $OUTPUT_FILE"
 
     # Check for exceptions in STDOUT_OUTPUT_FILE
-    if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_FULL"; then
-        echo "🚨 Exception raised during analysis of $MODEL 1."
-    fi
     if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_INCREMENTAL"; then
         echo "🚨 Exception raised during analysis of $MODEL 3."
     fi 
