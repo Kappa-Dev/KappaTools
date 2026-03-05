@@ -259,6 +259,12 @@ for MODEL in "${MODELS[@]}"; do
             echo -n  ",$jj" >> "$INPUT_INCREMENTAL_TMP"
         done
         echo "" >> "$INPUT_INCREMENTAL_TMP"
+        echo -n "enable 0" >> "$INPUT_INCREMENTAL_TMP"
+        for (( jj=1; jj<$NR_RULES; jj++ ))
+        do
+            echo -n  ",$jj" >> "$INPUT_INCREMENTAL_TMP"
+        done
+        echo "" >> "$INPUT_INCREMENTAL_TMP"
         echo "print result" >> "$INPUT_INCREMENTAL_TMP"
         echo "q" >> "$INPUT_INCREMENTAL_TMP"
         
@@ -300,7 +306,9 @@ for MODEL in "${MODELS[@]}"; do
         grep -m 1 "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,3_print1,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
         grep "End</TD><TD>Enable or disable a rule" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Enable or disable a rule" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,4_disable,5_disable,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+        grep -m 1 "End</TD><TD>Enable or disable a rule" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,4_disable,5_disable1,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+        
+        grep "End</TD><TD>Enable or disable a rule" "$PROFILING_FILE"  | tail -1 | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,4_disable,6_disable2,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
         grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | tail -1 >> "${OUTPUT_FILE}"
         echo "</table>" >> "${OUTPUT_FILE}"

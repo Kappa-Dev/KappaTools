@@ -113,7 +113,7 @@ def main(inp_path, out_path):
     lines.append(r"\cmidrule(lr){5-6}")
     lines.append(r"\cmidrule(lr){7-10}")
     # Second header row
-    lines.append(r"& & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{disable\\rules} & \bfseries\shortstack{print\\result} \\")
+    lines.append(r"& & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{activate/\\deactivate} & \bfseries\shortstack{print\\result} \\")
     lines.append(r"\midrule")
 
     for model in sorted(data.keys()):
