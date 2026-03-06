@@ -13,6 +13,7 @@ let file_new_input_id = "menu-editor-file-new-input"
 let file_new_input_ws_id = "menu-editor-file-working-set-checkbox"
 let file_dropdown_menu_id = "menu-editor-file-dropdown-menu"
 let file_dropdown_menu_id2 = "menu-editor-file-dropdown-menu-ws"
+let file_dropdown_menu_id3 = "menu-editor-rules-dropdown-menu"
 let file_new_li_id = "menu-editor-file-new-li"
 let file_open_li_id = "menu-editor-file-open-li"
 let file_open_selector_id = "menu-editor-open-selector-id"
@@ -307,7 +308,7 @@ let content =
   in
   [
     Html.div
-      ~a:[ Html.a_class [ "choose-file" ] ]
+      ~a:[ Html.a_class [ "dropdown"; "choose-file" ] ]
       [
         Html.button
           ~a:
@@ -362,7 +363,7 @@ let content =
                  Js._false));
       ];
     Html.div
-      ~a:[ Html.a_class [ "choose-working-set" ] ]
+      ~a:[ Html.a_class [ "dropdown"; "choose-working-set" ] ]
       [
         Html.button
           ~a:
@@ -394,7 +395,7 @@ let content =
           li_list_files;
       ];
     Html.div
-      ~a:[ Html.a_class [ "choose-enabled-rules" ] ]
+      ~a:[ Html.a_class [ "dropdown"; "choose-enabled-rules" ] ]
       [
         Html.button
           ~a:
@@ -422,7 +423,7 @@ let content =
         Tyxml_js.R.Html.ul
           ~a:
             [
-              Html.a_id file_dropdown_menu_id2; Html.a_class [ "dropdown-menu" ];
+              Html.a_id file_dropdown_menu_id3; Html.a_class [ "dropdown-menu" ];
             ]
           li_list_rules;
       ];
