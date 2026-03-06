@@ -153,7 +153,7 @@ for ((NR_RULES=MIN_NR_RULES; NR_RULES <= MAX_NR_RULES; NR_RULES=NR_RULES+STEP)) 
             cat "$INPUT_INCREMENTAL_TMP"
         fi
 
-        if ((NR_RULES==0)) then 
+        if ((NR_RULES==0)); then 
             cmd=(
             timeout "$TIMEOUT"
             "$KASA_INC_BINARY"
