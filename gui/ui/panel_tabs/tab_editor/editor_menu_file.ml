@@ -248,15 +248,8 @@ let dropdown_rules (manager : Api.concrete_manager) () =
   let file_li =
     List.map
       (fun rule ->
+        let rule_name = "Rule " ^ Html_utility.string_of_ws_rule rule in
         let rule_id = string_of_int rule.Public_data.rule_ws_id in
-        let rule_name =
-          "Rule "
-          ^ string_of_int rule.Public_data.rule_ws_id
-          ^
-          match rule.Public_data.rule_ws_label with
-          | "" -> ""
-          | label -> " ('" ^ label ^ "')"
-        in
         let checked = rule.Public_data.rule_ws_enabled in
         Html.li
           ~a:

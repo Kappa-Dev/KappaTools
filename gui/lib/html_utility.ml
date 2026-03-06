@@ -155,9 +155,9 @@ let string_of_rule rule =
 
 let string_of_ws_rule rule =
   if rule.Public_data.rule_ws_label <> "" then
-    " '" ^ rule.Public_data.rule_ws_label ^ "'"
+    "'" ^ rule.Public_data.rule_ws_label ^ "'"
   else
-    "Rule " ^ string_of_int rule.Public_data.rule_ws_id
+    rule.Public_data.rule_ws_ast
 
 let print_rule rule list = print_string (string_of_rule rule) list
 

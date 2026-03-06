@@ -86,6 +86,7 @@ type rule = {
 type rule_in_working_set = {
   rule_ws_id: int;
   rule_ws_label: string;
+  rule_ws_ast: string;
   rule_ws_position: Loc.t;
   rule_ws_enabled: bool;
 }

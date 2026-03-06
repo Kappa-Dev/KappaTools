@@ -379,6 +379,7 @@ type rule = {
 type rule_in_working_set = {
   rule_ws_id: int;
   rule_ws_label: string;
+  rule_ws_ast: string;
   rule_ws_position: Loc.t;
   rule_ws_enabled: bool;
 }
@@ -439,17 +440,19 @@ let ws_rule_to_json rule =
     [
       rule_id, JsonUtil.of_int rule.rule_ws_id;
       label, JsonUtil.of_string rule.rule_ws_label;
+      ast, JsonUtil.of_string rule.rule_ws_ast;
       ( position,
         Loc.yojson_of_annoted JsonUtil.of_unit ((), rule.rule_ws_position) );
       rule_enabled, JsonUtil.of_bool rule.rule_ws_enabled;
     ]
 
 let json_to_ws_rule = function
-  | `Assoc l as x when List.length l = 4 ->
+  | `Assoc l as x when List.length l = 5 ->
     (try
        {
          rule_ws_id = JsonUtil.to_int (List.assoc rule_id l);
          rule_ws_label = JsonUtil.to_string (List.assoc label l);
+         rule_ws_ast = JsonUtil.to_string (List.assoc ast l);
          rule_ws_position =
            snd
              (Loc.annoted_of_yojson

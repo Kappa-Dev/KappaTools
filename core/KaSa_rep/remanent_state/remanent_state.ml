@@ -713,7 +713,7 @@ let get_working_set_rules state =
   | None -> []
   | Some compilation ->
     List.filter_map
-      (fun (ws_id, label, _, (_, loc)) ->
+      (fun (ws_id, label, _, (rule, loc)) ->
         match ws_id with
         | None -> None
         | Some ws_id ->
@@ -731,6 +731,10 @@ let get_working_set_rules state =
                 (match label with
                 | None -> ""
                 | Some (l, _) -> l);
+              Public_data.rule_ws_ast =
+                Format.asprintf "%a"
+                  (Ast.print_rule_content ~bidirectional:rule.Ast.bidirectional)
+                  rule.Ast.rewrite;
               Public_data.rule_ws_position = loc;
               Public_data.rule_ws_enabled = enabled;
             })
