@@ -445,186 +445,201 @@ let filter_influence_high maybe_reachable parameters handler error compilation
   in
   Ckappa_sig.PairRule_setmap.Map.fold
     (fun (a, b) couple ((error, dynamic), map') ->
-      try
-        let error, rule1 =
-          Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters error
-            a compilation.Cckappa_sig.rules
-        in
-        let error, r1 =
-          match rule1 with
-          | None ->
-            let error, () =
-              Exception.warn parameters error __POS__ ~message:"Missing rule"
-                Exit ()
-            in
-            raise (Pass error)
-          | Some r -> error, r
-        in
-        let error, mixt, rule2_opt =
-          if Ckappa_sig.compare_rule_id b (Ckappa_sig.rule_id_of_int nrules) < 0
-          then (
-            let error, rule2 =
-              Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters
-                error b compilation.Cckappa_sig.rules
-            in
-            match rule2 with
+      let error, enabled_a =
+        Cckappa_sig.rule_is_enabled_in_current_working_set parameters error a
+          compilation
+      in
+      let error, enabled_b =
+        Cckappa_sig.rule_is_enabled_in_current_working_set parameters error b
+          compilation
+      in
+      if (not enabled_a) || not enabled_b then
+        (error, dynamic), map'
+      else (
+        try
+          let error, rule1 =
+            Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters
+              error a compilation.Cckappa_sig.rules
+          in
+          let error, r1 =
+            match rule1 with
             | None ->
               let error, () =
-                Exception.warn parameters error __POS__
-                  ~message:("Missing rule" ^ Ckappa_sig.string_of_rule_id b)
+                Exception.warn parameters error __POS__ ~message:"Missing rule"
                   Exit ()
               in
               raise (Pass error)
-            | Some r -> error, get_lhs r, Some r
-          ) else (
-            let error, var =
-              Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters
-                error
-                (Ckappa_sig.sub_rule_id b nrules)
-                compilation.Cckappa_sig.variables
-            in
-            match var with
-            | None ->
-              let error, () =
-                Exception.warn parameters error __POS__
-                  ~message:("Missing var" ^ Ckappa_sig.string_of_rule_id b)
-                  Exit ()
+            | Some r -> error, r
+          in
+          let error, mixt, rule2_opt =
+            if
+              Ckappa_sig.compare_rule_id b (Ckappa_sig.rule_id_of_int nrules)
+              < 0
+            then (
+              let error, rule2 =
+                Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters
+                  error b compilation.Cckappa_sig.rules
               in
-              raise (Pass error)
-            | Some v ->
-              let error, var = get_var v in
-              error, var, None
-          )
-        in
-        let (error, dynamic), couple' =
-          try
-            let (error, dynamic), couple' =
-              Quark_type.Labels.filter_couple parameters (error, dynamic)
-                handler
-                (fun (error, dynamic) a b ->
-                  match
-                    check_influence_rule_mixt error r1 mixt rule2_opt
-                      ( Ckappa_sig.agent_id_of_int a,
-                        Ckappa_sig.agent_id_of_int b )
-                  with
-                  | error, None -> (error, dynamic), false
-                  | error, Some (_inj1, inj2) ->
-                    let error, n =
-                      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif
-                      .fold parameters error
-                        (fun _parameters error i _ sol ->
+              match rule2 with
+              | None ->
+                let error, () =
+                  Exception.warn parameters error __POS__
+                    ~message:("Missing rule" ^ Ckappa_sig.string_of_rule_id b)
+                    Exit ()
+                in
+                raise (Pass error)
+              | Some r -> error, get_lhs r, Some r
+            ) else (
+              let error, var =
+                Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters
+                  error
+                  (Ckappa_sig.sub_rule_id b nrules)
+                  compilation.Cckappa_sig.variables
+              in
+              match var with
+              | None ->
+                let error, () =
+                  Exception.warn parameters error __POS__
+                    ~message:("Missing var" ^ Ckappa_sig.string_of_rule_id b)
+                    Exit ()
+                in
+                raise (Pass error)
+              | Some v ->
+                let error, var = get_var v in
+                error, var, None
+            )
+          in
+          let (error, dynamic), couple' =
+            try
+              let (error, dynamic), couple' =
+                Quark_type.Labels.filter_couple parameters (error, dynamic)
+                  handler
+                  (fun (error, dynamic) a b ->
+                    match
+                      check_influence_rule_mixt error r1 mixt rule2_opt
+                        ( Ckappa_sig.agent_id_of_int a,
+                          Ckappa_sig.agent_id_of_int b )
+                    with
+                    | error, None -> (error, dynamic), false
+                    | error, Some (_inj1, inj2) ->
+                      let error, n =
+                        Ckappa_sig
+                        .Agent_id_quick_nearly_Inf_Int_storage_Imperatif
+                        .fold parameters error
+                          (fun _parameters error i _ sol ->
+                            ( error,
+                              if Ckappa_sig.compare_agent_id i sol < 0 then
+                                sol
+                              else
+                                i ))
+                          (get_bool r1).Cckappa_sig.views
+                          Ckappa_sig.dummy_agent_id
+                      in
+                      let f _parameters error i =
+                        match
+                          Ckappa_sig.Agent_id_setmap.Map.find_option i inj2
+                        with
+                        | None ->
                           ( error,
-                            if Ckappa_sig.compare_agent_id i sol < 0 then
-                              sol
-                            else
-                              i ))
-                        (get_bool r1).Cckappa_sig.views
-                        Ckappa_sig.dummy_agent_id
-                    in
-                    let f _parameters error i =
-                      match
-                        Ckappa_sig.Agent_id_setmap.Map.find_option i inj2
-                      with
-                      | None ->
-                        ( error,
-                          Ckappa_sig.agent_id_of_int
-                            (Ckappa_sig.int_of_agent_id i
-                            + Ckappa_sig.int_of_agent_id n
-                            + 1) )
-                      | Some j
-                        when Ckappa_sig.compare_agent_id j
-                               Ckappa_sig.dummy_agent_id
-                             < 0 ->
-                        (* check if we can improve in case of negative update, there should be a bond between j and this agent *)
-                        ( error,
-                          Ckappa_sig.agent_id_of_int
-                            (Ckappa_sig.int_of_agent_id i
-                            + Ckappa_sig.int_of_agent_id n
-                            + 1) )
-                      | Some j -> error, j
-                    in
-                    let error, join =
-                      Cckappa_sig.join_mixture parameters error
-                        (fun _ error i -> error, i)
-                        f (get_bool r1) mixt
-                    in
-                    let error, dynamic, bool =
-                      maybe_reachable static dynamic error join
-                    in
-                    let () = dynamic_ref := dynamic in
-                    let error =
-                      if Remanent_parameters.get_trace parameters then (
-                        let error =
-                          let () =
-                            Loggers.fprintf
-                              (Remanent_parameters.get_logger parameters)
-                              "FST:\n"
-                          in
+                            Ckappa_sig.agent_id_of_int
+                              (Ckappa_sig.int_of_agent_id i
+                              + Ckappa_sig.int_of_agent_id n
+                              + 1) )
+                        | Some j
+                          when Ckappa_sig.compare_agent_id j
+                                 Ckappa_sig.dummy_agent_id
+                               < 0 ->
+                          (* check if we can improve in case of negative update, there should be a bond between j and this agent *)
+                          ( error,
+                            Ckappa_sig.agent_id_of_int
+                              (Ckappa_sig.int_of_agent_id i
+                              + Ckappa_sig.int_of_agent_id n
+                              + 1) )
+                        | Some j -> error, j
+                      in
+                      let error, join =
+                        Cckappa_sig.join_mixture parameters error
+                          (fun _ error i -> error, i)
+                          f (get_bool r1) mixt
+                      in
+                      let error, dynamic, bool =
+                        maybe_reachable static dynamic error join
+                      in
+                      let () = dynamic_ref := dynamic in
+                      let error =
+                        if Remanent_parameters.get_trace parameters then (
                           let error =
-                            Print_cckappa.print_mixture parameters error handler
-                              (get_bool r1)
-                          in
-                          let () =
-                            Loggers.fprintf
-                              (Remanent_parameters.get_logger parameters)
-                              "SND:\n"
-                          in
-                          let error =
-                            Print_cckappa.print_mixture parameters error handler
-                              mixt
-                          in
-                          let () =
-                            Loggers.fprintf
-                              (Remanent_parameters.get_logger parameters)
-                              "PUSHOUT:\n"
-                          in
-                          let error =
-                            Print_cckappa.print_mixture parameters error handler
-                              join
-                          in
-                          let () =
-                            if bool then
+                            let () =
                               Loggers.fprintf
                                 (Remanent_parameters.get_logger parameters)
-                                "YES!!!\n"
-                            else
+                                "FST:\n"
+                            in
+                            let error =
+                              Print_cckappa.print_mixture parameters error
+                                handler (get_bool r1)
+                            in
+                            let () =
                               Loggers.fprintf
                                 (Remanent_parameters.get_logger parameters)
-                                "NO!!!\n"
-                          in
-                          let error =
-                            Print_cckappa.print_mixture parameters error handler
-                              (get_bool r1)
-                          in
-                          let error =
-                            Print_cckappa.print_mixture parameters error handler
-                              mixt
-                          in
-                          let error =
-                            Print_cckappa.print_mixture parameters error handler
-                              join
+                                "SND:\n"
+                            in
+                            let error =
+                              Print_cckappa.print_mixture parameters error
+                                handler mixt
+                            in
+                            let () =
+                              Loggers.fprintf
+                                (Remanent_parameters.get_logger parameters)
+                                "PUSHOUT:\n"
+                            in
+                            let error =
+                              Print_cckappa.print_mixture parameters error
+                                handler join
+                            in
+                            let () =
+                              if bool then
+                                Loggers.fprintf
+                                  (Remanent_parameters.get_logger parameters)
+                                  "YES!!!\n"
+                              else
+                                Loggers.fprintf
+                                  (Remanent_parameters.get_logger parameters)
+                                  "NO!!!\n"
+                            in
+                            let error =
+                              Print_cckappa.print_mixture parameters error
+                                handler (get_bool r1)
+                            in
+                            let error =
+                              Print_cckappa.print_mixture parameters error
+                                handler mixt
+                            in
+                            let error =
+                              Print_cckappa.print_mixture parameters error
+                                handler join
+                            in
+                            error
                           in
                           error
-                        in
-                        error
-                      ) else
-                        error
-                    in
-                    (error, dynamic), bool)
-                couple
-            in
-            (error, dynamic), couple'
-          with False error ->
-            let dynamic = !dynamic_ref in
-            (error, dynamic), couple
-        in
-        if Quark_type.Labels.is_empty_couple couple' then
+                        ) else
+                          error
+                      in
+                      (error, dynamic), bool)
+                  couple
+              in
+              (error, dynamic), couple'
+            with False error ->
+              let dynamic = !dynamic_ref in
+              (error, dynamic), couple
+          in
+          if Quark_type.Labels.is_empty_couple couple' then
+            (error, dynamic), map'
+          else
+            ( (error, dynamic),
+              Ckappa_sig.PairRule_setmap.Map.add (a, b) couple' map' )
+        with Pass error ->
+          let dynamic = !dynamic_ref in
           (error, dynamic), map'
-        else
-          ( (error, dynamic),
-            Ckappa_sig.PairRule_setmap.Map.add (a, b) couple' map' )
-      with Pass error ->
-        let dynamic = !dynamic_ref in
-        (error, dynamic), map')
+      ))
     map
     ((error, dynamic), Ckappa_sig.PairRule_setmap.Map.empty)
