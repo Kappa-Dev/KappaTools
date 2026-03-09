@@ -35,20 +35,6 @@ def latex_escape(s: str) -> str:
         s = s.replace(k, v)
     return s
 
-def parse_prefix_name(field: str):
-    """
-    Parse fields like "1_full" or "10_somename" into (index:int, name:str).
-    If no underscore present, return (large_index, field).
-    """
-    if '_' in field:
-        idx_str, name = field.split('_', 1)
-        try:
-            idx = int(idx_str)
-        except ValueError:
-            idx = 10**9
-        return idx, name
-    return 10**9, field
-
 def format_time(t):
     # compact formatting: up to 3 significant digits
     try:
@@ -61,9 +47,6 @@ def main(inp_path, out_path):
     # data[model][analysis_name][step_name] = time
     data = defaultdict(lambda: defaultdict(dict))
     model_nr_rules = {}
-    # track analysis order and step order
-    analysis_idx_map = {}  # analysis_name -> idx
-    step_idx_map = defaultdict(dict)  # analysis_name -> {step_name: idx}
 
     with open(inp_path, newline='') as f:
         reader = csv.reader(f)
@@ -80,14 +63,7 @@ def main(inp_path, out_path):
             step_name = row[3].strip()
             time_val = row[5].strip()
 
-            a_idx, a_name = parse_prefix_name(analysis_type)
-            s_idx, s_name = parse_prefix_name(step_name)
-
-            # if same step name appears multiple times with different indices, keep the smallest index
-            analysis_idx_map[a_name] = min(analysis_idx_map.get(a_name, 10**9), a_idx)
-            step_idx_map[a_name][s_name] = min(step_idx_map[a_name].get(s_name, 10**9), s_idx)
-
-            data[model][a_name][s_name] = time_val
+            data[model][analysis_type][step_name] = time_val
             # keep nr_rules (if inconsistent across rows for same model, keep first seen)
             if model not in model_nr_rules:
                 model_nr_rules[model] = nr_rules
@@ -120,7 +96,7 @@ def main(inp_path, out_path):
         row_elems = []
         row_elems.append(r"\texttt{" + latex_escape(model) + "}")
         row_elems.append(latex_escape(model_nr_rules.get(model, "")))
-        analysis_items = [("full",["init", "print"]), ("partial",["init", "print"]), ("incremental",["init", "print1", "disable","print2"])]
+        analysis_items = [("1_full",["1_init", "3_print"]), ("2_partial",["1_init", "3_print"]), ("3_incremental",["1_init", "3_print1", "4_disable","5_print2"])]
         for a, steps in analysis_items:
             for s in steps:
                 val = data[model].get(a, {}).get(s, "")

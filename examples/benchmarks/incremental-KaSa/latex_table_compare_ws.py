@@ -33,20 +33,6 @@ def latex_escape(s: str) -> str:
         s = s.replace(k, v)
     return s
 
-def parse_prefix_name(field: str):
-    """
-    Parse fields like "1_full" or "10_somename" into (index:int, name:str).
-    If no underscore present, return (large_index, field).
-    """
-    if '_' in field:
-        idx_str, name = field.split('_', 1)
-        try:
-            idx = int(idx_str)
-        except ValueError:
-            idx = 10**9
-        return idx, name
-    return 10**9, field
-
 def format_time(t):
     # compact formatting: up to 3 significant digits
     try:
@@ -56,12 +42,8 @@ def format_time(t):
     return "{:.4g}".format(f)
 
 def main(inp_path, out_path):
-    # data[nr_removed_rules][analysis_name][step_name] = time
+    # data[nr_removed_rules][step_name] = time
     data = defaultdict(lambda: defaultdict(dict))
-    # track analysis order and step order
-    analysis_idx_map = {}  # analysis_name -> idx
-    step_idx_map = defaultdict(dict)  # analysis_name -> {step_name: idx}
-
     with open(inp_path, newline='') as f:
         reader = csv.reader(f)
         next(reader, None) # skip first row (headers)
@@ -71,21 +53,14 @@ def main(inp_path, out_path):
             if len(row) < 4:
                 # skip malformed rows
                 continue
-            model = row[2].strip()
-            analysis_type = row[0].strip()
+            test_instance = row[2].strip()
             step_name = row[1].strip()
             time_val = row[3].strip()
 
-            a_idx, a_name = parse_prefix_name(analysis_type)
-            s_idx, s_name = parse_prefix_name(step_name)
+            data[test_instance][step_name] = time_val
 
-            # if same step name appears multiple times with different indices, keep the smallest index
-            analysis_idx_map[a_name] = min(analysis_idx_map.get(a_name, 10**9), a_idx)
-            step_idx_map[a_name][s_name] = min(step_idx_map[a_name].get(s_name, 10**9), s_idx)
-
-            data[model][a_name][s_name] = time_val
-
-    total_step_count = 2
+    all_steps = data["0"].keys()
+    total_step_count = len(all_steps)
     col_spec = "c " + " ".join(["c"] * total_step_count)
 
     # Build LaTeX
@@ -100,21 +75,24 @@ def main(inp_path, out_path):
     lines.append(r"\begin{tabular}{" + col_spec + "}")
     lines.append(r"\toprule")
     # First header row
-    lines.append(r"\bfseries\shortstack{Nr. of rules\\in working set} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result}\\")
+    header = r"\bfseries\shortstack{Nr. of rules\\in working set} "
+    for step in all_steps:
+        header += r"& \texttt{" + latex_escape(step) + "} "
+    header += r"\\"
+    lines.append(header)
     # Second header row
     lines.append(r"\midrule")
 
-    for model in sorted(data.keys()):
+    for test_instance in sorted(data.keys()):
         row_elems = []
-        row_elems.append(latex_escape(model))
-        analysis_items = [("incremental",["init", "print1"])]
-        for a, steps in analysis_items:
-            for s in steps:
-                val = data[model].get(a, {}).get(s, "")
-                if val == "":
-                    row_elems.append("")  # empty cell if missing
-                else:
-                    row_elems.append(format_time(val))
+        row_elems.append(latex_escape(test_instance))
+        analysis_items = all_steps
+        for s in analysis_items:
+            val = data[test_instance].get(s, "")
+            if val == "":
+                row_elems.append("")  # empty cell if missing
+            else:
+                row_elems.append(format_time(val))
         lines.append(" & ".join(row_elems) + r" \\")
     lines.append(r"\bottomrule")
     lines.append(r"\end{tabular}")
