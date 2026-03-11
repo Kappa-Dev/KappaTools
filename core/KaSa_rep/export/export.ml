@@ -2254,4 +2254,8 @@ functor
     let disable_rule_index index =
       enable_or_disable_rule false
         (List.map Ckappa_sig.working_set_index_of_int index)
+
+  (* Incremental analysis *)
+    let summarize = Diff.summarize  
+    
   end
