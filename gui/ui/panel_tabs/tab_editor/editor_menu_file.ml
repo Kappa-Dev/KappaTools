@@ -13,7 +13,6 @@ let file_new_input_id = "menu-editor-file-new-input"
 let file_new_input_ws_id = "menu-editor-file-working-set-checkbox"
 let file_dropdown_menu_id = "menu-editor-file-dropdown-menu"
 let file_dropdown_menu_id2 = "menu-editor-file-dropdown-menu-ws"
-let file_dropdown_menu_id3 = "menu-editor-rules-dropdown-menu"
 let file_new_li_id = "menu-editor-file-new-li"
 let file_open_li_id = "menu-editor-file-open-li"
 let file_open_selector_id = "menu-editor-open-selector-id"
@@ -40,8 +39,6 @@ let element_get_ws_filename (element : Dom_html.element Js.t) :
 
 let element_get_rulename (elt : Dom_html.element Js.t) =
   elt##getAttribute (Js.string "data-rule-id")
-
-let element_set_rulename rule_id = Html.a_user_data "rule-id" rule_id
 
 let file_new_input =
   Html.input
@@ -78,23 +75,6 @@ let file_checkbox file_id is_checked checkbox_class set_filename =
          Html.a_input_type `Checkbox;
          Html.a_class [ checkbox_class ];
          set_filename file_id;
-       ]
-      @ checked_attribute)
-    ()
-
-let rule_checkbox rule_id is_checked =
-  let checked_attribute =
-    if is_checked then
-      [ Html.a_checked () ]
-    else
-      []
-  in
-  Html.input
-    ~a:
-      ([
-         Html.a_input_type `Checkbox;
-         Html.a_class [ rule_enabled_checkbox ];
-         element_set_rulename rule_id;
        ]
       @ checked_attribute)
     ()
@@ -237,52 +217,6 @@ let dropdown (model : State_file.model) =
   in
   dropdown_files @ separator_li @ new_li @ open_li @ close_li @ export_li
 
-let dropdown_rules (manager : Api.concrete_manager) () =
-  let open Lwt.Syntax in
-  let* rules = manager#get_working_set_rules in
-  let rules =
-    match rules.Result_util.value with
-    | Ok r -> r
-    | Error _ -> []
-  in
-  let file_li =
-    List.map
-      (fun rule ->
-        let rule_name = "Rule " ^ Html_utility.string_of_ws_rule rule in
-        let rule_id = string_of_int rule.Public_data.rule_ws_id in
-        let checked = rule.Public_data.rule_ws_enabled in
-        Html.li
-          ~a:
-            [
-              Html.a_class [ "active"; "ui-state-sortable" ];
-              element_set_rulename rule_id;
-            ]
-          [
-            Html.a
-              ~a:[ element_set_rulename rule_id ]
-              [
-                Html.div
-                  ~a:
-                    [
-                      Html.a_class [ "checkbox-control-div" ];
-                      element_set_rulename rule_id;
-                    ]
-                  [
-                    rule_checkbox rule_id checked;
-                    Html.span
-                      ~a:
-                        [
-                          Html.a_class [ "checkbox-control-label" ];
-                          element_set_rulename rule_id;
-                        ]
-                      [ Html.cdata rule_name ];
-                  ];
-              ];
-          ])
-      rules
-  in
-  Lwt.return ([] @ file_li)
-
 let content =
   let li_list =
     ReactiveData.RList.from_signal
@@ -293,11 +227,6 @@ let content =
       (React.S.map
          (fun model -> dropdown_files ~called_from_working_set:true model)
          State_file.model)
-  in
-  let li_list_rules =
-    ReactiveData.RList.from_signal
-      (State_project.on_project_change_async ~on:(React.S.const true) ()
-         (React.S.const ()) [] dropdown_rules)
   in
   [
     Html.div
@@ -386,39 +315,6 @@ let content =
               Html.a_id file_dropdown_menu_id2; Html.a_class [ "dropdown-menu" ];
             ]
           li_list_files;
-      ];
-    Html.div
-      ~a:[ Html.a_class [ "dropdown"; "choose-enabled-rules" ] ]
-      [
-        Html.button
-          ~a:
-            [
-              Html.Unsafe.string_attrib "type" "button";
-              Html.a_class [ "btn btn-default"; "dropdown-toggle" ];
-              Html.Unsafe.string_attrib "data-toggle" "dropdown";
-              Html.Unsafe.string_attrib "aria-haspopup" "true";
-              Html.Unsafe.string_attrib "aria-expanded" "false";
-              Tyxml_js.R.filter_attrib (Html.a_disabled ())
-                (React.S.l2
-                   (fun model file ->
-                     match model.State_project.model_current_id with
-                     | None -> true
-                     | Some _ ->
-                       (match file.State_file.current with
-                       | None -> false
-                       | Some { State_file.out_of_sync; _ } -> out_of_sync))
-                   State_project.model State_file.model);
-            ]
-          [
-            Html.txt "Activated Rules";
-            Html.span ~a:[ Html.a_class [ "caret" ] ] [];
-          ];
-        Tyxml_js.R.Html.ul
-          ~a:
-            [
-              Html.a_id file_dropdown_menu_id3; Html.a_class [ "dropdown-menu" ];
-            ]
-          li_list_rules;
       ];
   ]
 
