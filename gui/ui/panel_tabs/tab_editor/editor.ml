@@ -144,7 +144,9 @@ let onload () : unit =
   let () = lint_config##.lintOnChange := Js._false in
   let configuration = Codemirror.default_configuration in
   let gutter_options =
-    Js.string "breakpoints,CodeMirror-lint-markers,CodeMirror-linenumbers"
+    Js.string
+      ("breakpoints,CodeMirror-lint-markers,"
+     ^ Editor_controller.working_set_gutter ^ ",CodeMirror-linenumbers")
   in
   let gutter_option : Js.string_array Js.t =
     gutter_options##split (Js.string ",")
@@ -263,6 +265,7 @@ let onload () : unit =
           codemirror##setSelection first last
         ))
   in
+  let () = Editor_controller.set_working_set_rules codemirror in
   ()
 
 let onresize () = ()
