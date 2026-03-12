@@ -624,3 +624,12 @@ let on_project_change_async ?eq ~on ?(others_eq = ( = )) init_others others
        (React.S.changes
           (React.S.on ~eq:eq_pair on (init_state, init_others)
              (React.S.Pair.pair ~eq:eq_pair state others))))
+
+let on_project_change_async_simple handler =
+  Lwt_react.E.map_p
+    (fun st ->
+      match st.project_current with
+      | None -> Lwt.return ()
+      | Some current -> handler current.project_manager)
+    (React.S.changes state)
+  |> ignore
