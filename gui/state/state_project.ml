@@ -331,6 +331,7 @@ let sync () : unit Api.lwt_result =
       ~patternSharing:Pattern.Compatible_patterns []
     >>= fun out ->
     let st = React.S.value state in
+          let () = Js.Unsafe.global##.process##.stdout##write (Js.string ("model changed\n")) in
     let () = set_state { st with project_version = succ st.project_version } in
     Lwt.return out
 

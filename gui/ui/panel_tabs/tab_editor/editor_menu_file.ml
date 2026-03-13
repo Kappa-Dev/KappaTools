@@ -20,7 +20,6 @@ let file_close_li_id = "menu-editor-file-close-li"
 let file_export_li_id = "menu-editor-file-export-li"
 let file_compile_checkbox = "menu-editor-file-compile-checkbox"
 let file_ws_checkbox = "menu-editor-file-working-set-checkbox"
-let rule_enabled_checkbox = "menu-editor-rule-enabled-checkbox"
 
 (* list filename annotation *)
 let element_get_filename (element : Dom_html.element Js.t) :
@@ -36,9 +35,6 @@ let element_set_ws_filename (name : string) =
 let element_get_ws_filename (element : Dom_html.element Js.t) :
     Js.js_string Js.t Js.opt =
   Common.element_data (element : Dom_html.element Js.t) "ws-file-id"
-
-let element_get_rulename (elt : Dom_html.element Js.t) =
-  elt##getAttribute (Js.string "data-rule-id")
 
 let file_new_input =
   Html.input
@@ -476,42 +472,6 @@ let onload () =
                  let () =
                    Editor_menu_file_controller.set_file_working_set
                      (Js.to_string file_id) is_checked
-                 in
-                 ())
-           in
-           Js._false))
-  in
-  let () =
-    Common.jquery_on
-      (Format.sprintf "input.%s" rule_enabled_checkbox)
-      "change"
-      (Dom_html.handler (fun event ->
-           let target : Dom_html.element Js.t Js.opt = event##.target in
-           let rule_id : Js.js_string Js.t Js.opt =
-             Js.Opt.bind target (fun (element : Dom_html.element Js.t) ->
-                 element_get_rulename element)
-           in
-           let is_checked : bool =
-             Js.to_bool
-               (Js.Opt.case target
-                  (fun _ -> Js._false)
-                  (fun (element : Dom_html.element Js.t) ->
-                    (Js.Unsafe.coerce element : Dom_html.inputElement Js.t)##.checked))
-           in
-           let () =
-             Js.Opt.case rule_id
-               (fun _ -> ())
-               (fun rule_id ->
-                 let () =
-                   Common.log_group
-                     "[Editor_menu_file] triggered \
-                      input.rule_enabled_checkbox, rule_id:"
-                 in
-                 let () = Common.debug ~loc:__LOC__ rule_id in
-                 let () = Common.log_group_end () in
-                 let () =
-                   Editor_menu_file_controller.enable_or_disable_rule
-                     (Js.to_string rule_id) is_checked
                  in
                  ())
            in

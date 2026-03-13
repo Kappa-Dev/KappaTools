@@ -12,4 +12,6 @@ val with_file :
   ((string * string * bool) Api.result -> unit Api.lwt_result) -> unit
 
 val working_set_gutter : string
+val rule_enabled_checkbox : string
 val set_working_set_rules : Codemirror.codemirror Js.t -> unit
+val enable_or_disable_rule : string -> bool -> unit

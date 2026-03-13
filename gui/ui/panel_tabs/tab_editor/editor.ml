@@ -133,6 +133,9 @@ let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
   let () = codemirror##scrollTo Js.null (Js.some scrollLine) in
   ()
 
+let element_get_rulename (elt : Dom_html.element Js.t) =
+  elt##getAttribute (Js.string "data-rule-id")
+
 let onload () : unit =
   let () = Editor_menu_file.onload () in
   let lint_config = Codemirror.create_lint_configuration () in
@@ -266,6 +269,44 @@ let onload () : unit =
         ))
   in
   let () = Editor_controller.set_working_set_rules codemirror in
+  let () =
+    Common.jquery_on
+      (Format.sprintf "input.%s" Editor_controller.rule_enabled_checkbox)
+      "change"
+      (Dom_html.handler (fun event ->
+           let target : Dom_html.element Js.t Js.opt = event##.target in
+           let rule_id : Js.js_string Js.t Js.opt =
+             Js.Opt.bind target (fun (element : Dom_html.element Js.t) ->
+                 element_get_rulename element)
+           in
+           let is_checked : bool =
+             Js.to_bool
+               (Js.Opt.case target
+                  (fun _ -> Js._false)
+                  (fun (element : Dom_html.element Js.t) ->
+                    (Js.Unsafe.coerce element : Dom_html.inputElement Js.t)##.checked))
+           in
+           let () =
+             Js.Opt.case rule_id
+               (fun _ -> ())
+               (fun rule_id ->
+                 let () =
+                   Common.log_group
+                     "[Editor_menu_file] triggered \
+                      input.rule_enabled_checkbox, rule_id:"
+                 in
+                 let () = Common.debug ~loc:__LOC__ rule_id in
+                 let () = Common.log_group_end () in
+                 let enable = if is_checked then "enabling" else "disabling" in
+                 let () = Js.Unsafe.global##.process##.stdout##write (Js.string (enable ^" a rule\n")) in
+                 let () =
+                   Editor_controller.enable_or_disable_rule
+                     (Js.to_string rule_id) is_checked
+                 in
+                 ())
+           in
+           Js._false))
+  in
   ()
 
 let onresize () = ()
