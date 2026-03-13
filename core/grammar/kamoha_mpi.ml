@@ -11,7 +11,7 @@ let catalog = Kfiles.create ()
 type _ handle =
   | Nothing : unit handle
   | Catalog : Kfiles.catalog_item list handle
-  | Info : (string * int * bool) handle
+  | Info : (string * int) handle
   | Ast : Ast.parsing_compil handle
 
 type box =
@@ -65,12 +65,8 @@ let on_message yield post =
                        let content =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
-                       let working_set =
-                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
-                       in
                        let out =
-                         Kfiles.file_create ~position ~id ~content ~working_set
-                           catalog
+                         Kfiles.file_create ~position ~id ~content catalog
                        in
                        Lwt.return (B (Nothing, msg_id, lift_answer out))
                      | "FileGet" ->
@@ -95,25 +91,13 @@ let on_message yield post =
                        let content =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
-                       let working_set =
-                         JsonUtil.read_next_item
-                           (JsonUtil.read_option Yojson.Basic.read_bool)
-                           st b
-                       in
-                       let out =
-                         Kfiles.file_patch ~id ~working_set content catalog
-                       in
+                       let out = Kfiles.file_patch ~id content catalog in
                        Lwt.return (B (Nothing, msg_id, lift_answer out))
                      | "FileUpdateWS" ->
                        let id =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
-                       let working_set =
-                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
-                       in
-                       let out =
-                         Kfiles.file_set_working_set ~id working_set catalog
-                       in
+                       let out = Kfiles.file_set_working_set ~id catalog in
                        Lwt.return (B (Nothing, msg_id, lift_answer out))
                      | "FileDelete" ->
                        let id =
@@ -131,12 +115,7 @@ let on_message yield post =
                        let content =
                          JsonUtil.read_next_item Ast.read_parsing_compil st b
                        in
-                       let working_set =
-                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
-                       in
-                       let () =
-                         Kfiles.overwrite id ~working_set content catalog
-                       in
+                       let () = Kfiles.overwrite id content catalog in
                        Lwt.return (B (Nothing, msg_id, Result_util.ok ()))
                      | x ->
                        Lwt.return
@@ -162,8 +141,8 @@ let on_message yield post =
           | B (Ast, msg_id, x) -> reply post Ast.write_parsing_compil msg_id x
           | B (Info, msg_id, x) ->
             reply post
-              (JsonUtil.write_compact_triple Yojson.Basic.write_string
-                 Yojson.Basic.write_int Yojson.Basic.write_bool)
+              (JsonUtil.write_compact_pair Yojson.Basic.write_string
+                 Yojson.Basic.write_int)
               msg_id x)
     with e ->
       (match !current_id with

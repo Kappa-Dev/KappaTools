@@ -6,13 +6,10 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val create_file :
-  ?text:Js.js_string Js.t Lwt.t -> ?working_set:bool -> string -> unit
-
+val create_file : ?text:Js.js_string Js.t Lwt.t -> string -> unit
 val set_file : string -> unit
 val close_file : unit -> unit
 val export_current_file : unit -> unit
 val set_file_compile : string -> bool -> unit
-val set_file_working_set : string -> bool -> unit
 val enable_or_disable_rule : string -> bool -> unit
 val order_files : string list -> unit

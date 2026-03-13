@@ -9,7 +9,7 @@
 type _ handle =
   | Nothing : unit handle
   | Catalog : Kfiles.catalog_item list handle
-  | Info : (string * int * bool) handle
+  | Info : (string * int) handle
   | Ast : Ast.parsing_compil handle
 
 type box =
@@ -39,8 +39,8 @@ let receive mailbox x =
            | B (Info, thread) ->
              Lwt.wakeup thread
                (read_result
-                  (JsonUtil.read_compact_triple Yojson.Basic.read_string
-                     Yojson.Basic.read_int Yojson.Basic.read_bool)
+                  (JsonUtil.read_compact_pair Yojson.Basic.read_string
+                     Yojson.Basic.read_int)
                   p lb)
            | B (Ast, thread) ->
              Lwt.wakeup thread (read_result Ast.read_parsing_compil p lb)
@@ -92,25 +92,21 @@ class virtual new_client ~post mailbox : Api.manager_model =
               (fun b -> Yojson.Basic.write_string b file_id);
             ])
 
-    method file_update file_id file_content working_set_opt =
+    method file_update file_id file_content =
       self#message Nothing (fun b ->
           JsonUtil.write_sequence b
             [
               (fun b -> Yojson.Basic.write_string b "FileUpdate");
               (fun b -> Yojson.Basic.write_string b file_id);
               (fun b -> Yojson.Basic.write_string b file_content);
-              (fun b ->
-                (JsonUtil.write_option Yojson.Basic.write_bool)
-                  b working_set_opt);
             ])
 
-    method file_update_ws file_id working_set =
+    method file_update_ws file_id =
       self#message Nothing (fun b ->
           JsonUtil.write_sequence b
             [
               (fun b -> Yojson.Basic.write_string b "FileUpdateWS");
               (fun b -> Yojson.Basic.write_string b file_id);
-              (fun b -> Yojson.Basic.write_bool b working_set);
             ])
 
     method file_move file_position file_id =
@@ -130,7 +126,7 @@ class virtual new_client ~post mailbox : Api.manager_model =
               (fun b -> Yojson.Basic.write_string b file_id);
             ])
 
-    method file_create file_position file_id file_content working_set =
+    method file_create file_position file_id file_content =
       self#message Nothing (fun b ->
           JsonUtil.write_sequence b
             [
@@ -138,7 +134,6 @@ class virtual new_client ~post mailbox : Api.manager_model =
               (fun b -> Yojson.Basic.write_int b file_position);
               (fun b -> Yojson.Basic.write_string b file_id);
               (fun b -> Yojson.Basic.write_string b file_content);
-              (fun b -> Yojson.Basic.write_bool b working_set);
             ])
 
     method file_catalog =
@@ -151,13 +146,12 @@ class virtual new_client ~post mailbox : Api.manager_model =
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "ProjectParse") ])
 
-    method project_overwrite file_id ast working_set =
+    method project_overwrite file_id ast =
       self#message Nothing (fun b ->
           JsonUtil.write_sequence b
             [
               (fun b -> Yojson.Basic.write_string b "ProjectOverwrite");
               (fun b -> Yojson.Basic.write_string b file_id);
               (fun b -> Ast.write_parsing_compil b ast);
-              (fun b -> Yojson.Basic.write_bool b working_set);
             ])
   end

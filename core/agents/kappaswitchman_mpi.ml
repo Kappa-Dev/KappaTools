@@ -16,7 +16,7 @@ type _ handle =
   | String : string handle
   | Strings : string list handle
   | Catalog : Kfiles.catalog_item list handle
-  | Info : (string * int * bool) handle
+  | Info : (string * int) handle
   | Ast : Ast.parsing_compil handle
   | JSON : Yojson.Basic.t handle
   | Influence_map
@@ -112,11 +112,8 @@ let on_message exec_command message_delimiter =
                        let content =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
-                       let working_set =
-                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
-                       in
-                       manager#file_create position id content working_set
-                       >>= fun out -> Lwt.return (B (Nothing, msg_id, out))
+                       manager#file_create position id content >>= fun out ->
+                       Lwt.return (B (Nothing, msg_id, out))
                      | "FileGet" ->
                        let id =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
@@ -139,21 +136,13 @@ let on_message exec_command message_delimiter =
                        let content =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
-                       let working_set =
-                         JsonUtil.read_next_item
-                           (JsonUtil.read_option Yojson.Basic.read_bool)
-                           st b
-                       in
-                       manager#file_update id content working_set >>= fun out ->
+                       manager#file_update id content >>= fun out ->
                        Lwt.return (B (Nothing, msg_id, out))
                      | "FileUpdateWS" ->
                        let id =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
-                       let working_set =
-                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
-                       in
-                       manager#file_update_ws id working_set >>= fun out ->
+                       manager#file_update_ws id >>= fun out ->
                        Lwt.return (B (Nothing, msg_id, out))
                      | "FileDelete" ->
                        let id =
@@ -168,11 +157,8 @@ let on_message exec_command message_delimiter =
                        let content =
                          JsonUtil.read_next_item Ast.read_parsing_compil st b
                        in
-                       let working_set =
-                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
-                       in
-                       manager#project_overwrite id content working_set
-                       >>= fun out -> Lwt.return (B (Nothing, msg_id, out))
+                       manager#project_overwrite id content >>= fun out ->
+                       Lwt.return (B (Nothing, msg_id, out))
                      (* KaSa *)
                      | "INIT" ->
                        let compil =
@@ -455,8 +441,8 @@ let on_message exec_command message_delimiter =
           | B (JSON, msg_id, x) -> reply post Yojson.Basic.write_json msg_id x
           | B (Info, msg_id, x) ->
             reply post
-              (JsonUtil.write_compact_triple Yojson.Basic.write_string
-                 Yojson.Basic.write_int Yojson.Basic.write_bool)
+              (JsonUtil.write_compact_pair Yojson.Basic.write_string
+                 Yojson.Basic.write_int)
               msg_id x
           | B (Influence_map, msg_id, x) ->
             reply post

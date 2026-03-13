@@ -6,8 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val create_file :
-  filename:string -> content:string -> working_set:bool -> unit Api.lwt_result
+val create_file : filename:string -> content:string -> unit Api.lwt_result
 (** Create a file *)
 
 val select_file : string -> int option -> unit Api.lwt_result
@@ -19,13 +18,10 @@ val set_content : string -> unit Api.lwt_result
 val set_compile : string -> bool -> unit Api.lwt_result
 (** Update compile of the file of rank [k] *)
 
-val set_working_set : string -> bool -> unit Api.lwt_result
-(** Update working_set of the file *)
-
 val order_files : string list -> unit Api.lwt_result
 (** Update the position of a file *)
 
-val get_file : unit -> (string * string * bool) Api.lwt_result
+val get_file : unit -> (string * string) Api.lwt_result
 (** get current file *)
 
 val remove_file : unit -> unit Api.lwt_result
@@ -42,7 +38,7 @@ val refresh_file_hook : refresh Hooked.E.t
 val cursor_activity : line:int -> ch:int -> unit
 val out_of_sync : bool -> unit
 
-type slot = { local: string option; name: string; working_set: bool }
+type slot = { local: string option; name: string }
 type active = { rank: int; cursor_pos: Loc.position; out_of_sync: bool }
 type model = { current: active option; directory: slot Mods.IntMap.t }
 

@@ -244,25 +244,6 @@ let read_compact_pair f g st b =
   let () = Yojson.Basic.read_rbr st b in
   x, y
 
-let write_compact_triple f g h ob (x, y, z) =
-  let () = Buffer.add_char ob '[' in
-  let () = f ob x in
-  let () = write_comma ob in
-  let () = g ob y in
-  let () = write_comma ob in
-  let () = h ob z in
-  Buffer.add_char ob ']'
-
-let read_compact_triple f g h st b =
-  let () = Yojson.Basic.read_lbr st b in
-  let x = read_between_spaces f st b in
-  let () = Yojson.Basic.read_comma st b in
-  let y = read_between_spaces g st b in
-  let () = Yojson.Basic.read_comma st b in
-  let z = read_between_spaces h st b in
-  let () = Yojson.Basic.read_rbr st b in
-  x, y, z
-
 let compact_to_pair f g = function
   | `List [ x; y ] -> f x, g y
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a compact pair", x))
