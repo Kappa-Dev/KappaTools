@@ -41,6 +41,7 @@ module type Type = sig
   val get_compilation : state -> state * compilation
   val get_c_compilation : state -> state * c_compilation
 
+
   val get_contact_map :
     ?accuracy_level:Public_data.accuracy_level -> state -> state * contact_map
 
@@ -134,6 +135,10 @@ module type Type = sig
   val disable_rule : string -> state -> state
   val enable_rule_index : int list -> state -> state
   val disable_rule_index : int list -> state -> state
+
+  val summarize: state -> state * Diff.summary
+  val dump_summary: state -> Diff.summary -> state 
+  
 end
 
 module Export : functor (Reachability : Analyzer.Analyzer) -> Type

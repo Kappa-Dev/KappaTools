@@ -10,10 +10,15 @@ type diff =
 val summarize:  
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-    Cckappa_sig.compil -> 
+  Cckappa_sig.compil -> 
   Exception_without_parameter.exceptions_caught_and_uncaught
   * summary 
   
+val dump_summary: 
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  summary -> unit 
+
 val is_new_rule: 
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->

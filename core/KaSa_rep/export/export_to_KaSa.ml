@@ -137,6 +137,9 @@ module type Type = sig
   val disable_rule : string -> state -> state
   val enable_rule_index : int list -> state -> state
   val disable_rule_index : int list -> state -> state
+
+  val summarize: state -> state * Diff.summary
+  val dump_summary: state -> Diff.summary -> state 
 end
 
 module Export =
@@ -164,4 +167,7 @@ functor
     let disable_rule = disable_rule
     let enable_rule_index = enable_rule_index
     let disable_rule_index = disable_rule_index
+
+    let summarize = summarize 
+    let dump_summary = dump_summary 
   end

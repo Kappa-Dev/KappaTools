@@ -2256,6 +2256,18 @@ functor
         (List.map Ckappa_sig.working_set_index_of_int index)
 
   (* Incremental analysis *)
-    let summarize = Diff.summarize  
-    
+    let summarize state = 
+      let parameters = get_parameters state in 
+      let errors = get_errors state in 
+      let state, compil = get_c_compilation state in 
+      let error, sum = Diff.summarize parameters errors compil in 
+      let state = set_errors error state in 
+      state, sum 
+
+    let dump_summary state summary = 
+      let parameters = get_parameters state in 
+      let errors = get_errors state in  
+      let () = Diff.dump_summary parameters errors summary in 
+      let state = set_errors errors state in 
+      state 
   end
