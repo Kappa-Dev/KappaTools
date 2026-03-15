@@ -136,8 +136,17 @@ module type Type = sig
   val enable_rule_index : int list -> state -> state
   val disable_rule_index : int list -> state -> state
 
-  val summarize: state -> state * Diff.summary
-  val dump_summary: state -> Diff.summary -> state 
+  val summarize_from_ast: state -> state * (Ast.rule Ast.compil_rule,
+          (Ast.mixture, Ast.mixture, string) Ast.init_statement) Diff.summary
+
+  (*val summarize_from_ckappa: state -> state * 
+  (Ckappa_sig.enriched_rule, Ckappa_sig.enriched_init) Diff.summary *)
+
+val summarize_from_cckappa: state -> state * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init)  Diff.summary 
+
+
+
+  val dump_summary: state -> ('a,'b) Diff.summary -> state 
   
 end
 

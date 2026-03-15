@@ -2253,11 +2253,28 @@ functor
         (List.map Ckappa_sig.working_set_index_of_int index)
 
   (* Incremental analysis *)
-    let summarize state = 
+    let summarize_from_ast state = 
       let parameters = get_parameters state in 
       let errors = get_errors state in 
       let state, compil = get_compilation state in 
-      let error, sum = Diff.summarize parameters errors compil in 
+      let error, sum = Diff.summarize_from_ast parameters errors compil in 
+      let state = set_errors error state in 
+      state, sum 
+
+
+  (*let summarize_from_ckappa state = 
+      let parameters = get_parameters state in 
+      let errors = get_errors state in 
+      let state, (compil,_) = compute_c_compilation_handler (fun _ -> ()) state in 
+      let error, sum = Diff.summarize_from_ckappa parameters errors compil in 
+      let state = set_errors error state in 
+      state, sum *)
+
+   let summarize_from_cckappa state = 
+      let parameters = get_parameters state in 
+      let errors = get_errors state in 
+      let state, compil = get_c_compilation state in 
+      let error, sum = Diff.summarize_from_cckappa parameters errors compil in 
       let state = set_errors error state in 
       state, sum 
 

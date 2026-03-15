@@ -1,12 +1,12 @@
-type summary_file = 
+type ('rule,'init) summary_file = 
   {
-    summary_rule_map: (int * Ast.rule Ast.compil_rule) Mods.StringMap.t ; 
-    summary_init_state_map: (int * (Ast.mixture,Ast.mixture,string) Ast.init_statement) Mods.StringMap.t ;
+    summary_rule_map: (int * 'rule)  Mods.StringMap.t ; 
+    summary_init_state_map: (int * 'init)  Mods.StringMap.t ;
     summary_rule_set: Mods.StringSet.t ; 
     summary_init_state_set: Mods.StringSet.t ;
     } 
 
-type summary = summary_file Mods.StringMap.t 
+type ('a, 'b) summary = ('a,'b) summary_file Mods.StringMap.t 
 
 type diff_elt = {new_elt: int list; removed_elt: int list}
 type diff = 
@@ -72,7 +72,7 @@ let summarize_gen get_file_name get_string get_map set_map get_set set_set param
    let summary_file = set_set set summary_file in 
    error, Mods.StringMap.add file_name summary_file summary 
 
-let summarize_rule parameters error id (rule:Ast.rule Ast.compil_rule) summary = 
+let summarize_rule_from_ast parameters error id (rule:Ast.rule Ast.compil_rule) summary = 
   let get_file_name (_,_,_,(_,loc)) = 
       let filename = loc.Loc.file in 
       filename
@@ -101,7 +101,7 @@ let summarize_rule parameters error id (rule:Ast.rule Ast.compil_rule) summary =
       (fun summary_rule_set x -> {x with summary_rule_set})
       parameters error id rule summary
 
-let summarize_init_state parameters error id (init_state:(Ast.mixture,Ast.mixture,string) Ast.init_statement) summary = 
+let summarize_init_state_from_ast parameters error id (init_state:(Ast.mixture,Ast.mixture,string) Ast.init_statement) summary = 
   let get_file_name (init_state:(Ast.mixture,Ast.mixture,string) Ast.init_statement)  = 
       let (_,_,init) = init_state in 
       let loc = 
@@ -133,13 +133,13 @@ let summarize_init_state parameters error id (init_state:(Ast.mixture,Ast.mixtur
       (fun x -> x.summary_init_state_set) 
       (fun summary_init_state_set x -> {x with summary_init_state_set})
       parameters error id init_state summary
-let summarize parameters error compil = 
+let summarize_from_ast parameters error compil = 
   let error, summary = error, Mods.StringMap.empty in 
   let error, _, summary = 
     List.fold_left 
       (fun (error, id, summary) rule ->
          let error, summary = 
-          summarize_rule parameters error id rule summary in 
+          summarize_rule_from_ast parameters error id rule summary in 
           error, id+1, summary)
     (error, 0, summary)        
     (List.rev compil.Ast.rules) 
@@ -153,7 +153,7 @@ let summarize parameters error compil =
           | Ast.INIT_TOK _ -> (error, id+1, summary)
           | Ast.INIT_MIX _ -> 
             let error, summary = 
-              summarize_init_state parameters error id init_statement summary 
+              summarize_init_state_from_ast parameters error id init_statement summary 
             in 
             error, id+1, summary)
         (error, 0, summary)        
@@ -161,7 +161,159 @@ let summarize parameters error compil =
   in   
   error, summary  
 
-let diff_gen get_id get_set get_map _parameters error ~before  ~after = 
+
+
+let summarize_rule_from_ckappa parameters error id (rule:Ckappa_sig.enriched_rule) summary = 
+  let get_file_name (rule:Ckappa_sig.enriched_rule) = 
+      let loc = rule.Ckappa_sig.e_rule_rule.Ckappa_sig.position in 
+      let filename = loc.Loc.file in 
+      filename
+  in 
+  let get_string _parameters error (rule:Ckappa_sig.enriched_rule) = 
+    let string = rule.Ckappa_sig.e_rule_rule.Ckappa_sig.ast in 
+    let label = 
+      match rule.Ckappa_sig.e_rule_label with 
+      | None -> "" 
+      | Some (x,_) -> x 
+    in 
+    error, label^"."^string 
+  in 
+  summarize_gen 
+      get_file_name get_string 
+      (fun x -> x.summary_rule_map) 
+      (fun summary_rule_map x -> {x with summary_rule_map})
+      (fun x -> x.summary_rule_set) 
+      (fun summary_rule_set x -> {x with summary_rule_set})
+      parameters error id rule summary
+
+let summarize_init_state_from_ckappa parameters error id (init_state:Ckappa_sig.enriched_init) summary = 
+  let get_file_name (init_state:(Ckappa_sig.enriched_init))  = 
+      let loc = init_state.Ckappa_sig.e_init_pos in 
+      let filename = loc.Loc.file in 
+      filename
+  in 
+  let get_string parameters error (init_state:Ckappa_sig.enriched_init) = 
+    let mix = init_state.Ckappa_sig.e_init_mixture in 
+    let b = Buffer.create 1 in 
+    let fmt = Format.formatter_of_buffer b in 
+    let logger = Loggers.open_logger_from_formatter fmt in 
+    let parameters = Remanent_parameters.set_logger parameters logger in 
+    let error = Print_ckappa.print_mixture parameters error  mix in 
+    let string = Buffer.contents b in 
+    error, string 
+  in   
+  summarize_gen 
+      get_file_name get_string 
+      (fun x -> x.summary_init_state_map) 
+      (fun summary_init_state_map x -> {x with summary_init_state_map})
+      (fun x -> x.summary_init_state_set) 
+      (fun summary_init_state_set x -> {x with summary_init_state_set})
+      parameters error id init_state summary
+let summarize_from_ckappa parameters error (compil:Ckappa_sig.c_compil) = 
+  let error, summary = error, Mods.StringMap.empty in 
+  let error, summary = 
+    Int_storage.Nearly_inf_Imperatif.fold 
+      parameters 
+      error 
+      (fun parameters error id rule summary ->
+         let error, summary = 
+          summarize_rule_from_ckappa 
+              parameters error id rule summary 
+          in 
+          error, summary)
+    compil.Ckappa_sig.c_rules
+    summary        
+  in   
+  let error, summary = 
+    Int_storage.Nearly_inf_Imperatif.fold 
+      parameters error 
+      (fun parameters error id init_statement summary -> 
+            let error, summary = 
+              summarize_init_state_from_ckappa parameters error id init_statement summary 
+            in 
+            error, summary)
+        compil.Ckappa_sig.c_init  
+        summary 
+  in   
+  error, summary  
+
+let summarize_rule_from_cckappa parameters error id (rule:Cckappa_sig.enriched_rule) summary = 
+  let get_file_name (rule:Cckappa_sig.enriched_rule) = 
+      let loc = rule.Cckappa_sig.e_rule_rule.Ckappa_sig.position in 
+      let filename = loc.Loc.file in 
+      filename
+  in 
+  let get_string _parameters error (rule:Cckappa_sig.enriched_rule) = 
+    let string = rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast in 
+    let label = 
+      match rule.Cckappa_sig.e_rule_label with 
+      | None -> "" 
+      | Some (x,_) -> x 
+    in 
+    error, label^"."^string 
+  in 
+  summarize_gen 
+      get_file_name get_string 
+      (fun x -> x.summary_rule_map) 
+      (fun summary_rule_map x -> {x with summary_rule_map})
+      (fun x -> x.summary_rule_set) 
+      (fun summary_rule_set x -> {x with summary_rule_set})
+      parameters error id rule summary
+
+let summarize_init_state_from_cckappa parameters error id (init_state:Cckappa_sig.enriched_init) summary = 
+  let get_file_name (init_state:Cckappa_sig.enriched_init)  = 
+      let _ = init_state in 
+      let loc = Loc.dummy in (* TO DO *)
+      let filename = loc.Loc.file in 
+      filename
+  in 
+  let get_string _parameters error (init_state:Cckappa_sig.enriched_init) = 
+    let mix = init_state.Cckappa_sig.e_init_mixture in 
+    let b = Buffer.create 1 in 
+    let fmt = Format.formatter_of_buffer b in 
+    let logger = Loggers.open_logger_from_formatter fmt in 
+    let parameters = Remanent_parameters.set_logger parameters logger in 
+    let error = Print_ckappa.print_mixture parameters error  mix in 
+    let string = Buffer.contents b in 
+    error, string 
+  in   
+  summarize_gen 
+      get_file_name get_string 
+      (fun x -> x.summary_init_state_map) 
+      (fun summary_init_state_map x -> {x with summary_init_state_map})
+      (fun x -> x.summary_init_state_set) 
+      (fun summary_init_state_set x -> {x with summary_init_state_set})
+      parameters error id init_state summary
+let summarize_from_cckappa parameters error (compil:Cckappa_sig.compil) = 
+  let error, summary = error, Mods.StringMap.empty in 
+  let error, summary = 
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold 
+      parameters 
+      error 
+      (fun parameters error id rule summary ->
+        let id = Ckappa_sig.int_of_rule_id id in 
+         let error, summary = 
+          summarize_rule_from_cckappa 
+              parameters error id rule summary 
+          in 
+          error, summary)
+    compil.Cckappa_sig.rules
+    summary        
+  in   
+  let error, summary = 
+    Int_storage.Nearly_inf_Imperatif.fold 
+      parameters error 
+      (fun parameters error id init_statement summary -> 
+            let error, summary = 
+              summarize_init_state_from_cckappa parameters error id init_statement summary 
+            in 
+            error, summary)
+        compil.Cckappa_sig.init  
+        summary 
+  in   
+  error, summary  
+ 
+ let diff_gen get_id get_set get_map _parameters error ~before  ~after = 
   let set_before = get_set before in 
   let set_after = get_set after in 
   let removed = Mods.StringSet.diff set_before set_after in 
