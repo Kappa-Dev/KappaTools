@@ -1,7 +1,7 @@
 type summary_file = 
   {
-    summary_rule_map: (int * Cckappa_sig.enriched_rule) Mods.StringMap.t ; 
-    summary_init_state_map: (int * Cckappa_sig.enriched_init) Mods.StringMap.t ;
+    summary_rule_map: (int * Ast.rule Ast.compil_rule) Mods.StringMap.t ; 
+    summary_init_state_map: (int * (Ast.mixture,Ast.mixture,string) Ast.init_statement) Mods.StringMap.t ;
     summary_rule_set: Mods.StringSet.t ; 
     summary_init_state_set: Mods.StringSet.t ;
     } 
@@ -72,18 +72,22 @@ let summarize_gen get_file_name get_string get_map set_map get_set set_set param
    let summary_file = set_set set summary_file in 
    error, Mods.StringMap.add file_name summary_file summary 
 
-let summarize_rule parameters error id rule summary = 
-  let get_file_name rule = 
-      let rule = rule.Cckappa_sig.e_rule_rule in 
-      let loc = rule.Ckappa_sig.position in 
+let summarize_rule parameters error id (rule:Ast.rule Ast.compil_rule) summary = 
+  let get_file_name (_,_,_,(_,loc)) = 
       let filename = loc.Loc.file in 
       filename
   in 
-  let id = Ckappa_sig.int_of_rule_id id in 
-  let get_string _parameters error rule = 
-    let string = rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast  in 
+  let get_string _parameters error (rule:Ast.rule Ast.compil_rule) = 
+    let (_,_,_,(ast_rule,_)) = rule in 
+    let b = Buffer.create 1 in 
+    let fmt = Format.formatter_of_buffer b in 
+    let () = Ast.print_ast_rule fmt ast_rule in 
+    let string = Buffer.contents b in 
+    (* if it does not work, get the ast and use 
+      Ast.print_ast_rule *)
     let label = 
-      match rule.Cckappa_sig.e_rule_label with 
+      let (_,label_opt,_,_) = rule in 
+      match label_opt with 
       | None -> "" 
       | Some (x,_) -> x 
     in 
@@ -97,13 +101,31 @@ let summarize_rule parameters error id rule summary =
       (fun summary_rule_set x -> {x with summary_rule_set})
       parameters error id rule summary
 
-let summarize_init_state parameters error id init_state summary = 
-  let get_file_name _init_state  = 
-      let loc = Loc.dummy (* to do *) (*init_state.Ckappa_sig.e_init_pos*) in 
+let summarize_init_state parameters error id (init_state:(Ast.mixture,Ast.mixture,string) Ast.init_statement) summary = 
+  let get_file_name (init_state:(Ast.mixture,Ast.mixture,string) Ast.init_statement)  = 
+      let (_,_,init) = init_state in 
+      let loc = 
+        match init with 
+      | Ast.INIT_MIX (_,loc) -> loc
+      | Ast.INIT_TOK (_) -> assert false 
+      in  
       let filename = loc.Loc.file in 
       filename
   in 
-  let get_string _ error _init_state = error, "" in (* TO DO *)
+  let get_string _parameters error init_state = 
+     let (_,_,init) = init_state in 
+      let string = 
+        match init with 
+      | Ast.INIT_MIX (mix,_) -> 
+            let b = Buffer.create 1 in 
+            let fmt = Format.formatter_of_buffer b in 
+            let () = Ast.print_ast_mix fmt mix in 
+            let string = Buffer.contents b in 
+            string 
+      | Ast.INIT_TOK (_) -> assert false 
+      in  
+      error, string 
+    in   
   summarize_gen 
       get_file_name get_string 
       (fun x -> x.summary_init_state_map) 
@@ -113,20 +135,30 @@ let summarize_init_state parameters error id init_state summary =
       parameters error id init_state summary
 let summarize parameters error compil = 
   let error, summary = error, Mods.StringMap.empty in 
-  let error, summary = 
-    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold 
-      parameters error 
-      (fun parameters error id rule summary -> 
-        summarize_rule parameters error id rule summary )
-      compil.Cckappa_sig.rules summary 
+  let error, _, summary = 
+    List.fold_left 
+      (fun (error, id, summary) rule ->
+         let error, summary = 
+          summarize_rule parameters error id rule summary in 
+          error, id+1, summary)
+    (error, 0, summary)        
+    (List.rev compil.Ast.rules) 
   in   
-  let error, summary = 
-    Int_storage.Nearly_inf_Imperatif.fold 
-      parameters error 
-      (fun _parameters error id init summary -> 
-          summarize_init_state parameters error id init  summary )
-      compil.Cckappa_sig.init summary 
-  in      
+  let error, _, summary = 
+    List.fold_left 
+      (fun (error, id, summary) 
+          (init_statement:(Ast.mixture,Ast.mixture,string) Ast.init_statement) -> 
+        let (_,_,init) = init_statement in 
+        match init with 
+          | Ast.INIT_TOK _ -> (error, id+1, summary)
+          | Ast.INIT_MIX _ -> 
+            let error, summary = 
+              summarize_init_state parameters error id init_statement summary 
+            in 
+            error, id+1, summary)
+        (error, 0, summary)        
+        ( List.rev compil.Ast.init) 
+  in   
   error, summary  
 
 let diff_gen get_id get_set get_map _parameters error ~before  ~after = 

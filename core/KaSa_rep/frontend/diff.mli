@@ -10,7 +10,7 @@ type diff =
 val summarize:  
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Cckappa_sig.compil -> 
+  Ast.parsing_compil -> 
   Exception_without_parameter.exceptions_caught_and_uncaught
   * summary 
   

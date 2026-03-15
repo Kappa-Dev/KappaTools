@@ -2259,7 +2259,7 @@ functor
     let summarize state = 
       let parameters = get_parameters state in 
       let errors = get_errors state in 
-      let state, compil = get_c_compilation state in 
+      let state, compil = get_compilation state in 
       let error, sum = Diff.summarize parameters errors compil in 
       let state = set_errors error state in 
       state, sum 
