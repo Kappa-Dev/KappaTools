@@ -311,10 +311,6 @@ let on_message exec_command message_delimiter =
                      | "WORKING_SET_RULES" ->
                        manager#get_working_set_rules >>= fun out ->
                        Lwt.return (B (Ws_rules_kasa, msg_id, out))
-                     | "DEACTIVATED_WORKING_SET_RULES" ->
-                       manager#get_deactivated_rules_in_working_set
-                       >>= fun out ->
-                       Lwt.return (B (Ws_rules_kasa, msg_id, out))
                      | "RULE_ENABLE_OR_DISABLE" ->
                        let rule_id =
                          JsonUtil.read_next_item Yojson.Basic.read_int st b

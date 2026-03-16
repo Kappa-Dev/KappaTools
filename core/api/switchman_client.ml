@@ -449,14 +449,6 @@ class virtual new_client ~is_running ~post mailbox =
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "WORKING_SET_RULES") ])
 
-    method get_deactivated_rules_in_working_set =
-      self#message Ws_rules_kasa (fun b ->
-          JsonUtil.write_sequence b
-            [
-              (fun b ->
-                Yojson.Basic.write_string b "DEACTIVATED_WORKING_SET_RULES");
-            ])
-
     method enable_or_disable_rule rule_id enable =
       self#message Nothing (fun b ->
           JsonUtil.write_sequence b

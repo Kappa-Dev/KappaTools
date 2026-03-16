@@ -151,42 +151,6 @@ let init_dead_agents () =
                Lwt.return (Result_util.ok ()))))
     State_project.model
 
-let init_deactivated_rules () =
-  React.S.l1
-    (fun model ->
-      State_error.wrap ~append:true "tab_editor_deactivated_rule"
-        (State_project.eval_with_project ~label:__LOC__
-           (fun (manager : Api.concrete_manager) ->
-             if
-               model.State_project.model_parameters
-                 .State_project.show_deactivated_rules
-             then
-               manager#get_deactivated_rules_in_working_set
-               >|= Result_util.fold
-                     ~ok:(fun list ->
-                       let warnings =
-                         List.fold_left
-                           (fun acc rule ->
-                             let text =
-                               "Deactivated rule "
-                               ^ Html_utility.string_of_ws_rule rule
-                             in
-                             {
-                               Result_util.severity = Logs.Info;
-                               Result_util.range =
-                                 Some rule.Public_data.rule_ws_position;
-                               Result_util.text;
-                             }
-                             :: acc)
-                           [] list
-                       in
-                       List.rev warnings)
-                     ~error:(fun mh -> mh)
-               >|= Api_common.err_result_of_msgs ?result_code:None
-             else
-               Lwt.return (Result_util.ok ()))))
-    State_project.model
-
 let init_non_weakly_reversible_transitions () =
   React.S.l1
     (fun model ->
@@ -253,7 +217,6 @@ let onload () =
   let () = Editor.onload () in
   dont_gc_me := init_dead_rules () :: !dont_gc_me;
   dont_gc_me := init_dead_agents () :: !dont_gc_me;
-  dont_gc_me := init_deactivated_rules () :: !dont_gc_me;
   dont_gc_me := init_non_weakly_reversible_transitions () :: !dont_gc_me;
   let () = Subtab_contact_map.onload () in
   let () = Subtab_influences.onload () in
