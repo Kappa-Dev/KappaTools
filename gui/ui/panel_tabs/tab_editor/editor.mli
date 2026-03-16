@@ -8,5 +8,6 @@
 
 val editor_full : bool React.signal
 val move_cursor_hook_send : Loc.t -> unit
+val working_set_rules_checkboxes : unit React.signal
 
 include Ui_common.Panel

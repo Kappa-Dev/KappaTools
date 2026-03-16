@@ -67,6 +67,3 @@ val on_project_change_async :
   'a ->
   (Api.concrete_manager -> 'b -> 'a Lwt.t) ->
   'a React.signal
-
-val on_project_change_async_simple :
-  (Api.concrete_manager -> unit Lwt.t) -> unit
