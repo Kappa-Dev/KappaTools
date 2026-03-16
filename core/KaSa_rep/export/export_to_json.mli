@@ -60,7 +60,7 @@ module type Type = sig
   val get_conditionally_dead_rules : state -> state * Yojson.Basic.t
   val get_dead_agents : state -> state * Yojson.Basic.t
   val get_conditionally_dead_agents : state -> state * Yojson.Basic.t
-  val get_working_set_rules : state -> state * Yojson.Basic.t
+  val get_working_set_rules : state -> Yojson.Basic.t
   val enable_or_disable_rule : state -> int -> bool -> state
   val get_separating_transitions : state -> state * Yojson.Basic.t
   val get_constraints_list : state -> state * Yojson.Basic.t

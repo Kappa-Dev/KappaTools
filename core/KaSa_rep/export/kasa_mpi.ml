@@ -215,8 +215,7 @@ let on_message post text =
   | Some
       (id, (`List [ `String "WORKING_SET_RULES" ] | `String "WORKING_SET_RULES"))
     ->
-    let state, out = get_working_set_rules !gState in
-    let () = gState := state in
+    let out = get_working_set_rules !gState in
     send_response post id out
   | Some (id, `List [ `String "RULE_ENABLE_OR_DISABLE"; rule_id; enable ]) ->
     let rule_id = JsonUtil.to_int rule_id in

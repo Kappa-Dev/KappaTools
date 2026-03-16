@@ -134,6 +134,8 @@ let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
   let () = codemirror##scrollTo Js.null (Js.some scrollLine) in
   ()
 
+let element_set_rulename rule_id = Html.a_user_data "rule-id" rule_id
+
 let element_get_rulename (elt : Dom_html.element Js.t) =
   elt##getAttribute (Js.string "data-rule-id")
 
@@ -151,7 +153,7 @@ let rule_checkbox rule_id is_checked =
       ([
          Html.a_input_type `Checkbox;
          Html.a_class [ rule_enabled_checkbox ];
-         Html.a_user_data "rule-id" rule_id;
+         element_set_rulename rule_id;
        ]
       @ checked_attribute)
     ()
@@ -163,7 +165,7 @@ let add_checkbox_to_working_set_rules rules codemirror =
          ~a:
            [
              Html.a_class [ "checkbox-control-div" ];
-             Html.a_user_data "rule-id" rule_id;
+             element_set_rulename rule_id;
            ]
          [ rule_checkbox rule_id enabled ])
   in
@@ -178,7 +180,7 @@ let add_checkbox_to_working_set_rules rules codemirror =
             ~cm:codemirror
             ~dom:
               (build_checkbox
-                 ("ws-rule-" ^ string_of_int rule.Public_data.rule_ws_id)
+                 (string_of_int rule.Public_data.rule_ws_id)
                  rule.Public_data.rule_ws_enabled)
             ~gutter_id:working_set_gutter
         else
