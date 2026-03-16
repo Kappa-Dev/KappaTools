@@ -11,5 +11,4 @@ val set_file : string -> unit
 val close_file : unit -> unit
 val export_current_file : unit -> unit
 val set_file_compile : string -> bool -> unit
-val enable_or_disable_rule : string -> bool -> unit
 val order_files : string list -> unit

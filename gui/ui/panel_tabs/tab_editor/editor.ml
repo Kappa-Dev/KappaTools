@@ -55,6 +55,7 @@ let panel_heading =
 
 let codemirror_id = "code-mirror"
 let editor_panel_id = "editor-panel"
+let working_set_gutter = "working-set-checkbox-gutter"
 
 let content () =
   let textarea = Html.textarea ~a:[ Html.a_id codemirror_id ] (Html.txt "") in
@@ -133,6 +134,77 @@ let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
   let () = codemirror##scrollTo Js.null (Js.some scrollLine) in
   ()
 
+let element_set_rulename rule_id = Html.a_user_data "rule-id" rule_id
+
+let element_get_rulename (elt : Dom_html.element Js.t) =
+  elt##getAttribute (Js.string "data-rule-id")
+
+let rule_enabled_checkbox = "menu-editor-rule-enabled-checkbox"
+
+let rule_checkbox rule_id is_checked =
+  let checked_attribute =
+    if is_checked then
+      [ Html.a_checked () ]
+    else
+      []
+  in
+  Html.input
+    ~a:
+      ([
+         Html.a_input_type `Checkbox;
+         Html.a_class [ rule_enabled_checkbox ];
+         element_set_rulename rule_id;
+       ]
+      @ checked_attribute)
+    ()
+
+let add_checkbox_to_working_set_rules rules codemirror =
+  let build_checkbox rule_id enabled =
+    Tyxml_js.To_dom.of_element
+      (Html.div
+         ~a:
+           [
+             Html.a_class [ "checkbox-control-div" ];
+             element_set_rulename rule_id;
+           ]
+         [ rule_checkbox rule_id enabled ])
+  in
+  List.iter
+    (fun rule ->
+      let range = rule.Public_data.rule_ws_position in
+      match React.S.value State_file.current_filename with
+      | Some file_id ->
+        if range.Loc.file = file_id then
+          Codemirror.setGutterMarker
+            ~line:(range.Loc.from_position.Loc.line - 1)
+            ~cm:codemirror
+            ~dom:
+              (build_checkbox
+                 (string_of_int rule.Public_data.rule_ws_id)
+                 rule.Public_data.rule_ws_enabled)
+            ~gutter_id:working_set_gutter
+        else
+          ()
+      | None -> ())
+    rules
+
+let codemirror_ref : codemirror Js.t option ref = ref None
+
+let working_set_rules_checkboxes =
+  let open Lwt.Infix in
+  State_project.on_project_change_async ~on:(React.S.const true) ()
+    (React.S.const ()) () (fun (manager : Api.concrete_manager) () ->
+      match !codemirror_ref with
+      | None -> Lwt.return ()
+      | Some codemirror ->
+        let () =
+          Codemirror.clearGutter ~cm:codemirror ~gutter_id:working_set_gutter
+        in
+        manager#get_working_set_rules >|= fun x ->
+        (match x.Result_util.value with
+        | Result.Ok rules -> add_checkbox_to_working_set_rules rules codemirror
+        | Result.Error _ -> ()))
+
 let onload () : unit =
   let () = Editor_menu_file.onload () in
   let lint_config = Codemirror.create_lint_configuration () in
@@ -144,7 +216,9 @@ let onload () : unit =
   let () = lint_config##.lintOnChange := Js._false in
   let configuration = Codemirror.default_configuration in
   let gutter_options =
-    Js.string "breakpoints,CodeMirror-lint-markers,CodeMirror-linenumbers"
+    Js.string
+      ("breakpoints,CodeMirror-lint-markers," ^ working_set_gutter
+     ^ ",CodeMirror-linenumbers")
   in
   let gutter_option : Js.string_array Js.t =
     gutter_options##split (Js.string ",")
@@ -163,6 +237,7 @@ let onload () : unit =
   let codemirror : codemirror Js.t =
     Codemirror.fromTextArea textarea configuration
   in
+  let () = codemirror_ref := Some codemirror in
   let () = codemirror##setValue (Js.string "") in
   let () =
     Editor_controller.with_file
@@ -262,6 +337,42 @@ let onload () : unit =
           let last = new%js Codemirror.position (en.Loc.line - 1) en.Loc.chr in
           codemirror##setSelection first last
         ))
+  in
+  let () =
+    Common.jquery_on
+      (Format.sprintf "input.%s" rule_enabled_checkbox)
+      "change"
+      (Dom_html.handler (fun event ->
+           let target : Dom_html.element Js.t Js.opt = event##.target in
+           let rule_id : Js.js_string Js.t Js.opt =
+             Js.Opt.bind target (fun (element : Dom_html.element Js.t) ->
+                 element_get_rulename element)
+           in
+           let is_checked : bool =
+             Js.to_bool
+               (Js.Opt.case target
+                  (fun _ -> Js._false)
+                  (fun (element : Dom_html.element Js.t) ->
+                    (Js.Unsafe.coerce element : Dom_html.inputElement Js.t)##.checked))
+           in
+           let () =
+             Js.Opt.case rule_id
+               (fun _ -> ())
+               (fun rule_id ->
+                 let () =
+                   Common.log_group
+                     "[Editor_menu_file] triggered \
+                      input.rule_enabled_checkbox, rule_id:"
+                 in
+                 let () = Common.debug ~loc:__LOC__ rule_id in
+                 let () = Common.log_group_end () in
+                 let () =
+                   Editor_controller.enable_or_disable_rule
+                     (Js.to_string rule_id) is_checked
+                 in
+                 ())
+           in
+           Js._false))
   in
   ()
 

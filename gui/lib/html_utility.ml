@@ -153,12 +153,6 @@ let string_of_rule rule =
   else
     string_of_int rule.Public_data.rule_id
 
-let string_of_ws_rule rule =
-  if rule.Public_data.rule_ws_label <> "" then
-    "'" ^ rule.Public_data.rule_ws_label ^ "'"
-  else
-    rule.Public_data.rule_ws_ast
-
 let print_rule rule list = print_string (string_of_rule rule) list
 
 let string_of_agent agent =

@@ -1949,9 +1949,6 @@ functor
 
     let get_working_set_rules = Remanent_state.get_working_set_rules
 
-    let get_deactivated_rules_in_working_set =
-      Remanent_state.get_deactivated_rules_in_working_set
-
     (****************************************************************)
     (*constraints_list*)
     (****************************************************************)

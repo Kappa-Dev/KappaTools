@@ -129,10 +129,6 @@ object
     (Public_data.working_set_rules, Result_util.message list) Result_util.t
     Lwt.t
 
-  method get_deactivated_rules_in_working_set :
-    (Public_data.working_set_rules, Result_util.message list) Result_util.t
-    Lwt.t
-
   method enable_or_disable_rule :
     int -> bool -> (unit, Result_util.message list) Result_util.t Lwt.t
 

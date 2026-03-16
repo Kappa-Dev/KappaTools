@@ -255,13 +255,6 @@ class new_client ~is_running ~post (mailbox : mailbox) :
               Public_data.working_set_rules_of_json x
               |> Result_util.ok |> Lwt.return)
 
-    method get_deactivated_rules_in_working_set =
-      let request = `List [ `String "DEACTIVATED_WORKING_SET_RULES" ] in
-      self#message request
-      >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
-              Public_data.working_set_rules_of_json x
-              |> Result_util.ok |> Lwt.return)
-
     method enable_or_disable_rule rule_id enable =
       let request =
         `List

@@ -260,6 +260,11 @@ class type codemirror = object
   method getCursor : position Js.t Js.meth
   method setSelection : position Js.t -> position Js.t -> unit Js.meth
   method performLint : unit Js.meth
+
+  method setGutterMarker :
+    int -> string -> Dom_html.element Js.t -> unit Js.meth
+
+  method clearGutter : string -> unit Js.meth
 end
 
 class type lint_configuration = object
@@ -444,6 +449,13 @@ let fromTextArea (dom : Dom_html.element Js.t)
   (Js.Unsafe.js_expr "CodeMirror")##fromTextArea
     (Js.Unsafe.inject dom)
     (Js.Unsafe.inject configuration)
+
+let clearGutter ~(cm : codemirror Js.t) ~(gutter_id : string) =
+  cm##clearGutter gutter_id
+
+let setGutterMarker ~(line : int) ~(cm : codemirror Js.t)
+    ~(dom : Dom_html.element Js.t) ~(gutter_id : string) =
+  cm##setGutterMarker line gutter_id dom
 
 let setLintConfig (cm : codemirror Js.t) =
   (Js.Unsafe.js_expr "CodeMirror") ## LintState cm

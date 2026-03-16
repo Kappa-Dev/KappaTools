@@ -39,7 +39,6 @@ val print_exceptions_caught_and_uncaught :
   [> Html_types.p ] Html.elt list
 
 val string_of_rule : Public_data.rule -> string
-val string_of_ws_rule : Public_data.rule_in_working_set -> string
 
 val print_rule :
   Public_data.rule -> ([> `PCDATA ] as 'a) Html.elt list -> 'a Html.elt list
