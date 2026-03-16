@@ -128,7 +128,7 @@ class File(object):
     def get_content(self):
         """Get the file's contents."""
         return self.file_content
-    
+
 
 class SimulationParameter(object):
     """Parameters needed to run a simulation
