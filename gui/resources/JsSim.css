@@ -63,11 +63,6 @@ rect { stroke-width: 2; }
     padding: 20px;
 }
 
-.btn-group {
-  display: flex;
-  gap: 8px;
-}
-
 .numberCircle {
     display:inline-block;
 

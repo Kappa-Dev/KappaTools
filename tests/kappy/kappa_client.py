@@ -76,7 +76,7 @@ def main():
             with open(inputfile) as f:
                 code = f.read()
                 file_content = str(code)
-                file_metadata = kappy.FileMetadata(inputfile,0,False)
+                file_metadata = kappy.FileMetadata(inputfile,0)
                 file_object = kappy.File(file_metadata,file_content)
                 runtime.file_create(file_object)
                 runtime.project_parse()

@@ -168,61 +168,48 @@ let dropdown (model : State_file.model) =
   in
   [] @ file_li @ separator_li @ new_li @ open_li @ close_li @ export_li
 
-
 let content =
   let li_list =
     ReactiveData.RList.from_signal
       (React.S.map (fun model -> dropdown model) State_file.model)
   in
   [
-    Html.div
-      ~a:[ Html.a_class [ "dropdown"; "choose-file" ] ]
-      [
-        Html.button
-          ~a:
-            [
-              Html.Unsafe.string_attrib "type" "button";
-              Html.a_class [ "btn btn-default"; "dropdown-toggle" ];
-              Html.Unsafe.string_attrib "data-toggle" "dropdown";
-              Html.Unsafe.string_attrib "aria-haspopup" "true";
-              Html.Unsafe.string_attrib "aria-expanded" "false";
-              Tyxml_js.R.filter_attrib (Html.a_disabled ())
-                (React.S.l2
-                   (fun model file ->
-                     match model.State_project.model_current_id with
-                     | None -> true
-                     | Some _ ->
-                       (match file.State_file.current with
-                       | None -> false
-                       | Some { State_file.out_of_sync; _ } -> out_of_sync))
-                   State_project.model State_file.model);
-            ]
-          [ Html.txt "File"; Html.span ~a:[ Html.a_class [ "caret" ] ] [] ];
-        Tyxml_js.R.Html.ul
-          ~a:
-            [
-              Html.a_id file_dropdown_menu_id; Html.a_class [ "dropdown-menu" ];
-            ]
-          li_list;
-        Ui_common.create_modal_text_input ~id:file_new_modal_id
-          ~title_label:"New File"
-          ~body:
-            [
-              [%html
-                {|<div class="input-group">|} [ file_new_input ] {|</div>|}];
-            ]
-          ~submit_label:"Create File"
-          ~submit:
-            (Dom_html.handler (fun _ ->
-                 let filename : string =
-                   Js.to_string file_new_input_dom##.value
-                 in
-                 let () = Editor_menu_file_controller.create_file filename in
-                 let () =
-                   Common.modal ~id:("#" ^ file_new_modal_id) ~action:"hide"
-                 in
-                 Js._false));
-      ];
+    Html.button
+      ~a:
+        [
+          Html.Unsafe.string_attrib "type" "button";
+          Html.a_class [ "btn btn-default"; "dropdown-toggle" ];
+          Html.Unsafe.string_attrib "data-toggle" "dropdown";
+          Html.Unsafe.string_attrib "aria-haspopup" "true";
+          Html.Unsafe.string_attrib "aria-expanded" "false";
+          Tyxml_js.R.filter_attrib (Html.a_disabled ())
+            (React.S.l2
+               (fun model file ->
+                 match model.State_project.model_current_id with
+                 | None -> true
+                 | Some _ ->
+                   (match file.State_file.current with
+                   | None -> false
+                   | Some { State_file.out_of_sync; _ } -> out_of_sync))
+               State_project.model State_file.model);
+        ]
+      [ Html.txt "File"; Html.span ~a:[ Html.a_class [ "caret" ] ] [] ];
+    Tyxml_js.R.Html.ul
+      ~a:[ Html.a_id file_dropdown_menu_id; Html.a_class [ "dropdown-menu" ] ]
+      li_list;
+    Ui_common.create_modal_text_input ~id:file_new_modal_id
+      ~title_label:"New File"
+      ~body:
+        [ [%html {|<div class="input-group">|} [ file_new_input ] {|</div>|}] ]
+      ~submit_label:"Create File"
+      ~submit:
+        (Dom_html.handler (fun _ ->
+             let filename : string = Js.to_string file_new_input_dom##.value in
+             let () = Editor_menu_file_controller.create_file filename in
+             let () =
+               Common.modal ~id:("#" ^ file_new_modal_id) ~action:"hide"
+             in
+             Js._false));
   ]
 
 let order_files (element : Dom_html.element Js.t) =

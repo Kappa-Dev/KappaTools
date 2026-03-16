@@ -146,19 +146,19 @@ class KappaStd(KappaApi):
         overwrites = list(kwargs.items())
         self._dispatch(["ProjectParse", sharing_level, overwrites])
 
-    def project_overwrite(self, ast, file_id="model.ka", working_set=False):
-        self._dispatch(["ProjectOverwrite", file_id, ast, working_set])
+    def project_overwrite(self, ast, file_id="model.ka"):
+        self._dispatch(["ProjectOverwrite", file_id, ast])
 
     def file_create(self, file_):
         return self._dispatch(
-            ["FileCreate", file_.get_position(), file_.get_id(), file_.get_content(), file_.get_working_set()])
+            ["FileCreate", file_.get_position(), file_.get_id(), file_.get_content()])
 
     def file_delete(self, file_id):
         return self._dispatch(["FileDelete", file_id])
 
     def file_get(self, file_id):
         f = self._dispatch(["FileGet", file_id])
-        return File(FileMetadata(file_id, f[1], f[2]), f[0])
+        return File(FileMetadata(file_id, f[1]), f[0])
 
     def file_info(self):
         info = self._dispatch(["FileCatalog"])

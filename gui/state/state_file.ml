@@ -98,7 +98,7 @@ let update_directory ~reset current catalog =
   let state = React.S.value model in
   let directory =
     List.fold_left
-      (fun acc { Kfiles.position; id; _ } ->
+      (fun acc { Kfiles.position; id } ->
         Mods.IntMap.add position { name = id; local = None } acc)
       (if reset then
          Mods.IntMap.empty
@@ -156,7 +156,7 @@ let rec choose_file choice = function
       Format.sprintf "Failed to switch file %s." choice
     in
     Api_common.err_result_of_string error_msg
-  | { Kfiles.id; position; _ } :: t ->
+  | { Kfiles.id; position } :: t ->
     if choice = id then
       Result_util.ok position
     else
@@ -192,7 +192,7 @@ let set_content (content : string) : unit Api.lwt_result =
       in
       let () = set_directory_state { current = state.current; directory } in
       Lwt.return (Result_util.ok ())
-    | { local = None; name; _ } ->
+    | { local = None; name } ->
       let () =
         set_directory_state
           {
@@ -227,7 +227,7 @@ let set_compile file_id (compile : bool) : unit Api.lwt_result =
           manager#file_create rank name content)
     ) else
       Lwt.return (Result_util.ok ())
-  | Some (rank, { local = None; name; _ }) ->
+  | Some (rank, { local = None; name }) ->
     if compile then
       Lwt.return (Result_util.ok ())
     else
@@ -253,7 +253,7 @@ let set_compile file_id (compile : bool) : unit Api.lwt_result =
                   )))
 
 let remove_file () : unit Api.lwt_result =
-  with_current_file (fun state active { local; name; _ } ->
+  with_current_file (fun state active { local; name } ->
       let directory = Mods.IntMap.remove active.rank state.directory in
       let current =
         Option_util.map

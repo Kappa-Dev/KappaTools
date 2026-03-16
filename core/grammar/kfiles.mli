@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 type catalog
-type catalog_item = { position: int; id: string; is_current_file: bool }
+type catalog_item = { position: int; id: string }
 
 val write_catalog_item : Buffer.t -> catalog_item -> unit
 val read_catalog_item : Yojson.lexer_state -> Lexing.lexbuf -> catalog_item

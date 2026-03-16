@@ -17,36 +17,29 @@ type catalog = {
   current_ws: int option ref;
 }
 
-type catalog_item = { position: int; id: string; is_current_file: bool }
+type catalog_item = { position: int; id: string }
 
-let write_catalog_item ob { position; id; is_current_file } =
+let write_catalog_item ob { position; id } =
   let () = Buffer.add_char ob '{' in
   let () = JsonUtil.write_field "id" Yojson.Basic.write_string ob id in
   let () = JsonUtil.write_comma ob in
   let () = JsonUtil.write_field "position" Yojson.Basic.write_int ob position in
-  let () = JsonUtil.write_comma ob in
-  let () =
-    JsonUtil.write_field "is_current_file" Yojson.Basic.write_bool ob
-      is_current_file
-  in
   Buffer.add_char ob '}'
 
 let read_catalog_item p lb =
-  let position, id, working_set, count =
+  let position, id, count =
     Yojson.Basic.read_fields
-      (fun (pos, i, working_set, c) key p lb ->
-        if key = "is_current_file" then
-          pos, i, Yojson.Basic.read_bool p lb, succ c
-        else if key = "position" then
-          Yojson.Basic.read_int p lb, i, working_set, succ c
+      (fun (pos, i, c) key p lb ->
+        if key = "position" then
+          Yojson.Basic.read_int p lb, i, succ c
         else (
           let () = assert (key = "id") in
-          pos, Yojson.Basic.read_string p lb, working_set, succ c
+          pos, Yojson.Basic.read_string p lb, succ c
         ))
-      (-1, "", false, 0) p lb
+      (-1, "", 0) p lb
   in
-  let () = assert (count = 3) in
-  { position; id; is_current_file = working_set }
+  let () = assert (count = 2) in
+  { position; id }
 
 let create () =
   {
@@ -87,7 +80,7 @@ let file_patch ~id content catalog =
   match Hashtbl.find_all catalog.elements id with
   | [] -> Result.Error ("Unknown file \"" ^ id ^ "\"")
   | _ :: _ :: _ -> Result.Error "Serious problems in file catalog"
-  | [ { rank; content = _ } ] ->
+  | [ { rank; _ } ] ->
     let () = Hashtbl.replace catalog.elements id { rank; content } in
     let () = catalog.ast := None in
     Result.Ok ()
@@ -122,13 +115,7 @@ let catalog catalog =
     (fun position x acc ->
       match x with
       | None -> acc
-      | Some id ->
-        {
-          position;
-          id;
-          is_current_file = !(catalog.current_ws) = Some position;
-        }
-        :: acc)
+      | Some id -> { position; id } :: acc)
     catalog.index []
 
 let parse yield catalog =
