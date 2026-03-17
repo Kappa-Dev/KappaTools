@@ -68,7 +68,7 @@ def main(inp_path, out_path):
             if model not in model_nr_rules:
                 model_nr_rules[model] = nr_rules
 
-    total_step_count = 8
+    total_step_count = 5
     col_spec = "l c " + " ".join(["c"] * total_step_count)
 
     # Build LaTeX
@@ -84,19 +84,19 @@ def main(inp_path, out_path):
     lines.append(r"\toprule")
 
     # First header row
-    lines.append(r"\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{2}{c}{\textbf{full}} & \multicolumn{2}{c}{\textbf{partial}} & \multicolumn{4}{c}{\textbf{incremental}} \\")
-    lines.append(r"\cmidrule(lr){3-4}")
+    lines.append(r"\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{1}{c}{\textbf{full}} & \multicolumn{1}{c}{\textbf{partial}} & \multicolumn{2}{c}{\textbf{incremental}} \\")
+    lines.append(r"\cmidrule(lr){3-3}")
+    lines.append(r"\cmidrule(lr){4-4}")
     lines.append(r"\cmidrule(lr){5-6}")
-    lines.append(r"\cmidrule(lr){7-10}")
     # Second header row
-    lines.append(r"& & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{activate/\\deactivate} & \bfseries\shortstack{print\\result} \\")
+    lines.append(r"& & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{activate/\\deactivate}\\")
     lines.append(r"\midrule")
 
     for model in sorted(data.keys()):
         row_elems = []
         row_elems.append(r"\texttt{" + latex_escape(model) + "}")
         row_elems.append(latex_escape(model_nr_rules.get(model, "")))
-        analysis_items = [("1_full",["1_init", "3_print"]), ("2_partial",["1_init", "3_print"]), ("3_incremental",["1_init", "3_print1", "4_disable","5_print2"])]
+        analysis_items = [("1_full",["1_init"]), ("2_partial",["1_init"]), ("3_incremental",["1_init", "4_disable"])]
         for a, steps in analysis_items:
             for s in steps:
                 val = data[model].get(a, {}).get(s, "")

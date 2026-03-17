@@ -67,6 +67,7 @@ done
 
 shift $((OPTIND - 1))
 
+echo "Benchmarks for the incremental KaSa tool."
 echo "Using a timeout of $TIMEOUT."
 echo "Using $NR_RULES rules in the working set."
 echo "Performing $REPS repetitions for each experiment."
@@ -74,22 +75,8 @@ echo "Performing $REPS repetitions for each experiment."
 OPTIONS="--reset-all --compute-reachability-analysis --enable-every-domain"
 # models
 MODELS_DIRECTORY="${SCRIPT_DIR}/models/"
-V3_MODELS_DIRECTORY="${MODELS_DIRECTORY}examples-for-incremental-analysis/"
 
-ENSEMBLE="${MODELS_DIRECTORY}ensemble.ka"
-EGFR="${MODELS_DIRECTORY}causality_05_sos.ka"
-REPRESSILATOR="${MODELS_DIRECTORY}Repressilator.ka"
-FGF="${MODELS_DIRECTORY}fgf.ka"
-SFB="${MODELS_DIRECTORY}sfb.ka"
-
-egfr_net="${MODELS_DIRECTORY}egfr_net.ka"
-fceri_fyn="${V3_MODELS_DIRECTORY}BNGL/fceri_fyn.ka"
-fceri_fyn_lig="${V3_MODELS_DIRECTORY}BNGL/fceri_fyn_lig.ka"
-fceri_fyn_trimer="${V3_MODELS_DIRECTORY}BNGL/fceri_fyn_trimer.ka"
-fceri_gamma2="${V3_MODELS_DIRECTORY}BNGL/fceri_gamma2.ka"
-fceri_ji="${V3_MODELS_DIRECTORY}BNGL/fceri_ji.ka"
-machine="${V3_MODELS_DIRECTORY}large/machine/machine.ka"
-ensemble="${V3_MODELS_DIRECTORY}large/ensemble/ensemble.ka"
+egfr_net="${MODELS_DIRECTORY}egfr_net.ka" # small model for debugging this script
 
 korkut_20170206="${MODELS_DIRECTORY}korkut/20170206/korkut_model.ka"
 korkut_20170113="${MODELS_DIRECTORY}korkut/20170113/prior_model.ka"
@@ -98,9 +85,6 @@ wnt_20151228="${MODELS_DIRECTORY}wnt/20151228/model_bigwnt.ka"
 tgf_v19="${MODELS_DIRECTORY}tgf/V19/NTactivationTGF_19.ka"
 tgf_20180419="${MODELS_DIRECTORY}tgf/20180419/full.ka"
 
-
-# To find the number of rules (not fool-proof):
-# grep -v "^/\*" model | grep -v "^#" - | grep -c -- "->" -
 korkut_20170206_nr_rules=5750
 korkut_20170113_nr_rules=3916
 wnt_20170322_nr_rules=1470
@@ -111,7 +95,6 @@ tgf_v19_nr_rules=97
 
 # Array of models
 MODELS=("tgf_v19" "tgf_20180419" "wnt_20151228" "wnt_20170322" "korkut_20170113" "korkut_20170206")
-OTHER_AVAILABLE_MODELS=("egfr_net" "fceri_fyn" "fceri_fyn_lig" "fceri_fyn_trimer" "fceri_gamma2" "ENSEMBLE" "EGFR" "REPRESSILATOR" "FGF" "SFB" "fceri_ji" "machine" "ensemble")
 
 OUTPUT_DIR="${SCRIPT_DIR}/output/"
 PROFILING_FILE="${KAPPA_OUTPUT_DIR}profiling.html"
@@ -150,30 +133,25 @@ for MODEL in "${MODELS[@]}"; do
     EXAMPLE_MODEL=${!MODEL}
     var_tmp="${MODEL}_nr_rules"
     value_tmp=${!var_tmp}
-    NR_RULES_MODEL=$(($value_tmp-1))
+    NR_RULES_MODEL=$((value_tmp-1))
 
     echo
     echo "Processing model: $MODEL ($value_tmp rules)"
 
     # output files
     OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_experiments_output"
-    i=0
-    while [ -e "${OUTPUT_FILE}_full~$i.txt" ]; do
-        i=$((i + 1))
-    done
-    STDOUT_OUTPUT_FILE_FULL="${OUTPUT_FILE}_full~$i.txt"
-    STDOUT_OUTPUT_FILE_REMOVED_RULES="${OUTPUT_FILE}_removed_rules~$i.txt"
-    STDOUT_OUTPUT_FILE_INCREMENTAL="${OUTPUT_FILE}_incremental~$i.txt"
-    OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_runtimes~$i.html"
+    STDOUT_OUTPUT_FILE_FULL="${OUTPUT_FILE}_full.txt"
+    STDOUT_OUTPUT_FILE_REMOVED_RULES="${OUTPUT_FILE}_removed_rules.txt"
+    STDOUT_OUTPUT_FILE_INCREMENTAL="${OUTPUT_FILE}_incremental.txt"
 
     SYNTAX="V4"
-    if grep -v "^/\*" "$EXAMPLE_MODEL" | grep -qi "!1" -; then
+    if grep -v "^/\*" "$EXAMPLE_MODEL" | grep -qi "!1" -; then # no guarantees
         SYNTAX="V3"
     fi
 
-    for (( i=1; i<=$REPS; i++ ))
+    for (( i=1; i<=$REPS; i++ )) # take the mean of REPS runtimes
     do
-        # CLASSICAL ANALYSIS
+        # NON-INCREMENTAL ANALYSIS
         if $DEBUG; then
             echo "⌛ Starting non-incremental analysis:"
         fi
@@ -190,20 +168,15 @@ for MODEL in "${MODELS[@]}"; do
         { ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_FULL"
         EXIT_STATUS=$?
 
-        echo "<h4>FULL NON INCREMENTAL ANALYSIS</h4><table>" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Global initialization" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        # copy runtimes from output/profiling.html to the csv output file
         grep "End</TD><TD>Global initialization" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,1_init,1_initialization,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,1_init,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,1_init,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        echo "</table>" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,3_print,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,1_init,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
         # Check if the program was killed by timeout
         if [ $EXIT_STATUS -eq 124 ]; then
-            echo "⚠️ Timeout or memory overflow occurred for $MODEL (non-incremental analysis 1)."
+            echo "⚠️ Timeout or memory overflow occurred for $MODEL (full non-incremental analysis)."
             break
         fi
 
@@ -211,7 +184,9 @@ for MODEL in "${MODELS[@]}"; do
             echo "⌛ Starting non-incremental analysis with removed rules:"
         fi
 
+        # choose 10 random rules to be added to the working set
         random_rules=$(shuf -i 0-$NR_RULES_MODEL -n $NR_RULES | paste -sd,)
+        # TODO choose a sublist of rules to be removed
 
         if $DEBUG; then
             echo "Random list of rules that are removed: $random_rules"
@@ -230,21 +205,15 @@ for MODEL in "${MODELS[@]}"; do
         { ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_REMOVED_RULES"
         EXIT_STATUS=$?
 
-        echo "<h4>NON INCREMENTAL ANALYSIS WITH REMOVED RULES</h4><table>" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Global initialization" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
+        # copy runtimes from output/profiling.html to the csv output file
         grep "End</TD><TD>Global initialization" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_partial,1_init,1_initialization,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_partial,1_init,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_partial,1_init,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        echo "</table>" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_partial,3_print,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-
+        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_partial,1_init,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
         # Check if the program was killed by timeout
         if [ $EXIT_STATUS -eq 124 ]; then
-            echo "⚠️ Timeout or memory overflow occurred for $MODEL (non-incremental analysis 2)."
+            echo "⚠️ Timeout or memory overflow occurred for $MODEL (partial non-incremental analysis)."
             break
         fi
 
@@ -253,6 +222,7 @@ for MODEL in "${MODELS[@]}"; do
             echo "⚡️ Starting incremental analysis:"
         fi
 
+        # disable and then reenable all the rules. TODO do not disable all of them
         echo -n "disable 0" > "$INPUT_INCREMENTAL_TMP"
         for (( jj=1; jj<$NR_RULES; jj++ ))
         do
@@ -260,7 +230,7 @@ for MODEL in "${MODELS[@]}"; do
         done
         echo "" >> "$INPUT_INCREMENTAL_TMP"
         echo -n "enable 0" >> "$INPUT_INCREMENTAL_TMP"
-        for (( jj=1; jj<$NR_RULES; jj++ ))
+        for (( jj=1; jj<NR_RULES; jj++ ))
         do
             echo -n  ",$jj" >> "$INPUT_INCREMENTAL_TMP"
         done
@@ -292,46 +262,35 @@ for MODEL in "${MODELS[@]}"; do
             break
         fi
 
-        echo "<h4>INCREMENTAL ANALYSIS</h4><table>" >> "${OUTPUT_FILE}"
-
-        grep "End</TD><TD>Global initialization" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Global initialization" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,1_init,1_initialization,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,1_init,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
-        grep -m 1 "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep -m 1 "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,1_init,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+        grep -m 1 "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,1_init,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
-        grep -m 1 "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
-        grep -m 1 "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,3_print1,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-
-        grep "End</TD><TD>Enable or disable a rule" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
         grep -m 1 "End</TD><TD>Enable or disable a rule" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,4_disable,5_disable1,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
         
         grep "End</TD><TD>Enable or disable a rule" "$PROFILING_FILE"  | tail -1 | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,4_disable,6_disable2,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
-        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | tail -1 >> "${OUTPUT_FILE}"
-        echo "</table>" >> "${OUTPUT_FILE}"
-        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | tail -1 | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,5_print2,6_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | tail -1 | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_incremental,4_disable,6_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
     done
 
-    rm $INPUT_INCREMENTAL_TMP
+    rm "$INPUT_INCREMENTAL_TMP"
 
     echo "✅ Completed: $MODEL"
-    echo "The results of the incremental analysis can be found in: $STDOUT_OUTPUT_FILE_INCREMENTAL"
-    echo "And those of the non-incremental analysis in: $STDOUT_OUTPUT_FILE_FULL and $STDOUT_OUTPUT_FILE_REMOVED_RULES"
-    echo "The runtimes can be found in: $OUTPUT_FILE"
+    echo "The results of the non-incremental analysis in: $STDOUT_OUTPUT_FILE_FULL and $STDOUT_OUTPUT_FILE_REMOVED_RULES"
+    echo "And those of the incremental analysis can be found in: $STDOUT_OUTPUT_FILE_INCREMENTAL"
 
     # Check for exceptions in STDOUT_OUTPUT_FILE
     if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_FULL"; then
-        echo "🚨 Exception raised during analysis of $MODEL 1."
+        echo "🚨 Exception raised during analysis of $MODEL (full non-incremental)."
     fi
     if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_REMOVED_RULES"; then
-        echo "🚨 Exception raised during analysis of $MODEL 2."
+        echo "🚨 Exception raised during analysis of $MODEL (partial non-incremental)."
     fi
     if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_INCREMENTAL"; then
-        echo "🚨 Exception raised during analysis of $MODEL 3."
+        echo "🚨 Exception raised during analysis of $MODEL (incremental)."
     fi 
 
 done
@@ -349,9 +308,9 @@ cmd=(python3
     "${SCRIPT_DIR}/../../../examples/benchmarks/incremental-KaSa/latex_table_of_runtimes.py" 
     $OUTPUT_MEAN_RUNTIMES $OUTPUT_LATEX_RUNTIMES
     )
-        printf '%q ' "${cmd[@]}"
-        printf '\n'
-        { ${cmd[@]}; }
+printf '%q ' "${cmd[@]}"
+printf '\n'
+{ ${cmd[@]}; }
 
 echo "📊 The latex table of the runtimes can be found in: $OUTPUT_LATEX_RUNTIMES"
 
