@@ -2278,10 +2278,22 @@ functor
       let state = set_errors error state in 
       state, sum 
 
-    let dump_summary state summary = 
+    let dump_summary summary state = 
       let parameters = get_parameters state in 
       let errors = get_errors state in  
       let () = Diff.dump_summary parameters errors summary in 
       let state = set_errors errors state in 
       state 
+
+    let  add_rule _rule state = state 
+    let  add_init _init state = state 
+
+
+
+    let update_file _file state = state (* TO DO *)  
+    
+    let modify_pos_of_init_states _f state = 
+      
+      state (* TO DO *)
+    let modify_pos_of_rules _f state = state (* TO DO *)
   end

@@ -160,3 +160,6 @@ let print_cycles sigs form contact_map =
            (Signature.print_site sigs ag')
            s'))
     form o
+
+
+let rename_pos_in_cm_int _rename t = t 

@@ -75,3 +75,5 @@ val get_ref : int ref -> int
 val remove_double_elements : 'a list -> 'a list
 val sort_by_priority : ('a -> int) -> int -> 'a list -> 'a list
 val map_opt : ('a -> 'b) -> 'a option -> 'b option
+
+val update_pos_list: ('renaming_pos -> int -> 'data -> 'data) -> 'renaming_pos -> 'data list -> 'data list 

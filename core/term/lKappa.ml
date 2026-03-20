@@ -506,8 +506,7 @@ let rec string_of_guard g =
   | Logical_formulae.True -> "TRUE"
   | Logical_formulae.False -> "FALSE"
   | Logical_formulae.P (i, _) -> i
-  | Logical_formulae.AND (a, b) ->
-    string_of_guard a ^ " && " ^ string_of_guard b
+  | Logical_formulae.AND (a, b) -> string_of_guard a ^ " && " ^ string_of_guard b
   | Logical_formulae.OR (a, b) -> string_of_guard a ^ " || " ^ string_of_guard b
   | Logical_formulae.NOT a -> "[not] " ^ string_of_guard a
   | Logical_formulae.IMPLY (a, b) ->
@@ -881,3 +880,14 @@ let max_link_id r =
       max_id ag.ra_ports
   in
   List.fold_left max_link_id_sites 0 r
+
+let rename_pos_link rename_a rename_b rename link:(('a,'b) link) = 
+  match link with 
+  | ANY_FREE -> ANY_FREE  
+  | LNK_FREE -> LNK_FREE 
+  | LNK_ANY -> LNK_ANY 
+  | LNK_SOME -> LNK_SOME 
+  | LNK_VALUE(a,b) -> LNK_VALUE (a,rename_b rename b)
+  | LNK_TYPE (a, b) -> LNK_TYPE (rename_a rename a,rename_a rename b)
+
+let rename_pos_guard rename_id = Logical_formulae.rename_pos (Loc.rename_pos rename_id) 

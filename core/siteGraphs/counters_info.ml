@@ -270,3 +270,25 @@ let get_conversion_info ?except c =
          (Loc.annot_with_dummy
             "internal error: conversion applyied to an original counter"))
   | From_clte_elimination counter_conversion -> counter_conversion
+
+let rename_pos_conversion_info rename conversion_info = 
+  {
+    from_sig_name = Loc.rename_pos_flat rename conversion_info.from_sig_name; 
+    convert_value = conversion_info.convert_value;
+    convert_delta = conversion_info.convert_delta;
+  }
+
+let rename_pos_origin rename origin = 
+  match origin with 
+  | From_original_ast -> From_original_ast 
+  | From_clte_elimination conversion_info -> 
+    From_clte_elimination (rename_pos_conversion_info rename conversion_info)
+let rename_pos_counter_sig rename counter_sig = 
+  {counter_sig with 
+  counter_sig_name =  Loc.rename_pos_flat rename counter_sig.counter_sig_name ;
+  counter_sig_min = 
+    Loc.rename_pos_opt Loc.rename_pos_flat rename counter_sig.counter_sig_min ;
+  counter_sig_max = 
+    Loc.rename_pos_opt Loc.rename_pos_flat rename counter_sig.counter_sig_max ;
+  counter_sig_visible = rename_pos_origin rename counter_sig.counter_sig_visible ;
+  }

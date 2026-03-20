@@ -227,7 +227,7 @@ type 'pattern rule = {
   ast_no_rate: string;
   original_ast: string;
   original_ast_no_rate: string;
-  from_a_biderectional_rule: bool;
+  from_a_bidirectional_rule: bool;
 }
 
 type ('pattern, 'rule) perturbation =
@@ -762,3 +762,20 @@ val guard_to_bdu_opt :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Views_bdu.handler
   * Views_bdu.mvbdu
+
+  val rename_pos_agent_sig: (Loc.t -> Loc.t option) -> agent_sig -> agent_sig
+  val rename_pos_agent: (Loc.t -> Loc.t option) -> agent -> agent 
+  val rename_pos_mixture: (Loc.t -> Loc.t option) -> mixture -> mixture  
+  val rename_pos_rule: 
+    ((Loc.t -> Loc.t option) -> 'mixture -> 'mixture)  -> 
+    (Loc.t -> Loc.t option) -> 'mixture rule -> 'mixture rule 
+  val rename_pos_perturbation_with_errors: 
+     ('parameters -> 'errors -> (position -> position option) -> 'c -> 'errors * 'c) ->
+      ('parameters -> 'errors -> (position -> position option) -> 'd -> 'errors * 'd) ->
+'parameters ->
+'errors ->
+(position -> position option) ->
+('c, 'c, 'e, 'd) Ast.perturbation ->
+'errors  * ('c, 'c, 'e, 'd) Ast.perturbation
+  
+  val rename_pos_compil: (Loc.t -> Loc.t option) -> (agent, agent_sig, mixture, mixture, mixture rule) compil -> (agent, agent_sig, mixture, mixture, mixture rule) compil

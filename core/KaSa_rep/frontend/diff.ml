@@ -25,23 +25,33 @@ type diff =
  
 let dump_summary parameters _error summary = 
   let logger = Remanent_parameters.get_logger parameters in 
-  let () = Loggers.fprintf logger "RULE_MAP" in 
+  let () = Loggers.fprintf logger "     RULE_MAP" in 
   let () = 
     Mods.StringMap.iter
       (fun s i -> 
-        let () = Loggers.fprintf logger "FILE: %s" s in 
-        let () = Loggers.fprintf logger "  Rules:" in 
+        let () = Loggers.fprintf logger "         FILE: %s" s in 
+        let () = Loggers.print_newline logger in 
+        let () = Loggers.fprintf logger "             Rules:" in 
+        let () = Loggers.print_newline logger in 
         let () = 
           Mods.StringMap.iter
-            (fun s (i,_) -> Loggers.fprintf logger "    %s -> %i" s i)
+            (fun s (i,_) -> 
+              let () = Loggers.fprintf logger "                %s -> %i" s i in 
+              let () = Loggers.print_newline logger in ())
             i.summary_rule_map
         in 
-        let () = Loggers.fprintf logger "  Init:" in 
+        let () = Loggers.print_newline logger in 
+        let () = Loggers.fprintf logger "             Init:" in 
+        let () = Loggers.print_newline logger in 
         let () = 
           Mods.StringMap.iter
-            (fun s (i,_) -> Loggers.fprintf logger "    %s -> %i" s i)
+            (fun s (i,_) -> 
+              let () = Loggers.fprintf logger "                %s -> %i" s i in 
+              let () = Loggers.print_newline logger in ())
             i.summary_init_state_map
         in 
+        let () = Loggers.print_newline logger in 
+        let () = Loggers.print_newline logger in 
         ())
       summary
       in () 
@@ -82,6 +92,7 @@ let summarize_rule_from_ast parameters error id (rule:Ast.rule Ast.compil_rule) 
     let b = Buffer.create 1 in 
     let fmt = Format.formatter_of_buffer b in 
     let () = Ast.print_ast_rule fmt ast_rule in 
+    let () = Format.pp_print_flush fmt () in 
     let string = Buffer.contents b in 
     (* if it does not work, get the ast and use 
       Ast.print_ast_rule *)
@@ -120,6 +131,7 @@ let summarize_init_state_from_ast parameters error id (init_state:(Ast.mixture,A
             let b = Buffer.create 1 in 
             let fmt = Format.formatter_of_buffer b in 
             let () = Ast.print_ast_mix fmt mix in 
+            let () = Format.pp_print_flush fmt () in 
             let string = Buffer.contents b in 
             string 
       | Ast.INIT_TOK (_) -> assert false 
@@ -262,8 +274,7 @@ let summarize_rule_from_cckappa parameters error id (rule:Cckappa_sig.enriched_r
 
 let summarize_init_state_from_cckappa parameters error id (init_state:Cckappa_sig.enriched_init) summary = 
   let get_file_name (init_state:Cckappa_sig.enriched_init)  = 
-      let _ = init_state in 
-      let loc = Loc.dummy in (* TO DO *)
+      let loc = init_state.Cckappa_sig.e_init_position in       
       let filename = loc.Loc.file in 
       filename
   in 
@@ -274,6 +285,7 @@ let summarize_init_state_from_cckappa parameters error id (init_state:Cckappa_si
     let logger = Loggers.open_logger_from_formatter fmt in 
     let parameters = Remanent_parameters.set_logger parameters logger in 
     let error = Print_ckappa.print_mixture parameters error  mix in 
+    let () = Format.pp_print_flush fmt () in 
     let string = Buffer.contents b in 
     error, string 
   in   

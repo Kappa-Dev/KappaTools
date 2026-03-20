@@ -383,7 +383,6 @@ type rule_in_working_set = {
   rule_ws_position: Loc.t;
   rule_ws_enabled: bool;
 }
-
 let direction_to_json d =
   match d with
   | Direct_rule -> `String "direct"
@@ -474,7 +473,6 @@ type var = {
   var_ast: string;
   var_position: Loc.t;
 }
-
 let var_to_json var =
   `Assoc
     [
@@ -1210,3 +1208,28 @@ let lemmas_list_to_json constraints =
   lemmas_list_to_json_gen interface_light_to_json constraints
 
 let print_formula = Logical_formulae.print_formula
+
+let rename_pos_rule rename rule = 
+  {rule with rule_position = Loc.rename_loc rename rule.rule_position}
+
+let rename_pos_var rename var = 
+  {var with var_position = Loc.rename_loc rename var.var_position}
+
+
+let rename_pos_influence_node rename_pos_rule rename_pos_var rename node = 
+  match node with 
+  | Rule rule -> Rule (rename_pos_rule rename rule) 
+  | Var var -> Var (rename_pos_var rename var)
+
+let rename_pos_refined_influence_node = 
+  rename_pos_influence_node rename_pos_rule rename_pos_var 
+
+let rename_pos_contact_map = User_graph.rename_pos 
+
+let rename_pos_influence_map rename influence_map = 
+  {influence_map 
+  with 
+    nodes = Loc.rename_pos_list rename_pos_refined_influence_node  rename  influence_map.nodes}
+
+let rename_pos_dead_rules rename dead_rules = 
+  Loc.rename_pos_list rename_pos_rule rename dead_rules 

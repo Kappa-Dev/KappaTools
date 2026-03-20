@@ -142,12 +142,17 @@ module type Type = sig
   (*val summarize_from_ckappa: state -> state * 
   (Ckappa_sig.enriched_rule, Ckappa_sig.enriched_init) Diff.summary *)
 
-val summarize_from_cckappa: state -> state * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init)  Diff.summary 
+  val summarize_from_cckappa: state -> state * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init)  Diff.summary 
 
-
-
-  val dump_summary: state -> ('a,'b) Diff.summary -> state 
+  val dump_summary: ('a,'b) Diff.summary -> state -> state 
   
+
+  val update_file: string -> state -> state 
+
+  val modify_pos_of_rules: (int -> Loc.position option) -> state -> state 
+  val modify_pos_of_init_states: (int -> Loc.position option) -> state -> state 
+  val add_rule: Ast.rule Ast.compil_rule -> state -> state 
+  val add_init: (Ast.mixture, Ast.mixture, string) Ast.init_statement -> state -> state 
 end
 
 module Export : functor (Reachability : Analyzer.Analyzer) -> Type

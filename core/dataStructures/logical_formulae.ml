@@ -199,3 +199,13 @@ let rec get_list_of_predicates = function
     let gp1 = get_list_of_predicates g1 in
     let gp2 = get_list_of_predicates g2 in
     merge_guards gp1 gp2
+
+
+let rec rename_pos rename_pos1 rename a = 
+  match a with 
+  | P a -> P (rename_pos1 rename a)
+  | NOT a -> NOT (rename_pos rename_pos1 rename a) 
+  | IMPLY (a,b) -> IMPLY (rename_pos rename_pos1 rename a,rename_pos rename_pos1 rename b) 
+  | AND (a,b) -> AND (rename_pos rename_pos1 rename a,rename_pos rename_pos1 rename b)
+  | OR (a,b) -> OR (rename_pos rename_pos1 rename a,rename_pos rename_pos1 rename b) 
+  | False | True -> a 

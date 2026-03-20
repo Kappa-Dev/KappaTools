@@ -369,3 +369,5 @@ let string_of_connected_component ?(len = 1024) x =
 
 let connected_component_of_string s =
   read_connected_component (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+
+let rename_pos _rename connected_component = connected_component 

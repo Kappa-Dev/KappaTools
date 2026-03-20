@@ -1596,3 +1596,6 @@ let quarkify parameters error handler cc_compil =
     scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules
   in
   scan_var_set parameters error handler cc_compil.Cckappa_sig.variables quarks
+
+
+let update_pos_in_quark_map _f q = q 

@@ -226,3 +226,44 @@ val compil_to_json : parsing_compil -> Yojson.Basic.t
 val write_parsing_compil : Buffer.t -> parsing_compil -> unit
 val read_parsing_compil : Yojson.lexer_state -> Lexing.lexbuf -> parsing_compil
 val working_set_index_to_string : int -> string
+
+val rename_pos_perturbation: 
+  ((Loc.t -> Loc.t option) -> 'pattern -> 'pattern) -> 
+  ((Loc.t -> Loc.t option) -> 'mixture -> 'mixture) -> 
+  ((Loc.t -> Loc.t option) -> 'id -> 'id) -> 
+  ((Loc.t -> Loc.t option) -> 'rule -> 'rule) -> 
+  (Loc.t -> Loc.t option) -> ('pattern, 'mixture, 'id, 'rule) perturbation  -> 
+  ('pattern, 'mixture, 'id, 'rule) perturbation 
+
+val rename_pos_perturbation_with_errors: 
+  ('parameters -> 'errors -> (Loc.t -> Loc.t option) -> 'pattern -> 'errors * 'pattern) -> 
+  ('parameters -> 'errors ->(Loc.t -> Loc.t option) -> 'mixture -> 'errors * 'mixture) -> 
+  ('parameters -> 'errors ->(Loc.t -> Loc.t option) -> 'id -> 'errors * 'id) -> 
+  ('parameters -> 'errors ->(Loc.t -> Loc.t option) -> 'rule -> 'errors * 'rule) -> 
+  'parameters -> 'errors -> (Loc.t -> Loc.t option) -> ('pattern, 'mixture, 'id, 'rule) perturbation  -> 
+  'errors * ('pattern, 'mixture, 'id, 'rule) perturbation 
+
+val rename_pos_variable_def_with_errors:
+('paramters -> 'errors -> (Loc.t -> Loc.t option) -> 'pattern -> 'errors * 'pattern) -> 
+('paramters -> 'errors -> (Loc.t -> Loc.t option) -> 'id -> 'errors * 'id) -> 
+ 'paramters -> 'errors -> (Loc.t -> Loc.t option) -> ('pattern, 'id) variable_def -> 
+  'errors * ('pattern, 'id) variable_def 
+
+  
+val rename_pos_command: 
+((Loc.t -> Loc.t option) -> 'pattern -> 'pattern) -> 
+((Loc.t -> Loc.t option) -> 'mixture -> 'mixture) -> 
+((Loc.t -> Loc.t option) -> 'id -> 'id) -> 
+((Loc.t -> Loc.t option) -> 'rule -> 'rule) -> 
+(Loc.t -> Loc.t option) -> ('pattern, 'mixture, 'id, 'rule) command -> ('pattern, 'mixture, 'id, 'rule) command 
+val rename_pos_parsing_instruction: (Loc.t -> Loc.t option) -> parsing_instruction -> parsing_instruction
+val rename_pos_parsing_compil: (Loc.t -> Loc.t option) -> parsing_compil -> parsing_compil 
+val rename_pos_compil: 
+    ((Loc.t -> Loc.t option) -> 'agent -> 'agent) -> 
+    ((Loc.t -> Loc.t option) -> 'agent_sig -> 'agent_sig) -> 
+    ((Loc.t -> Loc.t option) -> 'pattern -> 'pattern) -> 
+    ((Loc.t -> Loc.t option) -> 'mixture -> 'mixture) -> 
+    ((Loc.t -> Loc.t option) -> 'id -> 'id) -> 
+    ((Loc.t -> Loc.t option) -> 'rule -> 'rule) ->  
+    (Loc.t -> Loc.t option) -> 
+    ('agent,'agent_sig,'pattern,'mixture,'id,'rule) compil -> ('agent,'agent_sig,'pattern,'mixture,'id,'rule) compil 

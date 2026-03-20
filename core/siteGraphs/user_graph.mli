@@ -48,3 +48,5 @@ val read_connected_component :
 
 val connected_component_of_string : string -> connected_component
 (** Deserialize JSON data of type {!connected_component}. *)
+
+val rename_pos: (Loc.t -> Loc.t option) -> connected_component -> connected_component 

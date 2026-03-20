@@ -16,3 +16,5 @@ val convert_p :
   ('a -> 'error -> 'error * 'b) -> 'error -> 'a formula -> 'error * 'b formula
 
 val get_list_of_predicates : (string * 'a) formula -> string list
+
+val rename_pos: ((Loc.t -> Loc.t option) -> 'a -> 'a) -> (Loc.t -> Loc.t option) -> 'a formula -> 'a  formula

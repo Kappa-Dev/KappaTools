@@ -998,7 +998,7 @@ let translate_compil parameters error
             Ckappa_sig.ast_no_rate = direct_ast_no_rate;
             Ckappa_sig.original_ast;
             Ckappa_sig.original_ast_no_rate;
-            Ckappa_sig.from_a_biderectional_rule = rule.Ast.bidirectional;
+            Ckappa_sig.from_a_bidirectional_rule = rule.Ast.bidirectional;
           } )
     )
   in
@@ -1117,7 +1117,7 @@ let translate_compil parameters error
                   Ckappa_sig.original_ast = direct.Ckappa_sig.original_ast;
                   Ckappa_sig.original_ast_no_rate =
                     direct.Ckappa_sig.original_ast_no_rate;
-                  Ckappa_sig.from_a_biderectional_rule = rule.Ast.bidirectional;
+                  Ckappa_sig.from_a_bidirectional_rule = rule.Ast.bidirectional;
                 } )
             in
             ( error,

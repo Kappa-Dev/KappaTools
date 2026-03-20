@@ -28,6 +28,9 @@ type refined_compilation =
     Ckappa_sig.mixture Ckappa_sig.rule )
   Ast.compil
 
+
+let rename_pos_parsing_compil = Ast.rename_pos_parsing_compil
+
 type quark_map = Quark_type.quarks
 type rule_id = int
 type var_id = int
@@ -223,6 +226,8 @@ type ('static, 'dynamic) state = {
   symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
   separating_transitions: separating_transitions option;
   transition_system_length: int list option;
+  patch: Ast.parsing_compil option; 
+  patch_file_names: string list; 
 }
 
 let get_data state =
@@ -282,6 +287,8 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
     transition_system_length = None;
+    patch = None ; 
+    patch_file_names = [] ; 
   }
 
 (**************)
@@ -757,3 +764,131 @@ let reset_reachability_memoized_values state =
     signature = None;
     constraints_list = None;
   }
+
+
+let set_patch patch state = 
+  let patch = Some patch in 
+  {state with patch}
+
+let get_patch state = state.patch 
+let reset_patch state = 
+  let patch = None in 
+  {state with patch}
+
+let get_patch_file_names state = 
+  state.patch_file_names 
+
+let set_patch_file_names patch_file_names state = 
+  {state with patch_file_names}
+
+let add_patch_file_name s state = 
+  let patch_file_names = s::(get_patch_file_names state) in 
+  set_patch_file_names patch_file_names state 
+
+let reset_patch_file_names state = 
+  let patch_file_names = [] in 
+  set_patch_file_names patch_file_names state 
+
+let set_handler_opt h_opt state = 
+  match h_opt with 
+  | None -> state 
+  | Some x -> set_handler x state 
+  
+let _gen_opt set get update f y = 
+  match get y with 
+  | None -> y 
+  | Some x -> set (Some (update f x)) y
+
+let gen set get update f y = 
+   match get y with 
+  | None -> y 
+  | Some x -> set (update f x) y
+  
+let _gen_error set get update parameters error f y = 
+    let error, x' = update parameters error f (get y) in 
+    error, set x' y
+
+
+let gen_opt_opt_error set get update parameters error f y = 
+  match get y with 
+  | None -> error, y 
+  | Some x -> 
+    let error, x' = update parameters error f x in 
+    error, set (Some x') y    
+
+let gen_opt_error set get update parameters error f y = 
+  match get y with 
+  | None -> error, y 
+  | Some x -> 
+    let error, x' = update parameters error f x in 
+    error, set x' y    
+let rename_pos_in_init _f init = init
+let rename_pos_env _f env = env 
+
+let rename_pos_in_internal_influence_map _f map = map 
+
+let rename_pos_in_bidirectional_influence_map _f map = map 
+
+let rename_pos_in_local_influence_map_blackboard _f map = map 
+
+let rename_pos_reachability_result_with_errors 
+    rename_static rename_compil parameters errors rename result = 
+    (Loc.rename_pos_pair_with_errors 
+      rename_static rename_compil) 
+    parameters errors rename result
+
+let rename_pos rename_static rename_dynamic rename state = 
+  let parameters = get_parameters state in 
+  let errors = get_errors state in 
+  let errors, state = gen_opt_opt_error set_handler_opt get_handler Cckappa_sig.rename_pos_kappa_handler_with_errors parameters errors rename state in 
+  let state = gen set_init_state get_init_state rename_pos_in_init rename state in 
+  let state = gen set_env get_env rename_pos_env rename state in 
+  let state = gen set_contact_map_int get_contact_map_int Contact_map.rename_pos_in_cm_int rename state in 
+  let state = gen (set_contact_map Public_data.High) (get_contact_map Public_data.High) User_graph.rename_pos rename state in 
+  let state = gen (set_contact_map Public_data.Medium) (get_contact_map Public_data.Medium) User_graph.rename_pos rename state in 
+  let state = gen (set_contact_map Public_data.Low) (get_contact_map Public_data.Low) User_graph.rename_pos rename state in 
+  let state = gen set_compilation get_compilation rename_pos_parsing_compil rename state in 
+  let state = gen set_refined_compil get_refined_compil 
+                      (Ast.rename_pos_compil 
+                         Ckappa_sig.rename_pos_agent 
+                         Ckappa_sig.rename_pos_agent_sig
+                         Ckappa_sig.rename_pos_mixture
+                         Ckappa_sig.rename_pos_mixture 
+                         (fun _ a -> a)
+                         (Ckappa_sig.rename_pos_rule Ckappa_sig.rename_pos_mixture)    
+                      ) 
+                      rename 
+                      state in 
+  let errors, state = gen_opt_error set_c_compil get_c_compil Cckappa_sig.rename_pos_compil_with_errors parameters errors rename state in 
+  let state = gen set_quark_map get_quark_map Quark_type.rename_pos_quarks rename state in 
+  let state = gen (set_internal_influence_map Public_data.High) (get_internal_influence_map Public_data.High) rename_pos_in_internal_influence_map rename state in 
+  let state = gen (set_internal_influence_map Public_data.Medium) (get_internal_influence_map Public_data.Medium) rename_pos_in_internal_influence_map rename state in 
+  let state = gen (set_internal_influence_map Public_data.Low) (get_internal_influence_map Public_data.Low) rename_pos_in_internal_influence_map rename state in 
+  let state = gen (set_influence_map Public_data.High) (get_influence_map Public_data.High) Public_data.rename_pos_influence_map rename state in 
+  let state = gen (set_influence_map Public_data.Medium) (get_influence_map Public_data.Medium) Public_data.rename_pos_influence_map rename state in 
+  let state = gen (set_influence_map Public_data.Low) (get_influence_map Public_data.Low) Public_data.rename_pos_influence_map rename state in 
+  let state = gen (set_bidirectional_influence_map Public_data.High) (get_bidirectional_influence_map Public_data.High)  rename_pos_in_bidirectional_influence_map rename state in 
+  let state = gen (set_bidirectional_influence_map Public_data.Medium) (get_bidirectional_influence_map Public_data.Medium)  rename_pos_in_bidirectional_influence_map rename state in 
+  let state = gen (set_bidirectional_influence_map Public_data.Low) (get_bidirectional_influence_map Public_data.Low)  rename_pos_in_bidirectional_influence_map rename state in 
+  let state = gen set_local_influence_map_blackboard get_local_influence_map_blackboard rename_pos_in_local_influence_map_blackboard rename state in 
+  let state = gen (set_contact_map Public_data.Low) (get_contact_map Public_data.Low) 
+  Public_data.rename_pos_contact_map rename state in 
+  let state = gen (set_contact_map Public_data.Medium) (get_contact_map Public_data.Medium) 
+  Public_data.rename_pos_contact_map rename state in 
+  let state = gen (set_contact_map Public_data.High) (get_contact_map Public_data.High) 
+  Public_data.rename_pos_contact_map rename state in 
+  let errors, state = gen_opt_error set_reachability_result get_reachability_result (rename_pos_reachability_result_with_errors rename_static rename_dynamic) parameters errors rename state in 
+  let state = gen set_dead_rules get_dead_rules (Public_data.rename_pos_dead_rules) 
+  rename state in 
+  set_errors errors state 
+(* TODO
+  conditionally_dead_rules: rule_deadness_conditions option;
+  dead_agents: dead_agents option;
+  conditionally_dead_agents: agent_deadness_conditions option;
+  ode_flow: Ode_fragmentation_type.ode_frag option;
+  ctmc_flow: flow option;
+  internal_constraints_list: internal_constraints_list option;
+  constraints_list: constraints_list option;
+  symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
+  separating_transitions: separating_transitions option;
+   *)

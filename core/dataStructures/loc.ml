@@ -205,3 +205,55 @@ let string_option_annoted_to_json ~filenames =
 let string_option_annoted_of_json ~filenames =
   annoted_of_yojson ~filenames
     (JsonUtil.to_option (JsonUtil.to_string ?error_msg:None))
+
+let rename_loc rename pos = 
+   match rename pos with 
+    | None -> pos 
+    | Some pos -> pos
+let rename_pos rename_pos rename (elt,pos) = 
+  (rename_pos rename elt,rename_loc rename pos) 
+
+let rename_pos_with_errors rename_pos_with_errors parameters error rename (elt,pos) = 
+  let error, elt = rename_pos_with_errors parameters error rename elt in 
+  error, (elt, rename_loc rename pos)
+
+let rename_pos_flat rename (elt,pos) = 
+  rename_pos (fun _ a -> a) rename  (elt,pos) 
+
+let rename_pos_flat_with_errors parameters errors rename (elt,pos) =       
+   rename_pos_with_errors  (fun _ e _ a -> e, a) parameters errors rename (elt,pos)
+let rename_pos_opt rename_pos rename elt_opt = 
+  match elt_opt with 
+  | None -> None 
+  | Some a -> Some (rename_pos rename a) 
+
+let rename_pos_opt_with_errors rename_pos parameters errors rename elt_opt = 
+  match elt_opt with 
+  | None -> errors, None 
+  | Some a -> 
+    let errors, elt = rename_pos parameters errors rename a in 
+    errors, Some (elt) 
+    
+
+let rename_pos_list rename_pos rename list = 
+  List.rev_map 
+  (rename_pos rename)
+  (List.rev list)
+
+let rename_pos_list_with_errors rename_pos_with_errors parameters errors rename list =
+  List.fold_left 
+    (fun (errors, l) elt -> 
+        let errors, elt = 
+          rename_pos_with_errors parameters errors rename elt
+        in (errors, elt::l))
+   (errors, []) (List.rev list) 
+
+let rename_pos_pair rename_pos1 rename_pos2 rename p = 
+  (rename_pos1 rename (fst p), 
+   rename_pos2 rename (snd p))
+   
+let rename_pos_pair_with_errors rename_pos1 rename_pos2 parameters errors rename p = 
+  let errors, a = rename_pos1 parameters errors rename (fst p) in 
+  let errors, b = rename_pos2 parameters errors rename (snd p) in 
+  errors, (a,b) 
+   

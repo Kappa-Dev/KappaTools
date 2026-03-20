@@ -37,4 +37,5 @@ module type GenArray = sig
     Format.formatter ->
     'a t ->
     unit
+
 end

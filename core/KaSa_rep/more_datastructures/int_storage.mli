@@ -104,7 +104,10 @@ module type Storage = sig
 
   val for_all : ((key, 'a, bool) binary, 'a t, bool) binary
   val free_all : ('a t, 'a t) unary
-end
+
+  val rename_pos : 
+    (((Loc.t ->  Loc.t option),'a,'a) binary) -> ((Loc.t -> Loc.t option),'a t,'a t) binary 
+ end
 
 (** Cartesian product *)
 module Extend (Extension : Storage) (Underlying : Storage) :

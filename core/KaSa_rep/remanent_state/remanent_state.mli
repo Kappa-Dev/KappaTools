@@ -441,3 +441,16 @@ val get_working_set_rules :
 
 val reset_reachability_memoized_values :
   ('static, 'compile) state -> ('static, 'compile) state
+
+val set_patch: Ast.parsing_compil ->  ('static, 'compile) state -> ('static, 'compile) state
+val reset_patch: ('static, 'compile) state -> ('static, 'compile) state
+val get_patch: ('static, 'compile) state -> Ast.parsing_compil option 
+
+val add_patch_file_name: string -> ('static, 'compile) state -> ('static, 'compile) state
+val reset_patch_file_names: ('static, 'compile) state -> ('static, 'compile) state
+val get_patch_file_names: ('static, 'compile) state -> string list 
+
+val rename_pos: 
+    (Remanent_parameters_sig.parameters -> Exception.exceptions_caught_and_uncaught -> (Loc.t -> Loc.t option) -> 'static -> Exception.exceptions_caught_and_uncaught * 'static) -> 
+    (Remanent_parameters_sig.parameters -> Exception.exceptions_caught_and_uncaught -> (Loc.t -> Loc.t option) -> 'compile -> Exception.exceptions_caught_and_uncaught * 'compile) -> 
+    (Loc.t -> Loc.t option) -> ('static, 'compile) state -> ('static, 'compile) state 

@@ -93,7 +93,7 @@ let empty_e_rule handler error =
           Ckappa_sig.ast_no_rate = "";
           Ckappa_sig.original_ast = "";
           Ckappa_sig.original_ast_no_rate = "";
-          Ckappa_sig.from_a_biderectional_rule = false;
+          Ckappa_sig.from_a_bidirectional_rule = false;
         };
       Cckappa_sig.e_rule_c_rule = rule;
     } )
@@ -2129,7 +2129,7 @@ let lift_allowing_question_marks parameters handler error x =
   in
   clean_question_marks parameters a c b
 
-let translate_pert_init error guard (alg, _) (c_alg, _) mixture c_mixture _pos'
+let translate_pert_init error guard (alg, _) (c_alg, _) mixture c_mixture pos'
     =
   ( error,
     {
@@ -2138,6 +2138,7 @@ let translate_pert_init error guard (alg, _) (c_alg, _) mixture c_mixture _pos'
       Cckappa_sig.e_init_c_factor = c_alg;
       Cckappa_sig.e_init_mixture = mixture;
       Cckappa_sig.e_init_c_mixture = c_mixture;
+      Cckappa_sig.e_init_position = pos'
     } )
 
 let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map

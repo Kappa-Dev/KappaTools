@@ -104,6 +104,10 @@ module type Storage = sig
 
   val for_all : ((key, 'a, bool) binary, 'a t, bool) binary
   val free_all : ('a t, 'a t) unary
+
+  val rename_pos : 
+    (((Loc.t ->  Loc.t option),'a,'a) binary) -> ((Loc.t -> Loc.t option),'a t,'a t) binary 
+
 end
 
 let invalid_arg parameters mh pos exn value =
@@ -356,6 +360,23 @@ module Int_storage_imperatif :
     fold parameter error
       (fun parameter error a _ t -> free parameter error a t)
       t t
+
+   let rename_pos rename_pos_elt
+                    parameters
+                    errors rename t = 
+      let errors, dim = dimension parameters errors t in 
+      let errors, t = expand_and_copy parameters errors t dim in
+      let errors, t = 
+        fold 
+          parameters errors 
+          (fun parameters errors k  elt t -> 
+            let errors, elt = rename_pos_elt parameters errors rename elt in 
+            set 
+              parameters errors 
+              k elt t)
+          t t 
+      in errors, t
+
 end
 
 module Nearly_infinite_arrays =
@@ -409,6 +430,7 @@ functor
       let fold2_common = Basic.fold2_common
       let for_all = Basic.for_all
       let free_all = Basic.free_all
+      let rename_pos = Basic.rename_pos 
     end :
       Storage with type key = int and type dimension = int)
 
@@ -594,6 +616,14 @@ functor
         fold parameter error
           (fun parameter error a _ t -> free parameter error a t)
           t t
+
+      let rename_pos rename_pos_elt parameter error rename t = 
+        let error, matrix = 
+          Extension.rename_pos 
+            (Underlying.rename_pos rename_pos_elt)
+            parameter error rename t.matrix
+        in 
+        error, {t with matrix} 
     end :
       Storage
         with type key = Extension.key * Underlying.key
@@ -763,6 +793,23 @@ functor
             | None -> g parameter error k b c
             | Some _ -> error, c)
           b c
+
+
+      let rename_pos rename_pos_elt
+                    parameters
+                    errors rename t = 
+        let errors, dim = dimension parameters errors t in 
+        let errors, t = expand_and_copy parameters errors t dim in
+        let errors, t = 
+          fold 
+            parameters errors 
+            (fun parameters errors k  elt t -> 
+              let errors, elt = rename_pos_elt parameters errors rename elt in 
+              set 
+                parameters errors 
+               k elt t)
+            t t 
+        in errors, t
     end :
       Storage with type key = Basic.key and type dimension = Basic.dimension)
 

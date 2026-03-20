@@ -87,3 +87,30 @@ val string_option_annoted_to_json :
 
 val string_option_annoted_of_json :
   filenames:string array -> Yojson.Basic.t -> string option annoted
+
+val rename_loc: (t -> t option) -> t -> t
+
+val rename_pos: ((t -> t option) -> 'a -> 'a) -> (t -> t option) ->  'a annoted -> 'a annoted 
+
+val rename_pos_with_errors: 
+   ('parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a) -> 
+    'parameters -> 'errors -> (t -> t option) -> 'a annoted -> 'errors * 'a annoted
+
+
+val rename_pos_opt_with_errors: ('parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a) -> 'parameters -> 'errors ->  (t -> t option) -> 'a option -> 'errors * 
+'a option   
+
+val rename_pos_list_with_errors: ('parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a) -> 'parameters -> 'errors -> (t -> t option) -> 'a list -> 'errors * 'a list 
+
+val rename_pos_flat: (t -> t option) -> 'a annoted -> 'a annoted 
+
+val rename_pos_flat_with_errors: 'parameters -> 'errors -> (t -> t option) -> 'a annoted -> 'errors * 'a annoted 
+val rename_pos_pair: ((t -> t option) -> 'a -> 'a) -> ((t -> t option) -> 'b -> 'b) -> 
+  (t -> t option) -> 'a * 'b -> 'a * 'b
+
+val rename_pos_pair_with_errors: ('parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a) -> ('parameters -> 'errors -> (t -> t option) -> 'b -> 'errors * 'b) -> 
+ 'parameters -> 'errors ->  (t -> t option) -> 'a * 'b -> 'errors * ('a * 'b)
+
+val rename_pos_list: ((t -> t option) -> 'a -> 'a) -> (t -> t option) ->  'a list -> 'a list 
+
+val rename_pos_opt: ((t -> t option) -> 'a -> 'a) -> (t -> t option) ->  'a option -> 'a option  

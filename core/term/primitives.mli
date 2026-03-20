@@ -189,3 +189,12 @@ val fold_expr_perturbation :
   'a ->
   perturbation ->
   'a
+
+val rename_pos_print_expr: 
+((Loc.t -> Loc.t option) -> 'alg_expr -> 'alg_expr) ->
+            (Loc.t -> Loc.t option) -> 'alg_expr print_expr -> 'alg_expr print_expr
+    
+val rename_pos_print_expr_with_errors : 
+('parameters -> 'errors -> (Loc.t -> Loc.t option) -> 'alg_expr -> 'errors * 'alg_expr) ->
+            'parameters -> 'errors -> (Loc.t -> Loc.t option) -> 'alg_expr print_expr -> 'errors * 'alg_expr print_expr
+ 
