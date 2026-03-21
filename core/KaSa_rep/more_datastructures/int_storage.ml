@@ -69,6 +69,9 @@ type ('a, 'b) binary_no_output =
   'b ->
   Exception.exceptions_caught_and_uncaught
 
+type 'a loc_pos = (Remanent_parameters_sig.parameters,
+  Exception.exceptions_caught_and_uncaught, 'a) Loc.rename_pos_with_errors 
+
 module type Storage = sig
   type 'a t
   type key
@@ -105,8 +108,7 @@ module type Storage = sig
   val for_all : ((key, 'a, bool) binary, 'a t, bool) binary
   val free_all : ('a t, 'a t) unary
 
-  val rename_pos : 
-    (((Loc.t ->  Loc.t option),'a,'a) binary) -> ((Loc.t -> Loc.t option),'a t,'a t) binary 
+  val rename_pos : 'a loc_pos -> 'a t loc_pos 
 
 end
 

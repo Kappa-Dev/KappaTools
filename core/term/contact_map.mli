@@ -16,4 +16,4 @@ val print_cycles : Signature.s -> Format.formatter -> t -> unit
 val to_yojson : t -> Yojson.Basic.t
 val of_yojson : Yojson.Basic.t -> t
 
-val rename_pos_in_cm_int: (Loc.t -> Loc.t option) -> t option -> t option  
+val rename_pos_in_cm_int: t option Loc.rename_pos 

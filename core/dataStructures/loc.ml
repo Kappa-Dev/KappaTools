@@ -206,6 +206,9 @@ let string_option_annoted_of_json ~filenames =
   annoted_of_yojson ~filenames
     (JsonUtil.to_option (JsonUtil.to_string ?error_msg:None))
 
+type 'a rename_pos = (t -> t option)-> 'a -> 'a 
+type ('parameters,'errors,'a) rename_pos_with_errors = 'parameters -> 'errors -> (t -> t option)-> 'a -> 'errors * 'a 
+
 let rename_loc rename pos = 
    match rename pos with 
     | None -> pos 

@@ -253,6 +253,9 @@ val string_of_binding_type :
 
 val string_of_label_list : location pair list -> string
 
-val rename_pos_influence_map: (Loc.t -> Loc.t option)-> influence_map -> influence_map
-val rename_pos_contact_map: (Loc.t -> Loc.t option)-> contact_map -> contact_map
-val rename_pos_dead_rules: (Loc.t -> Loc.t option)-> dead_rules -> dead_rules
+val rename_pos_influence_map: influence_map Loc.rename_pos 
+val rename_pos_contact_map: contact_map Loc.rename_pos 
+val rename_pos_dead_rules: dead_rules Loc.rename_pos 
+val rename_pos_dead_agents: dead_agents Loc.rename_pos 
+val rename_pos_rule_deadness_conditions: rule_deadness_conditions Loc.rename_pos 
+val rename_pos_agent_deadness_conditions: agent_deadness_conditions Loc.rename_pos 

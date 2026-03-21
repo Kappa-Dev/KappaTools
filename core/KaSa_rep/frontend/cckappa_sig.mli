@@ -333,10 +333,7 @@ val working_set_id_of_rule_id :
   * Ckappa_sig.c_working_set_index option
 
 val rename_pos_kappa_handler_with_errors : 
-Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught -> 
-    (Loc.t -> Loc.t option) -> kappa_handler -> Exception_without_parameter.exceptions_caught_and_uncaught  * kappa_handler
+  (Remanent_parameters_sig.parameters, Exception_without_parameter.exceptions_caught_and_uncaught, kappa_handler) Loc.rename_pos_with_errors
 
-val rename_pos_compil_with_errors :
- Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught -> (Loc.t -> Loc.t option) -> compil -> Exception_without_parameter.exceptions_caught_and_uncaught * compil 
+val rename_pos_compil_with_errors : 
+  (Remanent_parameters_sig.parameters, Exception_without_parameter.exceptions_caught_and_uncaught, compil) Loc.rename_pos_with_errors  

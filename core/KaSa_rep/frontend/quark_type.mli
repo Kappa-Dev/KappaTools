@@ -94,4 +94,4 @@ type influence_maps = {
   influence_map: influence_map;
 }
 
-val rename_pos_quarks: (Loc.t -> Loc.t option) -> quarks -> quarks 
+val rename_pos_quarks: quarks Loc.rename_pos 

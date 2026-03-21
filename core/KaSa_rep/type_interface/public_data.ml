@@ -1212,6 +1212,9 @@ let print_formula = Logical_formulae.print_formula
 let rename_pos_rule rename rule = 
   {rule with rule_position = Loc.rename_loc rename rule.rule_position}
 
+  let rename_pos_agent_kind rename agent_kind = 
+  {agent_kind with agent_position = Loc.rename_pos_list Loc.rename_loc rename agent_kind.agent_position}
+
 let rename_pos_var rename var = 
   {var with var_position = Loc.rename_loc rename var.var_position}
 
@@ -1233,3 +1236,20 @@ let rename_pos_influence_map rename influence_map =
 
 let rename_pos_dead_rules rename dead_rules = 
   Loc.rename_pos_list rename_pos_rule rename dead_rules 
+
+let rename_pos_dead_agents rename dead_agents = 
+  Loc.rename_pos_list rename_pos_agent_kind rename dead_agents 
+
+let rename_pos_rule_deadness_conditions rename rule_deadness_conditions = 
+  Loc.rename_pos_list 
+      (Loc.rename_pos_pair 
+          rename_pos_rule 
+          (Logical_formulae.rename_pos (fun _ a -> a) ))
+      rename rule_deadness_conditions
+
+let rename_pos_agent_deadness_conditions rename agent_deadness_conditions = 
+  Loc.rename_pos_list 
+      (Loc.rename_pos_pair 
+          rename_pos_agent_kind 
+          (Logical_formulae.rename_pos (fun _ a -> a) ))
+      rename agent_deadness_conditions

@@ -70,22 +70,17 @@ val fold_over_mixtures_in_alg_exprs :
   (Pattern.id -> 'a -> 'a) -> Model.t -> 'a -> 'a
 
 val rename_pos_alg_expr: 
-((Loc.t -> Loc.t option) -> 'a -> 'a) -> 
-((Loc.t -> Loc.t option) -> 'b -> 'b) -> 
-(Loc.t -> Loc.t option) -> ('a,'b) Alg_expr.e -> ('a,'b) Alg_expr.e 
+'a Loc.rename_pos -> 'b Loc.rename_pos -> ('a,'b) Alg_expr.e Loc.rename_pos
 
 val rename_pos_bool: 
-((Loc.t -> Loc.t option) -> 'a -> 'a) -> 
-((Loc.t -> Loc.t option) -> 'b -> 'b) -> 
-(Loc.t -> Loc.t option) -> ('a,'b) Alg_expr.bool -> ('a,'b) Alg_expr.bool
-
+'a Loc.rename_pos -> 'b Loc.rename_pos -> ('a,'b) Alg_expr.bool Loc.rename_pos
 
 val rename_pos_alg_expr_with_errors: 
-('parameters -> 'errors -> (Loc.t -> Loc.t option) -> 'a -> 'errors * 'a) -> 
-('parameters -> 'errors -> (Loc.t -> Loc.t option) -> 'b -> 'errors * 'b) -> 
-'parameters -> 'errors -> (Loc.t -> Loc.t option) -> ('a,'b) Alg_expr.e -> 'errors * ('a,'b) Alg_expr.e 
+('parameters,'errors,'a) Loc.rename_pos_with_errors -> 
+('parameters,'errors,'b) Loc.rename_pos_with_errors -> 
+('parameters,'errors,('a,'b) Alg_expr.e) Loc.rename_pos_with_errors 
 
 val rename_pos_bool_with_errors: 
-('parameters -> 'errors -> (Loc.t -> Loc.t option) -> 'a -> 'errors * 'a) -> 
-('parameters -> 'errors -> (Loc.t -> Loc.t option) -> 'b -> 'errors * 'b) -> 
-'parameters -> 'errors -> (Loc.t -> Loc.t option) -> ('a,'b) Alg_expr.bool -> 'errors * ('a,'b) Alg_expr.bool
+('parameters,'errors,'a) Loc.rename_pos_with_errors -> 
+('parameters,'errors,'b) Loc.rename_pos_with_errors -> 
+('parameters,'errors,('a,'b) Alg_expr.bool) Loc.rename_pos_with_errors 

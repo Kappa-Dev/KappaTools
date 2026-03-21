@@ -88,29 +88,23 @@ val string_option_annoted_to_json :
 val string_option_annoted_of_json :
   filenames:string array -> Yojson.Basic.t -> string option annoted
 
-val rename_loc: (t -> t option) -> t -> t
+type 'a rename_pos = (t -> t option)-> 'a -> 'a 
 
-val rename_pos: ((t -> t option) -> 'a -> 'a) -> (t -> t option) ->  'a annoted -> 'a annoted 
-
-val rename_pos_with_errors: 
-   ('parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a) -> 
-    'parameters -> 'errors -> (t -> t option) -> 'a annoted -> 'errors * 'a annoted
-
-
-val rename_pos_opt_with_errors: ('parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a) -> 'parameters -> 'errors ->  (t -> t option) -> 'a option -> 'errors * 
-'a option   
-
-val rename_pos_list_with_errors: ('parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a) -> 'parameters -> 'errors -> (t -> t option) -> 'a list -> 'errors * 'a list 
-
-val rename_pos_flat: (t -> t option) -> 'a annoted -> 'a annoted 
-
-val rename_pos_flat_with_errors: 'parameters -> 'errors -> (t -> t option) -> 'a annoted -> 'errors * 'a annoted 
-val rename_pos_pair: ((t -> t option) -> 'a -> 'a) -> ((t -> t option) -> 'b -> 'b) -> 
-  (t -> t option) -> 'a * 'b -> 'a * 'b
-
-val rename_pos_pair_with_errors: ('parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a) -> ('parameters -> 'errors -> (t -> t option) -> 'b -> 'errors * 'b) -> 
- 'parameters -> 'errors ->  (t -> t option) -> 'a * 'b -> 'errors * ('a * 'b)
-
+val rename_loc: t rename_pos 
+val rename_pos: 'a rename_pos -> 'a annoted rename_pos 
+val rename_pos_flat: 'a annoted rename_pos 
+val rename_pos_opt: 'a rename_pos -> 'a option rename_pos 
+val rename_pos_pair: 'a rename_pos -> 'b rename_pos -> ('a*'b) rename_pos 
 val rename_pos_list: ((t -> t option) -> 'a -> 'a) -> (t -> t option) ->  'a list -> 'a list 
 
-val rename_pos_opt: ((t -> t option) -> 'a -> 'a) -> (t -> t option) ->  'a option -> 'a option  
+
+type ('parameters,'errors,'a) rename_pos_with_errors = 'parameters -> 'errors -> (t -> t option)-> 'a -> 'errors * 'a 
+
+
+val rename_pos_with_errors: 
+   ('parameters,'errors,'a) rename_pos_with_errors -> ('parameters,'errors,'a annoted) rename_pos_with_errors 
+val rename_pos_opt_with_errors:  ('parameters,'errors,'a) rename_pos_with_errors -> ('parameters,'errors,'a option) rename_pos_with_errors 
+val rename_pos_list_with_errors: ('parameters,'errors,'a) rename_pos_with_errors -> ('parameters,'errors,'a list) rename_pos_with_errors 
+val rename_pos_flat_with_errors: ('parameters,'errors,'a annoted) rename_pos_with_errors
+val rename_pos_pair_with_errors: ('parameters,'errors,'a) rename_pos_with_errors ->('parameters,'errors,'b) rename_pos_with_errors -> ('parameters,'errors,'a*'b) rename_pos_with_errors 
+
