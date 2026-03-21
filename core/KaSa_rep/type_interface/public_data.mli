@@ -213,7 +213,7 @@ type agent =
     * (int option * int option) option)
     list
 
-type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
+type 'site_graph poly_constraint_list = (string * 'site_graph lemma list) list
 
 val lemma_to_json :
   ('site_graph -> Yojson.Basic.t) -> 'site_graph lemma -> Yojson.Basic.t
@@ -252,10 +252,12 @@ val string_of_binding_type :
   string
 
 val string_of_label_list : location pair list -> string
-
+val rename_pos_separating_transitions: separating_transitions Loc.rename_pos 
+val rename_pos_lemma: ('a Loc.rename_pos) -> 'a lemma Loc.rename_pos 
 val rename_pos_influence_map: influence_map Loc.rename_pos 
 val rename_pos_contact_map: contact_map Loc.rename_pos 
 val rename_pos_dead_rules: dead_rules Loc.rename_pos 
 val rename_pos_dead_agents: dead_agents Loc.rename_pos 
 val rename_pos_rule_deadness_conditions: rule_deadness_conditions Loc.rename_pos 
 val rename_pos_agent_deadness_conditions: agent_deadness_conditions Loc.rename_pos 
+val rename_pos_poly_constraint_list: 'a Loc.rename_pos -> 'a poly_constraint_list Loc.rename_pos  

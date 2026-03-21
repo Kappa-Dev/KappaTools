@@ -20,9 +20,9 @@ module type Type = sig
   type contact_map = Public_data.contact_map
   type internal_influence_map = Remanent_state.internal_influence_map
   type bidirectional_influence_map
-  type internal_constraints_list = Remanent_state.internal_constraints_list
+  type internal_constraint_list = Remanent_state.internal_constraint_list
 
-  val empty_constraints_list : internal_constraints_list
+  val empty_constraint_list : internal_constraint_list
 
   type handler = Cckappa_sig.kappa_handler
   type compilation = Ast.parsing_compil
@@ -83,7 +83,7 @@ module type Type = sig
     state * internal_influence_map
 
   val get_reachability_analysis : state -> state * reachability_analysis
-  val get_constraints_list : state -> state * internal_constraints_list
+  val get_constraint_list : state -> state * internal_constraint_list
   val get_ctmc_flow : state -> state * ctmc_flow
   val get_ode_flow : state -> state * ode_flow
 
@@ -116,7 +116,7 @@ module type Type = sig
     state ->
     state
 
-  val output_constraints_list : ?logger:Loggers.t -> state -> state
+  val output_constraint_list : ?logger:Loggers.t -> state -> state
 
   val output_symmetries :
     ?logger:Loggers.t ->
@@ -170,13 +170,13 @@ functor
     let get_influence_map = get_internal_influence_map
     let get_local_influence_map = get_local_internal_influence_map
     let get_scc_decomposition = get_internal_scc_decomposition
-    let get_constraints_list = get_internal_constraints_list
+    let get_constraint_list = get_internal_constraint_list
     let output_internal_contact_map = output_internal_contact_map
     let output_influence_map = output_internal_influence_map
     let output_local_influence_map = output_local_internal_influence_map
-    let output_constraints_list = output_internal_constraints_list
+    let output_constraint_list = output_internal_constraint_list
     let output_scc_decomposition = dump_internal_scc_decomposition
-    let empty_constraints_list = []
+    let empty_constraint_list = []
     let enable_rule = enable_rule
     let disable_rule = disable_rule
     let enable_rule_index = enable_rule_index

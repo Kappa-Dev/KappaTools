@@ -3667,7 +3667,7 @@ module Domain = struct
              (agent_string, agent_type, _, translation) ->
           let error', bdu_handler, current_list =
             Translation_in_natural_language
-            .convert_views_internal_constraints_list
+            .convert_views_internal_constraint_list
               ~show_dep_with_dimmension_higher_than:dim_min parameters
               handler_kappa bdu_handler error agent_string agent_type
               translation current_list
@@ -3683,11 +3683,11 @@ module Domain = struct
       Exception.check_point Exception.warn parameters error error' __POS__ Exit
     in
     (*------------------------------------------------------------------*)
-    let internal_constraints_list =
-      Remanent_state.get_internal_constraints_list kasa_state
+    let internal_constraint_list =
+      Remanent_state.get_internal_constraint_list kasa_state
     in
-    let error, internal_constraints_list =
-      match internal_constraints_list with
+    let error, internal_constraint_list =
+      match internal_constraint_list with
       | None -> Exception.warn parameters error __POS__ Exit []
       | Some l -> error, l
     in
@@ -3701,9 +3701,9 @@ module Domain = struct
       else
         error, current_list
     in
-    let pair_list = (domain_name, current_list) :: internal_constraints_list in
+    let pair_list = (domain_name, current_list) :: internal_constraint_list in
     let kasa_state =
-      Remanent_state.set_internal_constraints_list pair_list kasa_state
+      Remanent_state.set_internal_constraint_list pair_list kasa_state
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, kasa_state

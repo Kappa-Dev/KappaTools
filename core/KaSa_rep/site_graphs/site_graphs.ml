@@ -703,4 +703,7 @@ module KaSa_site_graph = struct
     let error = print logger parameters error t in
     let () = Format.pp_print_flush string_fmt () in
     error, Buffer.contents buffer
+
+
+  let rename_pos _rename t = t 
 end

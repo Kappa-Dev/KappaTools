@@ -151,4 +151,6 @@ module type Site_graph = sig
     Ckappa_sig.c_agent_name ->
     Ckappa_sig.c_site_name ->
     Exception_without_parameter.exceptions_caught_and_uncaught * bool
+
+ val rename_pos: t Loc.rename_pos
 end

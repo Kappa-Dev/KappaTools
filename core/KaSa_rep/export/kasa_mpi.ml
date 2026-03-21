@@ -201,7 +201,7 @@ let on_message post text =
     let () = gState := state in
     send_response post id transitions
   | Some (id, (`List [ `String "CONSTRAINTS" ] | `String "CONSTRAINTS")) ->
-    let state, out = get_constraints_list !gState in
+    let state, out = get_constraint_list !gState in
     let () = gState := state in
     send_response post id out
   | Some (id, `List [ `String "POLYMERS"; acc_cm ]) ->

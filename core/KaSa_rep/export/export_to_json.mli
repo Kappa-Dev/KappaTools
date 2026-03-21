@@ -63,7 +63,7 @@ module type Type = sig
   val get_working_set_rules : state -> Yojson.Basic.t
   val enable_or_disable_rule : state -> int -> bool -> state
   val get_separating_transitions : state -> state * Yojson.Basic.t
-  val get_constraints_list : state -> state * Yojson.Basic.t
+  val get_constraint_list : state -> state * Yojson.Basic.t
 
   val get_errors :
     state -> Exception_without_parameter.exceptions_caught_and_uncaught
@@ -77,10 +77,10 @@ module type Type = sig
     * Public_data.contact_map Public_data.AccuracyMap.t
     * Public_data.influence_map Public_data.AccuracyMap.t
     * Public_data.dead_rules option
-    * Remanent_state.constraints_list option
+    * Remanent_state.constraint_list option
     * Public_data.separating_transitions option
 end
 
 module Export : functor (Reachability : Analyzer.Analyzer) -> Type
 
-(*val get_internal_constraints_list: state -> state * Yojson.Basic.t*)
+(*val get_internal_constraint_list: state -> state * Yojson.Basic.t*)

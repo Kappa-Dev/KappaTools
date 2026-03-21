@@ -1050,11 +1050,11 @@ functor
       let counters_set = get_counters_set static in
       (*------------------------------------------------------------------*)
       (*internal constraint list*)
-      let internal_constraints_list =
-        Remanent_state.get_internal_constraints_list kasa_state
+      let internal_constraint_list =
+        Remanent_state.get_internal_constraint_list kasa_state
       in
-      let error, internal_constraints_list =
-        match internal_constraints_list with
+      let error, internal_constraint_list =
+        match internal_constraint_list with
         | None -> Exception.warn parameters error __POS__ Exit []
         | Some l -> error, l
       in
@@ -1114,10 +1114,10 @@ functor
           counters_set (error, current_list)
       in
       let pair_list =
-        (domain_name, List.rev current_list) :: internal_constraints_list
+        (domain_name, List.rev current_list) :: internal_constraint_list
       in
       let kasa_state =
-        Remanent_state.set_internal_constraints_list pair_list kasa_state
+        Remanent_state.set_internal_constraint_list pair_list kasa_state
       in
       error, dynamic, kasa_state
 

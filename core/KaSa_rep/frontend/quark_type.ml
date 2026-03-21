@@ -121,5 +121,3 @@ type influence_maps = {
   wake_up_map: influence_map;
   influence_map: influence_map;
 }
-
-let rename_pos_quarks _rename quark_map = quark_map 

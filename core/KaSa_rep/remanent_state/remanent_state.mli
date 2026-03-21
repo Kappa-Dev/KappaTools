@@ -77,8 +77,8 @@ type flow =
 
 (*******************************************************************)
 
-type internal_constraints_list =
-  Site_graphs.KaSa_site_graph.t Public_data.poly_constraints_list
+type internal_constraint_list =
+  Site_graphs.KaSa_site_graph.t Public_data.poly_constraint_list
 
 type agent =
   string
@@ -88,10 +88,10 @@ type agent =
   * (int option * int option) option)
   Wrapped_modules.LoggedStringMap.t
 
-type constraints_list = agent list Public_data.poly_constraints_list
+type constraint_list = agent list Public_data.poly_constraint_list
 
-val lemmas_list_to_json : constraints_list -> Yojson.Basic.t
-val lemmas_list_of_json : Yojson.Basic.t -> constraints_list
+val lemmas_list_to_json : constraint_list -> Yojson.Basic.t
+val lemmas_list_of_json : Yojson.Basic.t -> constraint_list
 (*******************************************************************)
 
 type symmetric_sites = Symmetries.symmetries option
@@ -119,7 +119,7 @@ val of_json :
   * Public_data.contact_map Public_data.AccuracyMap.t
   * Public_data.influence_map Public_data.AccuracyMap.t
   * Public_data.dead_rules option
-  * constraints_list option
+  * constraint_list option
   * Public_data.separating_transitions option
 
 val create_state :
@@ -405,18 +405,18 @@ val set_log_info :
 val get_log_info :
   ('static, 'compile) state -> StoryProfiling.StoryStats.log_info
 
-val get_internal_constraints_list :
-  ('static, 'compile) state -> internal_constraints_list option
+val get_internal_constraint_list :
+  ('static, 'compile) state -> internal_constraint_list option
 
-val set_internal_constraints_list :
-  internal_constraints_list ->
+val set_internal_constraint_list :
+  internal_constraint_list ->
   ('static, 'compile) state ->
   ('static, 'compile) state
 
-val get_constraints_list : ('static, 'compile) state -> constraints_list option
+val get_constraint_list : ('static, 'compile) state -> constraint_list option
 
-val set_constraints_list :
-  constraints_list -> ('static, 'compile) state -> ('static, 'compile) state
+val set_constraint_list :
+  constraint_list -> ('static, 'compile) state -> ('static, 'compile) state
 
 val get_symmetries :
   Public_data.accuracy_level ->

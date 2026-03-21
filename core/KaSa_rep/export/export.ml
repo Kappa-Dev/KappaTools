@@ -48,7 +48,7 @@ functor
       Remanent_state.bidirectional_influence_map
 
     type handler = Cckappa_sig.kappa_handler
-    type internal_constraints_list = Remanent_state.internal_constraints_list
+    type internal_constraint_list = Remanent_state.internal_constraint_list
 
     module AgentProj =
       Map_wrapper.Proj
@@ -1950,13 +1950,13 @@ functor
     let get_working_set_rules = Remanent_state.get_working_set_rules
 
     (****************************************************************)
-    (*constraints_list*)
+    (*constraint_list*)
     (****************************************************************)
 
-    let compute_internal_constraints_list get_internal_constraints_list
+    let compute_internal_constraint_list get_internal_constraint_list
         _show_title state =
       let state, _ = get_reachability_analysis state in
-      match get_internal_constraints_list state with
+      match get_internal_constraint_list state with
       | None ->
         let error = Remanent_state.get_errors state in
         let parameters = Remanent_state.get_parameters state in
@@ -1965,21 +1965,21 @@ functor
         state, output
       | Some output -> state, output
 
-    let get_internal_constraints_list =
+    let get_internal_constraint_list =
       get_gen ~do_we_show_title:title_only_in_kasa
         ~log_title:"Extract refinement lemmas"
-        Remanent_state.get_internal_constraints_list
-        (compute_internal_constraints_list
-           Remanent_state.get_internal_constraints_list)
+        Remanent_state.get_internal_constraint_list
+        (compute_internal_constraint_list
+           Remanent_state.get_internal_constraint_list)
 
-    let compute_constraints_list _show_title state =
+    let compute_constraint_list _show_title state =
       let error = Remanent_state.get_errors state in
-      let state, internal_constraints_list =
-        get_internal_constraints_list state
+      let state, internal_constraint_list =
+        get_internal_constraint_list state
       in
-      let error, constraints_list =
+      let error, constraint_list =
         List.fold_left
-          (fun (error, constraints_list) (domain_name, lemma_list) ->
+          (fun (error, constraint_list) (domain_name, lemma_list) ->
             let error, current_list =
               List.fold_left
                 (fun (error, current_list) lem ->
@@ -2003,36 +2003,36 @@ functor
             in
             (*------------------------------------------------------*)
             let pair_list =
-              (domain_name, List.rev current_list) :: constraints_list
+              (domain_name, List.rev current_list) :: constraint_list
             in
             error, pair_list)
-          (error, []) internal_constraints_list
+          (error, []) internal_constraint_list
       in
-      let state = Remanent_state.set_constraints_list constraints_list state in
+      let state = Remanent_state.set_constraint_list constraint_list state in
       let state = Remanent_state.set_errors error state in
-      state, constraints_list
+      state, constraint_list
 
-    let get_constraints_list =
+    let get_constraint_list =
       get_gen ~do_we_show_title:title_only_in_kasa
         ~log_title:"translate refinement lemmas"
-        Remanent_state.get_constraints_list compute_constraints_list
+        Remanent_state.get_constraint_list compute_constraint_list
 
-    let output_internal_constraints_list ?logger state =
-      let state, constraints_list = get_internal_constraints_list state in
+    let output_internal_constraint_list ?logger state =
+      let state, constraint_list = get_internal_constraint_list state in
       let parameters = Remanent_state.get_parameters state in
       let error = Remanent_state.get_errors state in
       let state, kappa_handler = get_handler state in
       (*PRINT*)
       let error =
         Ckappa_site_graph.print_internal_pattern ?logger parameters error
-          kappa_handler constraints_list
+          kappa_handler constraint_list
       in
       let state = Remanent_state.set_errors error state in
       state
 
-    let get_constraints_list_to_json state =
-      let state, constraints_list = get_constraints_list state in
-      state, Remanent_state.lemmas_list_to_json constraints_list
+    let get_constraint_list_to_json state =
+      let state, constraint_list = get_constraint_list state in
+      state, Remanent_state.lemmas_list_to_json constraint_list
 
     (*********************************************************)
     (*Symmetries*)

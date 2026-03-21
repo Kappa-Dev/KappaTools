@@ -1026,7 +1026,7 @@ type 'site_graph lemma = {
   refinement: ('site_graph * string formula option) list;
 }
 
-type 'site_graph poly_constraints_list = (string * 'site_graph lemma list) list
+type 'site_graph poly_constraint_list = (string * 'site_graph lemma list) list
 
 let lemma_to_json site_graph_to_json json =
   JsonUtil.of_pair ~lab1:hyp ~lab2:refinement site_graph_to_json
@@ -1157,7 +1157,7 @@ let agent_gen_of_json interface_of_json =
     (JsonUtil.to_string ~error_msg:"agent name")
     interface_of_json
 
-let poly_constraints_list_of_json site_graph_of_json =
+let poly_constraint_list_of_json site_graph_of_json =
   JsonUtil.to_list
     (JsonUtil.to_pair ~error_msg:"constraints list" ~lab1:domain_name
        ~lab2:refinements_list
@@ -1168,7 +1168,7 @@ let lemmas_list_of_json_gen interface_of_json = function
   | `Assoc l as x ->
     (try
        let json = List.assoc refinement_lemmas l in
-       poly_constraints_list_of_json
+       poly_constraint_list_of_json
          (JsonUtil.to_list ~error_msg:"site graph"
             (agent_gen_of_json interface_of_json))
          json
@@ -1188,7 +1188,7 @@ let agent_gen_to_json interface_to_json =
   JsonUtil.of_pair ~lab1:agent ~lab2:interface JsonUtil.of_string
     interface_to_json
 
-let poly_constraints_list_to_json site_graph_to_json constraints =
+let poly_constraint_list_to_json site_graph_to_json constraints =
   JsonUtil.of_list
     (JsonUtil.of_pair ~lab1:domain_name ~lab2:refinements_list
        JsonUtil.of_string
@@ -1199,7 +1199,7 @@ let lemmas_list_to_json_gen interface_to_json constraints =
   `Assoc
     [
       ( refinement_lemmas,
-        poly_constraints_list_to_json
+        poly_constraint_list_to_json
           (JsonUtil.of_list (agent_gen_to_json interface_to_json))
           constraints );
     ]
@@ -1253,3 +1253,29 @@ let rename_pos_agent_deadness_conditions rename agent_deadness_conditions =
           rename_pos_agent_kind 
           (Logical_formulae.rename_pos (fun _ a -> a) ))
       rename agent_deadness_conditions
+
+let rename_pos_formula rename_pos rename formula = 
+  Logical_formulae.rename_pos rename_pos rename formula 
+
+let rename_pos_lemma rename_pos_site_graph rename lemma = 
+  { 
+    hyp = rename_pos_site_graph rename lemma.hyp ; 
+    refinement = Loc.rename_pos_list 
+                        (Loc.rename_pos_pair 
+                                rename_pos_site_graph 
+                                (Loc.rename_pos_opt (rename_pos_formula (fun _ a -> a))))
+                        rename lemma.refinement 
+  }
+let rename_pos_poly_constraint_list rename_pos_site_graph rename poly_constraint_list = 
+  Loc.rename_pos_list 
+    (Loc.rename_pos_pair 
+        (fun _ a -> a)
+        (Loc.rename_pos_list 
+              (rename_pos_lemma rename_pos_site_graph)))
+    rename 
+    poly_constraint_list 
+
+let rename_pos_separating_transitions rename (l:separating_transitions) = 
+  Loc.rename_pos_list 
+    (Loc.rename_pos_pair rename_pos_rule (fun _ a -> a)) 
+    rename l 

@@ -19,10 +19,10 @@ module type Type = sig
   type internal_scc_decomposition = Remanent_state.internal_scc_decomposition
   type contact_map = Public_data.contact_map
   type internal_influence_map = Remanent_state.internal_influence_map
-  type internal_constraints_list = Remanent_state.internal_constraints_list
+  type internal_constraint_list = Remanent_state.internal_constraint_list
   type bidirectional_influence_map
 
-  val empty_constraints_list : internal_constraints_list
+  val empty_constraint_list : internal_constraint_list
 
   type handler = Cckappa_sig.kappa_handler
   type compilation = Ast.parsing_compil
@@ -81,7 +81,7 @@ module type Type = sig
     state * internal_influence_map
 
   val get_reachability_analysis : state -> state * reachability_analysis
-  val get_constraints_list : state -> state * internal_constraints_list
+  val get_constraint_list : state -> state * internal_constraint_list
   val get_ctmc_flow : state -> state * ctmc_flow
   val get_ode_flow : state -> state * ode_flow
 
@@ -114,7 +114,7 @@ module type Type = sig
     state ->
     state
 
-  val output_constraints_list : ?logger:Loggers.t -> state -> state
+  val output_constraint_list : ?logger:Loggers.t -> state -> state
 
   val output_symmetries :
     ?logger:Loggers.t ->

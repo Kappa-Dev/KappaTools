@@ -3,7 +3,7 @@ val print_internal_pattern :
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
-  Remanent_state.internal_constraints_list ->
+  Remanent_state.internal_constraint_list ->
   Exception.exceptions_caught_and_uncaught
 
 val site_graph_to_list :

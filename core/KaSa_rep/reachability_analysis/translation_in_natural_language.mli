@@ -69,7 +69,7 @@ val print :
   token ->
   Exception.exceptions_caught_and_uncaught * Ckappa_sig.Views_bdu.handler
 
-val convert_views_internal_constraints_list :
+val convert_views_internal_constraint_list :
   show_dep_with_dimmension_higher_than:int ->
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->

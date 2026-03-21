@@ -1247,7 +1247,7 @@ let rec print ?beginning_of_sentence:(beggining = true)
 (*****************************************************************************)
 (*TODO:convert views to json*)
 
-let rec convert_views_internal_constraints_list_aux
+let rec convert_views_internal_constraint_list_aux
     ~show_dep_with_dimmension_higher_than:dim_min parameters kappa_handler error
     agent_string agent_type agent_id translation t current_list bdu_handler =
   let error, bdu_handler, current_list =
@@ -1368,7 +1368,7 @@ let rec convert_views_internal_constraints_list_aux
             let error'', bdu_handler, current_list =
               List.fold_left
                 (fun (error, bdu_handler, current_list) token ->
-                  convert_views_internal_constraints_list_aux
+                  convert_views_internal_constraint_list_aux
                     ~show_dep_with_dimmension_higher_than:0 parameters
                     kappa_handler error agent_string agent_type agent_id token
                     t' current_list bdu_handler)
@@ -1428,7 +1428,7 @@ let rec convert_views_internal_constraints_list_aux
   in
   error, bdu_handler, current_list
 
-let convert_views_internal_constraints_list
+let convert_views_internal_constraint_list
     ~show_dep_with_dimmension_higher_than:dim_min parameters kappa_handler
     bdu_handler error agent_string agent_type translation current_list =
   let t = Site_graphs.KaSa_site_graph.empty in
@@ -1447,7 +1447,7 @@ let convert_views_internal_constraints_list
           kappa_handler agent_id site t
       in
       let error, bdu_handler, current_list =
-        convert_views_internal_constraints_list_aux
+        convert_views_internal_constraint_list_aux
           ~show_dep_with_dimmension_higher_than:dim_min parameters kappa_handler
           error agent_string agent_type agent_id translation t current_list
           bdu_handler
@@ -1455,7 +1455,7 @@ let convert_views_internal_constraints_list
       error, bdu_handler, current_list
     | Equiv _ | Imply _ | Partition _ | No_known_translation _ ->
       let error, bdu_handler, current_list =
-        convert_views_internal_constraints_list_aux
+        convert_views_internal_constraint_list_aux
           ~show_dep_with_dimmension_higher_than:dim_min parameters kappa_handler
           error agent_string agent_type agent_id translation t current_list
           bdu_handler

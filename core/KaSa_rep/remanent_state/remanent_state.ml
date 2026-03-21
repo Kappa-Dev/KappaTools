@@ -122,7 +122,7 @@ type agent = string * (* agent name *)
 
 (***************************************************************************)
 
-type constraints_list = agent list Public_data.poly_constraints_list
+type constraint_list = agent list Public_data.poly_constraint_list
 
 let lemmas_list_of_json json =
   Public_data.lemmas_list_of_json_gen interface_of_json json
@@ -161,8 +161,8 @@ type flow =
   Ckappa_sig.Site_union_find.t
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
 
-type internal_constraints_list =
-  Site_graphs.KaSa_site_graph.t Public_data.poly_constraints_list
+type internal_constraint_list =
+  Site_graphs.KaSa_site_graph.t Public_data.poly_constraint_list
 
 (*******************************************************************)
 type symmetric_sites = Symmetries.symmetries option
@@ -221,8 +221,8 @@ type ('static, 'dynamic) state = {
   ode_flow: Ode_fragmentation_type.ode_frag option;
   ctmc_flow: flow option;
   errors: Exception.exceptions_caught_and_uncaught;
-  internal_constraints_list: internal_constraints_list option;
-  constraints_list: constraints_list option;
+  internal_constraint_list: internal_constraint_list option;
+  constraint_list: constraint_list option;
   symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
   separating_transitions: separating_transitions option;
   transition_system_length: int list option;
@@ -282,8 +282,8 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     dead_agents = None;
     conditionally_dead_agents = None;
     errors = error;
-    internal_constraints_list = None;
-    constraints_list = None;
+    internal_constraint_list = None;
+    constraint_list = None;
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
     transition_system_length = None;
@@ -331,7 +331,7 @@ let get_map empty add of_json label json =
 let get_contact_map_map state = state.contact_map
 let get_pos_of_rules_and_vars state = state.pos_of_rules_and_vars
 let get_influence_map_map state = state.influence_map
-let get_constraints_list state = state.constraints_list
+let get_constraint_list state = state.constraint_list
 
 let set_pos_of_rules_and_vars l state =
   { state with pos_of_rules_and_vars = Some l }
@@ -421,7 +421,7 @@ let add_conditionally_dead_rules_to_json state l =
     :: l
 
 let add_lemmas_to_json state l =
-  match get_constraints_list state with
+  match get_constraint_list state with
   | None -> l
   | Some constraints ->
     (Public_data.refinement_lemmas, lemmas_list_to_json constraints) :: l
@@ -688,15 +688,15 @@ let get_internal_contact_map_map state = state.internal_contact_map
 let get_internal_influence_map_map state = state.internal_influence_map
 let get_log_info state = state.log_info
 let set_log_info log state = { state with log_info = log }
-let get_internal_constraints_list state = state.internal_constraints_list
+let get_internal_constraint_list state = state.internal_constraint_list
 
-let set_internal_constraints_list list state =
-  { state with internal_constraints_list = Some list }
+let set_internal_constraint_list list state =
+  { state with internal_constraint_list = Some list }
 
-let get_constraints_list state = state.constraints_list
+let get_constraint_list state = state.constraint_list
 
-let set_constraints_list list state =
-  { state with constraints_list = Some list }
+let set_constraint_list list state =
+  { state with constraint_list = Some list }
 
 let get_symmetries accuracy state =
   Public_data.AccuracyMap.find_option accuracy state.symmetric_sites
@@ -762,7 +762,7 @@ let reset_reachability_memoized_values state =
     internal_scc_decomposition = Public_data.AccuracyMap.empty;
     scc_decomposition = Public_data.AccuracyMap.empty;
     signature = None;
-    constraints_list = None;
+    constraint_list = None;
   }
 
 
@@ -822,10 +822,9 @@ let gen_opt_error set get update parameters error f y =
   | Some x -> 
     let error, x' = update parameters error f x in 
     error, set x' y    
+
 let rename_pos_in_init _f init = init
 let rename_pos_env _f env = env 
-
-let rename_pos_in_internal_influence_map _f map = map 
 
 let rename_pos_in_bidirectional_influence_map _f map = map 
 
@@ -836,6 +835,18 @@ let rename_pos_reachability_result_with_errors
     (Loc.rename_pos_pair_with_errors 
       rename_static rename_compil) 
     parameters errors rename result
+
+
+let rename_pos_constraint_list rename (list:constraint_list) = 
+    Loc.rename_pos_list 
+      (Loc.rename_pos_pair 
+          (fun _ a -> a)
+          (Loc.rename_pos_list 
+                (Public_data.rename_pos_lemma 
+                  (Loc.rename_pos_list 
+                    ((fun _ a -> a))))))
+      rename 
+      list 
 
 let rename_pos rename_static rename_dynamic rename state = 
   let parameters = get_parameters state in 
@@ -860,10 +871,6 @@ let rename_pos rename_static rename_dynamic rename state =
                       rename 
                       state in 
   let errors, state = gen_opt_error set_c_compil get_c_compil Cckappa_sig.rename_pos_compil_with_errors parameters errors rename state in 
-  let state = gen set_quark_map get_quark_map Quark_type.rename_pos_quarks rename state in 
-  let state = gen (set_internal_influence_map Public_data.High) (get_internal_influence_map Public_data.High) rename_pos_in_internal_influence_map rename state in 
-  let state = gen (set_internal_influence_map Public_data.Medium) (get_internal_influence_map Public_data.Medium) rename_pos_in_internal_influence_map rename state in 
-  let state = gen (set_internal_influence_map Public_data.Low) (get_internal_influence_map Public_data.Low) rename_pos_in_internal_influence_map rename state in 
   let state = gen (set_influence_map Public_data.High) (get_influence_map Public_data.High) Public_data.rename_pos_influence_map rename state in 
   let state = gen (set_influence_map Public_data.Medium) (get_influence_map Public_data.Medium) Public_data.rename_pos_influence_map rename state in 
   let state = gen (set_influence_map Public_data.Low) (get_influence_map Public_data.Low) Public_data.rename_pos_influence_map rename state in 
@@ -880,15 +887,10 @@ let rename_pos rename_static rename_dynamic rename state =
   let errors, state = gen_opt_error set_reachability_result get_reachability_result (rename_pos_reachability_result_with_errors rename_static rename_dynamic) parameters errors rename state in 
   let state = gen set_dead_rules get_dead_rules (Public_data.rename_pos_dead_rules) 
   rename state in 
+  let state = gen set_conditionally_dead_rules get_conditionally_dead_rules (Public_data.rename_pos_rule_deadness_conditions)  rename state in 
+  let state = gen set_dead_agents get_dead_agents (Public_data.rename_pos_dead_agents) 
+  rename state in 
+  let state = gen set_conditionally_dead_agents get_conditionally_dead_agents (Public_data.rename_pos_agent_deadness_conditions)  rename state in 
+  let state = gen set_constraint_list get_constraint_list rename_pos_constraint_list rename state in 
+  let state = gen set_separating_transitions get_separating_transitions Public_data.rename_pos_separating_transitions rename state in 
   set_errors errors state 
-(* TODO
-  conditionally_dead_rules: rule_deadness_conditions option;
-  dead_agents: dead_agents option;
-  conditionally_dead_agents: agent_deadness_conditions option;
-  ode_flow: Ode_fragmentation_type.ode_frag option;
-  ctmc_flow: flow option;
-  internal_constraints_list: internal_constraints_list option;
-  constraints_list: constraints_list option;
-  symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
-  separating_transitions: separating_transitions option;
-   *)

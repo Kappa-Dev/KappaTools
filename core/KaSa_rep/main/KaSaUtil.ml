@@ -115,7 +115,7 @@ module KaSaUtil (Export_to_KaSa : Export_to_KaSa.Type) = struct
         || Remanent_parameters.get_compute_separating_transitions parameters
       then
         if Remanent_parameters.get_trace parameters then
-          Export_to_KaSa.output_constraints_list state
+          Export_to_KaSa.output_constraint_list state
         else
           fst (Export_to_KaSa.get_reachability_analysis state)
       else
@@ -335,7 +335,7 @@ module KaSaUtil (Export_to_KaSa : Export_to_KaSa.Type) = struct
         in
         let () =
           if Remanent_parameters.get_backdoor_nbr_of_constraints parameters then (
-            let _, constraints = Export_to_KaSa.get_constraints_list state in
+            let _, constraints = Export_to_KaSa.get_constraint_list state in
             let n_constraints =
               List.fold_left (fun n (_, l) -> n + List.length l) 0 constraints
             in
@@ -347,7 +347,7 @@ module KaSaUtil (Export_to_KaSa : Export_to_KaSa.Type) = struct
         let () =
           if Remanent_parameters.get_backdoor_nbr_of_nr_constraints parameters
           then (
-            let _, constraints = Export_to_KaSa.get_constraints_list state in
+            let _, constraints = Export_to_KaSa.get_constraint_list state in
             let n_constraints =
               List.fold_left
                 (fun n (x, l) ->
