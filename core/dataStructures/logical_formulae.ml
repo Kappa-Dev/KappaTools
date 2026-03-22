@@ -209,3 +209,13 @@ let rec rename_pos rename_pos1 rename a =
   | AND (a,b) -> AND (rename_pos rename_pos1 rename a,rename_pos rename_pos1 rename b)
   | OR (a,b) -> OR (rename_pos rename_pos1 rename a,rename_pos rename_pos1 rename b) 
   | False | True -> a 
+
+let rec diff_pos diff_atom (a:'a formula) a' l = 
+  match a,a' with 
+  | P a, P a' -> diff_atom a a' l 
+  | NOT a, NOT a' -> diff_pos diff_atom a a' l 
+  | IMPLY (a1,a2), IMPLY (a1',a2') | OR  (a1,a2), OR (a1',a2') | AND (a1,a2), AND (a1',a2') ->  diff_pos diff_atom a2 a2' (diff_pos diff_atom a1 a1' l)
+  | False, False 
+  | True, True -> l 
+  | (P _ |NOT _ |IMPLY _| OR _ | AND _ | True | False ),
+    (P _ |NOT _ |IMPLY _| OR _ | AND _ | True | False ) -> failwith (invalid_arg "diff_pos")

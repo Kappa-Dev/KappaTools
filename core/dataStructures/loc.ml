@@ -260,3 +260,50 @@ let rename_pos_pair_with_errors rename_pos1 rename_pos2 parameters errors rename
   let errors, b = rename_pos2 parameters errors rename (snd p) in 
   errors, (a,b) 
    
+type 'a diff_pos = ('a -> 'a -> (t*t) list -> (t*t) list)
+
+let diff_pos_empty = [] 
+
+let diff_pos loc loc' l = 
+  if loc == loc' || loc = loc' 
+  then l 
+   else (loc,loc')::l 
+
+
+let diff_pos_flat _ _ l = l 
+
+let diff_pos_annoted diff_pos' (a,pos) (a',pos') l = 
+  diff_pos' a a' (diff_pos pos pos' l)
+
+let diff_pos_opt diff_pos a a' l = 
+  match a,a' with 
+  | Some a,Some a' -> diff_pos a a' l 
+  | None, None -> l 
+  | Some _, None | None, Some _ -> raise (invalid_arg "diff_pos_opt")
+
+let diff_pos_pair diff_pos diff_pos' (a,b) (a',b') l = 
+  diff_pos' b b' (diff_pos a a' l)
+
+let diff_pos_list diff_pos l l' acc = 
+  List.fold_left2 
+    (fun acc a a' -> diff_pos a a' acc)
+    acc l l' 
+
+module LocMap = 
+  Map.Make (struct 
+    type t_above = t
+    type t = t_above  
+   (** type t = t *)
+    
+      let compare=compare 
+end)
+
+let fun_of_list l = 
+  let m = 
+    List.fold_left 
+      (fun m (a,b) -> LocMap.add a b m) 
+      LocMap.empty l 
+  in 
+  (fun elt -> LocMap.find_opt elt m)
+
+  

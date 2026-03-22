@@ -1,6 +1,6 @@
 type ('rule, 'init) summary_file 
 type ('rule, 'init) summary 
-type diff_elt = {new_elt: int list; removed_elt: int list}
+type diff_elt = {new_elt: int list; removed_elt: int list ; pos_renaming: (Loc.t * Loc.t) list }
 type diff = 
  {
     diff_rules: diff_elt ; 
@@ -52,10 +52,14 @@ val is_new_init_state:
   Exception_without_parameter.exceptions_caught_and_uncaught * bool 
 
 val diff: 
+  'rule Loc.diff_pos -> 'init Loc.diff_pos -> 
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  before:('a,'b) summary -> 
+  before:('rule,'init) summary -> 
   filename:string -> 
-  after:('a,'b) summary_file -> 
+  after:('rule,'init) summary_file -> 
   Exception_without_parameter.exceptions_caught_and_uncaught * diff
 
+val dump_diff: Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  diff -> Exception_without_parameter.exceptions_caught_and_uncaught

@@ -168,3 +168,6 @@ val rename_pos_guard:
     ((Loc.t -> Loc.t option) -> 'a -> 'a) -> 
        (Loc.t -> Loc.t option) -> 
         'a guard -> 'a guard 
+
+val diff_pos_link: 'a Loc.diff_pos -> 'b Loc.diff_pos -> ('a,'b) link Loc.diff_pos 
+val diff_pos_guard: 'a Loc.diff_pos -> 'a guard Loc.diff_pos 

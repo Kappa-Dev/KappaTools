@@ -891,3 +891,21 @@ let rename_pos_link rename_a rename_b rename link:(('a,'b) link) =
   | LNK_TYPE (a, b) -> LNK_TYPE (rename_a rename a,rename_a rename b)
 
 let rename_pos_guard rename_id = Logical_formulae.rename_pos (Loc.rename_pos rename_id) 
+
+
+let diff_pos_link diff_pos diff_pos' (lnk:('a,'b) link) lnk' l =  
+  match
+    lnk,lnk' 
+  with  
+  | ANY_FREE, ANY_FREE 
+  | LNK_FREE, LNK_FREE 
+  | LNK_ANY, LNK_ANY 
+  | LNK_SOME, LNK_SOME -> l 
+  | LNK_VALUE (_,a), LNK_VALUE (_,a') -> diff_pos' a a' l 
+  | LNK_TYPE (a,b), LNK_TYPE (a',b') -> diff_pos b b' (diff_pos a a' l)
+  | (ANY_FREE | LNK_FREE | LNK_ANY | LNK_SOME | LNK_VALUE _ | LNK_TYPE _ ), 
+    (ANY_FREE | LNK_FREE | LNK_ANY | LNK_SOME | LNK_VALUE _ | LNK_TYPE _ ) -> 
+        failwith (invalid_arg "diff_pos_link")
+
+let diff_pos_guard diff_pos (a:'a guard) a' l = 
+  Logical_formulae.diff_pos (Loc.diff_pos_annoted diff_pos) a a' l 

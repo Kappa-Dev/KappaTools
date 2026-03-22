@@ -108,3 +108,13 @@ val rename_pos_list_with_errors: ('parameters,'errors,'a) rename_pos_with_errors
 val rename_pos_flat_with_errors: ('parameters,'errors,'a annoted) rename_pos_with_errors
 val rename_pos_pair_with_errors: ('parameters,'errors,'a) rename_pos_with_errors ->('parameters,'errors,'b) rename_pos_with_errors -> ('parameters,'errors,'a*'b) rename_pos_with_errors 
 
+type 'a diff_pos = ('a -> 'a -> (t*t) list -> (t*t) list)
+val diff_pos: t diff_pos 
+val diff_pos_annoted: 'a diff_pos -> 'a annoted diff_pos 
+val diff_pos_flat: 'a diff_pos 
+val diff_pos_opt: 'a diff_pos -> 'a option diff_pos 
+val diff_pos_list: 'a diff_pos -> 'a list diff_pos 
+val diff_pos_pair: 'a diff_pos -> 'b diff_pos -> ('a*'b) diff_pos  
+val diff_pos_empty: (t*t) list 
+
+val fun_of_list: (t*t) list -> (t -> t option)

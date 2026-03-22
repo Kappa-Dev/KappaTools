@@ -267,3 +267,17 @@ val rename_pos_compil:
     ((Loc.t -> Loc.t option) -> 'rule -> 'rule) ->  
     (Loc.t -> Loc.t option) -> 
     ('agent,'agent_sig,'pattern,'mixture,'id,'rule) compil -> ('agent,'agent_sig,'pattern,'mixture,'id,'rule) compil 
+
+val diff_pos_rule: rule Loc.diff_pos 
+  
+val diff_pos_parsing_compil_rule: 
+      ('rule -> 'rule -> (Loc.t * Loc.t) list -> (Loc.t * Loc.t) list) -> 
+      'rule compil_rule ->  'rule compil_rule -> 
+      (Loc.t * Loc.t) list -> (Loc.t * Loc.t) list 
+     
+val diff_pos_mixture: mixture Loc.diff_pos 
+val diff_pos_id: string Loc.diff_pos 
+
+val diff_pos_init_statement: 
+  'pattern Loc.diff_pos -> 'mixture Loc.diff_pos -> 'id Loc.diff_pos ->
+  ('pattern, 'mixture, 'id) init_statement Loc.diff_pos 

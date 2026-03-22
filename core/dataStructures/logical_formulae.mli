@@ -18,3 +18,5 @@ val convert_p :
 val get_list_of_predicates : (string * 'a) formula -> string list
 
 val rename_pos: 'a Loc.rename_pos -> 'a  formula Loc.rename_pos 
+
+val diff_pos: 'a Loc.diff_pos -> 'a formula Loc.diff_pos 

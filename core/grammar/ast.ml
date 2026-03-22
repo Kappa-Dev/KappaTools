@@ -2439,3 +2439,135 @@ let rename_pos_parsing_compil =
       rename_pos_agent rename_pos_agent_sig rename_pos_mixture 
       rename_pos_mixture (fun _ a -> a) rename_pos_rule 
 
+let diff_pos_counter_test = Loc.diff_pos_flat  
+
+let diff_pos_counter (c:counter) c' l = 
+  let l = Loc.diff_pos_annoted Loc.diff_pos_flat c.counter_name c'.counter_name l in
+  let l = Loc.diff_pos_opt (Loc.diff_pos_annoted  diff_pos_counter_test) c.counter_test c'.counter_test l in 
+  let l = Loc.diff_pos_annoted Loc.diff_pos_flat c.counter_delta c'.counter_delta l in 
+  l 
+
+let diff_pos_internal (a:internal) a' l = 
+  Loc.diff_pos_list (Loc.diff_pos_annoted (Loc.diff_pos_flat)) a a' l 
+
+let diff_pos_port (a:port) a' l = 
+   let l = Loc.diff_pos_annoted Loc.diff_pos_flat a.port_name a'.port_name l in 
+   let l = diff_pos_internal a.port_int a'.port_int l in 
+   let l = Loc.diff_pos_opt (Loc.diff_pos_annoted Loc.diff_pos_flat) a.port_int_mod a'.port_int_mod l in 
+   let l = Loc.diff_pos_list (Loc.diff_pos_annoted (LKappa.diff_pos_link (Loc.diff_pos_annoted Loc.diff_pos_flat) Loc.diff_pos_flat)) a.port_link a'.port_link l in 
+   let l = Loc.diff_pos_opt (Loc.diff_pos_opt (Loc.diff_pos_annoted Loc.diff_pos_flat)) a.port_link_mod a'.port_link_mod l in 
+   l 
+let diff_pos_site diff_pos (a:'counter site) a' l = 
+    match a,a' with 
+    | Port p, Port p' -> diff_pos_port p p' l 
+    | Counter c,Counter c' -> diff_pos c c' l 
+    | Port _, Counter _ | Counter _, Port _ -> raise (invalid_arg "diff_pos_site")
+
+let diff_agent_mod (a:agent_mod) a' l = 
+  Loc.diff_pos_flat a a' l 
+
+let diff_pos_parametric_agent diff_pos_counter (a:'a parametric_agent) a' l = 
+  match a,a' with 
+   | Present (a,b,c), Present(a',b',c') -> 
+    let l = Loc.diff_pos_annoted Loc.diff_pos_flat a a' l in 
+    let l = Loc.diff_pos_list (diff_pos_site diff_pos_counter) b b' l in 
+    let l = diff_agent_mod c c' l in 
+    l 
+   | Absent pos, Absent pos' -> Loc.diff_pos pos pos' l 
+   | Present _, Absent _ | Absent _, Present _ -> 
+    failwith (invalid_arg "diff_pos_rule_content")
+let diff_pos_agent (a:agent) a' l = 
+  diff_pos_parametric_agent diff_pos_counter a a' l 
+
+let diff_pos_mixture (m:mixture) m' l = 
+  Loc.diff_pos_list 
+    (Loc.diff_pos_list diff_pos_agent) m m' l 
+
+let diff_pos_edit_notation (e:edit_notation) e' l = 
+  let l = diff_pos_mixture e.mix e'.mix l in 
+  let l = Loc.diff_pos_list 
+            (Loc.diff_pos_pair 
+             (Loc.diff_pos_annoted 
+             (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat))  
+             (Loc.diff_pos_annoted Loc.diff_pos_flat))
+             e.delta_token e'.delta_token 
+            l 
+  in
+  l  
+
+let diff_pos_arrow_notation (e:arrow_notation) e' l = 
+  let l = diff_pos_mixture e.lhs e'.lhs l in 
+  let l = Loc.diff_pos_list 
+            (Loc.diff_pos_pair 
+                  (Loc.diff_pos_annoted 
+             (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)) 
+                  (Loc.diff_pos_annoted Loc.diff_pos_flat) ) 
+            e.rm_token e'.rm_token l in 
+  let l = diff_pos_mixture e.rhs e'.rhs l in 
+  let l = Loc.diff_pos_list
+            (Loc.diff_pos_pair 
+                  (Loc.diff_pos_annoted 
+             (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)) 
+                  (Loc.diff_pos_annoted Loc.diff_pos_flat) ) 
+             e.add_token e'.add_token l in 
+l
+
+
+ let diff_pos_rule_content  (r:rule_content) (r':rule_content) l = 
+  match r, r' with 
+  | Edit e,Edit e' -> diff_pos_edit_notation e e' l 
+  | Arrow e, Arrow e' -> diff_pos_arrow_notation e e' l 
+  | Edit _, Arrow _ | Arrow _, Edit _ -> failwith (invalid_arg "diff_pos_rule_content")
+
+let diff_pos_rule (rule:rule) (rule':rule) l = 
+  let l = diff_pos_rule_content rule.rewrite rule'.rewrite l in 
+  let l = Loc.diff_pos_annoted 
+            (Alg_expr_extra.diff_pos_e diff_pos_mixture (fun _ _ l -> l)) 
+            rule.k_def rule'.k_def l 
+  in 
+  let l = 
+    Loc.diff_pos_opt 
+       (Loc.diff_pos_pair 
+          (Loc.diff_pos_annoted (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)) 
+          (Loc.diff_pos_opt (Loc.diff_pos_annoted (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)))
+          )
+      rule.k_un rule'.k_un l in 
+  let l = Loc.diff_pos_opt
+          (Loc.diff_pos_annoted 
+            (Alg_expr_extra.diff_pos_e diff_pos_mixture (fun _ _ l -> l)))
+            rule.k_op rule'.k_op l 
+  in 
+ let l = 
+    Loc.diff_pos_opt 
+       (Loc.diff_pos_pair 
+          (Loc.diff_pos_annoted (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)) 
+          (Loc.diff_pos_opt (Loc.diff_pos_annoted (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)))
+          )
+      rule.k_op_un rule'.k_op_un l in 
+  l 
+
+let diff_pos_id _ _ l = l 
+
+let diff_pos_parsing_compil_rule diff_pos_rule (r:'a compil_rule) r' l = 
+      let (_,b,c,d) = r in 
+      let (_,b',c',d') = r' in 
+      let l = Loc.diff_pos_opt (Loc.diff_pos_annoted Loc.diff_pos_flat) b b' l in 
+      let l = Loc.diff_pos_opt (LKappa.diff_pos_guard Loc.diff_pos_flat) c c' l in 
+      let l = Loc.diff_pos_annoted diff_pos_rule d d' l in 
+      l  
+  
+let diff_pos_init_t diff_pos_mixture diff_pos_id init_t (init_t':('a,'b) init_t) l  = 
+  match init_t, init_t' with 
+  | INIT_MIX mix, INIT_MIX mix' -> Loc.diff_pos_annoted diff_pos_mixture mix mix' l 
+  | INIT_TOK tok, INIT_TOK tok' -> Loc.diff_pos_list (Loc.diff_pos_annoted diff_pos_id) tok tok' l 
+  | INIT_MIX _, INIT_TOK _ | INIT_TOK _, INIT_MIX _ -> 
+    failwith (invalid_arg "diff_pos_init_t")
+
+    
+let diff_pos_init_statement diff_pos_pattern diff_pos_mixture diff_pos_id (init:('a,'b,'c) init_statement) init' l = 
+  let (g_opt, e, init_t) = init in 
+  let (g_opt', e', init_t') = init' in 
+  let l = Loc.diff_pos_opt (LKappa.diff_pos_guard Loc.diff_pos_flat) g_opt g_opt' l in 
+  let l = Loc.diff_pos_annoted (Alg_expr_extra.diff_pos_e diff_pos_pattern Loc.diff_pos_flat) e e' l in 
+  let l = diff_pos_init_t diff_pos_mixture diff_pos_id init_t init_t' l in 
+  l 
