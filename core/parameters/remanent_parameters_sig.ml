@@ -156,6 +156,7 @@ type marshalisable_parameters = {
   empty_hashtbl_size: int;
   rules_to_remove: int list;
   rules_in_working_set: int list;
+  current_chapter: string list;
   backdoors: backdoors;
 }
 

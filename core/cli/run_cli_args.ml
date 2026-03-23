@@ -8,6 +8,7 @@
 
 type t = {
   mutable inputKappaFileNames: string list;
+  mutable currentChapter: string list;
   mutable minValue: float option;
   mutable maxValue: float option;
   mutable plotPeriod: float option;
@@ -34,6 +35,7 @@ type t_gui = {
 let default : t =
   {
     inputKappaFileNames = [];
+    currentChapter = [];
     minValue = None;
     maxValue = None;
     plotPeriod = None;
@@ -75,6 +77,7 @@ let get_from_gui t_gui =
     maxValue = !(t_gui.maxValue_gui);
     plotPeriod = !(t_gui.plotPeriod_gui);
     inputKappaFileNames = !(t_gui.inputKappaFileNames_gui);
+    currentChapter = [];
     outputDataFile = !(t_gui.outputDataFile_gui);
     outputDirectory = !(t_gui.outputDirectory_gui);
     syntaxVersion =
@@ -94,6 +97,7 @@ let copy_from_gui t_gui t =
   t.maxValue <- t_tmp.maxValue;
   t.plotPeriod <- t_tmp.plotPeriod;
   t.inputKappaFileNames <- t_tmp.inputKappaFileNames;
+  t.currentChapter <- t_tmp.currentChapter;
   t.outputDataFile <- t_tmp.outputDataFile;
   t.outputDirectory <- t_tmp.outputDirectory;
   t.syntaxVersion <- t_tmp.syntaxVersion;

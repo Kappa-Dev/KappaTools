@@ -239,9 +239,9 @@ let print_option verbose f (key, spec, msg, _cat, _lvl) =
     | Some i -> Format.fprintf f "  %s <int>   (default: %i)@." key2 i)
   | Int_list r ->
     (match !r with
-    | [] -> Format.fprintf f "  %s <ints>,...   (default: disabled)@." key
+    | [] -> Format.fprintf f "  %s <ints> ...   (default: disabled)@." key
     | l ->
-      Format.fprintf f "  %s <ints>,...   (default %a)@." key
+      Format.fprintf f "  %s <ints> ...   (default %a)@." key
         (Pp.list Pp.space Format.pp_print_int)
         l)
   | String r ->
@@ -343,7 +343,16 @@ let parse_list ~with_tk ?title (a : t) (l : string list) : string list =
   let long_help = ref false
   and short_help = ref false
   and show_version = ref false in
-
+  let rec get_list_of_string accum = function
+    | [] -> accum, []
+    | v :: list ->
+      if String.length v < 1 then
+        get_list_of_string accum list
+      else if v.[0] = '-' then
+        accum, v :: list
+      else
+        get_list_of_string (v :: accum) list
+  in
   let rec doit accum = function
     | [] -> accum
     | opt :: rem ->
@@ -421,9 +430,9 @@ let parse_list ~with_tk ?title (a : t) (l : string list) : string list =
             | String_opt r, rem ->
               r := None;
               rem
-            | String_list _, "" :: rem when opt = key -> rem
-            | String_list r, v :: rem when opt = key ->
-              r := v :: !r;
+            | String_list r, rem when opt = key ->
+              let list, rem = get_list_of_string [] rem in
+              r := List.rev list;
               rem
             | String_list r, rem ->
               r := [];
@@ -497,7 +506,6 @@ let parse_list ~with_tk ?title (a : t) (l : string list) : string list =
       ) else
         doit (opt :: accum) rem
   in
-
   let filenames = doit [] l in
   if !show_version then (
     Format.printf "%s @.(with%s Tk interface)@."

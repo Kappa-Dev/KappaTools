@@ -188,7 +188,7 @@ and recovery = parse
 
   let model lex = aux_model [] lex
 
-  let compile logger ~rules_in_ws ~removed_rules compil fic =
+  let compile logger ~all_rules_in_ws ~rules_in_ws ~removed_rules compil fic =
     let d = open_in fic in
     let lexbuf = Lexing.from_channel d in
     let () = lexbuf.Lexing.lex_curr_p <-
@@ -203,5 +203,5 @@ and recovery = parse
         let () = Pp.error Format.pp_print_string (msg,pos) in
         exit 3 in
     let () = close_in d in
-    Cst.append_to_ast_compil out ~rules_in_ws ~removed_rules compil
+    Cst.append_to_ast_compil out ~all_rules_in_ws ~rules_in_ws ~removed_rules compil
 }

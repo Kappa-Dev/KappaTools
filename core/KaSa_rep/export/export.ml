@@ -232,8 +232,12 @@ functor
         let rules_to_remove =
           Remanent_parameters.get_rules_to_remove parameters
         in
+        let current_chapter_files =
+          Remanent_parameters.get_current_chapter parameters
+        in
         let () = cli.Run_cli_args.syntaxVersion <- syntax_version in
         let () = cli.Run_cli_args.inputKappaFileNames <- files in
+        let () = cli.Run_cli_args.currentChapter <- current_chapter_files in
         let () =
           cli.Run_cli_args.rules_in_working_set <- rules_in_working_set
         in
@@ -278,6 +282,9 @@ functor
       let parameters = get_parameters state in
       let syntax_version = Remanent_parameters.get_syntax_version parameters in
       let removed_rules = Remanent_parameters.get_rules_to_remove parameters in
+      let current_chapter =
+        Remanent_parameters.get_current_chapter parameters
+      in
       let rules_in_ws =
         Remanent_parameters.get_rules_in_working_set parameters
       in
@@ -286,8 +293,8 @@ functor
         | Remanent_state.Compil compil -> compil
         | Remanent_state.Files files ->
           let () = show_title state in
-          Cli_init.get_ast_from_list_of_files ~rules_in_ws ~removed_rules
-            syntax_version files
+          Cli_init.get_ast_from_list_of_files ~current_chapter ~rules_in_ws
+            ~removed_rules syntax_version files
       in
       let state = Remanent_state.set_compilation compil state in
       state, compil

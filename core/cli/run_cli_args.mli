@@ -1,5 +1,6 @@
 type t = {
   mutable inputKappaFileNames: string list;
+  mutable currentChapter: string list;
   mutable minValue: float option;
   mutable maxValue: float option;
   mutable plotPeriod: float option;

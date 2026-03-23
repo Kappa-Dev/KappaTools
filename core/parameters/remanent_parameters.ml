@@ -389,6 +389,7 @@ let get_parameters ?(html_mode = true) ~called_from () =
   in
   let rules_to_remove = !Config.rules_to_remove in
   let rules_in_working_set = !Config.rules_in_working_set in
+  let current_chapter = !Config.current_chapter in
   {
     Remanent_parameters_sig.marshalisable_parameters =
       {
@@ -456,6 +457,7 @@ let get_parameters ?(html_mode = true) ~called_from () =
         Remanent_parameters_sig.empty_hashtbl_size = 1;
         Remanent_parameters_sig.rules_to_remove;
         Remanent_parameters_sig.rules_in_working_set;
+        Remanent_parameters_sig.current_chapter;
         Remanent_parameters_sig.backdoors = fetch_backdoors ();
       };
     Remanent_parameters_sig.save_error_list = (fun _ -> ());
@@ -727,6 +729,9 @@ let get_empty_hashtbl_size_1 marshalisable =
 let get_rules_to_remove_1 marshalisable =
   marshalisable.Remanent_parameters_sig.rules_to_remove
 
+let get_current_chapter_1 marshalisable =
+  marshalisable.Remanent_parameters_sig.current_chapter
+
 let get_rules_in_working_set_1 marshalisable =
   marshalisable.Remanent_parameters_sig.rules_in_working_set
 
@@ -909,6 +914,7 @@ let get_empty_hashtbl_size = upgrade_from_marshal_field get_empty_hashtbl_size_1
 let get_rules_in_working_set =
   upgrade_from_marshal_field get_rules_in_working_set_1
 
+let get_current_chapter = upgrade_from_marshal_field get_current_chapter_1
 let get_rules_to_remove = upgrade_from_marshal_field get_rules_to_remove_1
 let upgrade_from_influence_map_field f = compose f get_influence_map
 let upgrade_from_contact_map_field f = compose f get_contact_map

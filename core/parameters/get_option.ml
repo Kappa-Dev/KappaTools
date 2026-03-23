@@ -496,13 +496,18 @@ let options =
         Hidden );
       ( "--rules-in-working-set",
         Int_list Config.rules_in_working_set,
-        "Comma-separated list of rule indexes that should be added in the \
+        "comma-separated list of rule indexes that should be added in the \
          working set",
+        [],
+        Hidden );
+      ( "--current-chapter",
+        String_list Config.current_chapter,
+        "list of files whose rules are all added to the working set",
         [],
         Hidden );
       ( "--remove-rules",
         Int_list Config.rules_to_remove,
-        "Comma-separated list of rule indexes that should be removed from the \
+        "comma-separated list of rule indexes that should be removed from the \
          model",
         [],
         Hidden );

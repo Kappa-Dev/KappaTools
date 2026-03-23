@@ -57,11 +57,11 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
       let compil =
         match syntax_version with
         | Ast.V4 ->
-          Klexer4.compile Format.std_formatter Ast.empty_compil ~rules_in_ws
-            ~removed_rules file
+          Klexer4.compile Format.std_formatter Ast.empty_compil
+            ~all_rules_in_ws:false ~rules_in_ws ~removed_rules file
         | Ast.V3 ->
-          KappaLexer.compile Format.std_formatter Ast.empty_compil ~rules_in_ws
-            ~removed_rules file
+          KappaLexer.compile Format.std_formatter Ast.empty_compil
+            ~all_rules_in_ws:false ~rules_in_ws ~removed_rules file
       in
       let conf, _, _, _ = Configuration.parse compil.Ast.configurations in
       ( Some
@@ -83,18 +83,25 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
     overwrite_t0;
   }
 
-let get_ast_from_list_of_files ~rules_in_ws ~removed_rules syntax_version
-    file_list =
-  let compiling_function =
+let get_ast_from_list_of_files ~current_chapter ~rules_in_ws ~removed_rules
+    syntax_version file_list =
+  let compiling_function all_rules_in_ws =
     match syntax_version with
-    | Ast.V4 -> Klexer4.compile Format.std_formatter ~rules_in_ws ~removed_rules
+    | Ast.V4 ->
+      Klexer4.compile Format.std_formatter ~all_rules_in_ws ~rules_in_ws
+        ~removed_rules
     | Ast.V3 ->
-      KappaLexer.compile Format.std_formatter ~rules_in_ws ~removed_rules
+      KappaLexer.compile Format.std_formatter ~all_rules_in_ws ~rules_in_ws
+        ~removed_rules
   in
-  List.fold_left compiling_function Ast.empty_compil file_list
+  let compil =
+    List.fold_left (compiling_function false) Ast.empty_compil file_list
+  in
+  List.fold_left (compiling_function true) compil current_chapter
 
 let get_ast_from_cli_args cli_args =
   get_ast_from_list_of_files
+    ~current_chapter:cli_args.Run_cli_args.currentChapter
     ~rules_in_ws:cli_args.Run_cli_args.rules_in_working_set
     ~removed_rules:cli_args.Run_cli_args.rules_to_remove
     cli_args.Run_cli_args.syntaxVersion
@@ -111,6 +118,7 @@ let get_preprocessed_ast_from_cli_args ~warning ~debug_mode
         Ast.rule )
       Ast.compil =
     get_ast_from_list_of_files
+      ~current_chapter:cli_args.Run_cli_args.currentChapter
       ~rules_in_ws:cli_args.Run_cli_args.rules_in_working_set
       ~removed_rules:cli_args.Run_cli_args.rules_to_remove
       cli_args.Run_cli_args.syntaxVersion
@@ -194,6 +202,7 @@ let get_pack_from_marshalizedfile ~warning kasim_args cli_args marshalized_file
     | Some file ->
       let compil =
         get_ast_from_list_of_files
+          ~current_chapter:cli_args.Run_cli_args.currentChapter
           ~rules_in_ws:cli_args.Run_cli_args.rules_in_working_set
           ~removed_rules:cli_args.Run_cli_args.rules_to_remove
           cli_args.Run_cli_args.syntaxVersion [ file ]

@@ -42,6 +42,7 @@ val get_compilation :
   compilation_result
 
 val get_ast_from_list_of_files :
+  current_chapter:string list ->
   rules_in_ws:int list ->
   removed_rules:int list ->
   Ast.syntax_version ->
