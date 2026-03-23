@@ -2101,6 +2101,9 @@ functor
     let toggle_working_set_boolean_parameters_in_compilation error bool state
         working_set_indexes =
       let parameters = Remanent_state.get_parameters state in
+      let log = Remanent_parameters.get_logger  parameters  in 
+      let () = Loggers.fprintf log "toogle_working_set_boolean_parameters_in_compilation" in 
+      let () = Loggers.print_newline log in 
       match Remanent_state.get_compilation state with
       | None ->
         let error, () =
@@ -2112,6 +2115,9 @@ functor
         (match Remanent_state.get_c_compil state with
         | None -> error, state, false
         | Some c_compil ->
+          let () = Loggers.fprintf log "c_compil" in 
+           let () = Loggers.print_newline log in 
+     
           let rec toggle_parameters = function
             | [] ->
               ( error,
@@ -2119,14 +2125,26 @@ functor
                 c_compil.Cckappa_sig.working_set_valuations,
                 false )
             | working_set_index :: indexes ->
+                let () = Loggers.fprintf log "RULE %i" (Ckappa_sig.int_of_working_set_index working_set_index) in 
+               let () = Loggers.print_newline log in 
+     
               let error, working_set_values, working_set_valuations, changed =
                 toggle_parameters indexes
               in
               let guard_int =
                 Ckappa_sig.int_of_working_set_index working_set_index
               in
+              let () = 
+                Mods.IntMap.iter (fun a _ -> 
+                  Loggers.fprintf log "WS %i" a 
+                  ) working_set_values 
+              in 
+                let () = Loggers.print_newline log in 
+              
               (match Mods.IntMap.find_option guard_int working_set_values with
               | None ->
+                let () = Loggers.fprintf log "NO RULE" in 
+                let () = Loggers.print_newline log in 
                 let error, () =
                   Exception.warn parameters error __POS__
                     ~message:
@@ -2138,8 +2156,12 @@ functor
                 error, working_set_values, working_set_valuations, false
               | Some old_bool ->
                 if old_bool = bool then
+                  let () = Loggers.fprintf log "SAME BOOL STATE" in 
+                  let () = Loggers.print_newline log in 
                   error, working_set_values, working_set_valuations, changed
                 else (
+                   let () = Loggers.fprintf log "DIFFERENT STATE" in 
+                  let () = Loggers.print_newline log in 
                   let working_set_values =
                     Mods.IntMap.add guard_int bool working_set_values
                   in
@@ -2185,11 +2207,14 @@ functor
 
     let enable_or_disable_rule bool working_set_indexes state =
       let error = Remanent_state.get_errors state in
+       let parameters = Remanent_state.get_parameters state in
       let error, state, changed =
         toggle_working_set_boolean_parameters_in_compilation error bool state
-          working_set_indexes
-      in
+          working_set_indexes in 
+       let log = Remanent_parameters.get_logger parameters in
       if changed then (
+        let () = List.iter (fun i -> Loggers.fprintf log "REMOVE %i TRUE " (Ckappa_sig.int_of_working_set_index i) )  working_set_indexes in
+      let () = Loggers.print_newline log in 
         let state, (static, dynamic) = get_reachability_analysis state in
         match Remanent_state.get_c_compil state with
         | Some c_compil ->
@@ -2206,6 +2231,9 @@ functor
           Remanent_state.set_errors error state
         | None -> Remanent_state.set_errors error state
       ) else
+          let () = List.iter (fun i -> Loggers.fprintf log "REMOVE %i FALSE " (Ckappa_sig.int_of_working_set_index i) )  working_set_indexes in
+          let () = Loggers.print_newline log in 
+      
         Remanent_state.set_errors error state
 
     let ws_id_from_rule_name rule_name state =
@@ -2264,6 +2292,32 @@ functor
       enable_or_disable_rule false
         (List.map Ckappa_sig.working_set_index_of_int index)
 
+ let working_set_id_of_rule_id i state = 
+      let parameters = get_parameters state in 
+      let errors = get_errors state in 
+      let state, c_compil = get_c_compilation state in 
+      let rules = c_compil.Cckappa_sig.rules in 
+      let errors, rule = Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters errors i rules in 
+      let id_opt = 
+        match rule with 
+        | None -> None 
+        | Some r -> r.Cckappa_sig.e_rule_working_set_id 
+      in 
+      let state = set_errors errors state in 
+      state, id_opt  
+
+    let disable_rule_c_id_list list state = 
+      let state, l = 
+        List.fold_left 
+        (fun (state, l) index -> 
+          let state, id_opt =      working_set_id_of_rule_id index state 
+          in 
+        match id_opt with 
+        | None -> state, l 
+        | Some i -> state, i::l) 
+        (state, [])  (List.rev list) in 
+        enable_or_disable_rule false l state 
+
   (* Incremental analysis *)
     let summarize_from_ast state = 
       let parameters = get_parameters state in 
@@ -2315,6 +2369,7 @@ functor
       state (* TO DO *)
     let modify_pos_of_rules _f state = state (* TO DO *)
 
+   
     let patch ?debug ~called_from ~patch_file_name ~old_file_name state = 
        let parameters = get_parameters state in 
        let state, summary_ast = summarize_from_ast state in 
@@ -2338,6 +2393,7 @@ functor
        in 
        let state = set_errors errors state in 
        let state = rename_pos (Diff.renaming_of_diff diff) state in 
+       let state = disable_rule_index diff.Diff.diff_rules.removed_elt state in 
        let state = 
         match debug 
         with 
@@ -2355,7 +2411,9 @@ functor
            let () = Loggers.print_newline log in 
            let state = dump_summary summary_ast' state in 
            let errors = Diff.dump_diff parameters errors diff in 
+           let () =  Loggers.print_newline log in 
            set_errors errors state  
         in state         
  
+   
   end

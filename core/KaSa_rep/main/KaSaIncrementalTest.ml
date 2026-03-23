@@ -90,6 +90,7 @@ let main () =
   let state = 
       Export_to_KaSa.patch ~debug:true ~patch_file_name:"essai_diff.ka" ~old_file_name:"essai.ka" state 
   in 
+  let state = KaSaUtil.print_analysis_result start_time state in
   let rec loop state =
     let log = Remanent_parameters.get_logger parameters in
     Loggers.fprintf log "> ";

@@ -148,7 +148,6 @@ module type Type = sig
   
   val rename_pos: state Loc.rename_pos
   val update_file: string -> state -> state 
-
   val modify_pos_of_rules: (int -> Loc.position option) -> state -> state 
   val modify_pos_of_init_states: (int -> Loc.position option) -> state -> state 
   val add_rule: Ast.rule Ast.compil_rule -> state -> state 
@@ -159,6 +158,8 @@ module type Type = sig
            patch_file_name:string ->
            old_file_name:string ->
            state -> state
+
+ 
 end
 
 module Export : functor (Reachability : Analyzer.Analyzer) -> Type

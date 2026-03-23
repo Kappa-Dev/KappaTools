@@ -20,8 +20,6 @@ type diff =
    {
     summary_rule_map =  Mods.StringMap.empty; 
     summary_init_state_map = Mods.StringMap.empty;   
-  (*  summary_rule_set = Mods.StringSet.empty ; 
-    summary_init_state_set = Mods.StringSet.empty ;*)
     } 
  
 let get_file _parameters errors ~filename summary = 
@@ -66,15 +64,8 @@ let dump_summary parameters _error summary =
          ())
       summary
       in () 
-(*let string_of_rule rule = *)  
-   (*let buffer = Buffer.create 0 in
-   let fmt_buffer = Format.formatter_of_buffer buffer in
-   let logger = Loggers.open_logger_from_formatter fmt_buffer in 
-   let parameter = Remanent_parameters.set_logger parameter logger in 
-   let () = Ast.print_ast_rule fmt_buffer rule in 
-   Buffer.contents buffer *)
 
-let summarize_gen get_file_name get_string get_map set_map (*get_set set_set*) parameters error id  elt summary = 
+let summarize_gen get_file_name get_string get_map set_map parameters error id  elt summary = 
   let _ = parameters in 
   let file_name = get_file_name elt in 
   let summary_file = 
@@ -88,9 +79,6 @@ let summarize_gen get_file_name get_string get_map set_map (*get_set set_set*) p
    let map = get_map summary_file in 
    let map = Mods.StringMap.add string (id, elt) map in 
    let summary_file = set_map map summary_file in 
-   (*let set = get_set summary_file in 
-   let set = Mods.StringSet.add string set in 
-   let summary_file = set_set set summary_file in *)
    error, Mods.StringMap.add file_name summary_file summary 
 
 let summarize_rule_from_ast parameters error id (rule:Ast.rule Ast.compil_rule) summary = 
@@ -105,8 +93,6 @@ let summarize_rule_from_ast parameters error id (rule:Ast.rule Ast.compil_rule) 
     let () = Ast.print_ast_rule fmt ast_rule in 
     let () = Format.pp_print_flush fmt () in 
     let string = Buffer.contents b in 
-    (* if it does not work, get the ast and use 
-      Ast.print_ast_rule *)
     let label = 
       let (_,label_opt,_,_) = rule in 
       match label_opt with 
@@ -119,8 +105,6 @@ let summarize_rule_from_ast parameters error id (rule:Ast.rule Ast.compil_rule) 
       get_file_name get_string 
       (fun x -> x.summary_rule_map) 
       (fun summary_rule_map x -> {x with summary_rule_map})
-   (*   (fun x -> x.summary_rule_set) 
-      (fun summary_rule_set x -> {x with summary_rule_set})*)
       parameters error id rule summary
 
 let summarize_init_state_from_ast parameters error id (init_state:(Ast.mixture,Ast.mixture,string) Ast.init_statement) summary = 
@@ -153,9 +137,8 @@ let summarize_init_state_from_ast parameters error id (init_state:(Ast.mixture,A
       get_file_name get_string 
       (fun x -> x.summary_init_state_map) 
       (fun summary_init_state_map x -> {x with summary_init_state_map})
-     (* (fun x -> x.summary_init_state_set) 
-      (fun summary_init_state_set x -> {x with summary_init_state_set})*)
       parameters error id init_state summary
+
 let summarize_from_ast parameters error compil = 
   let error, summary = error, Mods.StringMap.empty in 
   let error, _, summary = 
@@ -164,7 +147,7 @@ let summarize_from_ast parameters error compil =
          let error, summary = 
           summarize_rule_from_ast parameters error id rule summary in 
           error, id+1, summary)
-    (error, 0, summary)        
+    (error, 1, summary)        
     (List.rev compil.Ast.rules) 
   in   
   let error, _, summary = 
@@ -179,7 +162,7 @@ let summarize_from_ast parameters error compil =
               summarize_init_state_from_ast parameters error id init_statement summary 
             in 
             error, id+1, summary)
-        (error, 0, summary)        
+        (error, 1, summary)        
         ( List.rev compil.Ast.init) 
   in   
   error, summary  
@@ -205,8 +188,6 @@ let summarize_rule_from_ckappa parameters error id (rule:Ckappa_sig.enriched_rul
       get_file_name get_string 
       (fun x -> x.summary_rule_map) 
       (fun summary_rule_map x -> {x with summary_rule_map})
-    (*  (fun x -> x.summary_rule_set) 
-      (fun summary_rule_set x -> {x with summary_rule_set})*)
       parameters error id rule summary
 
 let summarize_init_state_from_ckappa parameters error id (init_state:Ckappa_sig.enriched_init) summary = 
@@ -229,9 +210,8 @@ let summarize_init_state_from_ckappa parameters error id (init_state:Ckappa_sig.
       get_file_name get_string 
       (fun x -> x.summary_init_state_map) 
       (fun summary_init_state_map x -> {x with summary_init_state_map})
-     (* (fun x -> x.summary_init_state_set) 
-      (fun summary_init_state_set x -> {x with summary_init_state_set})*)
       parameters error id init_state summary
+
 let summarize_from_ckappa parameters error (compil:Ckappa_sig.c_compil) = 
   let error, summary = error, Mods.StringMap.empty in 
   let error, summary = 
@@ -279,8 +259,6 @@ let summarize_rule_from_cckappa parameters error id (rule:Cckappa_sig.enriched_r
       get_file_name get_string 
       (fun x -> x.summary_rule_map) 
       (fun summary_rule_map x -> {x with summary_rule_map})
-    (*  (fun x -> x.summary_rule_set) 
-      (fun summary_rule_set x -> {x with summary_rule_set})*)
       parameters error id rule summary
 
 let summarize_init_state_from_cckappa parameters error id (init_state:Cckappa_sig.enriched_init) summary = 
@@ -304,9 +282,8 @@ let summarize_init_state_from_cckappa parameters error id (init_state:Cckappa_si
       get_file_name get_string 
       (fun x -> x.summary_init_state_map) 
       (fun summary_init_state_map x -> {x with summary_init_state_map})
-      (*(fun x -> x.summary_init_state_set) 
-      (fun summary_init_state_set x -> {x with summary_init_state_set})*)
       parameters error id init_state summary
+
 let summarize_from_cckappa parameters error (compil:Cckappa_sig.compil) = 
   let error, summary = error, Mods.StringMap.empty in 
   let error, summary = 
@@ -339,7 +316,7 @@ let summarize_from_cckappa parameters error (compil:Cckappa_sig.compil) =
  let diff_gen diff_pos get_id get_obj get_map parameters errors ~before  ~after = 
   let map_before = get_map before in 
   let map_after = get_map after in 
- let errors, (created_list, removed_list, pos_renaming) = 
+ let errors, (removed_list, created_list, pos_renaming) = 
     Mods.StringMap.monadic_fold2
      parameters errors 
       (fun _parameters errors _ elt elt' (removed_list, added_list, pos_diff) -> 
@@ -401,62 +378,62 @@ let is_new_init_state parameters errors summary ~filename ~init_state =
 
 
 let dump_diff parameters errors (diff:diff) = 
-   let logger = Remanent_parameters.get_logger parameters in 
-  let () = Loggers.fprintf logger "     DIFF" in 
-        let () = Loggers.fprintf logger "         REMOVED: " in 
-        let () = Loggers.print_newline logger in 
-        let () = Loggers.fprintf logger "             Rules:" in 
-        let () = Loggers.print_newline logger in 
-        let () = 
-          List.iter
-            (fun i -> 
-              let () = Loggers.fprintf logger "                %i" i in 
-              let () = Loggers.print_newline logger in ())
-            diff.diff_rules.removed_elt 
-        in 
-        let () = Loggers.print_newline logger in 
-        let () = Loggers.fprintf logger "             Init:" in 
-        let () = Loggers.print_newline logger in 
-        let () = 
-          List.iter 
-            (fun i -> 
-              let () = Loggers.fprintf logger "                %i" i in 
-              let () = Loggers.print_newline logger in ())
-            diff.diff_init.removed_elt 
-        in 
-        let () = Loggers.print_newline logger in 
-         let () = Loggers.print_newline logger in   
-         let () = Loggers.fprintf logger "         NEW: " in 
-        let () = Loggers.print_newline logger in 
-        let () = Loggers.fprintf logger "             Rules:" in 
-        let () = Loggers.print_newline logger in 
-        let () = 
-          List.iter
-            (fun i -> 
-              let () = Loggers.fprintf logger "                %i" i in 
-              let () = Loggers.print_newline logger in ())
+    let logger = Remanent_parameters.get_logger parameters in 
+    let () = Loggers.fprintf logger "     DIFF" in 
+    let () = Loggers.fprintf logger "         REMOVED: " in 
+    let () = Loggers.print_newline logger in 
+    let () = Loggers.fprintf logger "             Rules:" in 
+    let () = Loggers.print_newline logger in 
+    let () = 
+      List.iter
+        (fun i -> 
+          let () = Loggers.fprintf logger "                %i" i 
+          in 
+          let () = Loggers.print_newline logger in ())
+        diff.diff_rules.removed_elt 
+    in 
+    let () = Loggers.print_newline logger in 
+    let () = Loggers.fprintf logger "             Init:" in 
+    let () = Loggers.print_newline logger in 
+    let () = 
+       List.iter 
+         (fun i -> 
+            let () = Loggers.fprintf logger "                %i" i in 
+            let () = Loggers.print_newline logger in ())
+         diff.diff_init.removed_elt 
+    in 
+    let () = Loggers.print_newline logger in 
+    let () = Loggers.print_newline logger in   
+    let () = Loggers.fprintf logger "         NEW: " in 
+    let () = Loggers.print_newline logger in 
+    let () = Loggers.fprintf logger "             Rules:" in 
+    let () = Loggers.print_newline logger in 
+    let () = 
+      List.iter
+        (fun i -> 
+          let () = Loggers.fprintf logger "                %i" i in 
+          let () = Loggers.print_newline logger in ())
             diff.diff_rules.new_elt 
-        in 
-        let () = Loggers.print_newline logger in 
-        let () = Loggers.fprintf logger "             Init:" in 
-        let () = Loggers.print_newline logger in 
-        let () = 
-          List.iter 
-            (fun i -> 
-              let () = Loggers.fprintf logger "                %i" i in 
-              let () = Loggers.print_newline logger in ())
-            diff.diff_init.new_elt 
-        in 
-        let () = Loggers.print_newline logger in 
-         let () = Loggers.print_newline logger in  
-          let () = Loggers.fprintf logger "         POS renaming : "  in 
-        let () = Loggers.print_newline logger in 
-        let () = 
-          List.iter
-            (fun (pos,pos') -> 
-              let () = Loggers.fprintf logger "                %s -> %s" 
-            (Loc.to_string pos) (Loc.to_string pos') in 
-              let () = Loggers.print_newline logger in ())
-            diff.diff_rules.pos_renaming
-        in 
-        errors 
+    in 
+    let () = Loggers.print_newline logger in 
+    let () = Loggers.fprintf logger "             Init:" in 
+    let () = Loggers.print_newline logger in 
+    let () = 
+      List.iter 
+        (fun i -> 
+          let () = Loggers.fprintf logger "                %i" i in 
+          let () = Loggers.print_newline logger in ())
+        diff.diff_init.new_elt 
+    in 
+    let () = Loggers.print_newline logger in 
+    let () = Loggers.print_newline logger in  
+    let () = Loggers.fprintf logger "         POS renaming : "  in 
+    let () = Loggers.print_newline logger in 
+    let () = 
+      List.iter
+        (fun (pos,pos') -> 
+          let () = Loggers.fprintf logger "                %s -> %s" (Loc.to_string pos) (Loc.to_string pos') in 
+          let () = Loggers.print_newline logger in ())
+        diff.diff_rules.pos_renaming
+    in 
+    errors 

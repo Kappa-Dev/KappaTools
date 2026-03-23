@@ -202,5 +202,6 @@ functor
     let  add_init = add_init 
     
     let patch = patch ~called_from:Remanent_parameters_sig.KaSa
-      
+     
+    let update_file = update_file 
   end
