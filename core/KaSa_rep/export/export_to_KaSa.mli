@@ -31,7 +31,7 @@ module type Type = sig
   type ode_flow
   type ctmc_flow
 
-  val init : unit -> state
+  val init : ?files:(string list) -> unit -> state
   val set_errors : errors -> state -> state
   val set_parameters : parameters -> state -> state
   val get_parameters : state -> parameters
@@ -146,7 +146,7 @@ module type Type = sig
 
   val dump_summary: ('a,'b) Diff.summary -> state -> state 
   
-
+  val rename_pos: state Loc.rename_pos
   val update_file: string -> state -> state 
 
   val modify_pos_of_rules: (int -> Loc.position option) -> state -> state 

@@ -17,6 +17,7 @@ module type Type = sig
 
   val init :
     ?compil:Ast.parsing_compil ->
+    ?files:string list ->
     called_from:Remanent_parameters_sig.called_from ->
     unit ->
     state

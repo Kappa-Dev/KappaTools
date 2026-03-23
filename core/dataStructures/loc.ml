@@ -211,8 +211,9 @@ type ('parameters,'errors,'a) rename_pos_with_errors = 'parameters -> 'errors ->
 
 let rename_loc rename pos = 
    match rename pos with 
-    | None -> pos 
+    | None ->  pos 
     | Some pos -> pos
+
 let rename_pos rename_pos rename (elt,pos) = 
   (rename_pos rename elt,rename_loc rename pos) 
 
@@ -267,7 +268,7 @@ let diff_pos_empty = []
 let diff_pos loc loc' l = 
   if loc == loc' || loc = loc' 
   then l 
-   else (loc,loc')::l 
+  else (loc,loc')::l 
 
 
 let diff_pos_flat _ _ l = l 

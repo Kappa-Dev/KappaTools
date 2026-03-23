@@ -68,7 +68,7 @@ functor
     (******************************************************************)
     (*operations of module signatures*)
 
-    let init ?compil ~called_from () =
+    let init ?compil ?files ~called_from () =
       match compil with
       | Some compil ->
         let parameters = Remanent_parameters.get_parameters ~called_from () in
@@ -81,7 +81,12 @@ functor
         | Remanent_parameters_sig.Internalised | Remanent_parameters_sig.Server
         | Remanent_parameters_sig.KaSim | Remanent_parameters_sig.KaSa ->
           let errors = Exception.empty_exceptions_caught_and_uncaught in
-          let errors, parameters, files = Get_option.get_option errors in
+          let errors, parameters, files = 
+            match files with 
+            | None -> Get_option.get_option errors 
+            | Some x -> let (a,b,_) = Get_option.get_option errors 
+        in (a,b,x) 
+          in
           let log = Remanent_parameters.get_logger parameters in
           let _ =
             Loggers.fprintf log "%s"
@@ -2270,19 +2275,25 @@ functor
       let state = set_errors error state in 
       state, sum *)
 
-   let summarize_from_cckappa state = 
+   (*let summarize_from_cckappa state = 
       let parameters = get_parameters state in 
       let errors = get_errors state in 
       let state, compil = get_c_compilation state in 
       let error, sum = Diff.summarize_from_cckappa parameters errors compil in 
       let state = set_errors error state in 
-      state, sum 
+      state, sum *)
 
     let dump_summary summary state = 
       let parameters = get_parameters state in 
       let errors = get_errors state in  
       let () = Diff.dump_summary parameters errors summary in 
       let state = set_errors errors state in 
+      state 
+
+    let rename_pos rename state = 
+      let state = Remanent_state.rename_pos 
+                                (fun _ e _ a -> e,a) 
+                                (fun _ e _ a -> e,a) rename state  in 
       state 
 
     let  add_rule _rule state = state 

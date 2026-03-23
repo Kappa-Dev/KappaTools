@@ -802,7 +802,8 @@ let _gen_opt set get update f y =
 let gen set get update f y = 
    match get y with 
   | None -> y 
-  | Some x -> set (update f x) y
+  | Some x -> 
+    set (update f x) y
   
 let _gen_error set get update parameters error f y = 
     let error, x' = update parameters error f (get y) in 

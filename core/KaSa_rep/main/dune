@@ -115,12 +115,14 @@
 
 (executable
  (name KaSaIncrementalTest)
- (libraries num yojson str kappa_staticanalyses kappa_kasa_frontend)
+ (libraries num yojson str kappa_data_structures kappa_staticanalyses kappa_kasa_frontend)
  (modules KaSaIncrementalTest)
  (public_name KaSaIncrementalTest)
  (package kappa-binaries)
  (flags
   (:standard
+   -open 
+   Kappa_data_structures
    -open
    Kappa_logging
    -open

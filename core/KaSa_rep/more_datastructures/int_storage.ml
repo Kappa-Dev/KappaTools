@@ -366,8 +366,8 @@ module Int_storage_imperatif :
    let rename_pos rename_pos_elt
                     parameters
                     errors rename t = 
-      let errors, dim = dimension parameters errors t in 
-      let errors, t = expand_and_copy parameters errors t dim in
+      (*let errors, dim = dimension parameters errors t in *)
+     (* let errors, t = expand_and_copy parameters errors t dim in*)
       let errors, t = 
         fold 
           parameters errors 
