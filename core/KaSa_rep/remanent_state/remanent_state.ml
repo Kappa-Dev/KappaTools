@@ -895,3 +895,6 @@ let rename_pos rename_static rename_dynamic rename state =
   let state = gen set_constraint_list get_constraint_list rename_pos_constraint_list rename state in 
   let state = gen set_separating_transitions get_separating_transitions Public_data.rename_pos_separating_transitions rename state in 
   set_errors errors state 
+
+
+  

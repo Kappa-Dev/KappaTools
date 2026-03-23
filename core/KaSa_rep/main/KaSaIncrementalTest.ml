@@ -103,7 +103,18 @@ let main () =
   let () =  Loggers.print_newline log in 
   let () = Loggers.print_newline log in 
   let () = Loggers.print_newline log in 
-   let state = Export_to_KaSa.dump_summary summary_ast' state in 
+  let state = Export_to_KaSa.dump_summary summary_ast' state in 
+  let errors, summary_file = Diff.get_file ~filename:"essai.ka" parameters errors summary_ast' in 
+  let errors, diff = 
+    Diff.diff 
+       (Ast.diff_pos_parsing_compil_rule Ast.diff_pos_rule) 
+        (Ast.diff_pos_init_statement Ast.diff_pos_mixture Ast.diff_pos_mixture Loc.diff_pos_flat)
+        parameters errors 
+      ~filename:"essai.ka" ~before:summary_ast 
+      ~after:summary_file
+  in 
+  let _errors = Diff.dump_diff parameters errors diff in 
+  let state = Export_to_KaSa.rename_pos (Diff.renaming_of_diff diff) state in 
   let rec loop state =
     let log = Remanent_parameters.get_logger parameters in
     Loggers.fprintf log "> ";

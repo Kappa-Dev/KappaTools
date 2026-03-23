@@ -63,3 +63,10 @@ val diff:
 val dump_diff: Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   diff -> Exception_without_parameter.exceptions_caught_and_uncaught
+
+val get_file: Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught -> filename:string ->
+  ('rule,'init) summary -> 
+    Exception_without_parameter.exceptions_caught_and_uncaught * ('rule,'init) summary_file 
+
+val renaming_of_diff: diff -> (Loc.t -> Loc.t option) 

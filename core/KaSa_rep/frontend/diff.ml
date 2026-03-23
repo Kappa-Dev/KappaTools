@@ -8,6 +8,7 @@ type ('rule,'init) summary_file =
 
 type ('a, 'b) summary = ('a,'b) summary_file Mods.StringMap.t 
 
+
 type diff_elt = {new_elt: int list; removed_elt: int list ; pos_renaming: (Loc.t * Loc.t) list}
 type diff = 
  {
@@ -23,6 +24,16 @@ type diff =
     summary_init_state_set = Mods.StringSet.empty ;*)
     } 
  
+let get_file _parameters errors ~filename summary = 
+  match 
+    Mods.StringMap.find_option filename summary
+  with  
+    | None -> errors, empty_summary_file 
+    | Some x -> errors, x 
+
+let renaming_of_diff diff = 
+Loc.fun_of_list (diff.diff_rules.pos_renaming @ diff.diff_init.pos_renaming)
+
 let dump_summary parameters _error summary = 
   let logger = Remanent_parameters.get_logger parameters in 
   let () = Loggers.fprintf logger "     RULE_MAP" in 
