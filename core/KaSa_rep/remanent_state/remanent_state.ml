@@ -741,8 +741,7 @@ let get_working_set_rules state =
               Public_data.rule_ws_position = loc;
               Public_data.rule_ws_enabled = enabled;
             })
-      compilation.Ast.rules
-
+      compilation.Ast.rules 
 let reset_reachability_memoized_values state =
   {
     state with
