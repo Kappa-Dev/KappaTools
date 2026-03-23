@@ -149,7 +149,7 @@ module type Type = sig
   val dump_summary: ('a,'b) Diff.summary -> state -> state 
 
   val rename_pos: state Loc.rename_pos 
-  
+
   val update_file: string -> state -> state 
 
   
@@ -158,7 +158,11 @@ module type Type = sig
   val add_rule: Ast.rule Ast.compil_rule -> state -> state 
   val add_init: (Ast.mixture, Ast.mixture, string) Ast.init_statement -> state -> state 
 
-
+  val patch: 
+           ?debug:bool ->
+           patch_file_name:string ->
+           old_file_name:string ->
+           state -> state
  end
 
 module Export =
@@ -197,4 +201,6 @@ functor
     let  add_rule = add_rule 
     let  add_init = add_init 
     
+    let patch = patch ~called_from:Remanent_parameters_sig.KaSa
+      
   end

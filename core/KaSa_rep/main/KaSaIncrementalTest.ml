@@ -87,34 +87,9 @@ let main () =
   in
   let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
   let state = KaSaUtil.print_analysis_result start_time state in
-  let state, summary_ast = Export_to_KaSa.summarize_from_ast state in 
-  let log = Remanent_parameters.get_logger parameters in
-  let () = Loggers.fprintf log "SUMMARIES" in 
-  let () =  Loggers.print_newline log in 
-  let () = Loggers.print_newline log in 
-  let () = Loggers.print_newline log in 
-  let state = Export_to_KaSa.dump_summary summary_ast state in 
-  let files = ["essai_diff.ka"] in 
-  let state' = Export_to_KaSa.init ~files () in 
-  let state',_ = Export_to_KaSa.get_c_compilation state' in 
-  let state' = Export_to_KaSa.rename_pos (fun loc -> Some {loc with Loc.file =  "essai.ka"}) state' in 
-  let _state', summary_ast' = Export_to_KaSa.summarize_from_ast state' in 
-  let () = Loggers.fprintf log "SUMMARIES (PATCH)" in 
-  let () =  Loggers.print_newline log in 
-  let () = Loggers.print_newline log in 
-  let () = Loggers.print_newline log in 
-  let state = Export_to_KaSa.dump_summary summary_ast' state in 
-  let errors, summary_file = Diff.get_file ~filename:"essai.ka" parameters errors summary_ast' in 
-  let errors, diff = 
-    Diff.diff 
-       (Ast.diff_pos_parsing_compil_rule Ast.diff_pos_rule) 
-        (Ast.diff_pos_init_statement Ast.diff_pos_mixture Ast.diff_pos_mixture Loc.diff_pos_flat)
-        parameters errors 
-      ~filename:"essai.ka" ~before:summary_ast 
-      ~after:summary_file
+  let state = 
+      Export_to_KaSa.patch ~debug:true ~patch_file_name:"essai_diff.ka" ~old_file_name:"essai.ka" state 
   in 
-  let _errors = Diff.dump_diff parameters errors diff in 
-  let state = Export_to_KaSa.rename_pos (Diff.renaming_of_diff diff) state in 
   let rec loop state =
     let log = Remanent_parameters.get_logger parameters in
     Loggers.fprintf log "> ";

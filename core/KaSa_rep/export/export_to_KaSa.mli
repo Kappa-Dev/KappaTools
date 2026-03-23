@@ -153,6 +153,12 @@ module type Type = sig
   val modify_pos_of_init_states: (int -> Loc.position option) -> state -> state 
   val add_rule: Ast.rule Ast.compil_rule -> state -> state 
   val add_init: (Ast.mixture, Ast.mixture, string) Ast.init_statement -> state -> state 
+
+
+  val patch: ?debug:bool ->
+           patch_file_name:string ->
+           old_file_name:string ->
+           state -> state
 end
 
 module Export : functor (Reachability : Analyzer.Analyzer) -> Type

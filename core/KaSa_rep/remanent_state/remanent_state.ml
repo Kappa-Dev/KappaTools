@@ -226,8 +226,6 @@ type ('static, 'dynamic) state = {
   symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
   separating_transitions: separating_transitions option;
   transition_system_length: int list option;
-  patch: Ast.parsing_compil option; 
-  patch_file_names: string list; 
 }
 
 let get_data state =
@@ -287,8 +285,6 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
     transition_system_length = None;
-    patch = None ; 
-    patch_file_names = [] ; 
   }
 
 (**************)
@@ -764,30 +760,6 @@ let reset_reachability_memoized_values state =
     signature = None;
     constraint_list = None;
   }
-
-
-let set_patch patch state = 
-  let patch = Some patch in 
-  {state with patch}
-
-let get_patch state = state.patch 
-let reset_patch state = 
-  let patch = None in 
-  {state with patch}
-
-let get_patch_file_names state = 
-  state.patch_file_names 
-
-let set_patch_file_names patch_file_names state = 
-  {state with patch_file_names}
-
-let add_patch_file_name s state = 
-  let patch_file_names = s::(get_patch_file_names state) in 
-  set_patch_file_names patch_file_names state 
-
-let reset_patch_file_names state = 
-  let patch_file_names = [] in 
-  set_patch_file_names patch_file_names state 
 
 let set_handler_opt h_opt state = 
   match h_opt with 

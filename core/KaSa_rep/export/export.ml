@@ -2307,4 +2307,48 @@ functor
       
       state (* TO DO *)
     let modify_pos_of_rules _f state = state (* TO DO *)
+
+    let patch ?debug ~called_from ~patch_file_name ~old_file_name state = 
+       let parameters = get_parameters state in 
+       let state, summary_ast = summarize_from_ast state in 
+       let files = [patch_file_name] in
+       let errors = get_errors state in 
+       let state' = init ~called_from ~files () in 
+       let state' = set_errors errors state' in 
+       let state',_ = get_compilation state' in 
+       let state' = rename_pos (fun loc -> Some {loc with Loc.file =  old_file_name }) state' in 
+       let state', summary_ast' = summarize_from_ast state' in 
+       let errors = get_errors state' in 
+       let errors, summary_file = Diff.get_file ~filename:"essai.ka" parameters errors summary_ast' in 
+       let errors, diff = 
+           Diff.diff 
+             (Ast.diff_pos_parsing_compil_rule Ast.diff_pos_rule) 
+             (Ast.diff_pos_init_statement Ast.diff_pos_mixture Ast.diff_pos_mixture Loc.diff_pos_flat)
+             parameters errors 
+            ~filename:old_file_name  
+            ~before:summary_ast 
+            ~after:summary_file
+       in 
+       let state = set_errors errors state in 
+       let state = rename_pos (Diff.renaming_of_diff diff) state in 
+       let state = 
+        match debug 
+        with 
+          | None | Some false -> state 
+          | Some true -> 
+           let log = Remanent_parameters.get_logger parameters in
+           let () = Loggers.fprintf log "SUMMARIES" in 
+           let () = Loggers.print_newline log in 
+           let () = Loggers.print_newline log in 
+           let () = Loggers.print_newline log in 
+           let state = dump_summary summary_ast state in 
+           let () = Loggers.fprintf log "SUMMARIES (PATCH)" in 
+           let () =  Loggers.print_newline log in 
+           let () = Loggers.print_newline log in 
+           let () = Loggers.print_newline log in 
+           let state = dump_summary summary_ast' state in 
+           let errors = Diff.dump_diff parameters errors diff in 
+           set_errors errors state  
+        in state         
+ 
   end
