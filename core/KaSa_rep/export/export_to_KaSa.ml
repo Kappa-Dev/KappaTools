@@ -149,12 +149,7 @@ module type Type = sig
   val dump_summary: ('a,'b) Diff.summary -> state -> state 
 
   val rename_pos: state Loc.rename_pos 
-
-  val update_file: string -> state -> state 
-
   
-  val modify_pos_of_rules: (int -> Loc.position option) -> state -> state 
-  val modify_pos_of_init_states: (int -> Loc.position option) -> state -> state 
   val add_rule: Ast.rule Ast.compil_rule -> state -> state 
   val add_init: (Ast.mixture, Ast.mixture, string) Ast.init_statement -> state -> state 
 
@@ -193,15 +188,9 @@ functor
 
     let summarize_from_ast = summarize_from_ast 
     let dump_summary = dump_summary 
-
-    let update_file = update_file 
-    
-    let modify_pos_of_rules = modify_pos_of_rules  
-    let modify_pos_of_init_states = modify_pos_of_init_states 
     let  add_rule = add_rule 
     let  add_init = add_init 
     
     let patch = patch ~called_from:Remanent_parameters_sig.KaSa
      
-    let update_file = update_file 
   end

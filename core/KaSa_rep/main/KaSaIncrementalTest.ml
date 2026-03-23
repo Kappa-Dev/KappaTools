@@ -13,6 +13,10 @@ let help_message =
   \        Enables (or disables) the rule at index <index> in the working set.\n\
   \    enable/disable <label>\n\
   \        Enables (or disables) the rule with label <label> in the working set.\n\
+  \    update file foo.ka\n\
+  \        Replace the content of the current version of foo.ka with the new one.\n\
+  \    update file foo.ka as foo'.ka\n\
+  \        Replace the content of the current verion of the file foo'.ka with the content of the file foo.ka\n\
   \    add <rule>\n\
   \        (Not implemented yet TODO) Adds a rule to the working set.\n"
 
@@ -87,10 +91,6 @@ let main () =
   in
   let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
   let state = KaSaUtil.print_analysis_result start_time state in
-  let state = 
-      Export_to_KaSa.patch ~debug:true ~patch_file_name:"essai_diff.ka" ~old_file_name:"essai.ka" state 
-  in 
-  let state = KaSaUtil.print_analysis_result start_time state in
   let rec loop state =
     let log = Remanent_parameters.get_logger parameters in
     Loggers.fprintf log "> ";
@@ -124,11 +124,24 @@ let main () =
         let error = Export_to_KaSa.get_errors state in
         let () = Exception.print parameters error in
         loop state
-      | input when String.length input > 12 && String.sub input 0 12 = "update_file " -> 
-        let state = Export_to_KaSa.update_file (String.trim (String.sub input 12 (String.length input-12))) state in 
-        
-        
-        loop state 
+      | input when String.length input > 12 && String.sub input 0 12 = "update file " -> 
+            let l = String.split_on_char ' ' input in 
+            let state = 
+              match l with 
+            | ["update";"file";patch_file_name] -> 
+                let old_file_name = patch_file_name in 
+                Export_to_KaSa.patch ~debug:true ~patch_file_name ~old_file_name state  
+            | ["update";"file";patch_file_name;"as";old_file_name]  -> 
+                Export_to_KaSa.patch ~debug:true ~patch_file_name ~old_file_name state 
+            | _ -> 
+              let error = Export_to_KaSa.get_errors state in
+              let error, () =
+                Exception.warn parameters error __POS__
+                  ~message:("Parsing error: " ^ input) Exit ()
+              in
+              Export_to_KaSa.set_errors error state
+            in 
+          loop state 
       | input ->
         let state =
           match parse_input input with

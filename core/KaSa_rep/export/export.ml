@@ -2357,17 +2357,8 @@ functor
                                 (fun _ e _ a -> e,a) rename state  in 
       state 
 
-    let  add_rule _rule state = state 
-    let  add_init _init state = state 
-
-
-
-    let update_file _file state = state (* TO DO *)  
-    
-    let modify_pos_of_init_states _f state = 
-      
-      state (* TO DO *)
-    let modify_pos_of_rules _f state = state (* TO DO *)
+    let add_rule _rule state = state 
+    let add_init _init state = state 
 
    
     let patch ?debug ~called_from ~patch_file_name ~old_file_name state = 
