@@ -4,7 +4,7 @@ let help_message =
   \        Quits the program.\n\
   \    help/h\n\
   \        Prints this help message.\n\
-  \    print rules/working set/ws\n\
+  \    print rules/print working set/print ws\n\
   \        Prints all rules (or just the working set) with the indexes of each \
    rule and an indication of which rules are enabled.\n\
   \    print result\n\
@@ -64,7 +64,6 @@ let parse_input s =
     Parsing_error ("Unknown command: " ^ s)
 
 let main () =
-  let start_time = Sys.time () in
   let errors = Exception.empty_exceptions_caught_and_uncaught in
   let _, parameters, _ = Get_option.get_option errors in
   let module A =
@@ -85,8 +84,7 @@ let main () =
     else
       state
   in
-  let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
-  let state = KaSaUtil.print_analysis_result start_time state in
+  let state = Export_to_KaSa.output_reachability_result state in
   let rec loop state =
     let log = Remanent_parameters.get_logger parameters in
     Loggers.fprintf log "> ";
@@ -101,7 +99,7 @@ let main () =
       | "help" | "h" ->
         Loggers.fprintf log "%s" help_message;
         loop state
-      | "print rules" ->
+      | "print rules" | "p rules" ->
         let state, compilation = Export_to_KaSa.get_compilation state in
         let () =
           Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
@@ -109,13 +107,13 @@ let main () =
         let error = Export_to_KaSa.get_errors state in
         let () = Exception.print parameters error in
         loop state
-      | "print working set" | "print ws" ->
+      | "print working set" | "print ws" | "p ws" ->
         let state, compilation = Export_to_KaSa.get_compilation state in
         let () = Loggers.fprintf log "%a" Ast.print_working_set compilation in
         let error = Export_to_KaSa.get_errors state in
         let () = Exception.print parameters error in
         loop state
-      | "print result" ->
+      | "print result" | "p result" | "p" ->
         let state = Export_to_KaSa.output_reachability_result state in
         let error = Export_to_KaSa.get_errors state in
         let () = Exception.print parameters error in
