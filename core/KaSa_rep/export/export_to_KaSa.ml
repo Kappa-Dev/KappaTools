@@ -155,6 +155,7 @@ module type Type = sig
 
   val patch: 
            ?debug:bool ->
+             ?do_we_show_title:bool -> 
            patch_file_name:string ->
            old_file_name:string ->
            state -> state

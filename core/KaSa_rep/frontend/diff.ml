@@ -35,6 +35,7 @@ Loc.fun_of_list (diff.diff_rules.pos_renaming @ diff.diff_init.pos_renaming)
 let dump_summary parameters _error summary = 
   let logger = Remanent_parameters.get_logger parameters in 
   let () = Loggers.fprintf logger "     RULE_MAP" in 
+  let () = Loggers.print_newline logger in    
   let () = 
     Mods.StringMap.iter
       (fun s i -> 
@@ -380,6 +381,7 @@ let is_new_init_state parameters errors summary ~filename ~init_state =
 let dump_diff parameters errors (diff:diff) = 
     let logger = Remanent_parameters.get_logger parameters in 
     let () = Loggers.fprintf logger "     DIFF" in 
+    let () = Loggers.print_newline logger in  
     let () = Loggers.fprintf logger "         REMOVED: " in 
     let () = Loggers.print_newline logger in 
     let () = Loggers.fprintf logger "             Rules:" in 

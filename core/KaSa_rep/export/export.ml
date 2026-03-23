@@ -2101,9 +2101,6 @@ functor
     let toggle_working_set_boolean_parameters_in_compilation error bool state
         working_set_indexes =
       let parameters = Remanent_state.get_parameters state in
-      let log = Remanent_parameters.get_logger  parameters  in 
-      let () = Loggers.fprintf log "toogle_working_set_boolean_parameters_in_compilation" in 
-      let () = Loggers.print_newline log in 
       match Remanent_state.get_compilation state with
       | None ->
         let error, () =
@@ -2115,9 +2112,6 @@ functor
         (match Remanent_state.get_c_compil state with
         | None -> error, state, false
         | Some c_compil ->
-          let () = Loggers.fprintf log "c_compil" in 
-           let () = Loggers.print_newline log in 
-     
           let rec toggle_parameters = function
             | [] ->
               ( error,
@@ -2125,27 +2119,15 @@ functor
                 c_compil.Cckappa_sig.working_set_valuations,
                 false )
             | working_set_index :: indexes ->
-                let () = Loggers.fprintf log "RULE %i" (Ckappa_sig.int_of_working_set_index working_set_index) in 
-               let () = Loggers.print_newline log in 
-     
               let error, working_set_values, working_set_valuations, changed =
                 toggle_parameters indexes
               in
               let guard_int =
                 Ckappa_sig.int_of_working_set_index working_set_index
               in
-              let () = 
-                Mods.IntMap.iter (fun a _ -> 
-                  Loggers.fprintf log "WS %i" a 
-                  ) working_set_values 
-              in 
-                let () = Loggers.print_newline log in 
-              
-              (match Mods.IntMap.find_option guard_int working_set_values with
+                (match Mods.IntMap.find_option guard_int working_set_values with
               | None ->
-                let () = Loggers.fprintf log "NO RULE" in 
-                let () = Loggers.print_newline log in 
-                let error, () =
+                 let error, () =
                   Exception.warn parameters error __POS__
                     ~message:
                       ("Index out of bounds: there is no rule with index "
@@ -2156,12 +2138,8 @@ functor
                 error, working_set_values, working_set_valuations, false
               | Some old_bool ->
                 if old_bool = bool then
-                  let () = Loggers.fprintf log "SAME BOOL STATE" in 
-                  let () = Loggers.print_newline log in 
                   error, working_set_values, working_set_valuations, changed
                 else (
-                   let () = Loggers.fprintf log "DIFFERENT STATE" in 
-                  let () = Loggers.print_newline log in 
                   let working_set_values =
                     Mods.IntMap.add guard_int bool working_set_values
                   in
@@ -2207,14 +2185,10 @@ functor
 
     let enable_or_disable_rule bool working_set_indexes state =
       let error = Remanent_state.get_errors state in
-       let parameters = Remanent_state.get_parameters state in
       let error, state, changed =
         toggle_working_set_boolean_parameters_in_compilation error bool state
           working_set_indexes in 
-       let log = Remanent_parameters.get_logger parameters in
       if changed then (
-        let () = List.iter (fun i -> Loggers.fprintf log "REMOVE %i TRUE " (Ckappa_sig.int_of_working_set_index i) )  working_set_indexes in
-      let () = Loggers.print_newline log in 
         let state, (static, dynamic) = get_reachability_analysis state in
         match Remanent_state.get_c_compil state with
         | Some c_compil ->
@@ -2231,10 +2205,7 @@ functor
           Remanent_state.set_errors error state
         | None -> Remanent_state.set_errors error state
       ) else
-          let () = List.iter (fun i -> Loggers.fprintf log "REMOVE %i FALSE " (Ckappa_sig.int_of_working_set_index i) )  working_set_indexes in
-          let () = Loggers.print_newline log in 
-      
-        Remanent_state.set_errors error state
+         Remanent_state.set_errors error state
 
     let ws_id_from_rule_name rule_name state =
       let error = Remanent_state.get_errors state in
@@ -2310,7 +2281,7 @@ functor
       let state, l = 
         List.fold_left 
         (fun (state, l) index -> 
-          let state, id_opt =      working_set_id_of_rule_id index state 
+          let state, id_opt = working_set_id_of_rule_id index state 
           in 
         match id_opt with 
         | None -> state, l 
@@ -2326,23 +2297,6 @@ functor
       let error, sum = Diff.summarize_from_ast parameters errors compil in 
       let state = set_errors error state in 
       state, sum 
-
-
-  (*let summarize_from_ckappa state = 
-      let parameters = get_parameters state in 
-      let errors = get_errors state in 
-      let state, (compil,_) = compute_c_compilation_handler (fun _ -> ()) state in 
-      let error, sum = Diff.summarize_from_ckappa parameters errors compil in 
-      let state = set_errors error state in 
-      state, sum *)
-
-   (*let summarize_from_cckappa state = 
-      let parameters = get_parameters state in 
-      let errors = get_errors state in 
-      let state, compil = get_c_compilation state in 
-      let error, sum = Diff.summarize_from_cckappa parameters errors compil in 
-      let state = set_errors error state in 
-      state, sum *)
 
     let dump_summary summary state = 
       let parameters = get_parameters state in 
@@ -2360,11 +2314,25 @@ functor
     let add_rule _rule state = state 
     let add_init _init state = state 
 
-   
-    let patch ?debug ~called_from ~patch_file_name ~old_file_name state = 
+    let parse_token show_title state' state = 
+      let state', refined_compil' = get_refined_compil state' in 
+      let parameters = get_parameters state in 
+      let errors = get_errors state in 
+       let () = show_title state in
+      let state, handler = get_handler state in 
+      let errors, handler = List_tokens.scan_incremental_compil parameters errors refined_compil' handler in 
+      Remanent_state.set_errors errors (Remanent_state.set_handler handler state), state'
+
+    let patch ?debug ?do_we_show_title ~called_from ~patch_file_name ~old_file_name state = 
        let parameters = get_parameters state in 
        let state, summary_ast = summarize_from_ast state in 
        let files = [patch_file_name] in
+       let do_we_show_title = 
+          match do_we_show_title
+       with 
+        | Some true -> true 
+        | Some false | None -> false 
+       in 
        let errors = get_errors state in 
        let state' = init ~called_from ~files () in 
        let state' = set_errors errors state' in 
@@ -2372,7 +2340,7 @@ functor
        let state' = rename_pos (fun loc -> Some {loc with Loc.file =  old_file_name }) state' in 
        let state', summary_ast' = summarize_from_ast state' in 
        let errors = get_errors state' in 
-       let errors, summary_file = Diff.get_file ~filename:"essai.ka" parameters errors summary_ast' in 
+       let errors, summary_file = Diff.get_file ~filename:old_file_name parameters errors summary_ast' in 
        let errors, diff = 
            Diff.diff 
              (Ast.diff_pos_parsing_compil_rule Ast.diff_pos_rule) 
@@ -2385,6 +2353,12 @@ functor
        let state = set_errors errors state in 
        let state = rename_pos (Diff.renaming_of_diff diff) state in 
        let state = disable_rule_index diff.Diff.diff_rules.removed_elt state in 
+       let state, _state' = parse_token 
+                    (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
+                    state' state in 
+       let state, handler = get_handler state in 
+       let errors = Print_handler.print_handler parameters errors handler in 
+       let state = enable_rule_index diff.Diff.diff_rules.new_elt state in 
        let state = 
         match debug 
         with 
