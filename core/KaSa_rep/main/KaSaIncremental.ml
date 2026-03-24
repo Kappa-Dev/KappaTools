@@ -148,13 +148,13 @@ let main () =
             true, Export_to_KaSa.enable_rule i state
           | Enable_index (false, i) ->
             let () =
-              Loggers.fprintf log "Disabling rules at index %s...\n"
+              Loggers.fprintf log "Disabling initial states or rules at index %s...\n"
                 (String.concat "," (List.map string_of_int (List.rev i)))
             in
             true, Export_to_KaSa.disable_rule_index i state
           | Enable_index (true, i) ->
             let () =
-              Loggers.fprintf log "Enabling rules at index %s...\n"
+              Loggers.fprintf log "Enabling initial states or rules at index %s...\n"
                 (String.concat "," (List.map string_of_int (List.rev i)))
             in
             true, Export_to_KaSa.enable_rule_index i state
