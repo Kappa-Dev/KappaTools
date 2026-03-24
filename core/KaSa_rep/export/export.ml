@@ -2365,6 +2365,9 @@ functor
        in 
        let state', compil = get_compilation state' in 
        let compil = Diff.cut diff compil in 
+       let errors, c_compil = Prepreprocess.translate_compil parameters errors compil in 
+       let errors, handler, cc_compil = 
+          Preprocess.translate_c_compil parameters errors handler c_compil in 
        let _state' = Remanent_state.set_compilation compil state' in 
        let debug_mode =
         match 
@@ -2395,6 +2398,7 @@ functor
                let () = Ast.print_parsing_compil_kappa fmt compil 
               in () 
             in   
+            let errors = Print_cckappa.print_compil parameters errors handler cc_compil in 
             set_errors errors state  
       else state 
  
