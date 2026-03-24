@@ -2363,6 +2363,9 @@ functor
           Print_handler.print_handler parameters errors handler
         else errors 
        in 
+       let state', compil = get_compilation state' in 
+       let compil = Diff.cut diff compil in 
+       let _state' = Remanent_state.set_compilation compil state' in 
        let debug_mode =
         match 
           debug
@@ -2384,7 +2387,15 @@ functor
            let state = dump_summary summary_ast' state in 
            let errors = Diff.dump_diff parameters errors diff in 
            let () =  Loggers.print_newline log in 
-           set_errors errors state  
+           let fmt = Loggers.formatter_of_logger log in 
+           let () =
+             match fmt with 
+             | None -> () 
+            | Some fmt -> 
+               let () = Ast.print_parsing_compil_kappa fmt compil 
+              in () 
+            in   
+            set_errors errors state  
       else state 
  
    

@@ -439,3 +439,18 @@ let dump_diff parameters errors (diff:diff) =
         diff.diff_rules.pos_renaming
     in 
     errors 
+
+let extract index_list list = 
+  let rec aux index_list i list acc = 
+    match index_list, list with 
+    | [], _ -> List.rev acc 
+    | h::t,a::b when h=i -> aux t (i+1) b (a::acc)
+    | _::t,_::b -> aux t (i+1) b acc 
+    | _, [] -> assert false 
+  in aux index_list 1 list []
+
+let cut diff (ast:Ast.parsing_compil) = 
+  let rules = extract diff.diff_rules.new_elt ast.Ast.rules in 
+  let init = extract diff.diff_init.new_elt ast.Ast.init in 
+  {ast with Ast.init ; Ast.rules}
+  
