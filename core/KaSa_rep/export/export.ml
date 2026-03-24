@@ -2363,7 +2363,6 @@ functor
           Print_handler.print_handler parameters errors handler
         else errors 
        in 
-       let state = enable_rule_index diff.Diff.diff_rules.new_elt state in 
        let debug_mode =
         match 
           debug
