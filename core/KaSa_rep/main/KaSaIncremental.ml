@@ -39,7 +39,7 @@ let parse_input s =
           (fun e i ->
             match e with
             | Enable_index (bool, l) ->
-              (match int_of_string_opt i with
+              (match int_of_string_opt (String.trim i) with
               | None ->
                 Parsing_error
                   ("Invalid index list: " ^ s
@@ -48,7 +48,10 @@ let parse_input s =
               | Some i -> Enable_index (bool, i :: l))
             | e -> e)
           (Enable_index (bool, []))
-          (String.split_on_char ',' s)
+          (if String.contains s ',' then
+             String.split_on_char ',' s
+           else
+             String.split_on_char ' ' s)
   in
   (* ---- ADD ---- *)
   if String.starts_with ~prefix:"add" s then (

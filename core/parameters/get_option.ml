@@ -504,7 +504,7 @@ let options =
         String_list Config.current_chapter,
         "list of files whose rules are all added to the working set",
         [],
-        Hidden );
+        Expert );
       ( "--remove-rules",
         Int_list Config.rules_to_remove,
         "comma-separated list of rule indexes that should be removed from the \
