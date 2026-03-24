@@ -843,7 +843,7 @@ an algebraic expression is expected")) }
     { let (i,v,_,_) = $3 in add (Ast.DECLARE (i,v)) }
   | OBS annoted variable_declaration { let (i,v,_,_) = $3 in add (Ast.OBS (i,v)) }
   | INIT annoted init_with_guard
-    { let (guard,alg,init) = $3 in add (Ast.INIT (guard,alg,init)) }
+    { let (guard,alg,init) = $3 in add (Ast.INIT ((guard,alg,init),false)) }
   | PERT perturbation_declaration { add (Ast.PERT ($2, rhs_pos 2)) }
   | CONFIG annoted STRING annoted value_list
     { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }

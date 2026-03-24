@@ -154,13 +154,13 @@ let summarize_from_ast parameters error compil =
   let error, _, summary = 
     List.fold_left 
       (fun (error, id, summary) 
-          (init_statement:(Ast.mixture,Ast.mixture,string) Ast.init_statement) -> 
-        let (_,_,init) = init_statement in 
+          (init_statement:int option * (Ast.mixture,Ast.mixture,string) Ast.init_statement) -> 
+        let (_,(a,b,init)) = init_statement in 
         match init with 
           | Ast.INIT_TOK _ -> (error, id+1, summary)
           | Ast.INIT_MIX _ -> 
             let error, summary = 
-              summarize_init_state_from_ast parameters error id init_statement summary 
+              summarize_init_state_from_ast parameters error id (a,b,init) summary 
             in 
             error, id+1, summary)
         (error, 1, summary)        

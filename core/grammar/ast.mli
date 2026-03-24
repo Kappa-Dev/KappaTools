@@ -136,7 +136,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) instruction =
   | SIG of 'agent_sig
   | TOKENSIG of string Loc.annoted
   | VOLSIG of string * float * string  (** type, volume, parameter *)
-  | INIT of ('pattern, 'mixture, 'id) init_statement
+  | INIT of (('pattern, 'mixture, 'id) init_statement * bool) (*init, is_in_working_set*)
   | DECLARE of ('pattern, 'id) variable_def
   | OBS of ('pattern, 'id) variable_def (*for backward compatibility*)
   | PLOT of ('pattern, 'id) Alg_expr.e Loc.annoted
@@ -176,8 +176,8 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
       *)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
       (** list of patterns to plot *)
-  init: ('pattern, 'mixture, 'id) init_statement list;
-      (** initial graph declaration *)
+  init: (int option * ('pattern, 'mixture, 'id) init_statement) list;
+      (** working_set_id and initial graph declaration *)
   perturbations: ('pattern, 'mixture, 'id, 'rule) perturbation list;
   configurations: configuration list;
   tokens: string Loc.annoted list;

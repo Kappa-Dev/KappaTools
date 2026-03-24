@@ -157,8 +157,8 @@ type ('agent, 'agent_id, 'pattern, 'mixture, 'id, 'rule) instruction =
   | SIG of 'agent_id
   | TOKENSIG of string Loc.annoted
   | VOLSIG of string * float * string (* type, volume, parameter*)
-  | INIT of ('pattern, 'mixture, 'id) init_statement
-  (*guard, volume, init, position *)
+  | INIT of (('pattern, 'mixture, 'id) init_statement * bool)
+  (*(guard, volume, (init, position)), is_in_working_set *)
   | DECLARE of ('pattern, 'id) variable_def
   | OBS of ('pattern, 'id) variable_def (*for backward compatibility*)
   | PLOT of ('pattern, 'id) Alg_expr.e Loc.annoted
@@ -198,8 +198,8 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   *)
   observables: ('pattern, 'id) Alg_expr.e Loc.annoted list;
       (** list of patterns to plot *)
-  init: ('pattern, 'mixture, 'id) init_statement list;
-      (** initial graph declaration *)
+  init: (int option * ('pattern, 'mixture, 'id) init_statement) list;
+      (** initial graph declaration. The int option is None if the initial state is not in the working set. *)
   perturbations: ('pattern, 'mixture, 'id, 'rule) perturbation list;
   configurations: configuration list;
   tokens: string Loc.annoted list;
@@ -1062,14 +1062,31 @@ let print_configuration f ((n, _), l) =
 
 let print_guard = Pp.option ~with_space:false LKappa.print_guard
 
-let print_init f = function
-  | g, (n, _), INIT_MIX (m, _) ->
-    Format.fprintf f "@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]" print_guard g
+
+let print_working_set_prefix id working_set_values =
+  string_of_int id ^ ". "
+  ^
+  match Mods.IntMap.find_option id working_set_values with
+  | None -> "[UNKNOWN] "
+  | Some true -> "[ENABLED] "
+  | Some false -> "[DISABLED] "
+
+let print_init c f = function
+  | ws_id, (g, (n, _), INIT_MIX (m, _)) ->
+    Format.fprintf f "@[%s@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]]" 
+    (match ws_id with
+           | None -> ""
+           | Some id -> print_working_set_prefix id c.working_set_values)
+    print_guard g
       print_ast_alg_expr n
       (print_ast_mix ~print_counter)
       m
-  | g, (n, _), INIT_TOK t ->
-    Format.fprintf f "@[%%init: @[%a@]@ %a %a@]" print_guard g
+  | ws_id, (g, (n, _), INIT_TOK t) ->
+    Format.fprintf f "@[%s@[%%init: @[%a@]@ %a %a@]]" 
+    (match ws_id with
+           | None -> ""
+           | Some id -> print_working_set_prefix id c.working_set_values)
+    print_guard g
       print_ast_alg_expr n
       (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
       t
@@ -1151,14 +1168,6 @@ let print_perturbation f ((alarm, cond, modif, rep), _) =
          Format.fprintf f "repeat @[%a@]" print_ast_bool_expr r))
     rep
 
-let print_working_set_prefix id working_set_values =
-  string_of_int id ^ ". "
-  ^
-  match Mods.IntMap.find_option id working_set_values with
-  | None -> "[UNKNOWN] "
-  | Some true -> "[ENABLED] "
-  | Some false -> "[DISABLED] "
-
 let print_parsing_compil_kappa f c =
   Format.fprintf f
     "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,%a@,%a@,@]@."
@@ -1188,7 +1197,7 @@ let print_parsing_compil_kappa f c =
     c.rules
     (Pp.list Pp.space print_perturbation)
     c.perturbations
-    (Pp.list Pp.space print_init)
+    (Pp.list Pp.space (print_init c))
     c.init
     (Pp.list Pp.space (fun f (s, b) ->
          Format.fprintf f "%%guard_param: %s -> %b" s b))
@@ -1598,8 +1607,8 @@ let merge_tokens =
 
 let sig_from_inits =
   List.fold_left (fun (ags, toks) -> function
-    | _, _, INIT_MIX (m, _) -> merge_agents ags m, toks
-    | _, na, INIT_TOK l -> ags, merge_tokens toks (List.map (fun x -> na, x) l))
+    | _, (_, _, INIT_MIX (m, _)) -> merge_agents ags m, toks
+    | _, (_, na, INIT_TOK l) -> ags, merge_tokens toks (List.map (fun x -> na, x) l))
 
 let sig_from_rule (ags, toks) r =
   match r.rewrite with
@@ -1732,11 +1741,13 @@ let compil_to_json c =
           c.observables );
       ( "init",
         JsonUtil.of_list
-          (JsonUtil.of_triple
-             (LKappa.string_guard_option_to_json ~filenames)
-             (Loc.yojson_of_annoted ~filenames
-                (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json))
-             (init_to_json ~filenames mix_to_json var_to_json))
+          (JsonUtil.of_pair
+            (JsonUtil.of_option JsonUtil.of_int)
+            (JsonUtil.of_triple
+               (LKappa.string_guard_option_to_json ~filenames)
+               (Loc.yojson_of_annoted ~filenames
+                  (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json))
+               (init_to_json ~filenames mix_to_json var_to_json)))
           c.init );
       ( "perturbations",
         JsonUtil.of_list
@@ -1843,11 +1854,16 @@ let compil_of_json = function
          init =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST init")
-             (JsonUtil.to_triple
-                (LKappa.string_guard_option_of_json ~filenames)
-                (Loc.annoted_of_yojson ~filenames
-                   (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
-                (init_of_json ~filenames mix_of_json var_of_json))
+             (JsonUtil.to_pair
+                (JsonUtil.to_option
+                  (JsonUtil.to_int
+                      ~error_msg:
+                        (JsonUtil.exn_msg_cant_import_from_json "AST init")))
+               (JsonUtil.to_triple
+                  (LKappa.string_guard_option_of_json ~filenames)
+                  (Loc.annoted_of_yojson ~filenames
+                     (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
+                  (init_of_json ~filenames mix_of_json var_of_json)))
              (List.assoc "init" l);
          perturbations =
            JsonUtil.to_list
@@ -2321,7 +2337,7 @@ let rename_pos_init_t rename_pos_mixture rename_pos_id rename init_t =
   match instruction with 
   | SIG agent_sig -> SIG (rename_pos_agent_sig rename agent_sig)
   | TOKENSIG string -> TOKENSIG (Loc.rename_pos_flat rename string)
-  | INIT init -> INIT (rename_pos_init_statement rename_pos_pattern rename_pos_mixture rename_pos_id rename init)
+  | INIT (init, is_in_ws) -> INIT (rename_pos_init_statement rename_pos_pattern rename_pos_mixture rename_pos_id rename init, is_in_ws)
   | DECLARE var_def -> 
       DECLARE (rename_pos_variable_def rename_pos_pattern rename_pos_id rename var_def)
   | OBS var_def -> OBS (rename_pos_variable_def rename_pos_pattern rename_pos_id rename var_def)
@@ -2393,8 +2409,8 @@ let rename_pos_compil
           rename  compil.observables; 
         init = 
            Loc.rename_pos_list 
-            (rename_pos_init_statement 
-                rename_pos_pattern rename_pos_mixture rename_pos_id)
+            (fun rename (ws_id, init) -> ws_id, rename_pos_init_statement 
+                rename_pos_pattern rename_pos_mixture rename_pos_id rename init)
                 rename compil.init ; 
         perturbations = 
             Loc.rename_pos_list 

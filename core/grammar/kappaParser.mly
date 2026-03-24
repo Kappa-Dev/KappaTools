@@ -77,16 +77,22 @@ start_rule:
     | instruction newline
 		  { fun c -> let r = $2 c in
 		      match $1 with
-		      | Ast.RULE (label, guard, rule, _) ->
-			 {r with Ast.rules = (None, label, guard, rule)::r.Ast.rules}
+		      | Ast.RULE (label, guard, rule, is_in_ws) ->
+          if is_in_ws then 
+            {r with Ast.rules = (Some 1, label, guard, rule)::r.Ast.rules}
+          else
+            {r with Ast.rules = (None, label, guard, rule)::r.Ast.rules}
 		      | Ast.SIG ag ->
 			 {r with Ast.signatures=ag::r.Ast.signatures}
 		      | Ast.TOKENSIG (str_pos) ->
 			 {r with Ast.tokens=str_pos::r.Ast.tokens}
 		      | Ast.VOLSIG (vol_type,vol,vol_param) ->
 			 {r with Ast.volumes=(vol_type,vol,vol_param)::r.Ast.volumes}
-		      | Ast.INIT (guard,alg,init_t) ->
-			 {r with Ast.init=(guard,alg,init_t)::r.Ast.init}
+		      | Ast.INIT ((guard,alg,init_t),is_in_ws) ->
+          if is_in_ws then 
+			      {r with Ast.init=(Some 1,(guard,alg,init_t))::r.Ast.init}
+          else
+            {r with Ast.init=(None,(guard,alg,init_t))::r.Ast.init}
 		      | Ast.DECLARE var ->
 			 {r with Ast.variables = var::r.Ast.variables}
 		      | Ast.OBS ((lbl,pos),_ as var) ->
@@ -124,7 +130,7 @@ instruction:
     | SIGNATURE error {raise (ExceptionDefn.Syntax_Error
 				(add_pos "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
 
-    | INIT init_with_guard {let guard,a,i = $2 in Ast.INIT (guard,a,i)}
+    | INIT init_with_guard {let guard,a,i = $2 in Ast.INIT ((guard,a,i),false)}
     | INIT error
 	{ raise (ExceptionDefn.Syntax_Error
 		   (add_pos "Malformed initial condition"))}

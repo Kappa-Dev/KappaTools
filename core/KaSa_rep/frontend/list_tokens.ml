@@ -447,7 +447,7 @@ let scan_guard parameters (error, handler) guard =
       (error, handler) guard_parameters
 
 let scan_initial_states parameters =
-  List.fold_left (fun remanent (guard, (alg, _pos), init_t) ->
+  List.fold_left (fun remanent (_, (guard, (alg, _pos), init_t)) ->
       let remanent = scan_guard parameters remanent guard in
       let remanent = scan_alg parameters remanent alg in
       match init_t with

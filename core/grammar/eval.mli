@@ -40,7 +40,7 @@ val compile_inits :
   compile_mode_on:bool ->
   Contact_map.t ->
   Model.t ->
-  (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statement list ->
+  (int option * (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statement) list ->
   (Primitives.alg_expr * Primitives.elementary_rule) list
 
 val compile :
@@ -55,7 +55,7 @@ val compile :
   debug_mode:bool ->
   compile_mode_on:bool ->
   ?overwrite_init:
-    (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statement list ->
+    (int option * (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statement) list ->
   ?overwrite_t0:float ->
   ?rescale_init:float ->
   Signature.s ->

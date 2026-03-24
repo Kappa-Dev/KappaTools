@@ -1040,18 +1040,20 @@ let translate_compil parameters error
         error, alg' :: list)
       (error, []) compil.Ast.observables
   in
+  let add_ws_id_to_guard guard ws_id loc = 
+    match ws_id with
+    | None -> guard
+    | Some ws_id ->
+      let guard_name = Ast.working_set_index_to_string ws_id in
+      let guard_param = Logical_formulae.P (guard_name, loc) in
+      (match guard with
+       | None -> Some guard_param
+       | Some guard -> Some (Logical_formulae.AND (guard_param, guard)))
+  in
   let error, _id_set, rules_rev =
     List.fold_left
       (fun (error, id_set, list) (ws_id, id, guard, (rule, p)) ->
-        let guard =
-          match ws_id with
-          | None -> guard
-          | Some ws_id ->
-            let guard_name = Ast.working_set_index_to_string ws_id in
-            let guard_param = Logical_formulae.P (guard_name, p) in
-            (match guard with
-            | None -> Some guard_param
-            | Some guard -> Some (Logical_formulae.AND (guard_param, guard)))
+        let guard = add_ws_id_to_guard guard ws_id p
         in
         let error, id_set =
           match id with
@@ -1131,12 +1133,18 @@ let translate_compil parameters error
   in
   let error, init_rev =
     List.fold_left
-      (fun (error, list) (guard, alg_ex, init_t) ->
+      (fun (error, list) (ws_id, (guard, alg_ex, init_t)) ->
+        let loc = match init_t with 
+          | Ast.INIT_MIX (_, pos) -> pos
+          | Ast.INIT_TOK ((_, pos)::_) -> pos 
+          | Ast.INIT_TOK [] -> Loc.dummy
+        in
+        let guard = add_ws_id_to_guard guard ws_id loc in
         let error, alg =
           alg_with_pos_map (refine_mixture parameters) error alg_ex
         in
         let error, init = refine_init_t parameters error init_t in
-        error, (guard, alg, init) :: list)
+        error, (ws_id, (guard, alg, init)) :: list)
       (error, []) compil.Ast.init
   in
   let error, perturbations_rev, rules_rev =

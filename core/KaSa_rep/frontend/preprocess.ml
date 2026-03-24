@@ -1486,8 +1486,7 @@ let check_freeness parameters lhs source (error, half_release_set) =
         Cckappa_sig.Address_map_and_set.Set.add_when_not_in parameters error
           source half_release_set))
 
-let translate_rule parameters error handler rule =
-  let ws_id, label, guard_string, (rule, position) = rule in
+let translate_rule parameters error handler (ws_id, label, guard_string, (rule, position)) =
   let direction = rule.Ckappa_sig.interprete_delta in
   let error, c_rule_lhs, question_marks_l, delta_l =
     translate_mixture parameters error handler ~creation:false
@@ -2129,11 +2128,12 @@ let lift_allowing_question_marks parameters handler error x =
   in
   clean_question_marks parameters a c b
 
-let translate_pert_init error guard (alg, _) (c_alg, _) mixture c_mixture pos'
+let translate_pert_init error guard ws_id (alg, _) (c_alg, _) mixture c_mixture pos'
     =
   ( error,
     {
       Cckappa_sig.e_init_guard = guard;
+      Cckappa_sig.e_init_working_set_id = ws_id;
       Cckappa_sig.e_init_factor = alg;
       Cckappa_sig.e_init_c_factor = c_alg;
       Cckappa_sig.e_init_mixture = mixture;
@@ -2144,19 +2144,23 @@ let translate_pert_init error guard (alg, _) (c_alg, _) mixture c_mixture pos'
 let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 
 let translate_init parameters error handler
-    (guard_string, (alg, pos_alg), init_t) =
+    (ws_id, (guard_string, (alg, pos_alg), init_t)) =
   let error, c_alg =
     Prepreprocess.alg_map
       (lift_allowing_question_marks parameters handler)
       error alg
   in
   let error, guard = translate_guard parameters error handler guard_string in
+  let ws_id =
+        (match ws_id with
+        | None -> None
+        | Some ws_id -> Some (Ckappa_sig.working_set_index_of_int ws_id)) in
   match init_t with
   | Ast.INIT_MIX (mixture, pos') ->
     let error, c_mixture, _, _ =
       translate_mixture parameters error handler ~creation:true mixture
     in
-    translate_pert_init error guard (alg, pos_alg) (c_alg, pos_alg) mixture
+    translate_pert_init error guard ws_id (alg, pos_alg) (c_alg, pos_alg) mixture
       c_mixture pos'
   | Ast.INIT_TOK _ ->
     (*TO DO*)

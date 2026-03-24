@@ -9,6 +9,7 @@ val compute_ws_values :
   all_rules_in_ws:bool ->
   rules_in_ws:int list ->
   Ast.rule Ast.compil_rule list ->
+  (int option * (Ast.mixture, Ast.mixture, string) Ast.init_statement) list ->
   Ast.parsing_compil ->
   Ast.parsing_compil
 

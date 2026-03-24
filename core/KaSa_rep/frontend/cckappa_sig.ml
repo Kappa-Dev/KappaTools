@@ -194,6 +194,7 @@ type enriched_rule = {
 
 type enriched_init = {
   e_init_guard: Ckappa_sig.c_guard_parameter LKappa.guard option;
+  e_init_working_set_id: Ckappa_sig.c_working_set_index option;
   e_init_factor: (Ckappa_sig.mixture, string) Alg_expr.e;
   e_init_c_factor: (mixture, string) Alg_expr.e;
   e_init_mixture: Ckappa_sig.mixture;
@@ -213,7 +214,7 @@ type compil = {
   (*rules (possibly named)*)
   working_set_valuations:
     (Ckappa_sig.c_guard_parameter * bool) Ckappa_sig.Ws_index_map_and_set.Map.t;
-  (*maps working_set rules to their boolean parameter and a boolean that tells us if they are enabled or not*)
+  (*maps working_set rules and inital states to their boolean parameter and a boolean that tells us if they are enabled or not*)
   observables:
     (mixture, string) Alg_expr.e Loc.annoted Int_storage.Nearly_inf_Imperatif.t;
   (*list of patterns to plot*)
@@ -252,6 +253,7 @@ let dummy_init parameters error =
   ( error,
     {
       e_init_guard = None;
+      e_init_working_set_id = None;
       e_init_factor = Alg_expr.CONST (Nbr.I 0);
       e_init_c_factor = Alg_expr.CONST (Nbr.I 0);
       e_init_mixture = Ckappa_sig.EMPTY_MIX;
@@ -904,6 +906,7 @@ let rename_pos_enriched_init_with_errors parameters errors rename enriched_init 
   in 
   errors, {
     e_init_guard; 
+    e_init_working_set_id=enriched_init.e_init_working_set_id;
     e_init_factor; 
     e_init_c_factor; 
     e_init_mixture; 

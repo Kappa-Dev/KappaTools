@@ -209,7 +209,7 @@ and inline_comment = parse
     try
       let () = Format.fprintf logger "Parsing %s...@." file in
       let out = KappaParser.start_rule token lexbuf compil in
-	  let out = Cst.compute_ws_values ~all_rules_in_ws ~rules_in_ws out.Ast.rules {out with rules = []} in
+	  let out = Cst.compute_ws_values ~all_rules_in_ws ~rules_in_ws out.Ast.rules [] {out with rules = []} in
       let () = Format.fprintf logger "done@." in
       let () = close_in d in out
     with ExceptionDefn.Syntax_Error (msg,pos) ->

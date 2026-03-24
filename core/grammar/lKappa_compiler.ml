@@ -1946,14 +1946,14 @@ let evaluate_guard_opt guard guard_param_values =
 let init_of_ast ~warning ~syntax_version sigs counters_info contact_map tok algs
     inits guard_param_values =
   List.filter_map
-    (fun (guard, expr, ini) ->
+    (fun (ws_id,(guard, expr, ini)) ->
       if evaluate_guard_opt guard guard_param_values then
         Some
-          ( guard,
+          ( ws_id, (guard,
             alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
               expr,
             init_of_ast ~warning ~syntax_version sigs counters_info tok
-              contact_map ini )
+              contact_map ini ))
       else
         None)
     inits
@@ -2070,7 +2070,7 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
     counter_fold_in_expr f acc obs_def
   in
   let counter_fold_in_init f acc init =
-    let _, e, _ = init in
+    let _, (_, e, _) = init in
     counter_fold_in_expr f acc e
   in
   let counter_fold_in_print f acc p =
@@ -2509,10 +2509,10 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
       (List.rev ast_compil.rules)
   in
 
-  let init : (Ast.mixture, Ast.mixture, string) Ast.init_statement list =
+  let init : (int option * (Ast.mixture, Ast.mixture, string) Ast.init_statement) list =
     List.map
-      (fun (guard, quantity_alg_expr, init_kind) ->
-        ( guard,
+      (fun (ws_id, (guard, quantity_alg_expr, init_kind)) ->
+        ws_id, ( guard,
           quantity_alg_expr,
           match init_kind with
           | Ast.INIT_TOK _ -> init_kind
