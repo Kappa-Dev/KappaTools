@@ -1210,8 +1210,32 @@ let print_parsing_compil_kappa f c =
     c.sequential_bonds
 
 let print_working_set f c =
-  Format.fprintf f "@[<v>%a@]@."
-    (Pp.list Pp.space (fun f (ws_id, s, guard, (r, _)) ->
+  Format.fprintf f "@[<v>%a%a@]@."
+    (Pp.list (fun f -> Format.fprintf f "@.") (fun f init ->
+         match init with
+         | ws_id, (g, (n, _), INIT_MIX (m, _)) ->
+           (match ws_id with
+            | None -> ()
+            | Some id -> 
+              Format.fprintf f "@[%s@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]" 
+                (print_working_set_prefix id c.working_set_values)
+                print_guard g
+                print_ast_alg_expr n
+                (print_ast_mix ~print_counter)
+                m)
+         | ws_id, (g, (n, _), INIT_TOK t) ->
+           (match ws_id with
+            | None -> ()
+            | Some id -> 
+              Format.fprintf f "@[%s@[%%init: @[%a@]@ %a %a@]]" 
+                (print_working_set_prefix id c.working_set_values)
+                print_guard g
+                print_ast_alg_expr n
+                (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
+                t)
+       ))
+    c.init
+    (Pp.list (fun f -> Format.fprintf f "@.") (fun f (ws_id, s, guard, (r, _)) ->
          match ws_id with
          | None -> ()
          | Some id ->
