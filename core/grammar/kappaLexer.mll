@@ -201,7 +201,7 @@ and inline_comment = parse
 		   | _ {inline_comment lexbuf}
 {
 
-  let compile logger ~all_rules_in_ws ~rules_in_ws ~removed_rules  compil file =
+  let compile logger ~all_rules_in_ws ~rules_in_ws compil file =
     let d = open_in file in
     let lexbuf = Lexing.from_channel d in
     let () = lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = file} in
@@ -209,7 +209,7 @@ and inline_comment = parse
     try
       let () = Format.fprintf logger "Parsing %s...@." file in
       let out = KappaParser.start_rule token lexbuf compil in
-	  let out = Cst.compute_ws_values ~all_rules_in_ws ~rules_in_ws ~removed_rules out.Ast.rules {out with rules = []} in
+	  let out = Cst.compute_ws_values ~all_rules_in_ws ~rules_in_ws out.Ast.rules {out with rules = []} in
       let () = Format.fprintf logger "done@." in
       let () = close_in d in out
     with ExceptionDefn.Syntax_Error (msg,pos) ->

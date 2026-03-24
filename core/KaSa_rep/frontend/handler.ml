@@ -216,7 +216,7 @@ let guard_of_string parameters handler guard_p_name error =
       handler.Cckappa_sig.guard_parameters_dic
   in
   match bool, output with
-  | _, None | true, _ ->
+  | _, None ->
     Exception.warn parameters error __POS__ Exit
       Ckappa_sig.dummy_guard_parameter
   | _, Some (i, _, _, _) -> error, i

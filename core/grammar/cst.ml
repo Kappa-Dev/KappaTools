@@ -6,29 +6,24 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let compute_ws_values ~all_rules_in_ws ~rules_in_ws ~removed_rules rules compil
-    =
+let compute_ws_values ~all_rules_in_ws ~rules_in_ws rules compil =
   let rules_rev, working_set_values, nr_working_set_params, _ =
     List.fold_left
       (fun (rules, ws_values, k, i) (ws_index, label, guard, rule) ->
-        if List.exists (( = ) i) removed_rules then
-          rules, ws_values, k, i + 1
-        else (
-          match ws_index with
-          | None ->
-            if all_rules_in_ws || List.exists (( = ) i) rules_in_ws then
-              ( (Some k, label, guard, rule) :: rules,
-                Mods.IntMap.add k true ws_values,
-                k + 1,
-                i + 1 )
-            else
-              (ws_index, label, guard, rule) :: rules, ws_values, k, i + 1
-          | Some _ ->
+        match ws_index with
+        | None ->
+          if all_rules_in_ws || List.exists (( = ) i) rules_in_ws then
             ( (Some k, label, guard, rule) :: rules,
               Mods.IntMap.add k true ws_values,
               k + 1,
               i + 1 )
-        ))
+          else
+            (ws_index, label, guard, rule) :: rules, ws_values, k, i + 1
+        | Some _ ->
+          ( (Some k, label, guard, rule) :: rules,
+            Mods.IntMap.add k true ws_values,
+            k + 1,
+            i + 1 ))
       ( [],
         compil.Ast.working_set_values,
         compil.nr_working_set_params,
@@ -43,7 +38,7 @@ let compute_ws_values ~all_rules_in_ws ~rules_in_ws ~removed_rules rules compil
   }
 
 let append_to_ast_compil rev_instr ?(all_rules_in_ws = false)
-    ?(rules_in_ws = []) ?(removed_rules = []) compil =
+    ?(rules_in_ws = []) compil =
   let compil, rules =
     List.fold_left
       (fun (r, rules) -> function
@@ -106,4 +101,4 @@ let append_to_ast_compil rev_instr ?(all_rules_in_ws = false)
             rules ))
       (compil, []) (List.rev rev_instr)
   in
-  compute_ws_values ~all_rules_in_ws ~rules_in_ws ~removed_rules rules compil
+  compute_ws_values ~all_rules_in_ws ~rules_in_ws rules compil

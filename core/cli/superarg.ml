@@ -413,7 +413,7 @@ let parse_list ~with_tk ?title (a : t) (l : string list) : string list =
               rem
             | Int_list r, v :: rem when opt = key ->
               let ints = List.map int_of_string (String.split_on_char ',' v) in
-              r := !r @ ints;
+              r := ints;
               rem
             | String r, v :: rem when opt = key ->
               r := v;

@@ -38,8 +38,6 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
   in
   let () = Format.printf "+ Sanity checks@." in
   let syntax_version = cli_args.Run_cli_args.syntaxVersion in
-  let rules_in_ws = cli_args.Run_cli_args.rules_in_working_set in
-  let removed_rules = cli_args.Run_cli_args.rules_to_remove in
   let var_overwrite, initialMix =
     match kasim_args with
     | None -> [], None
@@ -58,10 +56,10 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
         match syntax_version with
         | Ast.V4 ->
           Klexer4.compile Format.std_formatter Ast.empty_compil
-            ~all_rules_in_ws:false ~rules_in_ws ~removed_rules file
+            ~all_rules_in_ws:false ~rules_in_ws:[] file
         | Ast.V3 ->
           KappaLexer.compile Format.std_formatter Ast.empty_compil
-            ~all_rules_in_ws:false ~rules_in_ws ~removed_rules file
+            ~all_rules_in_ws:false ~rules_in_ws:[] file
       in
       let conf, _, _, _ = Configuration.parse compil.Ast.configurations in
       ( Some
@@ -85,19 +83,31 @@ let preprocess_ast ~warning ~debug_mode ?kasim_args cli_args
 
 let get_ast_from_list_of_files ~current_chapter ~rules_in_ws ~removed_rules
     syntax_version file_list =
+  let rec remove_rules current_index rules indexes_to_remove =
+    match rules, indexes_to_remove with
+    | [], _ | _, [] -> rules
+    | r :: rules, i :: indexes ->
+      if current_index > i then
+        remove_rules (current_index + 1) (r :: rules) indexes
+      else if i = current_index then
+        remove_rules (current_index + 1) rules indexes
+      else
+        r :: remove_rules (current_index + 1) rules (i :: indexes)
+  in
   let compiling_function all_rules_in_ws =
     match syntax_version with
     | Ast.V4 ->
       Klexer4.compile Format.std_formatter ~all_rules_in_ws ~rules_in_ws
-        ~removed_rules
     | Ast.V3 ->
       KappaLexer.compile Format.std_formatter ~all_rules_in_ws ~rules_in_ws
-        ~removed_rules
   in
   let compil =
     List.fold_left (compiling_function false) Ast.empty_compil file_list
   in
-  List.fold_left (compiling_function true) compil current_chapter
+  let compil =
+    List.fold_left (compiling_function true) compil current_chapter
+  in
+  { compil with Ast.rules = remove_rules 0 compil.Ast.rules removed_rules }
 
 let get_ast_from_cli_args cli_args =
   get_ast_from_list_of_files
