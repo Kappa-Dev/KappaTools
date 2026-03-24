@@ -1,4 +1,91 @@
 module KaSaUtil (Export_to_KaSa : Export_to_KaSa.Type) = struct
+  let print_efficiency parameters state start_time =
+    if Remanent_parameters.get_print_efficiency parameters then (
+      let end_time = Sys.time () in
+      let cpu_time = end_time -. start_time in
+      let handler, dead_rules, separating_transitions, transition_system_length
+          =
+        Export_to_KaSa.get_data state
+      in
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "CPU time: %g s." cpu_time
+      in
+      let () =
+        match handler with
+        | None -> ()
+        | Some l ->
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "; rules: %i" l.Cckappa_sig.nrules
+      in
+      let () =
+        match dead_rules with
+        | None -> ()
+        | Some l ->
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "; dead rules: %i" (List.length l)
+      in
+      let () =
+        match separating_transitions with
+        | None -> ()
+        | Some l ->
+          let json = Public_data.separating_transitions_to_json l in
+          let l = Public_data.separating_transitions_of_json json in
+          let nr, nt =
+            List.fold_left
+              (fun (nr, nt) (_, l) -> nr + 1, nt + List.length l)
+              (0, 0) l
+          in
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "; separating transitions: %i in %i rules ;" nt nr
+      in
+      let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      in
+      let _ =
+        match transition_system_length with
+        | None -> ()
+        | Some l ->
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameters)
+              "transition system lengths: %a"
+              (fun fmt -> List.iter (Format.fprintf fmt "%i;"))
+              l
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameters)
+          in
+          let sum, nbr, longest =
+            List.fold_left
+              (fun (sum, nbr, longest) i -> sum + i, succ nbr, max longest i)
+              (0, 0, 0) l
+          in
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameters)
+              "Total: %i; Average: %i; Longest: %i" sum
+              (int_of_float (ceil (float_of_int sum /. float_of_int nbr)))
+              longest
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameters)
+          in
+          ()
+      in
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) "."
+      in
+      let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      in
+      ()
+    )
+
   let print_backdoor_timing parameters start_time =
     let end_time = Sys.time () in
     let cpu_time = end_time -. start_time in
@@ -162,95 +249,7 @@ module KaSaUtil (Export_to_KaSa : Export_to_KaSa.Type) = struct
         state, None
     in
     let _ = Exception.print parameters (Export_to_KaSa.get_errors state) in
-    let () =
-      if Remanent_parameters.get_print_efficiency parameters then (
-        let end_time = Sys.time () in
-        let cpu_time = end_time -. start_time in
-        let ( handler,
-              dead_rules,
-              separating_transitions,
-              transition_system_length ) =
-          Export_to_KaSa.get_data state
-        in
-        let () =
-          Loggers.fprintf
-            (Remanent_parameters.get_logger parameters)
-            "CPU time: %g s." cpu_time
-        in
-        let () =
-          match handler with
-          | None -> ()
-          | Some l ->
-            Loggers.fprintf
-              (Remanent_parameters.get_logger parameters)
-              "; rules: %i" l.Cckappa_sig.nrules
-        in
-        let () =
-          match dead_rules with
-          | None -> ()
-          | Some l ->
-            Loggers.fprintf
-              (Remanent_parameters.get_logger parameters)
-              "; dead rules: %i" (List.length l)
-        in
-        let () =
-          match separating_transitions with
-          | None -> ()
-          | Some l ->
-            let json = Public_data.separating_transitions_to_json l in
-            let l = Public_data.separating_transitions_of_json json in
-            let nr, nt =
-              List.fold_left
-                (fun (nr, nt) (_, l) -> nr + 1, nt + List.length l)
-                (0, 0) l
-            in
-            Loggers.fprintf
-              (Remanent_parameters.get_logger parameters)
-              "; separating transitions: %i in %i rules ;" nt nr
-        in
-        let () =
-          Loggers.print_newline (Remanent_parameters.get_logger parameters)
-        in
-        let _ =
-          match transition_system_length with
-          | None -> ()
-          | Some l ->
-            let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters)
-                "transition system lengths: %a"
-                (fun fmt -> List.iter (Format.fprintf fmt "%i;"))
-                l
-            in
-            let () =
-              Loggers.print_newline (Remanent_parameters.get_logger parameters)
-            in
-            let sum, nbr, longest =
-              List.fold_left
-                (fun (sum, nbr, longest) i -> sum + i, succ nbr, max longest i)
-                (0, 0, 0) l
-            in
-            let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters)
-                "Total: %i; Average: %i; Longest: %i" sum
-                (int_of_float (ceil (float_of_int sum /. float_of_int nbr)))
-                longest
-            in
-            let () =
-              Loggers.print_newline (Remanent_parameters.get_logger parameters)
-            in
-            ()
-        in
-        let () =
-          Loggers.fprintf (Remanent_parameters.get_logger parameters) "."
-        in
-        let () =
-          Loggers.print_newline (Remanent_parameters.get_logger parameters)
-        in
-        ()
-      )
-    in
+    let () = print_efficiency parameters state start_time in
     let () =
       if
         Remanent_parameters.get_backdoor_nbr_of_scc parameters
