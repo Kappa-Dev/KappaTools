@@ -2318,13 +2318,14 @@ functor
       let state', refined_compil' = get_refined_compil state' in 
       let parameters = get_parameters state in 
       let errors = get_errors state in 
-       let () = show_title state in
+      let () = show_title state in
       let state, handler = get_handler state in 
       let errors, handler = List_tokens.scan_incremental_compil parameters errors refined_compil' handler in 
       Remanent_state.set_errors errors (Remanent_state.set_handler handler state), state'
 
     let patch ?debug ?do_we_show_title ~called_from ~patch_file_name ~old_file_name state = 
        let parameters = get_parameters state in 
+       let debug_mode = Remanent_parameters.get_trace parameters in 
        let state, summary_ast = summarize_from_ast state in 
        let files = [patch_file_name] in
        let do_we_show_title = 
@@ -2357,7 +2358,11 @@ functor
                     (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
                     state' state in 
        let state, handler = get_handler state in 
-       let errors = Print_handler.print_handler parameters errors handler in 
+       let errors = 
+        if debug_mode then 
+          Print_handler.print_handler parameters errors handler
+        else errors 
+       in 
        let state = enable_rule_index diff.Diff.diff_rules.new_elt state in 
        let debug_mode =
         match 
