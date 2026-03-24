@@ -137,9 +137,10 @@ functor
     let get_gen ?debug_mode ?dump_result ?stack_title ?do_we_show_title
         ?log_title ?log_main_title ?log_prefix ?phase ?int ?dump get compute
         state =
+      let parameters = get_parameters state in
       let debug_mode =
         match debug_mode with
-        | None | Some false -> false
+        | None | Some false -> Remanent_parameters.get_trace parameters 
         | Some true -> true
       in
       let dump_result =
@@ -160,7 +161,6 @@ functor
       (*------------------------------------------------------*)
       match get state with
       | None ->
-        let parameters = get_parameters state in
         let parameters' =
           Remanent_parameters.update_call_stack parameters debug_mode
             stack_title
@@ -2359,11 +2359,14 @@ functor
        let state, handler = get_handler state in 
        let errors = Print_handler.print_handler parameters errors handler in 
        let state = enable_rule_index diff.Diff.diff_rules.new_elt state in 
-       let state = 
-        match debug 
+       let debug_mode =
+        match 
+          debug
         with 
-          | None | Some false -> state 
-          | Some true -> 
+          | None | Some false -> Remanent_parameters.get_trace parameters 
+          | Some true -> true 
+        in 
+        if debug_mode then 
            let log = Remanent_parameters.get_logger parameters in
            let () = Loggers.fprintf log "SUMMARIES" in 
            let () = Loggers.print_newline log in 
@@ -2378,7 +2381,7 @@ functor
            let errors = Diff.dump_diff parameters errors diff in 
            let () =  Loggers.print_newline log in 
            set_errors errors state  
-        in state         
+      else state 
  
    
   end

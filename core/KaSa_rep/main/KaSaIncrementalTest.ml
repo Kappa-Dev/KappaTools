@@ -130,9 +130,9 @@ let main () =
               match l with 
             | ["update";"file";patch_file_name] -> 
                 let old_file_name = patch_file_name in 
-                Export_to_KaSa.patch ~debug:true ~patch_file_name ~old_file_name state  
+                Export_to_KaSa.patch ~patch_file_name ~old_file_name state  
             | ["update";"file";patch_file_name;"as";old_file_name]  -> 
-                Export_to_KaSa.patch ~debug:true ~patch_file_name ~old_file_name state 
+                Export_to_KaSa.patch ~patch_file_name ~old_file_name state 
             | _ -> 
               let error = Export_to_KaSa.get_errors state in
               let error, () =
