@@ -2297,7 +2297,7 @@ functor
     let add_rule _rule state = state 
     let add_init _init state = state 
 
-    let parse_token show_title state' state = 
+    let parse_token show_title ~patch:state' ~current:state = 
       let state', refined_compil' = get_refined_compil state' in 
       let parameters = get_parameters state in 
       let errors = get_errors state in 
@@ -2309,6 +2309,7 @@ functor
     let patch ?debug ?do_we_show_title ~called_from ~patch_file_name ~old_file_name state = 
        let parameters = get_parameters state in 
        let debug_mode = Remanent_parameters.get_trace parameters in 
+       let log = Remanent_parameters.get_logger parameters in       
        let state, summary_ast = summarize_from_ast state in 
        let files = [patch_file_name] in
        let do_we_show_title = 
@@ -2339,19 +2340,23 @@ functor
        let state = disable_rule_index diff.Diff.diff_rules.removed_elt state in 
        let state, _state' = parse_token 
                     (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
-                    state' state in 
+                    ~patch:state' ~current:state in 
        let state, handler = get_handler state in 
        let errors = 
         if debug_mode then 
-          Print_handler.print_handler parameters errors handler
+           let () = Loggers.fprintf log "HANDLER" in 
+           let () = Loggers.print_newline log in          
+            Print_handler.print_handler parameters errors handler
         else errors 
        in 
-       let state', compil = get_compilation state' in 
+       let _state', compil = get_compilation state' in 
        let compil = Diff.cut diff compil in 
        let errors, c_compil = Prepreprocess.translate_compil parameters errors compil in 
-       let errors, handler, cc_compil = 
+       let errors, handler, cc_compil' = 
           Preprocess.translate_c_compil parameters errors handler c_compil in 
        let _state' = Remanent_state.set_compilation compil state' in 
+       let state, cc_compil = get_c_compilation state in
+       let errors, handler, cc_compil, _new_indexs = Diff.fuse parameters errors handler cc_compil cc_compil' in 
        let debug_mode =
         match 
           debug
@@ -2360,7 +2365,6 @@ functor
           | Some true -> true 
         in 
         if debug_mode then 
-           let log = Remanent_parameters.get_logger parameters in
            let () = Loggers.fprintf log "SUMMARIES" in 
            let () = Loggers.print_newline log in 
            let () = Loggers.print_newline log in 
@@ -2371,6 +2375,8 @@ functor
            let () = Loggers.print_newline log in 
            let () = Loggers.print_newline log in 
            let state = dump_summary summary_ast' state in 
+           let () = Loggers.fprintf log "DIFF" in 
+           let () =  Loggers.print_newline log in 
            let errors = Diff.dump_diff parameters errors diff in 
            let () =  Loggers.print_newline log in 
            let fmt = Loggers.formatter_of_logger log in 
@@ -2378,9 +2384,14 @@ functor
              match fmt with 
              | None -> () 
             | Some fmt -> 
-               let () = Ast.print_parsing_compil_kappa fmt compil 
+             let () = Loggers.fprintf log "AST (NEW RULES)" in 
+             let () =  Loggers.print_newline log in 
+        
+              let () = Ast.print_parsing_compil_kappa fmt compil 
               in () 
             in   
+            let () = Loggers.fprintf log "CCKAPPA" in 
+            let () =  Loggers.print_newline log in 
             let errors = Print_cckappa.print_compil parameters errors handler cc_compil in 
             set_errors errors state  
       else state 
