@@ -67,20 +67,17 @@ start_rule:
         {let (guard, rule) = $1 in
           fun c -> let r = $2 c in {r with Ast.rules = (None, None, guard, rule)::r.Ast.rules}}
     | WORKING_SET OP_BRA working_set CL_BRA newline 
-        {let ws_rules = $3 []
+        {let ws_rules, ws_init = $3 ([],[])
           in
-          fun c -> let r = $5 c in 
-          {r with Ast.rules = ws_rules @ r.Ast.rules} }
+          fun c -> let c = $5 c in 
+          {c with Ast.rules = ws_rules @ c.Ast.rules; Ast.init = ws_init @ c.Ast.init} }
     | LABEL EQUAL alg_expr newline
         {let out = (($1,rhs_pos 1),$3) in
 	        fun c -> let r = $4 c in {r with Ast.variables = out::r.Ast.variables}}
     | instruction newline
 		  { fun c -> let r = $2 c in
 		      match $1 with
-		      | Ast.RULE (label, guard, rule, is_in_ws) ->
-          if is_in_ws then 
-            {r with Ast.rules = (Some 1, label, guard, rule)::r.Ast.rules}
-          else
+		      | Ast.RULE (label, guard, rule, _) ->
             {r with Ast.rules = (None, label, guard, rule)::r.Ast.rules}
 		      | Ast.SIG ag ->
 			 {r with Ast.signatures=ag::r.Ast.signatures}
@@ -88,10 +85,7 @@ start_rule:
 			 {r with Ast.tokens=str_pos::r.Ast.tokens}
 		      | Ast.VOLSIG (vol_type,vol,vol_param) ->
 			 {r with Ast.volumes=(vol_type,vol,vol_param)::r.Ast.volumes}
-		      | Ast.INIT ((guard,alg,init_t),is_in_ws) ->
-          if is_in_ws then 
-			      {r with Ast.init=(Some 1,(guard,alg,init_t))::r.Ast.init}
-          else
+		      | Ast.INIT ((guard,alg,init_t),_) ->
             {r with Ast.init=(None,(guard,alg,init_t))::r.Ast.init}
 		      | Ast.DECLARE var ->
 			 {r with Ast.variables = var::r.Ast.variables}
@@ -397,16 +391,24 @@ rule_expression:
 
 working_set_newline:
     | NEWLINE working_set {$2}
-    | {fun c -> c};
+    | {fun (r,i) -> (r,i)};
 
 working_set:
   | working_set_newline {$1}
   | LABEL rule_expression working_set_newline 
     {let guard, rule = $2 in 
-      fun c -> let r = $3 c in (Some 1, Some ($1, rhs_pos 1), guard, rule)::r }
+      fun (r,i) -> let r, i = $3 (r,i) in (Some 1, Some ($1, rhs_pos 1), guard, rule)::r, i }
   | rule_expression working_set_newline 
     {let guard, rule = $1 in
-      fun c -> let r = $2 c in (Some 1, None, guard, rule)::r }
+      fun (r,i) -> let r, i = $2 (r,i) in (Some 1, None, guard, rule)::r, i }
+  | INIT init_with_guard working_set_newline 
+    {let guard,a,id = $2 in 
+     fun (r,i) -> 
+     let () = print_endline "adding init" in
+     let r, i = $3 (r,i) in r, (Some 1, (guard,a,id))::i}
+  | INIT error
+	{ raise (ExceptionDefn.Syntax_Error
+		   (add_pos "Malformed initial condition"))}
 
 arrow:
     | KAPPA_RAR {false}
