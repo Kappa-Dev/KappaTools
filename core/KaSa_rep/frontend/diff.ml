@@ -16,6 +16,12 @@ type diff =
     diff_init: diff_elt ; 
  }
 
+ type new_indexs=
+ { 
+   first_rule: int; 
+   first_init: int; 
+ }
+
  let empty_summary_file = 
    {
     summary_rule_map =  Mods.StringMap.empty; 
@@ -454,3 +460,33 @@ let cut diff (ast:Ast.parsing_compil) =
   let init = extract diff.diff_init.new_elt ast.Ast.init in 
   {ast with Ast.init ; Ast.rules}
   
+let fuse parameters errors handler c_compil c_compil' = 
+  let n = Handler.nrules parameters errors handler in 
+  let errors, n' = Int_storage.Nearly_inf_Imperatif.dimension parameters errors 
+  c_compil.Cckappa_sig.init in 
+  let new_indexs = 
+      {
+        first_rule = n+1 ; 
+        first_init = n'+1 
+
+      }
+  in 
+  let errors, (rules, nrules)  = 
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold 
+      parameters errors 
+      (fun parameters errors i rule' (rules,_) -> 
+       let errors, rules  = 
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set parameters errors (Ckappa_sig.rule_id_of_int ((Ckappa_sig.int_of_rule_id i)+n)) rule' rules in 
+        errors,(rules, ((Ckappa_sig.int_of_rule_id i)+n)))
+      (c_compil'.Cckappa_sig.rules)
+      (c_compil.Cckappa_sig.rules,n)
+  in 
+  let errors, init = 
+    Int_storage.Nearly_inf_Imperatif.fold 
+      parameters errors 
+      (fun parameters errors i init' inits -> 
+          Int_storage.Nearly_inf_Imperatif.set parameters errors (i+n') init' inits)
+      c_compil'.Cckappa_sig.init
+      c_compil.Cckappa_sig.init
+  in 
+  errors, {handler with Cckappa_sig.nrules}, {c_compil with Cckappa_sig.rules ; Cckappa_sig.init}, new_indexs 

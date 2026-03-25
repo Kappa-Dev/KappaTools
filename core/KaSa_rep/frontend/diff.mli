@@ -7,6 +7,12 @@ type diff =
     diff_init: diff_elt ; 
  }
 
+ type new_indexs=
+ { 
+   first_rule: int; 
+   first_init: int; 
+ }
+
 val summarize_from_ast:  
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -72,3 +78,8 @@ val get_file: Remanent_parameters_sig.parameters ->
 val renaming_of_diff: diff -> (Loc.t -> Loc.t option) 
 
 val cut: diff -> Ast.parsing_compil -> Ast.parsing_compil
+
+val fuse: Remanent_parameters_sig.parameters -> 
+  Exception_without_parameter.exceptions_caught_and_uncaught -> 
+Cckappa_sig.kappa_handler -> Cckappa_sig.compil -> Cckappa_sig.compil -> Exception_without_parameter.exceptions_caught_and_uncaught * 
+Cckappa_sig.kappa_handler * Cckappa_sig.compil * new_indexs
