@@ -817,7 +817,12 @@ working_set_rule:
     {let guard, rule = $3 in add (Ast.RULE (Some ($1, rhs_pos 1), guard, rule, true))}
   | rule {let guard, rule = $1 in add (Ast.RULE (None, guard, rule, true))}
 
+working_set_init:
+  | INIT annoted init_with_guard
+    { let (guard,alg,init) = $3 in add (Ast.INIT ((guard,alg,init),true)) }
+
 working_set:
+  | working_set_init working_set { }
   | working_set_rule working_set { }
   | { }
 
