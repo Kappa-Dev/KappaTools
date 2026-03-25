@@ -2350,7 +2350,32 @@ functor
         else errors 
        in 
        let _state', compil = get_compilation state' in 
+       let errors = 
+        if debug_mode then 
+        let fmt = Loggers.formatter_of_logger log in 
+                    let () =
+             match fmt with 
+             | None -> () 
+            | Some fmt -> 
+             let () = Loggers.fprintf log "AST (PATCH)" in 
+             let () =  Loggers.print_newline log in 
+        
+              let () = Ast.print_parsing_compil_kappa fmt compil in () 
+              in errors else errors  
+            in 
        let compil = Diff.cut diff compil in 
+        let errors = 
+        if debug_mode then 
+            let fmt = Loggers.formatter_of_logger log in 
+                     let () =
+             match fmt with 
+             | None -> () 
+            | Some fmt -> 
+              let () = Loggers.fprintf log "AST (new rule only)" in 
+             let () =  Loggers.print_newline log in 
+          let () = Ast.print_parsing_compil_kappa fmt compil in ()  
+              in errors else errors  
+            in 
        let errors, c_compil = Prepreprocess.translate_compil parameters errors compil in 
        let errors, handler, cc_compil' = 
           Preprocess.translate_c_compil parameters errors handler c_compil in 
