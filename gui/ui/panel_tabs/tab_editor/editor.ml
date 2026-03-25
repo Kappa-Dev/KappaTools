@@ -158,7 +158,7 @@ let rule_checkbox rule_id is_checked =
       @ checked_attribute)
     ()
 
-let add_checkbox_to_working_set_rules rules codemirror =
+let add_checkbox_to_working_set_elements rules codemirror =
   let build_checkbox rule_id enabled =
     Tyxml_js.To_dom.of_element
       (Html.div
@@ -190,7 +190,7 @@ let add_checkbox_to_working_set_rules rules codemirror =
 
 let codemirror_ref : codemirror Js.t option ref = ref None
 
-let working_set_rules_checkboxes =
+let working_set_elements_checkboxes =
   let open Lwt.Infix in
   State_project.on_project_change_async ~on:(React.S.const true) ()
     (React.S.const ()) () (fun (manager : Api.concrete_manager) () ->
@@ -200,9 +200,9 @@ let working_set_rules_checkboxes =
         let () =
           Codemirror.clearGutter ~cm:codemirror ~gutter_id:working_set_gutter
         in
-        manager#get_working_set_rules >|= fun x ->
+        manager#get_working_set_elements >|= fun x ->
         (match x.Result_util.value with
-        | Result.Ok rules -> add_checkbox_to_working_set_rules rules codemirror
+        | Result.Ok rules -> add_checkbox_to_working_set_elements rules codemirror
         | Result.Error _ -> ()))
 
 let onload () : unit =

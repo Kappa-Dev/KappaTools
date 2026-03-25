@@ -125,8 +125,8 @@ object
     Result_util.t
     Lwt.t
 
-  method get_working_set_rules :
-    (Public_data.working_set_rules, Result_util.message list) Result_util.t
+  method get_working_set_elements :
+    (Public_data.working_set_elements, Result_util.message list) Result_util.t
     Lwt.t
 
   method enable_or_disable_rule :

@@ -248,11 +248,11 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
               Public_data.scc_of_json x |> Result_util.ok |> Lwt.return)
 
-    method get_working_set_rules =
-      let request = `List [ `String "WORKING_SET_RULES" ] in
+    method get_working_set_elements =
+      let request = `List [ `String "WORKING_SET_ELEMENTS" ] in
       self#message request
       >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
-              Public_data.working_set_rules_of_json x
+              Public_data.working_set_elements_of_json x
               |> Result_util.ok |> Lwt.return)
 
     method enable_or_disable_rule rule_id enable =

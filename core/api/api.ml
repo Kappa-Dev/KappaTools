@@ -168,7 +168,7 @@ class type manager_static_analysis = object
     result
     Lwt.t
 
-  method get_working_set_rules : Public_data.working_set_rules result Lwt.t
+  method get_working_set_elements : Public_data.working_set_elements result Lwt.t
   method enable_or_disable_rule : int -> bool -> unit result Lwt.t
 end
 

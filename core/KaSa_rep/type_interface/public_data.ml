@@ -41,7 +41,7 @@ let position = "location"
 let position_list = "location list"
 let variable = "variable"
 let rule = "rule"
-let working_set_rules = "working set rules"
+let working_set_elements = "working set elements"
 let direct = "direct"
 let side_effect = "side effect"
 let source = "source"
@@ -376,10 +376,8 @@ type rule = {
   rule_hidden: bool;
 }
 
-type rule_in_working_set = {
+type element_in_working_set = {
   rule_ws_id: int;
-  rule_ws_label: string;
-  rule_ws_ast: string;
   rule_ws_position: Loc.t;
   rule_ws_enabled: bool;
 }
@@ -434,24 +432,20 @@ let json_to_rule = function
             (JsonUtil.exn_msg_cant_import_from_json " rule", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("rule", x))
 
-let ws_rule_to_json rule =
+let ws_element_to_json rule =
   `Assoc
     [
       rule_id, JsonUtil.of_int rule.rule_ws_id;
-      label, JsonUtil.of_string rule.rule_ws_label;
-      ast, JsonUtil.of_string rule.rule_ws_ast;
       ( position,
         Loc.yojson_of_annoted JsonUtil.of_unit ((), rule.rule_ws_position) );
       rule_enabled, JsonUtil.of_bool rule.rule_ws_enabled;
     ]
 
-let json_to_ws_rule = function
-  | `Assoc l as x when List.length l = 5 ->
+let json_to_ws_element = function
+  | `Assoc l as x when List.length l = 3 ->
     (try
        {
          rule_ws_id = JsonUtil.to_int (List.assoc rule_id l);
-         rule_ws_label = JsonUtil.to_string (List.assoc label l);
-         rule_ws_ast = JsonUtil.to_string (List.assoc ast l);
          rule_ws_position =
            snd
              (Loc.annoted_of_yojson
@@ -464,8 +458,8 @@ let json_to_ws_rule = function
      with Not_found ->
        raise
          (Yojson.Basic.Util.Type_error
-            (JsonUtil.exn_msg_cant_import_from_json " working set rule", x)))
-  | x -> raise (Yojson.Basic.Util.Type_error ("working set rule", x))
+            (JsonUtil.exn_msg_cant_import_from_json " working set element", x)))
+  | x -> raise (Yojson.Basic.Util.Type_error ("working set element", x))
 
 type var = {
   var_id: int;
@@ -872,22 +866,22 @@ let conditionally_dead_rules_of_json = function
 (* working set rules *)
 (*********************)
 
-type working_set_rules = rule_in_working_set list
+type working_set_elements = element_in_working_set list
 
-let working_set_rules_of_json = function
-  | `Assoc [ (s, json) ] as x when s = working_set_rules ->
-    (try JsonUtil.to_list json_to_ws_rule json
+let working_set_elements_of_json = function
+  | `Assoc [ (s, json) ] as x when s = working_set_elements ->
+    (try JsonUtil.to_list json_to_ws_element json
      with Not_found ->
        raise
          (Yojson.Basic.Util.Type_error
-            (JsonUtil.exn_msg_cant_import_from_json working_set_rules, x)))
+            (JsonUtil.exn_msg_cant_import_from_json working_set_elements, x)))
   | x ->
     raise
       (Yojson.Basic.Util.Type_error
-         (JsonUtil.exn_msg_cant_import_from_json working_set_rules, x))
+         (JsonUtil.exn_msg_cant_import_from_json working_set_elements, x))
 
-let working_set_rules_to_json json =
-  `Assoc [ working_set_rules, JsonUtil.of_list ws_rule_to_json json ]
+let working_set_elements_to_json json =
+  `Assoc [ working_set_elements, JsonUtil.of_list ws_element_to_json json ]
 
 (***************)
 (* dead agents *)

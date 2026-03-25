@@ -1041,9 +1041,9 @@ let translate_compil parameters error
       (error, []) compil.Ast.observables
   in
   let add_ws_id_to_guard guard ws_id loc = 
-    match ws_id with
-    | None -> guard
-    | Some ws_id ->
+    match loc, ws_id with
+    | None, _ | _, None -> guard
+    | Some loc, Some ws_id ->
       let guard_name = Ast.working_set_index_to_string ws_id in
       let guard_param = Logical_formulae.P (guard_name, loc) in
       (match guard with
@@ -1053,7 +1053,7 @@ let translate_compil parameters error
   let error, _id_set, rules_rev =
     List.fold_left
       (fun (error, id_set, list) (ws_id, id, guard, (rule, p)) ->
-        let guard = add_ws_id_to_guard guard ws_id p
+        let guard = add_ws_id_to_guard guard ws_id (Some p)
         in
         let error, id_set =
           match id with
@@ -1135,9 +1135,8 @@ let translate_compil parameters error
     List.fold_left
       (fun (error, list) (ws_id, (guard, alg_ex, init_t)) ->
         let loc = match init_t with 
-          | Ast.INIT_MIX (_, pos) -> pos
-          | Ast.INIT_TOK ((_, pos)::_) -> pos 
-          | Ast.INIT_TOK [] -> Loc.dummy
+          | Ast.INIT_MIX (_, pos) -> Some pos
+          | Ast.INIT_TOK _ -> None
         in
         let guard = add_ws_id_to_guard guard ws_id loc in
         let error, alg =

@@ -436,8 +436,8 @@ val get_data :
   * separating_transitions option
   * int list option
 
-val get_working_set_rules :
-  ('static, 'compile) state -> Public_data.working_set_rules
+val get_working_set_elements :
+  ('static, 'compile) state -> Public_data.working_set_elements
 
 val reset_reachability_memoized_values :
   ('static, 'compile) state -> ('static, 'compile) state

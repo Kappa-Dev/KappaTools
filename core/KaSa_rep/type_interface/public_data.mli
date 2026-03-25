@@ -83,10 +83,8 @@ type rule = {
   rule_hidden: bool;
 }
 
-type rule_in_working_set = {
+type element_in_working_set = {
   rule_ws_id: int;
-  rule_ws_label: string;
-  rule_ws_ast: string;
   rule_ws_position: Loc.t;
   rule_ws_enabled: bool;
 }
@@ -164,10 +162,10 @@ val conditionally_dead_rules_of_json :
 val conditionally_dead_rules_to_json :
   rule_deadness_conditions -> Yojson.Basic.t
 
-type working_set_rules = rule_in_working_set list
+type working_set_elements = element_in_working_set list
 
-val working_set_rules_of_json : Yojson.Basic.t -> working_set_rules
-val working_set_rules_to_json : working_set_rules -> Yojson.Basic.t
+val working_set_elements_of_json : Yojson.Basic.t -> working_set_elements
+val working_set_elements_to_json : working_set_elements -> Yojson.Basic.t
 
 type agent_kind = {
   agent_id: int;
