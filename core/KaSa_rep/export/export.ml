@@ -2100,62 +2100,53 @@ functor
 
     let toggle_working_set_boolean_parameters_in_compilation error bool state
         working_set_indexes =
-      let parameters = Remanent_state.get_parameters state in
-      match Remanent_state.get_compilation state with
-      | None ->
-        let error, () =
-          Exception.warn parameters error __POS__
-            ~message:"There is no compilation available." Exit ()
-        in
-        error, state, false
-      | Some compilation ->
-        (match Remanent_state.get_c_compil state with
-        | None -> error, state, false
-        | Some c_compil ->
-          let rec toggle_parameters = function
-            | [] ->
-              ( error,
-                compilation.Ast.working_set_values,
-                c_compil.Cckappa_sig.working_set_valuations,
-                false )
-            | working_set_index :: indexes ->
-              let error, working_set_values, working_set_valuations, changed =
-                toggle_parameters indexes
+      let parameters = get_parameters state in
+      let state, compilation = get_compilation state in
+      let state, c_compil = get_c_compilation state in
+      let rec toggle_parameters = function
+        | [] ->
+          ( error,
+            compilation.Ast.working_set_values,
+            c_compil.Cckappa_sig.working_set_valuations,
+            false )
+        | working_set_index :: indexes ->
+          let error, working_set_values, working_set_valuations, changed =
+            toggle_parameters indexes
+          in
+          let guard_int =
+            Ckappa_sig.int_of_working_set_index working_set_index
+          in
+            (match Mods.IntMap.find_option guard_int working_set_values with
+          | None ->
+              let error, () =
+              Exception.warn parameters error __POS__
+                ~message:
+                  ("Index out of bounds: there is no rule with index "
+                  ^ Ckappa_sig.string_of_working_set_index working_set_index
+                  ^ " in the working set")
+                Exit ()
+            in
+            error, working_set_values, working_set_valuations, false
+          | Some old_bool ->
+            if old_bool = bool then
+              error, working_set_values, working_set_valuations, changed
+            else (
+              let working_set_values =
+                Mods.IntMap.add guard_int bool working_set_values
               in
-              let guard_int =
-                Ckappa_sig.int_of_working_set_index working_set_index
+              let error, (guard_id, _) =
+                Ckappa_sig.Ws_index_map_and_set.Map.find_default parameters
+                  error
+                  (Ckappa_sig.guard_parameter_of_int (-1), false)
+                  working_set_index working_set_valuations
               in
-                (match Mods.IntMap.find_option guard_int working_set_values with
-              | None ->
-                 let error, () =
-                  Exception.warn parameters error __POS__
-                    ~message:
-                      ("Index out of bounds: there is no rule with index "
-                      ^ Ckappa_sig.string_of_working_set_index working_set_index
-                      ^ " in the working set")
-                    Exit ()
-                in
-                error, working_set_values, working_set_valuations, false
-              | Some old_bool ->
-                if old_bool = bool then
-                  error, working_set_values, working_set_valuations, changed
-                else (
-                  let working_set_values =
-                    Mods.IntMap.add guard_int bool working_set_values
-                  in
-                  let error, (guard_id, _) =
-                    Ckappa_sig.Ws_index_map_and_set.Map.find_default parameters
-                      error
-                      (Ckappa_sig.guard_parameter_of_int (-1), false)
-                      working_set_index working_set_valuations
-                  in
-                  let error, working_set_valuations =
-                    Ckappa_sig.Ws_index_map_and_set.Map.add_or_overwrite
-                      parameters error working_set_index (guard_id, bool)
-                      working_set_valuations
-                  in
-                  error, working_set_values, working_set_valuations, true
-                ))
+              let error, working_set_valuations =
+                Ckappa_sig.Ws_index_map_and_set.Map.add_or_overwrite
+                  parameters error working_set_index (guard_id, bool)
+                  working_set_valuations
+              in
+              error, working_set_values, working_set_valuations, true
+            ))
           in
           let error, working_set_values, working_set_valuations, changed =
             toggle_parameters working_set_indexes
@@ -2171,76 +2162,68 @@ functor
                 { c_compil with working_set_valuations }
                 state
             in
-            let state =
-              match Remanent_state.get_refined_compil state with
-              | Some c ->
-                Remanent_state.set_refined_compil
+            let state, c = get_refined_compil state in
+            let state = Remanent_state.set_refined_compil
                   { c with working_set_values }
                   state
-              | None -> state
             in
             error, state, true
           ) else
-            error, state, false)
+            error, state, false
 
     let enable_or_disable_rule bool working_set_indexes state =
-      let error = Remanent_state.get_errors state in
+      let error = get_errors state in
       let error, state, changed =
         toggle_working_set_boolean_parameters_in_compilation error bool state
           working_set_indexes in 
       if changed then (
         let state, (static, dynamic) = get_reachability_analysis state in
-        match Remanent_state.get_c_compil state with
-        | Some c_compil ->
-          let error, dynamic, static =
-            Reachability.enable_or_disable_rule static dynamic error c_compil
-          in
-          let error, dynamic, state =
-            Reachability.export static dynamic error state
-          in
-          let state =
-            Remanent_state.set_reachability_result (static, dynamic) state
-          in
-          let state = Remanent_state.reset_reachability_memoized_values state in
-          Remanent_state.set_errors error state
-        | None -> Remanent_state.set_errors error state
+        let state, c_compil = get_c_compilation state in
+        let error, dynamic, static =
+          Reachability.enable_or_disable_rule static dynamic error c_compil
+        in
+        let error, dynamic, state =
+          Reachability.export static dynamic error state
+        in
+        let state =
+          Remanent_state.set_reachability_result (static, dynamic) state
+        in
+        let state = Remanent_state.reset_reachability_memoized_values state in
+        Remanent_state.set_errors error state
       ) else
          Remanent_state.set_errors error state
 
     let ws_id_from_rule_name rule_name state =
-      let error = Remanent_state.get_errors state in
-      let parameters = Remanent_state.get_parameters state in
+      let error = get_errors state in
+      let parameters = get_parameters state in
+      let state, kappa_handler = get_handler state in 
+      let state, compil = get_c_compilation state in
       let error, ws_id =
-        match
-          Remanent_state.get_handler state, Remanent_state.get_c_compil state
+        (match
+        Ckappa_sig.Rule_label_map_and_set.Map.find_option parameters error
+          rule_name kappa_handler.Cckappa_sig.rules_label_map
         with
-        | None, _ | _, None -> Exception.warn parameters error __POS__ Exit None
-        | Some kappa_handler, Some compil ->
-          (match
-             Ckappa_sig.Rule_label_map_and_set.Map.find_option parameters error
-               rule_name kappa_handler.Cckappa_sig.rules_label_map
-           with
-          | error, None ->
+      | error, None ->
+        Exception.warn parameters error __POS__
+          ~message:("There is no rule with label '" ^ rule_name ^ "'")
+          Exit None
+      | error, Some rule_id ->
+        (match
+           Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters
+             error rule_id compil.Cckappa_sig.rules
+         with
+        | error, None -> Exception.warn parameters error __POS__ Exit None
+        | error, Some enriched_rule ->
+          (match enriched_rule.Cckappa_sig.e_rule_working_set_id with
+          | None ->
             Exception.warn parameters error __POS__
-              ~message:("There is no rule with label '" ^ rule_name ^ "'")
+              ~message:
+                ("The rule with label '" ^ rule_name
+                ^ "' is not in the current working set")
               Exit None
-          | error, Some rule_id ->
-            (match
-               Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters
-                 error rule_id compil.Cckappa_sig.rules
-             with
-            | error, None -> Exception.warn parameters error __POS__ Exit None
-            | error, Some enriched_rule ->
-              (match enriched_rule.Cckappa_sig.e_rule_working_set_id with
-              | None ->
-                Exception.warn parameters error __POS__
-                  ~message:
-                    ("The rule with label '" ^ rule_name
-                   ^ "' is not in the current working set")
-                  Exit None
-              | Some ws_id -> error, Some ws_id)))
+          | Some ws_id -> error, Some ws_id)))
       in
-      let state = Remanent_state.set_errors error state in
+      let state = set_errors error state in
       state, ws_id
 
     let enable_rule name state =
