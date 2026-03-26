@@ -75,7 +75,7 @@ echo "Using a timeout of $TIMEOUT."
 echo "Using $MIN_NR_RULES to $MAX_NR_RULES rules in the working set, with a step of $STEP."
 echo "Performing $REPS repetitions for each experiment."
 
-OPTIONS="--reset-all --compute-reachability-analysis --enable-every-domain"
+OPTIONS="--reset-all --compute-reachability-analysis --enable-every-domain --print-efficiency"
 # models
 MODELS_DIRECTORY="${SCRIPT_DIR}/models/"
 
@@ -147,14 +147,11 @@ for MODEL in "${MODELS[@]}"; do
         echo
         echo "Processing model: $MODEL with $NR_RULES rules in the working set"
 
-        # output files
-        OUTPUT_FILE="${OUTPUT_DIR}${NR_RULES}_rules_in_ws_experiments_output"
-        i=0
-        while [ -e "${OUTPUT_FILE}_incremental~$i.txt" ]; do
-            i=$((i + 1))
-        done
-        STDOUT_OUTPUT_FILE_INCREMENTAL="${OUTPUT_FILE}_incremental~$i.txt"
-        OUTPUT_FILE="${OUTPUT_DIR}${NR_RULES}_rules_in_ws_runtimes~$i.html"
+        # output file
+        STDOUT_OUTPUT_FILE_INCREMENTAL="${OUTPUT_DIR}${NR_RULES}_rules_in_ws_experiments_output_incremental_$MODEL.txt"
+   
+        # clear output file
+        echo -n "" > "$STDOUT_OUTPUT_FILE_INCREMENTAL"
 
         SYNTAX="V4"
         if grep -v "^/\*" "$EXAMPLE_MODEL" | grep -qi "!1" -; then
@@ -194,8 +191,10 @@ for MODEL in "${MODELS[@]}"; do
                 --rules-in-working-set "$random_rules"
                 )
             fi
-            printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
-            printf '\n'
+            if $DEBUG; then
+                printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
+                printf '\n'
+            fi
             { cat "$INPUT_INCREMENTAL_TMP" | ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_INCREMENTAL"
             EXIT_STATUS=$?
 
@@ -205,27 +204,21 @@ for MODEL in "${MODELS[@]}"; do
                 break
             fi
 
-            echo "<h4>INCREMENTAL ANALYSIS</h4><table>" >> "${OUTPUT_FILE}"
-
-            grep "End</TD><TD>Global initialization" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
             grep "End</TD><TD>Global initialization" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$MODEL,1_initialization,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-            grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
             grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$MODEL,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
-            grep -m 1 "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" >> "${OUTPUT_FILE}"
             grep -m 1 "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$MODEL,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 
         done
 
         rm "$INPUT_INCREMENTAL_TMP"
 
-        echo "✅ Completed: $MODEL"
+        echo "✅ Completed: $MODEL with $NR_RULES rules in the working set."
         echo "The results of the incremental analysis can be found in: $STDOUT_OUTPUT_FILE_INCREMENTAL"
-        echo "The runtimes can be found in: $OUTPUT_FILE"
 
         # Check for exceptions in STDOUT_OUTPUT_FILE
         if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_INCREMENTAL"; then
-            echo "🚨 Exception raised during analysis of $MODEL 3."
+            echo "🚨 Exception raised during analysis of $MODEL with $NR_RULES rules in the working set."
         fi 
     done
 done
