@@ -139,7 +139,9 @@ let main () =
                 Exception.warn parameters error __POS__
                   ~message:("Parsing error: " ^ input) Exit ()
               in
-              Export_to_KaSa.set_errors error state
+              let state = Export_to_KaSa.set_errors error state in 
+              let () = Exception.print parameters error in
+              state 
             in 
           loop state 
       | input ->

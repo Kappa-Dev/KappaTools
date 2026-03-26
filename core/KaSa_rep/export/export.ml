@@ -242,6 +242,7 @@ functor
           cli.Run_cli_args.rules_in_working_set <- rules_in_working_set
         in
         let () = cli.Run_cli_args.rules_to_remove <- rules_to_remove in
+        try 
         let compilation_result : Cli_init.compilation_result =
           Cli_init.get_compilation
             ~warning:(fun ~pos:_ _msg -> ())
@@ -257,6 +258,11 @@ functor
           Some (compilation_result.env : Model.t),
           Some compilation_result.init_l,
           Some compilation_result.contact_map )
+        with exn -> 
+          let errors = Remanent_state.get_errors state in 
+          let errors, () = Exception.warn parameters errors __POS__  exn () in 
+          let state = Remanent_state.set_errors errors state in 
+          (state, None, None, None) 
 
     let compute_env show_title state =
       let state, env, _, _ = compute_env_init show_title state in
@@ -288,14 +294,21 @@ functor
       let rules_in_ws =
         Remanent_parameters.get_rules_in_working_set parameters
       in
-      let compil =
+      let errors = Remanent_state.get_errors state in  
+      let errors, compil =
         match Remanent_state.get_init state with
-        | Remanent_state.Compil compil -> compil
+        | Remanent_state.Compil compil -> errors, compil
         | Remanent_state.Files files ->
           let () = show_title state in
-          Cli_init.get_ast_from_list_of_files ~current_chapter ~rules_in_ws
+          try 
+          errors, Cli_init.get_ast_from_list_of_files ~current_chapter ~rules_in_ws
             ~removed_rules syntax_version files
+        with 
+        exn ->  
+          let errors, () = Exception.warn parameters errors __POS__  exn () in 
+          (errors, Ast.empty_compil) 
       in
+      let state = Remanent_state.set_errors errors state in 
       let state = Remanent_state.set_compilation compil state in
       state, compil
 
@@ -2369,13 +2382,17 @@ functor
        let state, handler = get_handler state in 
        let _state', compil = get_compilation state' in 
        let compil = Diff.cut diff compil in 
+       let errors = get_errors state in 
        let errors, c_compil = Prepreprocess.translate_compil parameters errors compil in 
        let errors, handler, cc_compil' = 
           Preprocess.translate_c_compil parameters errors handler c_compil in 
        let _state' = Remanent_state.set_compilation compil state' in 
+       let state = Remanent_state.set_errors errors state in 
        let state, cc_compil = get_c_compilation state in
        let state = Remanent_state.store_patch cc_compil state in 
+        let errors = get_errors state in 
        let errors, handler, cc_compil, new_indexs = Diff.fuse parameters errors handler cc_compil cc_compil' in 
+        let state = set_errors errors state in 
        let state, ((_global_static,_static), _dynamic) = 
         update_reachability_result 
           (compute_show_title (fun _ -> do_we_show_title) (Some "Apply patch")) 
@@ -2387,7 +2404,7 @@ functor
           | None | Some false -> Remanent_parameters.get_trace parameters 
           | Some true -> true 
         in 
-        if debug_mode then 
+        let state = if debug_mode then 
            let () = Loggers.fprintf log "SUMMARIES" in 
            let () = Loggers.print_newline log in 
            let () = Loggers.print_newline log in 
@@ -2418,6 +2435,9 @@ functor
             let errors = Print_cckappa.print_compil parameters errors handler cc_compil in 
             set_errors errors state  
       else state 
+      in 
+      let () = dump_errors state in 
+      state 
  
    
   end
