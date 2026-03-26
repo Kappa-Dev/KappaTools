@@ -874,7 +874,17 @@ let print_rule parameters error handler rule =
     print_actions parameters_actions error handler
       rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.actions
   in
-  error
+  let error = 
+    match 
+      rule.Cckappa_sig.e_rule_working_set_id 
+    with
+    | None -> error 
+    | Some i ->   
+        let () = Loggers.fprintf
+      (Remanent_parameters.get_logger parameters)
+      "(%i)" (Ckappa_sig.int_of_working_set_index i) in error 
+    in 
+     error
 
 let print_rules parameters error handler rules =
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.print parameters error

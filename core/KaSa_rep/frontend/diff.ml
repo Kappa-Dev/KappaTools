@@ -159,8 +159,8 @@ let summarize_from_ast parameters error compil =
          let error, summary = 
           summarize_rule_from_ast parameters error id rule summary in 
           error, id+1, summary)
-    (error, 1, summary)        
-    (List.rev compil.Ast.rules) 
+    (error, 0, summary)        
+    compil.Ast.rules
   in   
   let error, _, summary = 
     List.fold_left 
@@ -174,8 +174,8 @@ let summarize_from_ast parameters error compil =
               summarize_init_state_from_ast parameters error id (a,b,init) summary 
             in 
             error, id+1, summary)
-        (error, 1, summary)        
-        ( List.rev compil.Ast.init) 
+        (error, 0, summary)        
+        compil.Ast.init 
   in   
   error, summary  
 

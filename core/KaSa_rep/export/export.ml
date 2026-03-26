@@ -2292,6 +2292,28 @@ functor
         | None -> None 
         | Some r -> r.Cckappa_sig.e_rule_working_set_id 
       in 
+       let () = 
+      if Remanent_parameters.get_trace parameters then 
+         Loggers.fprintf (Remanent_parameters.get_logger parameters) "WS OF RULE -> rid:%i Wid:%i" (Ckappa_sig.int_of_rule_id i) (match id_opt with None -> (-1) | Some a -> Ckappa_sig.int_of_working_set_index a) 
+      else () in 
+      let state = set_errors errors state in 
+      state, id_opt  
+
+  let working_set_id_of_init_id i state = 
+      let parameters = get_parameters state in 
+      let errors = get_errors state in 
+      let state, c_compil = get_c_compilation state in 
+      let init = c_compil.Cckappa_sig.init in 
+      let errors, init= Int_storage.Nearly_inf_Imperatif.get parameters errors i init in 
+      let id_opt = 
+        match init with 
+        | None -> None 
+        | Some r -> r.Cckappa_sig.e_init_working_set_id 
+      in 
+      let () = 
+      if Remanent_parameters.get_trace parameters then 
+         Loggers.fprintf (Remanent_parameters.get_logger parameters) "WS OF INIT -> rid:%i Wid:%i" i (match id_opt with None -> (-1) | Some a -> Ckappa_sig.int_of_working_set_index a) 
+      else () in 
       let state = set_errors errors state in 
       state, id_opt  
 
@@ -2300,6 +2322,19 @@ functor
         List.fold_left 
         (fun (state, l) index -> 
           let state, id_opt = working_set_id_of_rule_id index state 
+          in 
+        match id_opt with 
+        | None -> state, l 
+        | Some i -> state, i::l) 
+        (state, [])  (List.rev list) in 
+        enable_or_disable_rule false l state 
+
+
+    let disable_init_c_id_list list state = 
+      let state, l = 
+        List.fold_left 
+        (fun (state, l) index -> 
+          let state, id_opt = working_set_id_of_init_id index state 
           in 
         match id_opt with 
         | None -> state, l 
@@ -2374,8 +2409,8 @@ functor
        let state = rename_pos (Diff.renaming_of_diff diff) state in 
        let state = disable_rule_c_id_list 
         (List.rev_map Ckappa_sig.rule_id_of_int
-       (List.rev diff.Diff.diff_rules.removed_elt)) 
-       state in 
+       (List.rev diff.Diff.diff_rules.removed_elt)) state in 
+       let state = disable_init_c_id_list diff.Diff.diff_init.removed_elt state in
        let state, _state' = parse_token 
                     (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
                     ~patch:state' ~current:state in 
