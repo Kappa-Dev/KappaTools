@@ -2419,7 +2419,7 @@ functor
        let compil = Diff.cut diff compil in 
        let errors = get_errors state in 
        let errors, c_compil = Prepreprocess.translate_compil parameters errors compil in 
-       let errors, handler, cc_compil' = 
+       let errors, _handler, cc_compil' = 
           Preprocess.translate_c_compil parameters errors handler c_compil in 
        let _state' = Remanent_state.set_compilation compil state' in 
        let state = Remanent_state.set_errors errors state in 
@@ -2471,7 +2471,6 @@ functor
             set_errors errors state  
       else state 
       in 
-      let () = dump_errors state in 
       state 
  
    
