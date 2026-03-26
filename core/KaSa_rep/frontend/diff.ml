@@ -22,6 +22,11 @@ type diff =
    first_init: int; 
  }
 
+ let starting_new_elt = 
+   {
+    first_rule = 1; 
+    first_init = 1; 
+   }
  let empty_summary_file = 
    {
     summary_rule_map =  Mods.StringMap.empty; 
@@ -453,7 +458,7 @@ let extract index_list list =
     | h::t,a::b when h=i -> aux t (i+1) b (a::acc)
     | _::t,_::b -> aux t (i+1) b acc 
     | _, [] -> assert false 
-  in aux index_list 1 list []
+  in aux index_list 1 (List.rev list) []
 
 let cut diff (ast:Ast.parsing_compil) = 
   let rules = extract diff.diff_rules.new_elt ast.Ast.rules in 

@@ -13,6 +13,8 @@ type diff =
    first_init: int; 
  }
 
+val starting_new_elt: new_indexs 
+
 val summarize_from_ast:  
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->

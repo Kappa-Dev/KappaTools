@@ -505,7 +505,14 @@ module Domain = struct
     let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, result_restriction_bdu
 
-  let initialize static dynamic error =
+  let initialize ?patch static dynamic error =
+     let parameters = Analyzer_headers.get_parameter static in
+    match patch with 
+    | Some (static, local,_) -> let error, () = 
+                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
+    in error, static, {local ; global = dynamic}, [  ]
+    | None -> 
+  
     let error, dynamic, restriction_bdu =
       init_restriction_bdu static dynamic error
     in

@@ -39,7 +39,7 @@ type global_dynamic_information = {
   log_info: StoryProfiling.StoryStats.log_info;
 }
 
-type ('static, 'dynamic) kasa_state = ('static, 'dynamic) Remanent_state.state
+type ('static, 'dynamic) kasa_state = (global_static_information,'static, 'dynamic) Remanent_state.state
 type initial_state = Cckappa_sig.enriched_init
 
 let get_wake_up_relation static = static.global_wake_up_relation
@@ -256,6 +256,17 @@ let compute_initial_state error static =
   in
   error, List.rev init
 
+let update_initial_state error static new_elts =
+  let parameters = get_parameter static in
+  let compil = get_cc_code static in
+  let error, init =
+    Int_storage.Nearly_inf_Imperatif.fold parameters error
+      (fun _parameters error k i l -> 
+        if k>=new_elts.Diff.first_init then error, i :: l else error, l)
+      compil.Cckappa_sig.init []
+  in
+  error, List.rev init
+
 (*****************************************************************************)
 (*MVBDU OF THE GUARDS*)
 (*****************************************************************************)
@@ -321,8 +332,13 @@ let scan_rule static error mvbdu_handler =
   let static = set_common_views store_result static in
   error, mvbdu_handler, static
 
-let initialize_global_information parameters log_info error mvbdu_handler
+let initialize_global_information ?patch parameters log_info error mvbdu_handler
     compilation kappa_handler =
+    match patch with 
+    | Some (static, dynamic,_) -> let error, () = 
+                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
+    in error, static, dynamic 
+    | None -> 
   let error, init_common = Common_static.init_common_views parameters error in
   let error, wake_up = Common_static.empty_site_to_rules parameters error in
   let nsites = Handler.get_nsites kappa_handler in
@@ -356,6 +372,13 @@ let initialize_global_information parameters log_info error mvbdu_handler
   let init_dynamic = { dynamic_dummy = (); mvbdu_handler; log_info } in
   error, static, init_dynamic
 
+
+  (* TO DO *)
+let update_global_information parameters log_info error mvbdu_handler
+    compilation kappa_handler _new_elts _static _dynamic = (* TO DO *)
+    initialize_global_information parameters log_info error mvbdu_handler
+    compilation kappa_handler  
+    
 let dummy_dead_rules _ error _ = error, false
 let dummy_side_effects _ error _ = error, None
 

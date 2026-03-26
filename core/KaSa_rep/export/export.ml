@@ -23,7 +23,8 @@ functor
   ->
   struct
     type state =
-      ( Reachability.static_information,
+      ( Analyzer_headers.global_static_information, 
+        Reachability.static_information,
         Reachability.dynamic_information )
       Remanent_state.state
 
@@ -34,7 +35,8 @@ functor
     type c_compilation = Cckappa_sig.compil
 
     type reachability_analysis =
-      ( Reachability.static_information,
+      ( Analyzer_headers.global_static_information, 
+      Reachability.static_information,
         Reachability.dynamic_information )
       Remanent_state.reachability_result
 
@@ -213,10 +215,8 @@ functor
         state
 
     let compute_env_init show_title
-        (state :
-          ( Reachability.static_information,
-            Reachability.dynamic_information )
-          Remanent_state.state) =
+        (state : state)
+         =
       let parameters = get_parameters state in
       match Remanent_state.get_init state with
       | Remanent_state.Compil _ -> state, None, None, None
@@ -564,19 +564,41 @@ functor
       let log_info = Remanent_state.get_log_info state in
       let parameters = Remanent_state.get_parameters state in
       let error = Remanent_state.get_errors state in
-      let error, log_info, static, dynamic =
+      let error, log_info, (global,static), dynamic =
         Reachability.main parameters log_info error bdu_handler c_compil handler
       in
       let error, dynamic, state =
-        Reachability.export static dynamic error state
+        Reachability.export global static dynamic error state
       in
       let state = Remanent_state.set_errors error state in
       let state = Remanent_state.set_log_info log_info state in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
       let state =
-        Remanent_state.set_reachability_result (static, dynamic) state
+        Remanent_state.set_reachability_result ((global, static), dynamic) state
       in
-      state, (static, dynamic)
+      state, ((global,static), dynamic)
+
+   let update_reachability_result show_title new_indexs state =
+      let state, c_compil = get_c_compilation state in
+      let state, handler = get_handler state in
+      let () = show_title state in
+      let bdu_handler = Remanent_state.get_bdu_handler state in
+      let log_info = Remanent_state.get_log_info state in
+      let parameters = Remanent_state.get_parameters state in
+      let error = Remanent_state.get_errors state in
+      let error, log_info, (global, static), dynamic =
+          Reachability.update_main parameters log_info error bdu_handler c_compil handler new_indexs state 
+      in
+      let error, dynamic, state =
+        Reachability.export global static dynamic error state
+      in
+      let state = Remanent_state.set_errors error state in
+      let state = Remanent_state.set_log_info log_info state in
+      let state = Remanent_state.set_bdu_handler bdu_handler state in
+      let state =
+        Remanent_state.set_reachability_result ((global,static), dynamic) state
+      in
+      state, ((global,static), dynamic)   
 
     let get_reachability_analysis =
       get_gen ~log_title:"Reachability analysis"
@@ -587,7 +609,7 @@ functor
       let parameters = Remanent_state.get_parameters state in
       let log = Remanent_parameters.get_logger parameters in
       let state, (static, dynamic) = get_reachability_analysis state in
-      let error, dynamic = Reachability.print static dynamic error log in
+      let error, dynamic = Reachability.print (snd static) dynamic error log in
       let state =
         Remanent_state.set_reachability_result (static, dynamic) state
       in
@@ -1021,11 +1043,11 @@ functor
       in
       let (error, dynamic), wake_up_map =
         Algebraic_construction.filter_influence_high maybe_reachable parameters
-          handler error compil static dynamic wake_up_map true
+          handler error compil (snd static) dynamic wake_up_map true
       in
       let (error, dynamic), inhibition_map =
         Algebraic_construction.filter_influence_high maybe_reachable parameters
-          handler error compil static dynamic inhibition_map false
+          handler error compil (snd static) dynamic inhibition_map false
       in
       let state = Remanent_state.set_errors error state in
       let state =
@@ -1081,13 +1103,7 @@ functor
     let compute_map_gen
         (get :
           ?accuracy_level:Public_data.accuracy_level ->
-          ( Reachability.static_information,
-            Reachability.dynamic_information )
-          Remanent_state.state ->
-          ( Reachability.static_information,
-            Reachability.dynamic_information )
-          Remanent_state.state
-          * 'a) store convert ?(accuracy_level = Public_data.Low)
+          state -> state * 'a) store convert ?(accuracy_level = Public_data.Low)
         ?(do_we_show_title = fun _ -> true) ?log_title state =
       let show_title =
         match log_title with
@@ -1439,7 +1455,7 @@ functor
         | Public_data.Low -> errors, dynamic, cm_graph
         | Public_data.Medium | Public_data.High | Public_data.Full ->
           let maybe_reachable _parameters error static dynamic =
-            Reachability.maybe_reachable static dynamic error
+            Reachability.maybe_reachable (snd static) dynamic error
               Analyzer_headers.Embeddings
           in
           Contact_map_scc.filter_edges_in_converted_contact_map parameters
@@ -2180,13 +2196,19 @@ functor
         let state, (static, dynamic) = get_reachability_analysis state in
         let state, c_compil = get_c_compilation state in
         let error, dynamic, static =
-          Reachability.enable_or_disable_rule static dynamic error c_compil
+          Reachability.enable_or_disable_rule (snd static) dynamic error c_compil
         in
+        let global = Remanent_state.get_global_static_information state in 
+        let global = 
+            match global with 
+            | None -> assert false 
+            | Some global -> global 
+        in 
         let error, dynamic, state =
-          Reachability.export static dynamic error state
+          Reachability.export global static dynamic error state
         in
         let state =
-          Remanent_state.set_reachability_result (static, dynamic) state
+          Remanent_state.set_reachability_result ((global, static), dynamic) state
         in
         let state = Remanent_state.reset_reachability_memoized_values state in
         Remanent_state.set_errors error state
@@ -2290,6 +2312,7 @@ functor
 
     let rename_pos rename state = 
       let state = Remanent_state.rename_pos 
+                                (fun _ e _ a -> e,a)
                                 (fun _ e _ a -> e,a) 
                                 (fun _ e _ a -> e,a) rename state  in 
       state 
@@ -2308,7 +2331,6 @@ functor
 
     let patch ?debug ?do_we_show_title ~called_from ?compil ?patch_file_name ~old_file_name state = 
        let parameters = get_parameters state in 
-       let debug_mode = Remanent_parameters.get_trace parameters in 
        let log = Remanent_parameters.get_logger parameters in       
        let state, summary_ast = summarize_from_ast state in 
        let files = Option.map (fun x -> [x]) patch_file_name in
@@ -2337,18 +2359,14 @@ functor
        in 
        let state = set_errors errors state in 
        let state = rename_pos (Diff.renaming_of_diff diff) state in 
-       let state = disable_rule_index diff.Diff.diff_rules.removed_elt state in 
+       let state = disable_rule_c_id_list 
+        (List.rev_map Ckappa_sig.rule_id_of_int
+       (List.rev diff.Diff.diff_rules.removed_elt)) 
+       state in 
        let state, _state' = parse_token 
                     (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
                     ~patch:state' ~current:state in 
        let state, handler = get_handler state in 
-       let errors = 
-        if debug_mode then 
-           let () = Loggers.fprintf log "HANDLER" in 
-           let () = Loggers.print_newline log in          
-            Print_handler.print_handler parameters errors handler
-        else errors 
-       in 
        let _state', compil = get_compilation state' in 
        let compil = Diff.cut diff compil in 
        let errors, c_compil = Prepreprocess.translate_compil parameters errors compil in 
@@ -2356,7 +2374,12 @@ functor
           Preprocess.translate_c_compil parameters errors handler c_compil in 
        let _state' = Remanent_state.set_compilation compil state' in 
        let state, cc_compil = get_c_compilation state in
-       let errors, handler, cc_compil, _new_indexs = Diff.fuse parameters errors handler cc_compil cc_compil' in 
+       let state = Remanent_state.store_patch cc_compil state in 
+       let errors, handler, cc_compil, new_indexs = Diff.fuse parameters errors handler cc_compil cc_compil' in 
+       let state, ((_global_static,_static), _dynamic) = 
+        update_reachability_result 
+          (compute_show_title (fun _ -> do_we_show_title) (Some "Apply patch")) 
+          new_indexs state in 
        let debug_mode =
         match 
           debug

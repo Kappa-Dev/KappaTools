@@ -28,10 +28,26 @@ module type Analyzer = sig
     Cckappa_sig.kappa_handler ->
     Exception.exceptions_caught_and_uncaught
     * StoryProfiling.StoryStats.log_info
-    * static_information
+    * (Analyzer_headers.global_static_information * static_information)
+    * dynamic_information
+    
+
+val update_main :
+    Remanent_parameters_sig.parameters ->
+    StoryProfiling.StoryStats.log_info ->
+    Exception.exceptions_caught_and_uncaught ->
+    Ckappa_sig.Views_bdu.handler ->
+    Cckappa_sig.compil ->
+    Cckappa_sig.kappa_handler ->
+    Diff.new_indexs -> 
+   (Analyzer_headers.global_static_information,static_information, dynamic_information)  Remanent_state.state -> 
+    Exception.exceptions_caught_and_uncaught
+    * StoryProfiling.StoryStats.log_info
+    * (Analyzer_headers.global_static_information * static_information)
     * dynamic_information
 
   val export :
+    Analyzer_headers.global_static_information -> 
     static_information ->
     dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->
@@ -105,34 +121,55 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     in
     error, dynamic
 
-  let main parameters log_info error mvbdu_handler compil kappa_handler =
+  let main ?patch parameters log_info error mvbdu_handler compil kappa_handler =
+    let domain_event, global_event, init_event, analysis_event, new_elts = 
+        match patch with 
+          | None -> StoryProfiling.Domains_initialization, StoryProfiling.Global_initialization, StoryProfiling.Initial_states, StoryProfiling.Reachability_analysis, Diff.starting_new_elt
+          | Some (_,_,a) -> StoryProfiling.Domains_initialization_update, StoryProfiling.Global_initialization_update, StoryProfiling.Initial_state_updates, StoryProfiling.Incremental_reachability_analysis,a 
+    in 
     let error, log_info =
       StoryProfiling.StoryStats.add_event parameters error
-        StoryProfiling.Global_initialization None log_info
+        global_event None log_info
     in
-    let error, static, dynamic =
-      Analyzer_headers.initialize_global_information parameters log_info error
+    let patch_global  = 
+      match patch with 
+      | None -> None
+      | Some (static, dynamic, _) -> 
+        Some (fst static, Domain.get_global_dynamic_information dynamic, new_elts)
+    in 
+    let error, global_static, dynamic =
+      Analyzer_headers.initialize_global_information ?patch:patch_global parameters log_info error
         mvbdu_handler compil kappa_handler
     in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
-    let error, init = Analyzer_headers.compute_initial_state error static in
+    let error, init = Analyzer_headers.compute_initial_state error global_static in
     let log_info = Analyzer_headers.get_log_info dynamic in
     let error, log_info =
       StoryProfiling.StoryStats.add_event parameters error
-        StoryProfiling.Domains_initialization None log_info
+        domain_event None log_info
     in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
-    let error, static, dynamic = Domain.initialize static dynamic error in
+    let patch_domain = 
+      match patch with 
+      | None -> None 
+      | Some (static,dynamicd,_) -> Some (snd static,Domain.set_global_dynamic_information 
+       dynamic dynamicd,new_elts)
+    in 
+    let error, static, dynamic, _new_elts  = 
+         let error, static, dynamic =  
+            Domain.initialize ?patch:patch_domain  global_static dynamic error in 
+          error,  static, dynamic, new_elts 
+        in 
     let error, dynamic =
-      close_event parameters error StoryProfiling.Domains_initialization None
+      close_event parameters error domain_event None
         dynamic
     in
     let error, dynamic =
-      close_event parameters error StoryProfiling.Global_initialization None
+      close_event parameters error global_event None
         dynamic
     in
     let error, dynamic =
-      add_event parameters error StoryProfiling.Initial_states None dynamic
+      add_event parameters error init_event None dynamic
     in
     let error, dynamic, _ =
       List.fold_left
@@ -145,18 +182,18 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
             Domain.add_initial_state static dynamic error chemical_species
           in
           let error, dynamic =
-            close_event parameters error (StoryProfiling.Initial_state i) None
+            close_event parameters error (StoryProfiling.Initial_state i)  None
               dynamic
           in
           error, dynamic, i + 1)
         (error, dynamic, 1) init
     in
     let error, dynamic =
-      close_event parameters error StoryProfiling.Initial_states None dynamic
+      close_event parameters error init_event None dynamic
     in
     let log = Remanent_parameters.get_logger parameters in
     let error, dynamic =
-      add_event parameters error StoryProfiling.Reachability_analysis None
+      add_event parameters error analysis_event None
         dynamic
     in
     let error, static, dynamic =
@@ -230,7 +267,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     in
     let error, dynamic, () = Domain.stabilize static dynamic error in
     let error, dynamic =
-      close_event parameters error StoryProfiling.Reachability_analysis None
+      close_event parameters error analysis_event None
         dynamic
     in
     let error, dynamic = print static dynamic error log in
@@ -238,12 +275,26 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       Analyzer_headers.get_log_info
         (Domain.get_global_dynamic_information dynamic)
     in
-    error, log_info, static, dynamic
+    error, log_info, (global_static, static), dynamic
 
-  let export static dynamic error kasa_state =
+
+let update_main parameters log_info error mvbdu_handler compil kappa_handler new_indexs (state:(Analyzer_headers.global_static_information, static_information, dynamic_information) Remanent_state.state) =
+  let patch = 
+    match Remanent_state.get_reachability_result state with 
+    | None -> None 
+    | Some (static, dynamic) -> 
+      Some (static, dynamic, new_indexs)
+  in 
+   main ?patch parameters log_info error mvbdu_handler compil kappa_handler 
+   
+let main parameters log_info error mvbdu_handler compil kappa_handler =
+    main parameters log_info error mvbdu_handler compil kappa_handler
+
+  let export global static dynamic error kasa_state =
     let kasa_state =
       Remanent_state.set_internal_constraint_list [] kasa_state
     in
+    let kasa_state = Remanent_state.set_global_static_information global kasa_state in 
     let error, dynamic, kasa_state =
       Domain.export static dynamic error kasa_state
     in

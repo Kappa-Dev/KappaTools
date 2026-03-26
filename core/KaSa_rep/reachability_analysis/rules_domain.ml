@@ -179,12 +179,18 @@ module Domain = struct
   (**************************************************************************)
   (** [get_scan_rule_set static] *)
 
-  let initialize static dynamic error =
+  let initialize ?patch static dynamic error =
+     let parameters = Analyzer_headers.get_parameter static in
+    match patch with 
+    | Some (static, local,_) -> let error, () = 
+                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
+    in error, static, {local ; global = dynamic}, [  ]
+    | None -> 
+  
     let init_global_static_information =
       { global_static_information = static; domain_static_information = () }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    let parameters = Analyzer_headers.get_parameter static in
     let nrules = Handler.nrules parameters error kappa_handler in
     let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
     let error, bdu_handler, mvbdu_false =

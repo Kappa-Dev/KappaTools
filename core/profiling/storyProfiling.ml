@@ -47,9 +47,12 @@ type step_kind =
   | Global_initialization
   | Domains_initialization
   | Domain_initialization of string
+  | Domains_initialization_update 
+  | Domain_initialization_update of string 
   | Apply_rule of int
   | Initial_state of int
   | Initial_states
+  | Initial_state_updates 
   | Scan_rule_static of int
   | Scan_rule_dynamic of int
   | Regular_influences
@@ -63,8 +66,10 @@ type step_kind =
   | Internal_influence_map of string
   | LKappa_signature
   | Reachability_analysis
+  | Incremental_reachability_analysis
   | Print_reachability_result
   | Enable_or_disable_rule
+  | Global_initialization_update 
 
 let string_of_step_kind x =
   match x with
@@ -96,9 +101,12 @@ let string_of_step_kind x =
   | Domains_initialization -> "Domains initialization"
   | Domain_initialization string ->
     Printf.sprintf "Domain initialization (%s)" string
-  | Apply_rule int -> Printf.sprintf "Apply rule %i" int
+  | Domains_initialization_update -> "Domain updates"
+  | Domain_initialization_update string -> Printf.sprintf "Domain update (%s)" string
+    | Apply_rule int -> Printf.sprintf "Apply rule %i" int
   | Initial_state int -> Printf.sprintf "Initial state %i" int
   | Initial_states -> Printf.sprintf "Initial states computation"
+  | Initial_state_updates -> Printf.sprintf "Add new initial states computation"
   | Scan_rule_static int -> Printf.sprintf "Scan rule %i (static)" int
   | Scan_rule_dynamic int -> Printf.sprintf "Scan rule %i (dynamic)" int
   | Regular_influences -> Printf.sprintf "Regular influences computation"
@@ -115,9 +123,12 @@ let string_of_step_kind x =
   | LKappa_signature -> Printf.sprintf "LKappa signature"
   | Reachability_analysis ->
     Printf.sprintf "Compute fixpoint of reachability analysis"
+ | Incremental_reachability_analysis -> 
+    Printf.sprintf "Restart fixpoint computation for the reachability analysis"
   | Print_reachability_result ->
     Printf.sprintf "Print result of reachability analysis"
   | Enable_or_disable_rule -> Printf.sprintf "Enable or disable a rule"
+  | Global_initialization_update -> Printf.sprintf "Update global initialization"
 
 let print_step_kind parameters x =
   Loggers.print_cell
@@ -300,13 +311,16 @@ module StoryStats : StoryStats = struct
     | Compression | Build_grid | Build_configuration | Transitive_closure
     | Graph_reduction | Graph_conversion | Cannonic_form_computation
     | Store_trace | Removing_blacklisted_events | Blacklisting_events
-    | Global_initialization | Domains_initialization | Regular_influences
+    | Global_initialization | Domains_initialization | Domains_initialization_update 
+    | Regular_influences
     | Side_effects_influences | Merge_influences | KaSim_compilation
     | KaSa_precompilation | KaSa_lexing | KaSa_linking | LKappa_signature
     | Iteration _ | Story _ | Domain_initialization _ | Apply_rule _
     | Initial_state _ | Initial_states | Scan_rule_static _
     | Scan_rule_dynamic _ | Influence_map _ | Internal_influence_map _
     | Reachability_analysis | Print_reachability_result | Enable_or_disable_rule
+    | Global_initialization_update | Domain_initialization_update _ 
+    | Initial_state_updates | Incremental_reachability_analysis 
       ->
       false
 
