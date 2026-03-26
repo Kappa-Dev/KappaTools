@@ -7,7 +7,7 @@
   kappa_influence_map
   kappa_kasa_export)
  (modules
-  (:standard \ KaSa KaSaIncremental KaSaIncrementalTest))
+  (:standard \ KaSa KaSaIncremental))
  (flags
   (:standard
    -w
@@ -92,37 +92,6 @@
  (package kappa-binaries)
  (flags
   (:standard
-   -open
-   Kappa_logging
-   -open
-   Kappa_errors
-   -open
-   Kappa_parameters
-   -open
-   Kappa_reachability
-   -open
-   Kappa_staticanalyses
-   -open
-   Kappa_kasa_frontend
-   -open
-   Kappa_kasa_export
-   -open
-   Kappa_kasa_type_interface
-   -open
-   Kappa_kasa_remanent_state
-   -open
-   Kappa_grammar)))
-
-(executable
- (name KaSaIncrementalTest)
- (libraries num yojson str kappa_data_structures kappa_staticanalyses kappa_kasa_frontend)
- (modules KaSaIncrementalTest)
- (public_name KaSaIncrementalTest)
- (package kappa-binaries)
- (flags
-  (:standard
-   -open 
-   Kappa_data_structures
    -open
    Kappa_logging
    -open

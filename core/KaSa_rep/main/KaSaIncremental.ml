@@ -13,6 +13,10 @@ let help_message =
   \        Enables (or disables) the rule at index <index> in the working set.\n\
   \    enable/disable <label>\n\
   \        Enables (or disables) the rule with label <label> in the working set.\n\
+  \    update file foo.ka\n\
+  \        Replace the content of the current version of foo.ka with the new one.\n\
+  \    update file foo.ka as foo'.ka\n\
+  \        Replace the content of the current verion of the file foo'.ka with the content of the file foo.ka\n\
   \    add <rule>\n\
   \        (Not implemented yet TODO) Adds a rule to the working set.\n"
 
@@ -46,7 +50,7 @@ let parse_input s =
                  ^ ". Please put a label inside of quotation marks, e.g. \
                     'label'.")
               | Some i -> Enable_index (bool, i :: l))
-            | e -> e)
+            | Add _ | Enable _ | Parsing_error _ -> e)
           (Enable_index (bool, []))
           (if String.contains s ',' then
              String.split_on_char ',' s
@@ -128,6 +132,28 @@ let main () =
       | "print result" | "p result" | "p" ->
         let start_time = Sys.time () in
         let () = print_result parameters state start_time in
+        loop state
+      | input when String.length input > 12 && String.sub input 0 12 = "update file " -> 
+        let start_time = Sys.time () in
+        let l = String.split_on_char ' ' input in 
+        let state = 
+          match l with 
+          | ["update";"file";patch_file_name] -> 
+            let old_file_name = patch_file_name in 
+            let state = Export_to_KaSa.patch ~patch_file_name ~old_file_name state in state
+          | ["update";"file";patch_file_name;"as";old_file_name]  -> 
+            let state = Export_to_KaSa.patch ~patch_file_name ~old_file_name state in state
+          | _ -> 
+            let error = Export_to_KaSa.get_errors state in
+            let error, () =
+              Exception.warn parameters error __POS__
+                ~message:("Parsing error: " ^ input) Exit ()
+            in
+            Export_to_KaSa.set_errors error state
+        in
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
+        let () = KaSaUtil.print_efficiency parameters state start_time in
         loop state
       | input ->
         let start_time = Sys.time () in
