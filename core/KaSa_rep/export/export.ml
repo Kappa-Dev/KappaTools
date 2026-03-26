@@ -242,6 +242,7 @@ functor
           cli.Run_cli_args.rules_in_working_set <- rules_in_working_set
         in
         let () = cli.Run_cli_args.rules_to_remove <- rules_to_remove in
+        try 
         let compilation_result : Cli_init.compilation_result =
           Cli_init.get_compilation
             ~warning:(fun ~pos:_ _msg -> ())
@@ -257,6 +258,11 @@ functor
           Some (compilation_result.env : Model.t),
           Some compilation_result.init_l,
           Some compilation_result.contact_map )
+        with exn -> 
+          let errors = Remanent_state.get_errors state in 
+          let errors, () = Exception.warn parameters errors __POS__  exn () in 
+          let state = Remanent_state.set_errors errors state in 
+          (state, None, None, None) 
 
     let compute_env show_title state =
       let state, env, _, _ = compute_env_init show_title state in
@@ -288,14 +294,21 @@ functor
       let rules_in_ws =
         Remanent_parameters.get_rules_in_working_set parameters
       in
-      let compil =
+      let errors = Remanent_state.get_errors state in  
+      let errors, compil =
         match Remanent_state.get_init state with
-        | Remanent_state.Compil compil -> compil
+        | Remanent_state.Compil compil -> errors, compil
         | Remanent_state.Files files ->
           let () = show_title state in
-          Cli_init.get_ast_from_list_of_files ~current_chapter ~rules_in_ws
+          try 
+          errors, Cli_init.get_ast_from_list_of_files ~current_chapter ~rules_in_ws
             ~removed_rules syntax_version files
+        with 
+        exn ->  
+          let errors, () = Exception.warn parameters errors __POS__  exn () in 
+          (errors, Ast.empty_compil) 
       in
+      let state = Remanent_state.set_errors errors state in 
       let state = Remanent_state.set_compilation compil state in
       state, compil
 
@@ -2279,6 +2292,28 @@ functor
         | None -> None 
         | Some r -> r.Cckappa_sig.e_rule_working_set_id 
       in 
+       let () = 
+      if Remanent_parameters.get_trace parameters then 
+         Loggers.fprintf (Remanent_parameters.get_logger parameters) "WS OF RULE -> rid:%i Wid:%i" (Ckappa_sig.int_of_rule_id i) (match id_opt with None -> (-1) | Some a -> Ckappa_sig.int_of_working_set_index a) 
+      else () in 
+      let state = set_errors errors state in 
+      state, id_opt  
+
+  let working_set_id_of_init_id i state = 
+      let parameters = get_parameters state in 
+      let errors = get_errors state in 
+      let state, c_compil = get_c_compilation state in 
+      let init = c_compil.Cckappa_sig.init in 
+      let errors, init= Int_storage.Nearly_inf_Imperatif.get parameters errors i init in 
+      let id_opt = 
+        match init with 
+        | None -> None 
+        | Some r -> r.Cckappa_sig.e_init_working_set_id 
+      in 
+      let () = 
+      if Remanent_parameters.get_trace parameters then 
+         Loggers.fprintf (Remanent_parameters.get_logger parameters) "WS OF INIT -> rid:%i Wid:%i" i (match id_opt with None -> (-1) | Some a -> Ckappa_sig.int_of_working_set_index a) 
+      else () in 
       let state = set_errors errors state in 
       state, id_opt  
 
@@ -2287,6 +2322,19 @@ functor
         List.fold_left 
         (fun (state, l) index -> 
           let state, id_opt = working_set_id_of_rule_id index state 
+          in 
+        match id_opt with 
+        | None -> state, l 
+        | Some i -> state, i::l) 
+        (state, [])  (List.rev list) in 
+        enable_or_disable_rule false l state 
+
+
+    let disable_init_c_id_list list state = 
+      let state, l = 
+        List.fold_left 
+        (fun (state, l) index -> 
+          let state, id_opt = working_set_id_of_init_id index state 
           in 
         match id_opt with 
         | None -> state, l 
@@ -2361,21 +2409,25 @@ functor
        let state = rename_pos (Diff.renaming_of_diff diff) state in 
        let state = disable_rule_c_id_list 
         (List.rev_map Ckappa_sig.rule_id_of_int
-       (List.rev diff.Diff.diff_rules.removed_elt)) 
-       state in 
+       (List.rev diff.Diff.diff_rules.removed_elt)) state in 
+       let state = disable_init_c_id_list diff.Diff.diff_init.removed_elt state in
        let state, _state' = parse_token 
                     (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
                     ~patch:state' ~current:state in 
        let state, handler = get_handler state in 
        let _state', compil = get_compilation state' in 
        let compil = Diff.cut diff compil in 
+       let errors = get_errors state in 
        let errors, c_compil = Prepreprocess.translate_compil parameters errors compil in 
        let errors, handler, cc_compil' = 
           Preprocess.translate_c_compil parameters errors handler c_compil in 
        let _state' = Remanent_state.set_compilation compil state' in 
+       let state = Remanent_state.set_errors errors state in 
        let state, cc_compil = get_c_compilation state in
        let state = Remanent_state.store_patch cc_compil state in 
+        let errors = get_errors state in 
        let errors, handler, cc_compil, new_indexs = Diff.fuse parameters errors handler cc_compil cc_compil' in 
+        let state = set_errors errors state in 
        let state, ((_global_static,_static), _dynamic) = 
         update_reachability_result 
           (compute_show_title (fun _ -> do_we_show_title) (Some "Apply patch")) 
@@ -2387,7 +2439,7 @@ functor
           | None | Some false -> Remanent_parameters.get_trace parameters 
           | Some true -> true 
         in 
-        if debug_mode then 
+        let state = if debug_mode then 
            let () = Loggers.fprintf log "SUMMARIES" in 
            let () = Loggers.print_newline log in 
            let () = Loggers.print_newline log in 
@@ -2418,6 +2470,9 @@ functor
             let errors = Print_cckappa.print_compil parameters errors handler cc_compil in 
             set_errors errors state  
       else state 
+      in 
+      let () = dump_errors state in 
+      state 
  
    
   end
