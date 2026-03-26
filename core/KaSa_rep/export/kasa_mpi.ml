@@ -81,6 +81,15 @@ let on_message post text =
        let () = gState := init ~compil () in
        send_response post id `Null
      with e -> send_exception post ~id e)
+  | Some (id, `List [ `String "PATCH"; file_name; compil ]) ->
+    (try
+       let old_file_name = JsonUtil.to_string file_name in
+       let compil = Ast.compil_of_json compil in
+       let state = patch ~compil ~old_file_name !gState in
+       let state, ast = get_compilation state in
+       let () = gState := state in
+       send_response post id (Ast.compil_to_json ast)
+     with e -> send_exception post ~id e)
   | Some (id, `List [ `String "CONTACT_MAP"; acc ]) ->
     let accuracy_level = Public_data.accuracy_of_json acc in
     let state, cm = get_contact_map ~accuracy_level !gState in

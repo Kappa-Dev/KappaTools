@@ -13,7 +13,7 @@ type _ handle =
   | Strings : string list handle
   | Catalog : Kfiles.catalog_item list handle
   | Info : (string * int) handle
-  (*  | Ast : Ast.parsing_compil handle*)
+  | Ast : Ast.parsing_compil handle
   | JSON : Yojson.Basic.t handle
   | Influence_map
       : (Public_data.accuracy_level
@@ -94,9 +94,9 @@ let receive mailbox x =
                   (JsonUtil.read_compact_pair Yojson.Basic.read_string
                      Yojson.Basic.read_int)
                   p lb)
-             (* | B (Ast, thread) ->
+            | B (Ast, thread) ->
                 Lwt.wakeup thread
-                        (read_result Ast.read_parsing_compil p lb)*)
+                  (read_result Ast.read_parsing_compil p lb)
            | B (JSON, thread) ->
              Lwt.wakeup thread (read_result Yojson.Basic.read_json p lb)
            | B (Influence_map, thread) ->
@@ -268,7 +268,7 @@ class virtual new_client ~is_running ~post mailbox =
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "FileCatalog") ])
 
-    method secret_project_parse : Ast.parsing_compil Api.lwt_result =
+    method secret_project_parse : (Ast.parsing_compil * string option) Api.lwt_result =
       Lwt.return
         (Api_common.err_result_of_string
            "low level project_parse mustn't be used")
@@ -288,6 +288,14 @@ class virtual new_client ~is_running ~post mailbox =
               (fun b -> Ast.write_parsing_compil b ast);
             ])
 
+    method project_overwrite_ast ast =
+      self#message Nothing (fun b ->
+          JsonUtil.write_sequence b
+            [
+              (fun b -> Yojson.Basic.write_string b "ProjectOverwriteAst");
+              (fun b -> Ast.write_parsing_compil b ast);
+            ])
+
     (* KaSa *)
     method init_static_analyser_raw compil =
       self#message Nothing (fun b ->
@@ -300,6 +308,15 @@ class virtual new_client ~is_running ~post mailbox =
     method init_static_analyser compil =
       self#init_static_analyser_raw
         (Yojson.Basic.to_string (Ast.compil_to_json compil))
+
+    method patch_static_analyser file_name compil =
+      self#message Ast (fun b ->
+          JsonUtil.write_sequence b
+            [
+              (fun b -> Yojson.Basic.write_string b "PATCH");
+              (fun b -> Yojson.Basic.write_string b file_name);
+              (fun b -> Ast.write_parsing_compil b compil);
+            ])
 
     method get_contact_map accuracy =
       self#message JSON (fun b ->

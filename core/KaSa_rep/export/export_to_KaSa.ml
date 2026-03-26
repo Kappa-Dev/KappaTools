@@ -192,6 +192,6 @@ functor
     let  add_rule = add_rule 
     let  add_init = add_init 
     
-    let patch = patch ~called_from:Remanent_parameters_sig.KaSa
+    let patch ?debug ?do_we_show_title ~patch_file_name = patch ?debug ?do_we_show_title ?compil:None ~patch_file_name ~called_from:Remanent_parameters_sig.KaSa
      
   end

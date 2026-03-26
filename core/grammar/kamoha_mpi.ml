@@ -12,7 +12,7 @@ type _ handle =
   | Nothing : unit handle
   | Catalog : Kfiles.catalog_item list handle
   | Info : (string * int) handle
-  | Ast : Ast.parsing_compil handle
+  | Ast : (Ast.parsing_compil * string option) handle
 
 type box =
   | B : 'a handle * int * ('a, Result_util.message list) Result_util.t -> box
@@ -117,6 +117,12 @@ let on_message yield post =
                        in
                        let () = Kfiles.overwrite id content catalog in
                        Lwt.return (B (Nothing, msg_id, Result_util.ok ()))
+                      | "ProjectOverwriteAst" ->
+                       let content =
+                         JsonUtil.read_next_item Ast.read_parsing_compil st b
+                       in
+                       let () = Kfiles.update_ast content catalog in
+                       Lwt.return (B (Nothing, msg_id, Result_util.ok ()))
                      | x ->
                        Lwt.return
                          (B
@@ -138,7 +144,7 @@ let on_message yield post =
           | B (Catalog, msg_id, x) -> reply post write_catalog_items msg_id x
           | B (Nothing, msg_id, x) ->
             reply post Yojson.Basic.write_null msg_id x
-          | B (Ast, msg_id, x) -> reply post Ast.write_parsing_compil msg_id x
+          | B (Ast, msg_id, x) -> reply post (JsonUtil.write_compact_pair Ast.write_parsing_compil (JsonUtil.write_option Yojson.Basic.write_string)) msg_id x
           | B (Info, msg_id, x) ->
             reply post
               (JsonUtil.write_compact_pair Yojson.Basic.write_string

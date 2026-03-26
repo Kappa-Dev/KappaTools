@@ -10,7 +10,7 @@ type _ handle =
   | Nothing : unit handle
   | Catalog : Kfiles.catalog_item list handle
   | Info : (string * int) handle
-  | Ast : Ast.parsing_compil handle
+  | Ast : (Ast.parsing_compil * string option) handle
 
 type box =
   | B : 'a handle * ('a, Result_util.message list) Result_util.t Lwt.u -> box
@@ -43,7 +43,7 @@ let receive mailbox x =
                      Yojson.Basic.read_int)
                   p lb)
            | B (Ast, thread) ->
-             Lwt.wakeup thread (read_result Ast.read_parsing_compil p lb)
+             Lwt.wakeup thread (read_result (JsonUtil.read_compact_pair Ast.read_parsing_compil (JsonUtil.read_option Yojson.Basic.read_string)) p lb)
          in
          Hashtbl.remove mailbox id))
     x
@@ -152,6 +152,14 @@ class virtual new_client ~post mailbox : Api.manager_model =
             [
               (fun b -> Yojson.Basic.write_string b "ProjectOverwrite");
               (fun b -> Yojson.Basic.write_string b file_id);
+              (fun b -> Ast.write_parsing_compil b ast);
+            ])
+
+    method project_overwrite_ast ast =
+      self#message Nothing (fun b ->
+          JsonUtil.write_sequence b
+            [
+              (fun b -> Yojson.Basic.write_string b "ProjectOverwriteAst");
               (fun b -> Ast.write_parsing_compil b ast);
             ])
   end

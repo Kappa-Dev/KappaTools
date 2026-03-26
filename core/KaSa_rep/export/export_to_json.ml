@@ -15,6 +15,10 @@ module type Type = sig
   type state
 
   val init : ?compil:Ast.parsing_compil -> unit -> state
+  val patch : ?compil:Ast.parsing_compil -> old_file_name:string -> state -> state
+
+  val get_compilation :
+    state -> state * Ast.parsing_compil
 
   val get_contact_map :
     ?accuracy_level:Public_data.accuracy_level ->
@@ -90,6 +94,9 @@ functor
 
     let init ?compil () =
       init ?compil ~called_from:Remanent_parameters_sig.Server ()
+
+    let patch ?compil ~old_file_name state =
+      patch ?compil ~called_from:Remanent_parameters_sig.Server ~old_file_name state
 
     let get_contact_map ?(accuracy_level = Public_data.Low) state =
       let state, cm = get_contact_map ~accuracy_level state in

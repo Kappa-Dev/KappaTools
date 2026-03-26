@@ -2306,12 +2306,12 @@ functor
       let errors, handler = List_tokens.scan_incremental_compil parameters errors refined_compil' handler in 
       Remanent_state.set_errors errors (Remanent_state.set_handler handler state), state'
 
-    let patch ?debug ?do_we_show_title ~called_from ~patch_file_name ~old_file_name state = 
+    let patch ?debug ?do_we_show_title ~called_from ?compil ?patch_file_name ~old_file_name state = 
        let parameters = get_parameters state in 
        let debug_mode = Remanent_parameters.get_trace parameters in 
        let log = Remanent_parameters.get_logger parameters in       
        let state, summary_ast = summarize_from_ast state in 
-       let files = [patch_file_name] in
+       let files = Option.map (fun x -> [x]) patch_file_name in
        let do_we_show_title = 
           match do_we_show_title
        with 
@@ -2319,7 +2319,7 @@ functor
         | Some false | None -> false 
        in 
        let errors = get_errors state in 
-       let state' = init ~called_from ~files () in 
+       let state' = init ~called_from ?compil ?files () in 
        let state' = set_errors errors state' in 
        let state',_ = get_compilation state' in 
        let state' = rename_pos (fun loc -> Some {loc with Loc.file =  old_file_name }) state' in 

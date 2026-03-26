@@ -8,12 +8,14 @@
 
 open Lwt.Infix
 
+type ast_parsing_compil_option = Current of Ast.parsing_compil | Patched | Empty
+
 type item = { rank: int; content: string }
 
 type catalog = {
   elements: (string, item) Hashtbl.t;
   index: string option Mods.DynArray.t;
-  ast: Ast.parsing_compil option ref;
+  ast: ast_parsing_compil_option ref;
   current_ws: int option ref;
 }
 
@@ -45,7 +47,7 @@ let create () =
   {
     elements = Hashtbl.create 1;
     index = Mods.DynArray.create 1 None;
-    ast = ref None;
+    ast = ref Empty;
     current_ws = ref None;
   }
 
@@ -54,7 +56,7 @@ let put ~position:rank ~id ~content catalog =
   match Mods.DynArray.get catalog.index rank with
   | None ->
     let () = Mods.DynArray.set catalog.index rank (Some id) in
-    let () = catalog.ast := None in
+    let () = catalog.ast := Empty in
     Result.Ok ()
   | Some aie ->
     Result.Error
@@ -82,7 +84,10 @@ let file_patch ~id content catalog =
   | _ :: _ :: _ -> Result.Error "Serious problems in file catalog"
   | [ { rank; _ } ] ->
     let () = Hashtbl.replace catalog.elements id { rank; content } in
-    let () = catalog.ast := None in
+    let () = catalog.ast := 
+      (match !(catalog.ast) with 
+        | Current _ | Patched -> Patched
+        | Empty -> Empty) in
     Result.Ok ()
 
 let file_set_working_set ~id catalog =
@@ -91,7 +96,7 @@ let file_set_working_set ~id catalog =
   | _ :: _ :: _ -> Result.Error "Serious problems in file catalog"
   | [ { rank; _ } ] ->
     let () = catalog.current_ws := Some rank in
-    let () = catalog.ast := None in
+    let () = catalog.ast := Empty in
     Result.Ok ()
 
 let file_delete ~id catalog =
@@ -101,7 +106,7 @@ let file_delete ~id catalog =
   | [ { rank; _ } ] ->
     let () = Mods.DynArray.set catalog.index rank None in
     let () = Hashtbl.remove catalog.elements id in
-    let () = catalog.ast := None in
+    let () = catalog.ast := Empty in
     Result.Ok ()
 
 let file_get ~id catalog =
@@ -119,65 +124,85 @@ let catalog catalog =
     catalog.index []
 
 let parse yield catalog =
-  match !(catalog.ast) with
-  | Some compile -> Lwt.return (Result_util.ok compile)
-  | None ->
+  let parse_one_file x filenames compile all_rules_in_ws err = 
+    let file = Hashtbl.find catalog.elements x in
+    let lexbuf = Lexing.from_string file.content in
+    let () =
+      lexbuf.Lexing.lex_curr_p <-
+        { lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = x }
+    in
+    let compile =
+      { compile with Ast.filenames = x :: filenames }
+    in
+    Lwt.catch
+      (fun () ->
+         Lwt.wrap1 Klexer4.model lexbuf >>= fun (insts, err') ->
+         yield () >>= fun () ->
+         Lwt.return
+           ( Cst.append_to_ast_compil insts
+               ~all_rules_in_ws
+               compile,
+             err' @ err ))
+      (function
+        | ExceptionDefn.Syntax_Error (message, range)
+        | ExceptionDefn.Malformed_Decl (message, range)
+        | ExceptionDefn.Internal_Error (message, range) ->
+          Lwt.return (compile, (message, range) :: err)
+        | Invalid_argument error ->
+          Lwt.return
+            ( compile,
+              Loc.annot_with_dummy ("Runtime error " ^ error) :: err )
+        | exn ->
+          let message = Printexc.to_string exn in
+          Lwt.return (compile, Loc.annot_with_dummy message :: err))
+  in
+  let handle_error err = 
+    let err =
+      List.map
+        (fun ((text, p) as x) ->
+           let range =
+             if Loc.is_annoted_with_dummy x then
+               None
+             else
+               Some p
+           in
+           { Result_util.severity = Logs.Error; range; text })
+        err
+    in
+    Lwt.return (Result_util.error err) in
+  let parse_all_files () =
     Mods.DynArray.fold_righti
       (fun position x acc ->
-        match x with
-        | None -> acc
-        | Some x ->
-          let file = Hashtbl.find catalog.elements x in
-          let lexbuf = Lexing.from_string file.content in
-          let () =
-            lexbuf.Lexing.lex_curr_p <-
-              { lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = x }
-          in
-          acc >>= fun (compile, err) ->
-          let compile =
-            { compile with Ast.filenames = x :: compile.Ast.filenames }
-          in
-          Lwt.catch
-            (fun () ->
-              Lwt.wrap1 Klexer4.model lexbuf >>= fun (insts, err') ->
-              yield () >>= fun () ->
-              Lwt.return
-                ( Cst.append_to_ast_compil insts
-                    ~all_rules_in_ws:(!(catalog.current_ws) = Some position)
-                    compile,
-                  err' @ err ))
-            (function
-              | ExceptionDefn.Syntax_Error (message, range)
-              | ExceptionDefn.Malformed_Decl (message, range)
-              | ExceptionDefn.Internal_Error (message, range) ->
-                Lwt.return (compile, (message, range) :: err)
-              | Invalid_argument error ->
-                Lwt.return
-                  ( compile,
-                    Loc.annot_with_dummy ("Runtime error " ^ error) :: err )
-              | exn ->
-                let message = Printexc.to_string exn in
-                Lwt.return (compile, Loc.annot_with_dummy message :: err)))
+         match x with
+         | None -> acc
+         | Some x ->
+           acc >>= fun (compile, err) ->
+           parse_one_file x compile.Ast.filenames compile (!(catalog.current_ws) = Some position) err)
       catalog.index
       (Lwt.return (Ast.empty_compil, []))
     >>= ( function
-    | compile, [] ->
-      let () = catalog.ast := Some compile in
-      Lwt.return (Result_util.ok compile)
-    | _, err ->
-      let err =
-        List.map
-          (fun ((text, p) as x) ->
-            let range =
-              if Loc.is_annoted_with_dummy x then
-                None
-              else
-                Some p
-            in
-            { Result_util.severity = Logs.Error; range; text })
-          err
-      in
-      Lwt.return (Result_util.error err) )
+        | compile, [] ->
+          let () = catalog.ast := Current compile in
+          Lwt.return (Result_util.ok (compile, None))
+        | _, err -> handle_error err
+      ) 
+  in
+  match !(catalog.ast), !(catalog.current_ws) with
+  | Current compile, _ -> Lwt.return (Result_util.ok (compile, None))
+  | Patched, Some current -> 
+    begin match Mods.DynArray.get catalog.index current with 
+      | None -> let () = catalog.ast := Empty in
+        parse_all_files ()
+      | Some x -> 
+        parse_one_file x [] Ast.empty_compil true []
+        >>= ( function
+            | compile, [] ->
+              Lwt.return (Result_util.ok (compile, Some x))
+            | _, err ->
+              handle_error err)
+    end
+  | Empty, _| _ , None ->
+    parse_all_files ()
 
 let overwrite filename ast catalog =
   let content = Format.asprintf "%a" Ast.print_parsing_compil_kappa ast in
@@ -190,4 +215,7 @@ let overwrite filename ast catalog =
       catalog.index
   in
   let () = Mods.DynArray.set catalog.index 0 (Some filename) in
-  catalog.ast := Some ast
+  catalog.ast := Current ast
+
+let update_ast ast catalog =
+    catalog.ast := Current ast

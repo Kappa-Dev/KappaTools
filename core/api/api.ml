@@ -26,8 +26,10 @@ end
 
 class type virtual manager_model = object
   method virtual is_running : bool
-  method secret_project_parse : Ast.parsing_compil result Lwt.t
+  method secret_project_parse : (Ast.parsing_compil * string option) result Lwt.t (*the string is Some filename if the returned parsing_compil represents only the current chapter*)
+
   method project_overwrite : string -> Ast.parsing_compil -> unit result Lwt.t
+  method project_overwrite_ast : Ast.parsing_compil -> unit result Lwt.t
   method file_catalog : Kfiles.catalog_item list result Lwt.t
   method file_create : int -> string -> string -> unit result Lwt.t
   method file_get : string -> (string * int) result Lwt.t
@@ -103,6 +105,8 @@ class type manager_static_analysis = object
 
   method init_static_analyser_raw : string -> unit result Lwt.t
   (** The string has to be the json corresponding to an [Ast.parsing_compil] *)
+
+  method patch_static_analyser : string -> Ast.parsing_compil -> Ast.parsing_compil result Lwt.t
 
   method get_contact_map :
     Public_data.accuracy_level option -> Yojson.Basic.t result Lwt.t

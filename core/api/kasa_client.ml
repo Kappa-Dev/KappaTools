@@ -89,6 +89,19 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       self#init_static_analyser_raw
         (Yojson.Basic.to_string (Ast.compil_to_json compil))
 
+    method patch_static_analyser file_name compil =
+      let request =
+        `List
+          [
+            `String "PATCH";
+            JsonUtil.of_string file_name;
+            Ast.compil_to_json compil;
+          ]
+      in
+      self#message request
+      >>= Api_common.result_bind_with_lwt ~ok:(fun ast ->
+              Result_util.ok (Ast.compil_of_json ast) |> Lwt.return)
+
     method get_contact_map accuracy =
       let request =
         `List
@@ -267,4 +280,6 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       self#message request
       >>= Api_common.result_bind_with_lwt ~ok:(fun _ ->
               Result_util.ok () |> Lwt.return)
+
+     
   end

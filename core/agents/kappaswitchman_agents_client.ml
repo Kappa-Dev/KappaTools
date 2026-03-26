@@ -116,30 +116,41 @@ class t exec_command message_delimiter =
     val mutable kasa_locator = []
 
     method project_parse ~patternSharing overwrites =
+      let process_kasa_locator init_kasa load = 
+        let locators =
+          init_kasa >>= fun result ->
+          match result.Result_util.value with
+          | Result.Error _ ->
+            let () = kasa_locator <- [] in
+            Lwt.return result
+          | Result.Ok () ->
+            self#secret_get_pos_of_rules_and_vars >>= fun result ->
+            (match result.value with
+             | Result.Ok infos ->
+               let () = kasa_locator <- infos in
+               Lwt.return (Result_util.ok ())
+             | Result.Error _ ->
+               let () = kasa_locator <- [] in
+               Lwt.return (Result_util.map (fun _ -> ()) result))
+        in
+        load >>= Api_common.result_bind_with_lwt ~ok:(fun () -> locators)
+      in
       self#secret_project_parse
-      >>= Api_common.result_bind_with_lwt ~ok:(fun out ->
-              (* load the sim so that kasa can run on it *)
-              let load =
-                self#secret_simulation_load patternSharing out overwrites
-              in
-              let init_kasa = self#init_static_analyser out in
-              let locators =
-                init_kasa >>= fun result ->
-                match result.value with
-                | Result.Error _ ->
-                  let () = kasa_locator <- [] in
-                  Lwt.return result
-                | Result.Ok () ->
-                  self#secret_get_pos_of_rules_and_vars >>= fun result ->
-                  (match result.value with
-                  | Result.Ok infos ->
-                    let () = kasa_locator <- infos in
-                    Lwt.return (Result_util.ok ())
-                  | Result.Error _ ->
-                    let () = kasa_locator <- [] in
-                    Lwt.return (Result_util.map (fun _ -> ()) result))
-              in
-              load >>= Api_common.result_bind_with_lwt ~ok:(fun () -> locators))
+      >>= Api_common.result_bind_with_lwt ~ok:(fun (out, patch_file) ->
+          (* load the sim so that kasa can run on it *)
+          let load =
+            self#secret_simulation_load patternSharing out overwrites
+          in
+          match patch_file with
+          | Some filename -> (*the file was only patched so we can run the incremental update*)
+            let kasa = self#patch_static_analyser filename out 
+              >>= Api_common.result_bind_with_lwt ~ok:(fun ast -> self#project_overwrite_ast ast)
+            in
+            process_kasa_locator kasa load
+          | None ->
+            let init_kasa = self#init_static_analyser out in
+            process_kasa_locator init_kasa load
+        )
 
     method get_influence_map_node_at ~filename pos : _ Api.lwt_result =
       List.find_opt
