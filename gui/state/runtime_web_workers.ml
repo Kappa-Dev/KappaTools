@@ -153,32 +153,42 @@ class virtual manager_without_kasim () : concrete_manager_without_kasim =
     val mutable kasa_locator = []
 
     method private project_parse_without_kasim ~simulation_load ~patternSharing
-        overwrites =
+        overwrites = 
+      let process_kasa_locator init_kasa load = 
+        let locators =
+          init_kasa
+          >>= Result_util.fold
+            ~error:(fun e ->
+                let () = kasa_locator <- [] in
+                Lwt.return (Result_util.error e))
+            ~ok:(fun () ->
+                self#secret_get_pos_of_rules_and_vars
+                >>= Result_util.fold
+                  ~ok:(fun infos ->
+                      let () = kasa_locator <- infos in
+                      Lwt.return (Result_util.ok ()))
+                  ~error:(fun e ->
+                      let () = kasa_locator <- [] in
+                      Lwt.return (Result_util.error e)))
+        in
+        load >>= Api_common.result_bind_with_lwt ~ok:(fun () -> locators) in
       self#secret_project_parse
       >>= Api_common.result_bind_with_lwt
-            ~ok:(fun (parsing_compil : Ast.parsing_compil) ->
-              (* load the sim so that kasa can run on it *)
-              let load : unit Api.lwt_result =
-                simulation_load patternSharing parsing_compil overwrites
+        ~ok:(fun ((parsing_compil : Ast.parsing_compil), patch_file) ->
+            (* load the sim so that kasa can run on it *)
+            let load : unit Api.lwt_result =
+              simulation_load patternSharing parsing_compil overwrites
+            in
+            match patch_file with 
+            | Some filename -> (*the file was only patched so we can run the incremental update*)
+              let kasa = self#patch_static_analyser filename parsing_compil 
+                >>= Api_common.result_bind_with_lwt ~ok:(fun ast -> self#project_overwrite_ast ast)
               in
+              process_kasa_locator kasa load
+            | None ->
               let init_kasa = self#init_static_analyser parsing_compil in
-              let locators =
-                init_kasa
-                >>= Result_util.fold
-                      ~error:(fun e ->
-                        let () = kasa_locator <- [] in
-                        Lwt.return (Result_util.error e))
-                      ~ok:(fun () ->
-                        self#secret_get_pos_of_rules_and_vars
-                        >>= Result_util.fold
-                              ~ok:(fun infos ->
-                                let () = kasa_locator <- infos in
-                                Lwt.return (Result_util.ok ()))
-                              ~error:(fun e ->
-                                let () = kasa_locator <- [] in
-                                Lwt.return (Result_util.error e)))
-              in
-              load >>= Api_common.result_bind_with_lwt ~ok:(fun () -> locators))
+              process_kasa_locator init_kasa load
+          ) 
 
     method get_influence_map_node_at ~filename pos : _ Api.lwt_result =
       List.find_opt
