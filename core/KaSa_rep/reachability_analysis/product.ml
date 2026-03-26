@@ -62,19 +62,26 @@ module Product
       New_domain.local = global_dynamic.local.new_domain;
     }
 
-  let initialize global_static_information global_dynamic_information error =
+  let initialize ?patch global_static_information global_dynamic_information error =
+    let patch_under, patch_new = 
+      match patch with 
+      | None -> None, None 
+      | Some (static, dynamic, new_elts) -> Some (static.underlying_domain, 
+                                                  dynamic.underlying_domain,new_elts),
+                                            Some (static.new_domain, dynamic.new_domain,new_elts) 
+    in 
     let ( error,
           underlying_domain_static_information,
           underlying_domain_dynamic_information,
           event_list ) =
-      Underlying_domain.initialize global_static_information
+      Underlying_domain.initialize ?patch:patch_under global_static_information
         global_dynamic_information error
     in
     let ( error,
           new_domain_static_information,
           new_domain_dynamic_information,
           event_list' ) =
-      New_domain.initialize global_static_information
+      New_domain.initialize ?patch:patch_new global_static_information
         underlying_domain_dynamic_information.Underlying_domain.global error
     in
     ( error,

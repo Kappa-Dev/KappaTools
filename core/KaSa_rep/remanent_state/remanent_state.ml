@@ -154,7 +154,7 @@ type internal_scc_decomposition =
   list
   list
 
-type ('static, 'dynamic) reachability_result = 'static * 'dynamic
+type ('global, 'static, 'dynamic) reachability_result = ('global * 'static) * 'dynamic
 type subviews_info = unit
 
 type flow =
@@ -185,7 +185,7 @@ type local_influence_map_blackboard = {
   blackboard_to_be_explored: bool array;
 }
 
-type ('static, 'dynamic) state = {
+type ('global_static, 'static, 'dynamic) state = {
   parameters: Remanent_parameters_sig.parameters;
   log_info: StoryProfiling.StoryStats.log_info;
   kappa_handler: Cckappa_sig.kappa_handler option;
@@ -212,7 +212,7 @@ type ('static, 'dynamic) state = {
     Public_data.scc Public_data.AccuracyMap.t Public_data.AccuracyMap.t;
   signature: Signature.s option;
   bdu_handler: Mvbdu_wrapper.Mvbdu.handler;
-  reachability_state: ('static, 'dynamic) reachability_result option;
+  reachability_state: ('global_static, 'static, 'dynamic) reachability_result option;
   subviews_info: subviews_info option;
   dead_rules: dead_rules option;
   conditionally_dead_rules: rule_deadness_conditions option;
@@ -226,7 +226,14 @@ type ('static, 'dynamic) state = {
   symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
   separating_transitions: separating_transitions option;
   transition_system_length: int list option;
+  global_static_information: 'global_static option; 
+  patch: Cckappa_sig.compil option ; 
 }
+
+let get_global_static_information state = state.global_static_information 
+let set_global_static_information global_static_information state = 
+  let global_static_information = Some global_static_information in 
+  {state with global_static_information}
 
 let get_data state =
   ( state.kappa_handler,
@@ -285,6 +292,8 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
     transition_system_length = None;
+    patch = None; 
+    global_static_information = None; 
   }
 
 (**************)
@@ -819,9 +828,9 @@ let rename_pos_in_bidirectional_influence_map _f map = map
 let rename_pos_in_local_influence_map_blackboard _f map = map 
 
 let rename_pos_reachability_result_with_errors 
-    rename_static rename_compil parameters errors rename result = 
+    rename_global_static rename_static rename_compil parameters errors rename result = 
     (Loc.rename_pos_pair_with_errors 
-      rename_static rename_compil) 
+      (Loc.rename_pos_pair_with_errors rename_global_static rename_static) rename_compil) 
     parameters errors rename result
 
 
@@ -836,7 +845,7 @@ let rename_pos_constraint_list rename (list:constraint_list) =
       rename 
       list 
 
-let rename_pos rename_static rename_dynamic rename state = 
+let rename_pos rename_global_static rename_static rename_dynamic rename state = 
   let parameters = get_parameters state in 
   let errors = get_errors state in 
   let errors, state = gen_opt_opt_error set_handler_opt get_handler Cckappa_sig.rename_pos_kappa_handler_with_errors parameters errors rename state in 
@@ -872,7 +881,7 @@ let rename_pos rename_static rename_dynamic rename state =
   Public_data.rename_pos_contact_map rename state in 
   let state = gen (set_contact_map Public_data.High) (get_contact_map Public_data.High) 
   Public_data.rename_pos_contact_map rename state in 
-  let errors, state = gen_opt_error set_reachability_result get_reachability_result (rename_pos_reachability_result_with_errors rename_static rename_dynamic) parameters errors rename state in 
+  let errors, state = gen_opt_error set_reachability_result get_reachability_result (rename_pos_reachability_result_with_errors rename_global_static rename_static rename_dynamic) parameters errors rename state in 
   let state = gen set_dead_rules get_dead_rules (Public_data.rename_pos_dead_rules) 
   rename state in 
   let state = gen set_conditionally_dead_rules get_conditionally_dead_rules (Public_data.rename_pos_rule_deadness_conditions)  rename state in 
@@ -884,4 +893,8 @@ let rename_pos rename_static rename_dynamic rename state =
   set_errors errors state 
 
 
-  
+let reset_patch s = 
+    let patch = None in {s with patch}
+let store_patch patch s = 
+  let patch = Some patch in {s with patch}
+let get_patch s = s.patch  

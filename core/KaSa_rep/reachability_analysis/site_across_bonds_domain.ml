@@ -635,9 +635,14 @@ module Domain = struct
   (*INITIAL STATES*)
   (***************************************************************************)
 
-  let initialize static dynamic error =
+  let initialize ?patch static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
-    let log_info = Analyzer_headers.get_log_info dynamic in
+    match patch with 
+    | Some (static, local,_) -> let error, () = 
+                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
+    in error, static, {local ; global = dynamic}, [  ]
+    | None -> 
+   let log_info = Analyzer_headers.get_log_info dynamic in
     let error, log_info =
       StoryProfiling.StoryStats.add_event parameters error
         (StoryProfiling.Domain_initialization domain_name) None log_info

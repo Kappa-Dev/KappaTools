@@ -167,9 +167,14 @@ functor
     (*rules*)
     (****************************************************************)
 
-    let initialize static dynamic error =
+    let initialize ?patch static dynamic error =
       let parameters = Analyzer_headers.get_parameter static in
-      let error, static =
+      match patch with 
+        | Some (static, local,_) -> let error, () = 
+                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
+    in error, static, {local ; global = dynamic}, [  ]
+        | None -> 
+        let error, static =
         compute_local_static_information static dynamic error
       in
       let error, store_value =

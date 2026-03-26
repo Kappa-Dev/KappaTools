@@ -316,8 +316,13 @@ module Domain = struct
 
   (**************************************************************************)
 
-  let initialize static dynamic error =
+  let initialize ?patch static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
+    match patch with 
+    | Some (static, local,_) -> let error, () = 
+                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
+    in error, static, {local ; global = dynamic}, [  ]
+    | None -> 
     let init_global_static_information =
       {
         global_static_information = static;

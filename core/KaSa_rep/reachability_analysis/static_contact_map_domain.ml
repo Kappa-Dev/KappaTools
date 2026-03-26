@@ -46,9 +46,14 @@ module Domain = struct
   (**************************************************************************)
   (*implementations*)
 
-  let initialize static dynamic error =
-    let init_global_dynamic_information = { local = (); global = dynamic } in
-    let parameter = Analyzer_headers.get_parameter static in
+  let initialize ?patch static dynamic error =
+    let parameters = Analyzer_headers.get_parameter static in
+    match patch with 
+    | Some (static, local,_) -> let error, () = 
+                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
+    in error, static, {local ; global = dynamic}, [  ]
+    | None -> 
+   let init_global_dynamic_information = { local = (); global = dynamic } in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
     let init_global_static_information =
       { global_static_information = static }
@@ -56,7 +61,7 @@ module Domain = struct
     let error, event_list =
       Ckappa_sig
       .Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
-      .fold parameter error
+      .fold parameters error
         (fun _ error (i, (j, k)) (i', j', k') event_list ->
           ( error,
             Communication.See_a_new_bond ((i, j, k), (i', j', k')) :: event_list

@@ -22,6 +22,11 @@ type diff =
    first_init: int; 
  }
 
+ let starting_new_elt = 
+   {
+    first_rule = 1; 
+    first_init = 1; 
+   }
  let empty_summary_file = 
    {
     summary_rule_map =  Mods.StringMap.empty; 
