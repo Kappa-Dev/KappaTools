@@ -388,8 +388,10 @@ module Domain = struct
             let error, b1 = Handler.is_reverse parameters error compil i in
             let error, b2 = Handler.has_no_label parameters error compil i in
             let rule = Remanent_state.info_to_rule info in
+            let error, is_permanently_removed = 
+              Cckappa_sig.rule_is_permanently_disabled_in_current_working_set parameters error i compil in
             let rule =
-              if b1 && b2 && hide_reverse_rule then
+              if (b1 && b2 && hide_reverse_rule) || is_permanently_removed then
                 Handler.hide rule
               else
                 rule

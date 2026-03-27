@@ -716,11 +716,21 @@ let rule_is_enabled_in_current_working_set parameters error rule_id compilation
        Ckappa_sig.Ws_index_map_and_set.Map.find_option parameters error ws_id
          compilation.working_set_valuations
      with
-    | error, None ->
-      Exception.warn parameters error __POS__
-        ~message:"working_set_id does not exist" Exit false
+    | error, None -> error, false (*permanently disabled*)
     | error, Some (_, bool) -> error, bool)
 
+let rule_is_permanently_disabled_in_current_working_set parameters error rule_id compilation
+    =
+  match working_set_id_of_rule_id parameters error rule_id compilation with
+  | error, None ->
+    error, false (* rules that are not in the working set are always enabled *)
+  | error, Some ws_id ->
+    (match
+       Ckappa_sig.Ws_index_map_and_set.Map.find_option parameters error ws_id
+         compilation.working_set_valuations
+     with
+    | error, None -> error, true
+    | error, Some _ -> error, false)
 
 let rename_pos_kappa_handler_with_errors parameters error rename kappa_handler = 
   let error, agents_annotation = 

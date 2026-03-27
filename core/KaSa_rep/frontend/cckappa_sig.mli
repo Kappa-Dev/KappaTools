@@ -325,6 +325,13 @@ val rule_is_enabled_in_current_working_set :
   compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught * bool
 
+val rule_is_permanently_disabled_in_current_working_set :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Ckappa_sig.c_rule_id ->
+  compil ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * bool
+
 val working_set_id_of_rule_id :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
