@@ -106,16 +106,16 @@ fi
 AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
 AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
 
+# Install the dependencies
 if $INSTALL_DEPS; then
     cd "${SCRIPT_DIR}/../../.."
-    # Install the dependencies
     echo "Installing dependencies:"
     opam install . --update-invariant
 fi
 
+# Build Kappa
 if ! $DEBUG; then
     echo
-    # Build Kappa
     echo "Building the project:"
     make all
 fi
@@ -127,6 +127,11 @@ echo "Analyzing models: $AVAILABLE_MODELS"
 
 GLOBAL_OUTPUT_FILE="${OUTPUT_DIR}experiments_output.csv"
 echo "model,nr_rules,analysis_type,step_name,substep_name,rep,nr_removed_rules,time" > "$GLOBAL_OUTPUT_FILE"
+
+store_runtime_from_profiling () {
+    # take the line we are interested in from profiling.html and copy the runtime to the output file in a csv format
+    grep --text "End</TD><TD>$1" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$2,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+}
 
 # Analyze each model
 for MODEL in "${MODELS[@]}"; do
@@ -149,12 +154,13 @@ for MODEL in "${MODELS[@]}"; do
     echo -n "" > "$STDOUT_OUTPUT_FILE_DECREMENTAL"
     echo -n "" > "$STDOUT_OUTPUT_FILE_INCREMENTAL"
 
+    # Find the syntax version (no guarantees)
     SYNTAX="V4"
-    if grep -v "^/\*" "$EXAMPLE_MODEL" | grep -qi "!1" -; then # no guarantees
+    if grep -v "^/\*" "$EXAMPLE_MODEL" | grep -qi "!1" -; then
         SYNTAX="V3"
     fi
 
-    for (( i=1; i<=REPS; i++ )) # take the mean runtime of multiple reps
+    for (( i=1; i<=REPS; i++ )) # take the mean runtime of multiple repetitions
     do
 
         # choose 10 random rules to be added to the working set
@@ -164,11 +170,12 @@ for MODEL in "${MODELS[@]}"; do
             echo "Random list of rules that are in the working set: $random_rules"
         fi
 
-        # NON-INCREMENTAL ANALYSIS with 10 rules removed
+        # INITIAL INCREMENTAL ANALYSIS with the 10 rules removed and empty working set
         if $DEBUG; then
             echo "⌛ Starting non-incremental analysis:"
         fi
 
+        # interactive input for the incremental analysis
         echo "q" > "$INPUT_INCREMENTAL_TMP"
 
         cmd=(
@@ -179,18 +186,20 @@ for MODEL in "${MODELS[@]}"; do
             $OPTIONS
             --remove-rules "$random_rules"
             )
-        if $DEBUG; then
+        # print command
+        if $DEBUG; then 
             printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
             printf '\n'
         fi
+        # execute analysis
         { cat "$INPUT_INCREMENTAL_TMP" | ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_FULL"
         EXIT_STATUS=$?
 
         # copy runtimes from output/profiling.html to the csv output file
-        grep "End</TD><TD>Global initialization" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,1_init,1_initialization,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,1_init,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,1_init,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,1_full,1_init,4_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+        store_runtime_from_profiling "Global initialization" "$MODEL,$NR_RULES_MODEL,1_full,1_init,1_initialization,$i,$NR_RULES"
+        store_runtime_from_profiling "Initial states computation" "$MODEL,$NR_RULES_MODEL,1_full,1_init,2_initial_state,$i,$NR_RULES"
+        store_runtime_from_profiling "Compute fixpoint of reachability analysis" "$MODEL,$NR_RULES_MODEL,1_full,1_init,3_fixpoint,$i,$NR_RULES"
+        store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,1_full,1_init,4_print,$i,$NR_RULES"
 
         # Check if the program was killed by timeout
         if [ $EXIT_STATUS -eq 124 ]; then
@@ -203,8 +212,8 @@ for MODEL in "${MODELS[@]}"; do
         if $DEBUG; then
             echo "➕ Starting incremental analysis:"
         fi
-        # we remove 10 rules from the model and then compute the time it takes to add them again
 
+        # we take the model with 10 rules removed and then compute the time it takes to add them
         echo "update file $EXAMPLE_MODEL" > "$INPUT_INCREMENTAL_TMP"
         echo "q" >> "$INPUT_INCREMENTAL_TMP"
 
@@ -235,18 +244,14 @@ for MODEL in "${MODELS[@]}"; do
         fi
 
         # copy runtimes from output/profiling.html to the csv output file
-        grep --text "End</TD><TD>Update global initialization" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_incremental,1_init,1_initialization,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep --text "End</TD><TD>Add new initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_incremental,1_init,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-
-        grep --text "End</TD><TD>Restart fixpoint computation for the reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_incremental,1_init,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-
-        grep --text "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | tail -1 | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,2_incremental,1_init,5_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-
-
+        store_runtime_from_profiling "Update global initialization" "$MODEL,$NR_RULES_MODEL,2_incremental,1_init,1_initialization,$i,$NR_RULES"
+        store_runtime_from_profiling "Add new initial states computation" "$MODEL,$NR_RULES_MODEL,2_incremental,1_init,2_initial_state,$i,$NR_RULES"
+        store_runtime_from_profiling "Restart fixpoint computation for the reachability analysis" "$MODEL,$NR_RULES_MODEL,2_incremental,1_init,3_fixpoint,$i,$NR_RULES"
+        store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,2_incremental,1_init,5_print,$i,$NR_RULES"
 
         # DECREMENTAL ANALYSIS
         
-        # choose a random valuation for each of the rules
+        # choose a random valuation (true or false) for each of the rules in the working set
         false_indices=()
         for ((n=0; n<NR_RULES; n++)); do
             val=$((RANDOM % 2))
@@ -254,7 +259,6 @@ for MODEL in "${MODELS[@]}"; do
                 false_indices+=("$n")
             fi
         done
-        # Join with commas
         disabled_rules=$(printf "%s," "${false_indices[@]}")
         disabled_rules=${disabled_rules%,}
 
@@ -296,8 +300,8 @@ for MODEL in "${MODELS[@]}"; do
         fi
 
         # copy runtimes from output/profiling.html to the csv output file
-        grep -m 1 "End</TD><TD>Enable or disable a rule" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_decremental,4_disable,4_disable,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-        grep "End</TD><TD>Print result of reachability analysis" "$PROFILING_FILE" | tail -1 | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$NR_RULES_MODEL,3_decremental,4_disable,5_print,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+        store_runtime_from_profiling "Enable or disable a rule" "$MODEL,$NR_RULES_MODEL,3_decremental,4_disable,4_disable,$i,$NR_RULES"
+        store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,3_decremental,4_disable,5_print,$i,$NR_RULES"
     done
 
     rm "$INPUT_INCREMENTAL_TMP"
@@ -306,20 +310,9 @@ for MODEL in "${MODELS[@]}"; do
     echo "Results of the non-incremental analysis: $STDOUT_OUTPUT_FILE_FULL"
     echo "Results of the decremental analysis: $STDOUT_OUTPUT_FILE_DECREMENTAL"
     echo "Results of the incremental analysis: $STDOUT_OUTPUT_FILE_INCREMENTAL"
-
-    # Check for exceptions in STDOUT_OUTPUT_FILE
-    if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_FULL"; then
-        echo "🚨 Exception raised during analysis of $MODEL (non-incremental)."
-    fi
-    if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_DECREMENTAL"; then
-        echo "🚨 Exception raised during analysis of $MODEL (decremental)."
-    fi
-    if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_INCREMENTAL"; then
-        echo "🚨 Exception raised during analysis of $MODEL (incremental)."
-    fi 
-
 done
 
+# compute the mean runtime of the multiple repetitions
 python3 examples/benchmarks/incremental-KaSa/mean_of_reps.py
 
 OUTPUT_MEAN_RUNTIMES="${OUTPUT_DIR}experiments_output_mean.csv"
@@ -328,6 +321,8 @@ echo
 echo "📝 The mean of all runtimes can be found in: $OUTPUT_MEAN_RUNTIMES"
 
 OUTPUT_LATEX_RUNTIMES="${OUTPUT_DIR}experiments_output.tex"
+
+# draw a latex table with the runtimes
 
 cmd=(python3 
     "${SCRIPT_DIR}/../../../examples/benchmarks/incremental-KaSa/latex_table_of_runtimes.py" 
