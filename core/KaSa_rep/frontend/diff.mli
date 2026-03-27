@@ -9,8 +9,10 @@ type diff =
 
  type new_indexs=
  { 
-   first_rule: int; 
-   first_init: int; 
+   next_rule: Ckappa_sig.c_rule_id ; 
+   next_init: int; 
+   next_nsites: Ckappa_sig.c_site_name;
+   next_nr_predicates: Ckappa_sig.c_guard_parameter
  }
 
 val starting_new_elt: new_indexs 
@@ -81,7 +83,9 @@ val renaming_of_diff: diff -> (Loc.t -> Loc.t option)
 
 val cut: diff -> Ast.parsing_compil -> Ast.parsing_compil
 
+val get_new_indexs: Remanent_parameters_sig.parameters -> 
+  Exception_without_parameter.exceptions_caught_and_uncaught -> Cckappa_sig.kappa_handler -> Cckappa_sig.compil  -> Exception_without_parameter.exceptions_caught_and_uncaught * new_indexs
 val fuse: Remanent_parameters_sig.parameters -> 
   Exception_without_parameter.exceptions_caught_and_uncaught -> 
 Cckappa_sig.kappa_handler -> Cckappa_sig.compil -> Cckappa_sig.compil -> Exception_without_parameter.exceptions_caught_and_uncaught * 
-Cckappa_sig.kappa_handler * Cckappa_sig.compil * new_indexs
+Cckappa_sig.kappa_handler * Cckappa_sig.compil 

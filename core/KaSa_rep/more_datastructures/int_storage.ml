@@ -77,6 +77,10 @@ module type Storage = sig
   type key
   type dimension
 
+
+  val init_key:key 
+  val compare_key: key -> key -> bool 
+
   val create : (dimension, 'a t) unary
   val create_biggest_key : (key, 'a t) unary
   val expand_and_copy : ('a t, dimension, 'a t) binary
@@ -90,7 +94,7 @@ module type Storage = sig
   val key_list : ('a t, key list) unary
   val iter : ((key, 'a) binary_no_output, 'a t) binary_no_output
   val fold_with_interruption : ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary
-  val fold : ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary
+  val fold : ?start:key -> ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary
 
   val fold2 :
     ( (key, 'a, 'c, 'c) ternary,
@@ -121,6 +125,9 @@ module Int_storage_imperatif :
   type dimension = int
   type 'a t = { array: 'a option array; size: int }
 
+  let compare_key a b = a < b 
+
+  let init_key = 0 
   let dimension _ error a = error, a.size
 
   let key_list _paremeters error t =
@@ -267,7 +274,8 @@ module Int_storage_imperatif :
     in
     aux 0 error
 
-  let fold parameter error f t init =
+  let fold ?start parameter error f t init =
+    let start = match start with | None -> 0 | Some i -> i in 
     let size = t.size in
     let array = t.array in
     let rec aux k remanent =
@@ -281,7 +289,7 @@ module Int_storage_imperatif :
           aux (k + 1) (f parameter error k x sol)
       )
     in
-    aux 0 (error, init)
+    aux start (error, init)
 
   let for_all parameter error f t =
     let size = t.size in
@@ -391,6 +399,8 @@ functor
       type key = Basic.key
       type 'a t = 'a Basic.t
 
+      let init_key = Basic.init_key 
+      let compare_key = Basic.compare_key 
       let create = Basic.create
       let create_biggest_key = Basic.create_biggest_key
       let dimension = Basic.dimension
@@ -447,6 +457,8 @@ functor
       type key = Extension.key * Underlying.key
       type 'a t = { matrix: 'a Underlying.t Extension.t; dimension: dimension }
 
+      let compare_key (a,b) (c,d) = Extension.compare_key a c && Underlying.compare_key b d 
+      let init_key = Extension.init_key, Underlying.init_key 
       let create parameters error dimension =
         let error, matrix = Extension.create parameters error (fst dimension) in
         error, { matrix; dimension }
@@ -580,8 +592,14 @@ functor
               a b)
           a.matrix b
 
-      let fold parameter error f a b =
-        fold_gen Extension.fold Underlying.fold parameter error f a b
+      let fold ?start parameter error f a b = 
+        let start_ext, start_under = 
+          match start 
+          with 
+            | None -> None, None 
+            | Some (a,b) -> Some a, Some b 
+        in 
+        fold_gen (Extension.fold ?start:start_ext) (Underlying.fold ?start:start_under) parameter error f a b
 
       let fold_with_interruption parameter error f a b =
         fold_gen Extension.fold_with_interruption
@@ -640,6 +658,9 @@ functor
       type dimension = Basic.dimension
       type key = Basic.key
       type 'a t = { basic: 'a Basic.t; keys: key list }
+
+      let init_key = Basic.init_key 
+      let compare_key = Basic.compare_key 
 
       let create parameters error i =
         let error, basic = Basic.create parameters error i in
@@ -711,10 +732,12 @@ functor
             | Some im -> f parameters error k im)
           error (List.rev list)
 
-      let fold parameters error f a b =
+      let fold ?start parameters error f a b =
+        let (start:key) = match start with | None -> init_key | Some i -> i in 
         let error, list = key_list parameters error a in
         List.fold_left
           (fun (error, b) k ->
+            if compare_key k start then error,b else 
             let error, im = get parameters error k a in
             match im with
             | None -> invalid_arg parameters error __POS__ Exit b

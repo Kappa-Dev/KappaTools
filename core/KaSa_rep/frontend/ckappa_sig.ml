@@ -14,6 +14,8 @@
 
 module Int_Set_and_Map = Map_wrapper.Make (Mods.IntSetMap)
 
+let hack_to_separate_sites_id_from_guard_id = 1000000 (* It would be better to use a Sum type to distinguish them *)
+                                                      (* The hack is useless when nsites > hack_to_separate_sites_id_from_guard_id *)
 let local_trace = true
 let _ = local_trace
 
@@ -209,7 +211,7 @@ let mvbdu_var_of_site (a : c_site_name) : c_mvbdu_var = a
 
 let mvbdu_var_of_guard (a : c_guard_parameter) (nsites : c_site_name) :
     c_mvbdu_var =
-  a + nsites
+  a + max nsites hack_to_separate_sites_id_from_guard_id 
 
 let mvbdu_var_of_site_or_guard_p (a : c_site_or_guard_p) (nsites : c_site_name)
     : c_mvbdu_var =
@@ -222,7 +224,8 @@ let int_of_working_set_index (a : c_working_set_index) : int = a
 
 let site_or_guard_p_of_mvbdu_var (a : c_mvbdu_var) (nsites : c_site_name) :
     c_site_or_guard_p =
-  if a < nsites then
+    let nsites = max nsites hack_to_separate_sites_id_from_guard_id in 
+    if a < nsites then
     Site a
   else
     Guard_p (a - nsites)
@@ -264,8 +267,16 @@ let get_agent_color n_sites parameters =
     (Remanent_parameters.get_agent_color_array parameters)
     (Remanent_parameters.get_agent_color_def parameters)
 
-let get_list_of_guard_parameters nr_guard_parameters =
-  List.init (int_of_guard_parameter nr_guard_parameters) guard_parameter_of_int
+let get_list_of_guard_parameters ?starting nr_guard_parameters =
+  match starting with 
+  | None -> List.init (int_of_guard_parameter nr_guard_parameters) guard_parameter_of_int
+  | Some starting_point -> 
+    let rec aux k acc = 
+      if k<starting_point then acc 
+      else 
+        aux (k-1) ((guard_parameter_of_int k)::acc) 
+      in aux (nr_guard_parameters -1) []
+
 
 (***************************************************************)
 (*RENAME*)

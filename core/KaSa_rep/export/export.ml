@@ -2398,7 +2398,7 @@ functor
        let errors = get_errors state in 
        let state' = init ~called_from ?compil ?files () in 
        let state' = set_errors errors state' in 
-       let state',_ = get_compilation state' in 
+       let state', _  = get_compilation state' in 
        let state' = rename_pos (fun loc -> Some {loc with Loc.file =  old_file_name }) state' in 
        let state', summary_ast' = summarize_from_ast state' in 
        let errors = get_errors state' in 
@@ -2418,6 +2418,11 @@ functor
         (List.rev_map Ckappa_sig.rule_id_of_int
        (List.rev diff.Diff.diff_rules.removed_elt)) state in 
        let state = permanently_disable_init_c_id_list diff.Diff.diff_init.removed_elt state in
+       let state, handler = get_handler state in 
+       let state, cc_compil = get_c_compilation state in 
+       let errors = get_errors state in 
+       let errors, new_indexs = Diff.get_new_indexs parameters errors handler cc_compil in 
+       let state = set_errors errors state in 
        let state, _state' = parse_token 
                     (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
                     ~patch:state' ~current:state in 
@@ -2433,7 +2438,7 @@ functor
        let state, cc_compil = get_c_compilation state in
        let state = Remanent_state.store_patch cc_compil state in 
         let errors = get_errors state in 
-       let errors, handler, cc_compil, new_indexs = Diff.fuse parameters errors handler cc_compil cc_compil' in 
+       let errors, handler, cc_compil = Diff.fuse parameters errors handler cc_compil cc_compil' in 
         let state = set_errors errors state in 
        let state, ((_global_static,_static), _dynamic) = 
         update_reachability_result 

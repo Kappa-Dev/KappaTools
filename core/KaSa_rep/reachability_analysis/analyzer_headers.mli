@@ -36,7 +36,7 @@ type ('static, 'dynamic) kasa_state = (global_static_information, 'static, 'dyna
 type initial_state = Cckappa_sig.enriched_init
 
 val initialize_global_information :
-  ?patch:(global_static_information*global_dynamic_information*Diff.new_indexs) -> 
+  ?patch:(global_static_information*Diff.new_indexs) -> 
   Remanent_parameters_sig.parameters ->
   StoryProfiling.StoryStats.log_info ->
   Exception.exceptions_caught_and_uncaught ->

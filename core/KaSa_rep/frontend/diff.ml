@@ -18,14 +18,18 @@ type diff =
 
  type new_indexs=
  { 
-   first_rule: int; 
-   first_init: int; 
+   next_rule: Ckappa_sig.c_rule_id ; 
+   next_init: int; 
+   next_nsites: Ckappa_sig.c_site_name;
+   next_nr_predicates: Ckappa_sig.c_guard_parameter
  }
 
  let starting_new_elt = 
    {
-    first_rule = 0; 
-    first_init = 0; 
+    next_rule = Ckappa_sig.rule_id_of_int 0; 
+    next_init = 0; 
+    next_nsites = Ckappa_sig.site_name_of_int 0 ; 
+    next_nr_predicates = Ckappa_sig.guard_parameter_of_int 0 ;
    }
  let empty_summary_file = 
    {
@@ -464,19 +468,28 @@ let cut diff (ast:Ast.parsing_compil) =
   let rules = extract diff.diff_rules.new_elt ast.Ast.rules in 
   let init = extract diff.diff_init.new_elt ast.Ast.init in 
   {ast with Ast.init ; Ast.rules}
+
+let get_new_indexs parameters errors handler c_compil = 
+  let n = Handler.nrules parameters errors handler in 
+  let errors, n' = Int_storage.Nearly_inf_Imperatif.dimension parameters errors 
+  c_compil.Cckappa_sig.init in 
+  let next_nsites = Handler.get_nsites handler in 
+  let next_nr_predicates = Handler.get_nr_guard_parameters handler in 
+  let new_indexs = 
+      {
+        next_rule = Ckappa_sig.rule_id_of_int n ; 
+        next_init = n' ;
+        next_nsites; next_nr_predicates
+      }
+  in 
+  errors, new_indexs 
   
 let fuse parameters errors handler c_compil c_compil' = 
   let n = Handler.nrules parameters errors handler in 
   let errors, n' = Int_storage.Nearly_inf_Imperatif.dimension parameters errors 
   c_compil.Cckappa_sig.init in 
-  let new_indexs = 
-      {
-        first_rule = n+1 ; 
-        first_init = n'+1 ;
-      }
-  in 
   let rules_label_map = handler.Cckappa_sig.rules_label_map in 
-  let errors, (rules_label_map, rules, nrules)  = 
+  let errors, (rules_label_map, rules, nrules_pred)  = 
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold 
       parameters errors 
       (fun parameters errors i rule' (rules_label_map,rules,_) -> 
@@ -494,10 +507,11 @@ let fuse parameters errors handler c_compil c_compil' =
           in
           errors, rules_label_map
         in 
-        errors,(rules_label_map, rules, id+1 ))
+        errors,(rules_label_map, rules, id ))
       (c_compil'.Cckappa_sig.rules)
       (rules_label_map, c_compil.Cckappa_sig.rules,n)
   in 
+  let nrules = nrules_pred +1 in 
   let errors, init = 
     Int_storage.Nearly_inf_Imperatif.fold 
       parameters errors 
@@ -506,4 +520,4 @@ let fuse parameters errors handler c_compil c_compil' =
       c_compil'.Cckappa_sig.init
       c_compil.Cckappa_sig.init
   in 
-  errors, {handler with Cckappa_sig.nrules; Cckappa_sig.rules_label_map}, {c_compil with Cckappa_sig.rules ; Cckappa_sig.init}, new_indexs 
+  errors, {handler with Cckappa_sig.nrules; Cckappa_sig.rules_label_map}, {c_compil with Cckappa_sig.rules ; Cckappa_sig.init}

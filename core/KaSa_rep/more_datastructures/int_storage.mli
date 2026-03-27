@@ -76,6 +76,9 @@ module type Storage = sig
   type key
   type dimension
 
+  val init_key: key 
+  val compare_key: key -> key -> bool 
+  
   val create : (dimension, 'a t) unary
   val create_biggest_key : (key, 'a t) unary
   val expand_and_copy : ('a t, dimension, 'a t) binary
@@ -89,7 +92,7 @@ module type Storage = sig
   val key_list : ('a t, key list) unary
   val iter : ((key, 'a) binary_no_output, 'a t) binary_no_output
   val fold_with_interruption : ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary
-  val fold : ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary
+  val fold : ?start:key -> ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary
 
   val fold2 :
     ( (key, 'a, 'c, 'c) ternary,

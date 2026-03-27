@@ -41,6 +41,7 @@ type c_mvbdu_var
 
 (****************************************************************************)
 
+val hack_to_separate_sites_id_from_guard_id: c_site_name 
 val rule_id_to_json : c_rule_id -> Yojson.Basic.t
 val rule_id_of_json : Yojson.Basic.t -> c_rule_id
 val write_c_rule_id : Buffer.t -> c_rule_id -> unit
@@ -140,7 +141,7 @@ val get_agent_shape :
 val get_agent_color :
   c_site_name -> Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
 
-val get_list_of_guard_parameters : c_guard_parameter -> c_guard_parameter list
+val get_list_of_guard_parameters : ?starting:c_guard_parameter -> c_guard_parameter -> c_guard_parameter list
 val compare_unit : unit -> unit -> int
 val compare_unit_agent_name : unit -> unit -> c_agent_name
 val compare_unit_guard_parameter : unit -> unit -> c_guard_parameter

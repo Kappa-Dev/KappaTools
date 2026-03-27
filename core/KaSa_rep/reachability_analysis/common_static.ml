@@ -1069,14 +1069,13 @@ module Proj_agent_rule_to_rule =
     (Ckappa_sig.AgentRule_map_and_set)
     (Ckappa_sig.Rule_map_and_set)
 
-let scan_rule_set parameter error kappa_handler compil =
-  let error, init_common_views = init_common_views parameter error in
+let scan_rule_set parameter error kappa_handler compil store_result =
   let error, store_result =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error rule_id rule store_result ->
         scan_rule parameter error kappa_handler rule_id
           rule.Cckappa_sig.e_rule_c_rule store_result)
-      compil.Cckappa_sig.rules init_common_views
+      compil.Cckappa_sig.rules store_result 
   in
   let error, potential_side_effects_per_rule =
     Proj_agent_rule_to_rule.monadic_proj_map_i
@@ -1097,12 +1096,77 @@ let scan_rule_set parameter error kappa_handler compil =
       store_potential_side_effects_per_rule = potential_side_effects_per_rule;
     } )
 
+
+let scan_rule_set ?patch parameter error kappa_handler compil store_result =
+    match patch with 
+    | None -> scan_rule_set parameter error kappa_handler compil store_result
+    | Some new_indexs -> 
+      let start = Some (new_indexs.Diff.next_rule) in 
+  let backup = store_result.store_side_effects_views.store_potential_side_effects in 
+  let store_result = 
+    let store_side_effects_views =
+      {(store_result.store_side_effects_views) with store_potential_side_effects = Ckappa_sig.AgentRule_map_and_set.Map.empty}
+    in 
+    {store_result with store_side_effects_views}
+  in 
+  let error, store_result  =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameter error
+      (fun parameter error rule_id rule store_result ->
+        scan_rule parameter error kappa_handler rule_id
+          rule.Cckappa_sig.e_rule_c_rule store_result)
+      compil.Cckappa_sig.rules store_result 
+  in
+  let error, potential_side_effects_per_rule' = (* This is redone from scratch, it should be improved *) (* TO DO *)
+    Proj_agent_rule_to_rule.monadic_proj_map_i
+      (fun _parameter error (_, rule_id) -> error, rule_id)
+      parameter error []
+      (fun _parameters error old (agent_name, _) l ->
+        let new_list =
+          List.fold_left
+            (fun old (source, (x, y)) -> (source, (agent_name, x, y)) :: old)
+            old l
+        in
+        error, new_list)
+      store_result.store_side_effects_views.store_potential_side_effects
+  in
+  let error, store_potential_side_effects = 
+    Ckappa_sig.AgentRule_map_and_set.Map.map2 
+        parameter error 
+        (fun _ e b -> e,b)
+        (fun _ e b -> e, b)
+        (fun _ e b c -> e,b@c)
+        store_result.store_side_effects_views.store_potential_side_effects backup 
+  in 
+  let error, store_potential_side_effects_per_rule = 
+   Ckappa_sig.Rule_map_and_set.Map.map2 
+      parameter error 
+      (fun _ e b -> e,b)
+      (fun _ e b -> e,b)
+      (fun _ e a b -> e,a@b)
+      potential_side_effects_per_rule' store_result.store_potential_side_effects_per_rule 
+    in 
+  let store_side_effects_views = {store_result.store_side_effects_views with store_potential_side_effects} in 
+  let store_result = 
+  {
+      store_result with
+      store_side_effects_views ; 
+      store_potential_side_effects_per_rule ;
+    }
+  in 
+  error, store_result 
+
 (******************************************************************)
 
-let compute_restriction_mvbdu parameters error mvbdu_handler nr_guard_parameters
+let compute_restriction_mvbdu ?patch_compute_restriction_mvbdu parameters error mvbdu_handler nr_guard_parameters
     nsites =
-  let guard_p_list =
-    Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
+  let starting_mvbdu, starting = 
+    match patch_compute_restriction_mvbdu with 
+    | Some (_,mvbdu,i) -> 
+      Some mvbdu, Some i 
+    | None -> None, None 
+    in 
+     let guard_p_list =
+    Ckappa_sig.get_list_of_guard_parameters ?starting nr_guard_parameters
   in
   let pair_list =
     List.map
@@ -1112,13 +1176,22 @@ let compute_restriction_mvbdu parameters error mvbdu_handler nr_guard_parameters
             Some Ckappa_sig.dummy_state_index_true ) ))
       guard_p_list
   in
-  Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters mvbdu_handler error
-    pair_list
+  let error, mvbdu_handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters mvbdu_handler error
+    pair_list in 
+    match starting_mvbdu with 
+    | None -> error, mvbdu_handler, mvbdu
+    | Some a -> 
+      Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error a mvbdu 
 
-let collect_guard_mvbdus parameters error mvbdu_handler compilation
+  let collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters error mvbdu_handler compilation
     bdu_restriction nsites =
-  let error, (mvbdu_handler, guard_mvbdus) =
-    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+   let first_rule, map =
+    match patch_collect_guard_mvbdus with 
+    | None -> Ckappa_sig.rule_id_of_int 0, Ckappa_sig.Rule_setmap.Map.empty
+    | Some (new_elts, map) -> new_elts.Diff.next_rule, map 
+    in 
+    let error, (mvbdu_handler, guard_mvbdus) =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ~start:first_rule parameters error
       (fun parameters error rule_id rule (mvbdu_handler, guard_mvbdus) ->
         match rule.Cckappa_sig.e_rule_c_rule.guard with
         | None -> error, (mvbdu_handler, guard_mvbdus)
@@ -1131,24 +1204,49 @@ let collect_guard_mvbdus parameters error mvbdu_handler compilation
             ( mvbdu_handler,
               Ckappa_sig.Rule_setmap.Map.add rule_id bdu guard_mvbdus ) ))
       compilation.Cckappa_sig.rules
-      (mvbdu_handler, Ckappa_sig.Rule_setmap.Map.empty)
+      (mvbdu_handler, map)
   in
   error, mvbdu_handler, guard_mvbdus
 
-let compute_working_set_mvbdu parameters error mvbdu_handler compilation nsites
+let compute_working_set_mvbdu ?patch_compute_working_set_mvbdu parameters error mvbdu_handler compilation nsites
     =
-  let pair_list =
+    let starting_mvbdu, starting_g, starting_s = 
+      match patch_compute_working_set_mvbdu with 
+      | Some (diff,mvbdu) -> 
+         Some mvbdu, diff.Diff.next_nr_predicates, diff.Diff.next_nsites 
+      | None -> None, Ckappa_sig.guard_parameter_of_int 0 , Ckappa_sig.site_name_of_int 0 
+   in 
+   let error = 
+    if Ckappa_sig.compare_site_name Ckappa_sig.hack_to_separate_sites_id_from_guard_id nsites < 0 
+      && not (nsites = starting_s)
+    then 
+      let error, () = 
+    Exception.warn parameters error __POS__ ~message:"Number of sites capacity has been exceeded in incremental analysis" 
+          Exit () 
+      in error 
+    else error 
+  in 
+   let pair_list =
     Ckappa_sig.Ws_index_map_and_set.Map.fold
       (fun _ (guard, bool) pair_list ->
-        ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
+        ( 
+          if Ckappa_sig.compare_guard_parameter guard starting_g < 0 
+          then 
+            pair_list
+          else   
+           (Ckappa_sig.mvbdu_var_of_guard guard nsites,
           match bool with
           | false -> Ckappa_sig.dummy_state_index_false
           | true -> Ckappa_sig.dummy_state_index_true )
-        :: pair_list)
+        :: pair_list))
       compilation.Cckappa_sig.working_set_valuations []
   in
-  Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters mvbdu_handler error
-    (List.rev pair_list)
+  let error, mvbdu_handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters mvbdu_handler error
+    (List.rev pair_list) in 
+    match starting_mvbdu with 
+    | None -> error, mvbdu_handler, mvbdu
+    | Some a -> 
+      Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error a mvbdu 
 
 (******************************************************************)
 (******************************************************************)

@@ -134,8 +134,8 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     let patch_global  = 
       match patch with 
       | None -> None
-      | Some (static, dynamic, _) -> 
-        Some (fst static, Domain.get_global_dynamic_information dynamic, new_elts)
+      | Some (static, _,_) -> 
+        Some (fst static,  new_elts)
     in 
     let error, global_static, dynamic =
       Analyzer_headers.initialize_global_information ?patch:patch_global parameters log_info error
@@ -197,6 +197,12 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
         dynamic
     in
     let error, static, dynamic =
+      match patch with 
+    | Some _ -> 
+        let error, () = 
+                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit ()
+    in error, static, dynamic 
+     | None -> 
       let rec aux error dynamic =
         let error, dynamic, next_opt = Domain.next_rule static dynamic error in
         match next_opt with
