@@ -1073,7 +1073,7 @@ let print_working_set_prefix id working_set_values =
 
 let print_init c f = function
   | ws_id, (g, (n, _), INIT_MIX (m, _)) ->
-    Format.fprintf f "@[%s@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]]" 
+    Format.fprintf f "@[%s@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]@]" 
     (match ws_id with
            | None -> ""
            | Some id -> print_working_set_prefix id c.working_set_values)

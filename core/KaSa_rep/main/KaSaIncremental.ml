@@ -71,6 +71,7 @@ let parse_input s =
     Parsing_error ("Unknown command: " ^ s)
 
 let main () =
+  let initial_start_time = Sys.time () in
   let errors = Exception.empty_exceptions_caught_and_uncaught in
   let _, parameters, _ = Get_option.get_option errors in
   let module A =
@@ -92,12 +93,14 @@ let main () =
       state
   in
   let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
-  let print_result parameters state start_time =
-    let state = Export_to_KaSa.output_reachability_result state in
+  let print_result parameters state print_analysis start_time =
+    let state, _ = Export_to_KaSa.get_reachability_analysis state in
+    let state = if print_analysis then Export_to_KaSa.output_reachability_result state else state in
     let error = Export_to_KaSa.get_errors state in
     let () = Exception.print parameters error in
     KaSaUtil.print_efficiency parameters state start_time
   in
+  let () = print_result parameters state false initial_start_time in
   let rec loop state =
     let log = Remanent_parameters.get_logger parameters in
     Loggers.fprintf log "> ";
@@ -128,7 +131,7 @@ let main () =
         loop state
       | "print result" | "p result" | "p" ->
         let start_time = Sys.time () in
-        let () = print_result parameters state start_time in
+        let () = print_result parameters state true start_time in
         loop state
       | input when String.length input > 12 && String.sub input 0 12 = "update file " -> 
         let start_time = Sys.time () in
@@ -148,9 +151,7 @@ let main () =
             in
             Export_to_KaSa.set_errors error state
         in
-        let error = Export_to_KaSa.get_errors state in
-        let () = Exception.print parameters error in
-        let () = KaSaUtil.print_efficiency parameters state start_time in
+        let () = print_result parameters state false start_time in
         loop state
       | input ->
         let start_time = Sys.time () in
@@ -191,7 +192,7 @@ let main () =
         in
         let () =
           if success then
-            print_result parameters state start_time
+            print_result parameters state false start_time
           else (
             let error = Export_to_KaSa.get_errors state in
             Exception.print parameters error
