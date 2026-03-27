@@ -15,10 +15,11 @@ module type Type = sig
   type state
 
   val init : ?compil:Ast.parsing_compil -> unit -> state
-  val patch : ?compil:Ast.parsing_compil -> old_file_name:string -> state -> state
 
-  val get_compilation :
-    state -> state * Ast.parsing_compil
+  val patch :
+    ?compil:Ast.parsing_compil -> old_file_name:string -> state -> state
+
+  val get_compilation : state -> state * Ast.parsing_compil
 
   val get_contact_map :
     ?accuracy_level:Public_data.accuracy_level ->

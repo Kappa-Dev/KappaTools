@@ -69,18 +69,19 @@ type ('a, 'b) binary_no_output =
   'b ->
   Exception.exceptions_caught_and_uncaught
 
-type 'a loc_pos = (Remanent_parameters_sig.parameters,
-  Exception.exceptions_caught_and_uncaught, 'a) Loc.rename_pos_with_errors 
+type 'a loc_pos =
+  ( Remanent_parameters_sig.parameters,
+    Exception.exceptions_caught_and_uncaught,
+    'a )
+  Loc.rename_pos_with_errors
 
 module type Storage = sig
   type 'a t
   type key
   type dimension
 
-
-  val init_key:key 
-  val compare_key: key -> key -> bool 
-
+  val init_key : key
+  val compare_key : key -> key -> bool
   val create : (dimension, 'a t) unary
   val create_biggest_key : (key, 'a t) unary
   val expand_and_copy : ('a t, dimension, 'a t) binary
@@ -111,9 +112,7 @@ module type Storage = sig
 
   val for_all : ((key, 'a, bool) binary, 'a t, bool) binary
   val free_all : ('a t, 'a t) unary
-
-  val rename_pos : 'a loc_pos -> 'a t loc_pos 
-
+  val rename_pos : 'a loc_pos -> 'a t loc_pos
 end
 
 let invalid_arg parameters mh pos exn value =
@@ -125,9 +124,8 @@ module Int_storage_imperatif :
   type dimension = int
   type 'a t = { array: 'a option array; size: int }
 
-  let compare_key a b = a < b 
-
-  let init_key = 0 
+  let compare_key a b = a < b
+  let init_key = 0
   let dimension _ error a = error, a.size
 
   let key_list _paremeters error t =
@@ -160,7 +158,7 @@ module Int_storage_imperatif :
       let _ = Array.blit array.array 0 array'.array 0 dimension in
       error, array'
     ) else
-      error, { array = Array.sub array.array 0 (size+1); size }
+      error, { array = Array.sub array.array 0 (size + 1); size }
 
   let set parameters error key value array =
     if key > array.size || key < 0 then (
@@ -275,7 +273,11 @@ module Int_storage_imperatif :
     aux 0 error
 
   let fold ?start parameter error f t init =
-    let start = match start with | None -> 0 | Some i -> i in 
+    let start =
+      match start with
+      | None -> 0
+      | Some i -> i
+    in
     let size = t.size in
     let array = t.array in
     let rec aux k remanent =
@@ -371,22 +373,17 @@ module Int_storage_imperatif :
       (fun parameter error a _ t -> free parameter error a t)
       t t
 
-   let rename_pos rename_pos_elt
-                    parameters
-                    errors rename t = 
-      (*let errors, dim = dimension parameters errors t in *)
-     (* let errors, t = expand_and_copy parameters errors t dim in*)
-      let errors, t = 
-        fold 
-          parameters errors 
-          (fun parameters errors k  elt t -> 
-            let errors, elt = rename_pos_elt parameters errors rename elt in 
-            set 
-              parameters errors 
-              k elt t)
-          t t 
-      in errors, t
-
+  let rename_pos rename_pos_elt parameters errors rename t =
+    (*let errors, dim = dimension parameters errors t in *)
+    (* let errors, t = expand_and_copy parameters errors t dim in*)
+    let errors, t =
+      fold parameters errors
+        (fun parameters errors k elt t ->
+          let errors, elt = rename_pos_elt parameters errors rename elt in
+          set parameters errors k elt t)
+        t t
+    in
+    errors, t
 end
 
 module Nearly_infinite_arrays =
@@ -399,8 +396,8 @@ functor
       type key = Basic.key
       type 'a t = 'a Basic.t
 
-      let init_key = Basic.init_key 
-      let compare_key = Basic.compare_key 
+      let init_key = Basic.init_key
+      let compare_key = Basic.compare_key
       let create = Basic.create
       let create_biggest_key = Basic.create_biggest_key
       let dimension = Basic.dimension
@@ -442,7 +439,7 @@ functor
       let fold2_common = Basic.fold2_common
       let for_all = Basic.for_all
       let free_all = Basic.free_all
-      let rename_pos = Basic.rename_pos 
+      let rename_pos = Basic.rename_pos
     end :
       Storage with type key = int and type dimension = int)
 
@@ -457,8 +454,11 @@ functor
       type key = Extension.key * Underlying.key
       type 'a t = { matrix: 'a Underlying.t Extension.t; dimension: dimension }
 
-      let compare_key (a,b) (c,d) = Extension.compare_key a c && Underlying.compare_key b d 
-      let init_key = Extension.init_key, Underlying.init_key 
+      let compare_key (a, b) (c, d) =
+        Extension.compare_key a c && Underlying.compare_key b d
+
+      let init_key = Extension.init_key, Underlying.init_key
+
       let create parameters error dimension =
         let error, matrix = Extension.create parameters error (fst dimension) in
         error, { matrix; dimension }
@@ -592,14 +592,16 @@ functor
               a b)
           a.matrix b
 
-      let fold ?start parameter error f a b = 
-        let start_ext, start_under = 
-          match start 
-          with 
-            | None -> None, None 
-            | Some (a,b) -> Some a, Some b 
-        in 
-        fold_gen (Extension.fold ?start:start_ext) (Underlying.fold ?start:start_under) parameter error f a b
+      let fold ?start parameter error f a b =
+        let start_ext, start_under =
+          match start with
+          | None -> None, None
+          | Some (a, b) -> Some a, Some b
+        in
+        fold_gen
+          (Extension.fold ?start:start_ext)
+          (Underlying.fold ?start:start_under)
+          parameter error f a b
 
       let fold_with_interruption parameter error f a b =
         fold_gen Extension.fold_with_interruption
@@ -637,13 +639,13 @@ functor
           (fun parameter error a _ t -> free parameter error a t)
           t t
 
-      let rename_pos rename_pos_elt parameter error rename t = 
-        let error, matrix = 
-          Extension.rename_pos 
+      let rename_pos rename_pos_elt parameter error rename t =
+        let error, matrix =
+          Extension.rename_pos
             (Underlying.rename_pos rename_pos_elt)
             parameter error rename t.matrix
-        in 
-        error, {t with matrix} 
+        in
+        error, { t with matrix }
     end :
       Storage
         with type key = Extension.key * Underlying.key
@@ -659,8 +661,8 @@ functor
       type key = Basic.key
       type 'a t = { basic: 'a Basic.t; keys: key list }
 
-      let init_key = Basic.init_key 
-      let compare_key = Basic.compare_key 
+      let init_key = Basic.init_key
+      let compare_key = Basic.compare_key
 
       let create parameters error i =
         let error, basic = Basic.create parameters error i in
@@ -733,15 +735,22 @@ functor
           error (List.rev list)
 
       let fold ?start parameters error f a b =
-        let (start:key) = match start with | None -> init_key | Some i -> i in 
+        let (start : key) =
+          match start with
+          | None -> init_key
+          | Some i -> i
+        in
         let error, list = key_list parameters error a in
         List.fold_left
           (fun (error, b) k ->
-            if compare_key k start then error,b else 
-            let error, im = get parameters error k a in
-            match im with
-            | None -> invalid_arg parameters error __POS__ Exit b
-            | Some im -> f parameters error k im b)
+            if compare_key k start then
+              error, b
+            else (
+              let error, im = get parameters error k a in
+              match im with
+              | None -> invalid_arg parameters error __POS__ Exit b
+              | Some im -> f parameters error k im b
+            ))
           (error, b) (List.rev list)
 
       let for_all parameters error f a =
@@ -819,22 +828,17 @@ functor
             | Some _ -> error, c)
           b c
 
-
-      let rename_pos rename_pos_elt
-                    parameters
-                    errors rename t = 
-        let errors, dim = dimension parameters errors t in 
+      let rename_pos rename_pos_elt parameters errors rename t =
+        let errors, dim = dimension parameters errors t in
         let errors, t = expand_and_copy parameters errors t dim in
-        let errors, t = 
-          fold 
-            parameters errors 
-            (fun parameters errors k  elt t -> 
-              let errors, elt = rename_pos_elt parameters errors rename elt in 
-              set 
-                parameters errors 
-               k elt t)
-            t t 
-        in errors, t
+        let errors, t =
+          fold parameters errors
+            (fun parameters errors k elt t ->
+              let errors, elt = rename_pos_elt parameters errors rename elt in
+              set parameters errors k elt t)
+            t t
+        in
+        errors, t
     end :
       Storage with type key = Basic.key and type dimension = Basic.dimension)
 

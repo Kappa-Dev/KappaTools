@@ -94,9 +94,8 @@ let receive mailbox x =
                   (JsonUtil.read_compact_pair Yojson.Basic.read_string
                      Yojson.Basic.read_int)
                   p lb)
-            | B (Ast, thread) ->
-                Lwt.wakeup thread
-                  (read_result Ast.read_parsing_compil p lb)
+           | B (Ast, thread) ->
+             Lwt.wakeup thread (read_result Ast.read_parsing_compil p lb)
            | B (JSON, thread) ->
              Lwt.wakeup thread (read_result Yojson.Basic.read_json p lb)
            | B (Influence_map, thread) ->
@@ -268,7 +267,8 @@ class virtual new_client ~is_running ~post mailbox =
           JsonUtil.write_sequence b
             [ (fun b -> Yojson.Basic.write_string b "FileCatalog") ])
 
-    method secret_project_parse : (Ast.parsing_compil * string option) Api.lwt_result =
+    method secret_project_parse
+        : (Ast.parsing_compil * string option) Api.lwt_result =
       Lwt.return
         (Api_common.err_result_of_string
            "low level project_parse mustn't be used")

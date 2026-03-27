@@ -68,7 +68,9 @@ type internal_influence_map =
   * Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
   * Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
 
-type ('global,'static, 'dynamic) reachability_result = ('global * 'static) * 'dynamic
+type ('global, 'static, 'dynamic) reachability_result =
+  ('global * 'static) * 'dynamic
+
 type subviews_info = unit
 
 type flow =
@@ -109,10 +111,14 @@ type bidirectional_influence_map = {
 
 type ('global, 'static, 'dynamic) state
 
-val get_global_static_information: ('global, 'static, 'dynamic) state -> 'global option 
-val set_global_static_information: 'global -> ('global, 'static, 'dynamic) state -> ('global, 'static, 'dynamic) state
-(*******************************************************************)
+val get_global_static_information :
+  ('global, 'static, 'dynamic) state -> 'global option
 
+val set_global_static_information :
+  'global ->
+  ('global, 'static, 'dynamic) state ->
+  ('global, 'static, 'dynamic) state
+(*******************************************************************)
 
 val to_json : ('global, 'static, 'dynamic) state -> Yojson.Basic.t
 
@@ -158,12 +164,16 @@ val get_init : ('global, 'static, 'dynamic) state -> init
 val get_env : ('global, 'static, 'dynamic) state -> Model.t option option
 
 val set_env :
-  Model.t option -> ('global, 'static, 'dynamic) state -> ('global, 'static, 'dynamic) state
+  Model.t option ->
+  ('global, 'static, 'dynamic) state ->
+  ('global, 'static, 'dynamic) state
 
 val get_init_state : ('global, 'static, 'dynamic) state -> initial_state option
 
 val set_init_state :
-  initial_state -> ('global,'static, 'dynamic) state -> ('global, 'static, 'dynamic) state
+  initial_state ->
+  ('global, 'static, 'dynamic) state ->
+  ('global, 'static, 'dynamic) state
 
 (*contact map int*)
 
@@ -171,10 +181,14 @@ val get_contact_map_int :
   ('global, 'static, 'dynamic) state -> Contact_map.t option option
 
 val set_contact_map_int :
-  Contact_map.t option -> ('global, 'static, 'dynamic) state -> ('global, 'static, 'dynamic) state
+  Contact_map.t option ->
+  ('global, 'static, 'dynamic) state ->
+  ('global, 'static, 'dynamic) state
 
 val set_compilation :
-  compilation -> ('global, 'static, 'dynamic) state -> ('global, 'static, 'dynamic) state
+  compilation ->
+  ('global, 'static, 'dynamic) state ->
+  ('global, 'static, 'dynamic) state
 
 val get_compilation : ('global, 'static, 'dynamic) state -> compilation option
 
@@ -183,276 +197,322 @@ val set_handler :
   ('global, 'static, 'compile) state ->
   ('global, 'static, 'compile) state
 
-val get_handler : ('global, 'static, 'compile) state -> Cckappa_sig.kappa_handler option
+val get_handler :
+  ('global, 'static, 'compile) state -> Cckappa_sig.kappa_handler option
 
 val set_refined_compil :
-  refined_compilation -> ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+  refined_compilation ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
-val get_refined_compil : ('global,'static, 'compile) state -> refined_compilation option
+val get_refined_compil :
+  ('global, 'static, 'compile) state -> refined_compilation option
 
 val set_c_compil :
-  Cckappa_sig.compil -> ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+  Cckappa_sig.compil ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
-val get_c_compil : ('global,'static, 'compile) state -> Cckappa_sig.compil option
+val get_c_compil :
+  ('global, 'static, 'compile) state -> Cckappa_sig.compil option
 
 val get_errors :
-  ('global,'static, 'compile) state -> Exception.exceptions_caught_and_uncaught
+  ('global, 'static, 'compile) state -> Exception.exceptions_caught_and_uncaught
 
 val set_errors :
   Exception.exceptions_caught_and_uncaught ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val set_internal_contact_map :
   Public_data.accuracy_level ->
   internal_contact_map ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_internal_contact_map :
   Public_data.accuracy_level ->
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   internal_contact_map option
 
 val get_internal_scc_decomposition :
   Public_data.accuracy_level ->
   Public_data.accuracy_level ->
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   internal_scc_decomposition option
 
 val get_internal_scc_decomposition_map :
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   internal_scc_decomposition Public_data.AccuracyMap.t Public_data.AccuracyMap.t
 
 val set_internal_scc_decomposition :
   Public_data.accuracy_level ->
   Public_data.accuracy_level ->
   internal_scc_decomposition ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_scc_decomposition :
   Public_data.accuracy_level ->
   Public_data.accuracy_level ->
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   Public_data.scc option
 
 val set_scc_decomposition :
   Public_data.accuracy_level ->
   Public_data.accuracy_level ->
   Public_data.scc ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val set_contact_map :
   Public_data.accuracy_level ->
   Public_data.contact_map ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_contact_map :
   Public_data.accuracy_level ->
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   Public_data.contact_map option
 
 val set_signature :
-  Signature.s -> ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+  Signature.s ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
-val get_signature : ('global,'static, 'compile) state -> Signature.s option
+val get_signature : ('global, 'static, 'compile) state -> Signature.s option
 
 val set_quark_map :
-  quark_map -> ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+  quark_map ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
-val get_quark_map : ('global,'static, 'compile) state -> quark_map option
+val get_quark_map : ('global, 'static, 'compile) state -> quark_map option
 
 val set_pos_of_rules_and_vars :
   Public_data.pos_of_rules_and_vars ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_pos_of_rules_and_vars :
-  ('global,'static, 'compile) state -> Public_data.pos_of_rules_and_vars option
+  ('global, 'static, 'compile) state -> Public_data.pos_of_rules_and_vars option
 
 val set_internal_influence_map :
   Public_data.accuracy_level ->
   internal_influence_map ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_internal_influence_map :
   Public_data.accuracy_level ->
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   internal_influence_map option
 
 val set_influence_map :
   Public_data.accuracy_level ->
   Public_data.influence_map ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_influence_map :
   Public_data.accuracy_level ->
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   Public_data.influence_map option
 
 val set_bidirectional_influence_map :
   Public_data.accuracy_level ->
   bidirectional_influence_map ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_bidirectional_influence_map :
   Public_data.accuracy_level ->
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   bidirectional_influence_map option
 
 val set_local_influence_map_blackboard :
   local_influence_map_blackboard ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_local_influence_map_blackboard :
-  ('global,'static, 'compile) state -> local_influence_map_blackboard option
+  ('global, 'static, 'compile) state -> local_influence_map_blackboard option
 
 val set_ode_flow :
   Ode_fragmentation_type.ode_frag ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_ode_flow :
-  ('global,'static, 'compile) state -> Ode_fragmentation_type.ode_frag option
+  ('global, 'static, 'compile) state -> Ode_fragmentation_type.ode_frag option
 
 val set_ctmc_flow :
-  flow -> ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+  flow ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
-val get_ctmc_flow : ('global,'static, 'compile) state -> flow option
-val get_bdu_handler : ('global,'static, 'compile) state -> Mvbdu_wrapper.Mvbdu.handler
+val get_ctmc_flow : ('global, 'static, 'compile) state -> flow option
+
+val get_bdu_handler :
+  ('global, 'static, 'compile) state -> Mvbdu_wrapper.Mvbdu.handler
 
 val set_bdu_handler :
   Mvbdu_wrapper.Mvbdu.handler ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val set_reachability_result :
-  ('global,'static, 'compile) reachability_result ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) reachability_result ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_reachability_result :
-  ('global,'static, 'compile) state -> ('global,'static, 'compile) reachability_result option
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) reachability_result option
 
-val get_subviews_info : ('global,'static, 'compile) state -> subviews_info option
+val get_subviews_info :
+  ('global, 'static, 'compile) state -> subviews_info option
 
 val set_subviews_info :
-  subviews_info -> ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+  subviews_info ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
-val get_dead_rules : ('global,'static, 'compile) state -> Public_data.dead_rules option
+val get_dead_rules :
+  ('global, 'static, 'compile) state -> Public_data.dead_rules option
 
 val set_dead_rules :
   Public_data.dead_rules ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_conditionally_dead_rules :
-  ('global,'static, 'compile) state -> Public_data.rule_deadness_conditions option
+  ('global, 'static, 'compile) state ->
+  Public_data.rule_deadness_conditions option
 
 val set_conditionally_dead_rules :
   Public_data.rule_deadness_conditions ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
-val get_dead_agents : ('global,'static, 'compile) state -> dead_agents option
+val get_dead_agents : ('global, 'static, 'compile) state -> dead_agents option
 
 val set_dead_agents :
-  dead_agents -> ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+  dead_agents ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_conditionally_dead_agents :
-  ('global,'static, 'compile) state -> Public_data.agent_deadness_conditions option
+  ('global, 'static, 'compile) state ->
+  Public_data.agent_deadness_conditions option
 
 val set_conditionally_dead_agents :
   Public_data.agent_deadness_conditions ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_influence_map_map :
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   Public_data.influence_map Public_data.AccuracyMap.t
 
 val set_separating_transitions :
   separating_transitions ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_separating_transitions :
-  ('global,'static, 'compile) state -> separating_transitions option
+  ('global, 'static, 'compile) state -> separating_transitions option
 
 val set_transition_system_length :
-  int list -> ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+  int list ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
-val get_transition_system_length : ('global,'static, 'compile) state -> int list option
+val get_transition_system_length :
+  ('global, 'static, 'compile) state -> int list option
 
 val get_contact_map_map :
-  ('global,'static, 'compile) state -> Public_data.contact_map Public_data.AccuracyMap.t
+  ('global, 'static, 'compile) state ->
+  Public_data.contact_map Public_data.AccuracyMap.t
 
 val get_internal_influence_map_map :
-  ('global,'static, 'compile) state -> internal_influence_map Public_data.AccuracyMap.t
+  ('global, 'static, 'compile) state ->
+  internal_influence_map Public_data.AccuracyMap.t
 
 val get_internal_contact_map_map :
-  ('global,'static, 'compile) state -> internal_contact_map Public_data.AccuracyMap.t
+  ('global, 'static, 'compile) state ->
+  internal_contact_map Public_data.AccuracyMap.t
 
 val set_log_info :
   StoryProfiling.StoryStats.log_info ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_log_info :
-  ('global,'static, 'compile) state -> StoryProfiling.StoryStats.log_info
+  ('global, 'static, 'compile) state -> StoryProfiling.StoryStats.log_info
 
 val get_internal_constraint_list :
-  ('global,'static, 'compile) state -> internal_constraint_list option
+  ('global, 'static, 'compile) state -> internal_constraint_list option
 
 val set_internal_constraint_list :
   internal_constraint_list ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
-val get_constraint_list : ('global,'static, 'compile) state -> constraint_list option
+val get_constraint_list :
+  ('global, 'static, 'compile) state -> constraint_list option
 
 val set_constraint_list :
-  constraint_list -> ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+  constraint_list ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_symmetries :
   Public_data.accuracy_level ->
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   symmetric_sites option
 
 val set_symmetries :
   Public_data.accuracy_level ->
   symmetric_sites ->
-  ('global,'static, 'compile) state ->
-  ('global,'static, 'compile) state
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
 val get_data :
-  ('global,'static, 'compile) state ->
+  ('global, 'static, 'compile) state ->
   Cckappa_sig.kappa_handler option
   * Public_data.dead_rules option
   * separating_transitions option
   * int list option
 
 val get_working_set_elements :
-  ('global,'static, 'compile) state -> Public_data.working_set_elements
+  ('global, 'static, 'compile) state -> Public_data.working_set_elements
 
-  val reset_reachability_memoized_values :
-  ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+val reset_reachability_memoized_values :
+  ('global, 'static, 'compile) state -> ('global, 'static, 'compile) state
 
-val rename_pos: 
-(Remanent_parameters_sig.parameters,Exception.exceptions_caught_and_uncaught,'global) Loc.rename_pos_with_errors -> 
- (Remanent_parameters_sig.parameters,Exception.exceptions_caught_and_uncaught,'static) Loc.rename_pos_with_errors -> 
- (Remanent_parameters_sig.parameters,Exception.exceptions_caught_and_uncaught,'compile) Loc.rename_pos_with_errors -> 
-  ('global,'static,'compile) state Loc.rename_pos
+val rename_pos :
+  ( Remanent_parameters_sig.parameters,
+    Exception.exceptions_caught_and_uncaught,
+    'global )
+  Loc.rename_pos_with_errors ->
+  ( Remanent_parameters_sig.parameters,
+    Exception.exceptions_caught_and_uncaught,
+    'static )
+  Loc.rename_pos_with_errors ->
+  ( Remanent_parameters_sig.parameters,
+    Exception.exceptions_caught_and_uncaught,
+    'compile )
+  Loc.rename_pos_with_errors ->
+  ('global, 'static, 'compile) state Loc.rename_pos
 
-val store_patch: 
-Cckappa_sig.compil -> ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+val store_patch :
+  Cckappa_sig.compil ->
+  ('global, 'static, 'compile) state ->
+  ('global, 'static, 'compile) state
 
-val get_patch: ('global,'static, 'compile) state -> Cckappa_sig.compil option 
-val reset_patch: ('global,'static, 'compile) state -> ('global,'static, 'compile) state
+val get_patch : ('global, 'static, 'compile) state -> Cckappa_sig.compil option
+
+val reset_patch :
+  ('global, 'static, 'compile) state -> ('global, 'static, 'compile) state

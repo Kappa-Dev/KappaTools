@@ -149,7 +149,8 @@ object
   method patch_static_analyser :
     string ->
     Kappa_grammar.Ast.parsing_compil ->
-    (Kappa_grammar.Ast.parsing_compil, Result_util.message list) Result_util.t Lwt.t
+    (Kappa_grammar.Ast.parsing_compil, Result_util.message list) Result_util.t
+    Lwt.t
 
   method private message :
     'a.
@@ -174,7 +175,8 @@ object
   method secret_get_pos_of_rules_and_vars :
     Public_data.pos_of_rules_and_vars Api.lwt_result
 
-  method secret_project_parse : (Ast.parsing_compil * string option) Api.lwt_result
+  method secret_project_parse :
+    (Ast.parsing_compil * string option) Api.lwt_result
 
   method secret_simulation_load :
     Kappa_terms.Pattern.sharing_level ->

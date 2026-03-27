@@ -388,71 +388,73 @@ module Domain = struct
   (**************************************************************************)
 
   let initialize ?patch static dynamic error =
-     let parameters = Analyzer_headers.get_parameter static in
-    match patch with 
-    | Some (static, local,_) -> let error, () = 
-                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
-    in error, static, {local ; global = dynamic}, [  ]
-    | None -> 
-  
-    let log_info = Analyzer_headers.get_log_info dynamic in
-    let error, log_info =
-      StoryProfiling.StoryStats.add_event parameters error
-        (StoryProfiling.Domain_initialization domain_name) None log_info
-    in
-    let compil = Analyzer_headers.get_cc_code static in
-    let handler_kappa = Analyzer_headers.get_kappa_handler static in
-    let dynamic = Analyzer_headers.set_log_info log_info dynamic in
-    let error, init_bdu_analysis_static =
-      Bdu_static_views.init_bdu_analysis_static parameters error
-    in
-    let init_bdu_analysis_static_pattern =
-      Bdu_static_views.init_bdu_analysis_static_pattern
-    in
-    let error, init_covering_class =
-      Covering_classes_main.scan_predicate_covering_classes parameters error
-        handler_kappa compil
-    in
-    let init_global_static =
-      {
-        global_static_information = static;
-        domain_static_information = init_bdu_analysis_static;
-        domain_static_information_pattern = init_bdu_analysis_static_pattern;
-        domain_static_information_covering_class = init_covering_class;
-      }
-    in
-    let init_fixpoint = AgentCV_map_and_set.Map.empty in
-    let init_bdu_analysis_dynamic =
-      Bdu_dynamic_views.init_bdu_analysis_dynamic
-    in
-    let init_global_dynamic =
-      {
-        global = dynamic;
-        local =
-          {
-            fixpoint_result = init_fixpoint;
-            fixpoint_result_current_working_set = None;
-            domain_dynamic_information = init_bdu_analysis_dynamic;
-            subviews = None;
-            ranges = None;
-            separating_edges = None;
-            transition_system_length = None;
-          };
-      }
-    in
-    let error, init_static, init_dynamic =
-      scan_rule_set_static init_global_static init_global_dynamic error
-    in
-    let error, static, dynamic =
-      scan_rule_set_dynamic init_static init_dynamic error
-    in
-    let log_info = get_log_info dynamic in
-    let error, log_info =
-      StoryProfiling.StoryStats.close_event parameters error
-        (StoryProfiling.Domain_initialization domain_name) None log_info
-    in
-    let dynamic = set_log_info log_info dynamic in
-    error, static, dynamic, []
+    let parameters = Analyzer_headers.get_parameter static in
+    match patch with
+    | Some (static, local, _) ->
+      let error, () =
+        Exception.warn ~message:"Reinitialization is not implemented yet"
+          parameters error __POS__ Exit ()
+      in
+      error, static, { local; global = dynamic }, []
+    | None ->
+      let log_info = Analyzer_headers.get_log_info dynamic in
+      let error, log_info =
+        StoryProfiling.StoryStats.add_event parameters error
+          (StoryProfiling.Domain_initialization domain_name) None log_info
+      in
+      let compil = Analyzer_headers.get_cc_code static in
+      let handler_kappa = Analyzer_headers.get_kappa_handler static in
+      let dynamic = Analyzer_headers.set_log_info log_info dynamic in
+      let error, init_bdu_analysis_static =
+        Bdu_static_views.init_bdu_analysis_static parameters error
+      in
+      let init_bdu_analysis_static_pattern =
+        Bdu_static_views.init_bdu_analysis_static_pattern
+      in
+      let error, init_covering_class =
+        Covering_classes_main.scan_predicate_covering_classes parameters error
+          handler_kappa compil
+      in
+      let init_global_static =
+        {
+          global_static_information = static;
+          domain_static_information = init_bdu_analysis_static;
+          domain_static_information_pattern = init_bdu_analysis_static_pattern;
+          domain_static_information_covering_class = init_covering_class;
+        }
+      in
+      let init_fixpoint = AgentCV_map_and_set.Map.empty in
+      let init_bdu_analysis_dynamic =
+        Bdu_dynamic_views.init_bdu_analysis_dynamic
+      in
+      let init_global_dynamic =
+        {
+          global = dynamic;
+          local =
+            {
+              fixpoint_result = init_fixpoint;
+              fixpoint_result_current_working_set = None;
+              domain_dynamic_information = init_bdu_analysis_dynamic;
+              subviews = None;
+              ranges = None;
+              separating_edges = None;
+              transition_system_length = None;
+            };
+        }
+      in
+      let error, init_static, init_dynamic =
+        scan_rule_set_static init_global_static init_global_dynamic error
+      in
+      let error, static, dynamic =
+        scan_rule_set_dynamic init_static init_dynamic error
+      in
+      let log_info = get_log_info dynamic in
+      let error, log_info =
+        StoryProfiling.StoryStats.close_event parameters error
+          (StoryProfiling.Domain_initialization domain_name) None log_info
+      in
+      let dynamic = set_log_info log_info dynamic in
+      error, static, dynamic, []
 
   let add_wake_up_common parameters error rule_id (agent_type, cv_id)
       store_list_of_site_type_in_covering_classes wake_up =
@@ -3800,8 +3802,10 @@ module Domain = struct
             let error, b1 = Handler.is_reverse parameters error compil i in
             let error, b2 = Handler.has_no_label parameters error compil i in
             let rule = Remanent_state.info_to_rule info in
-            let error, is_permanently_removed = 
-              Cckappa_sig.rule_is_permanently_disabled_in_current_working_set parameters error i compil in
+            let error, is_permanently_removed =
+              Cckappa_sig.rule_is_permanently_disabled_in_current_working_set
+                parameters error i compil
+            in
             let rule =
               if (b1 && b2 && hide_reverse_rule) || is_permanently_removed then
                 Handler.hide rule

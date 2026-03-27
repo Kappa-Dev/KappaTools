@@ -556,7 +556,7 @@ module type Projection = sig
     Exception.exceptions_caught_and_uncaught * 'b map_b
 
   val monadic_proj_map_i :
-    ?patch:((elt_b -> bool) * 'b map_b) -> 
+    ?patch:(elt_b -> bool) * 'b map_b ->
     (Remanent_parameters_sig.parameters ->
     Exception.exceptions_caught_and_uncaught ->
     elt_a ->
@@ -642,23 +642,26 @@ module Proj (A : S_with_logs) (B : S_with_logs) :
       map (error, MB.empty)
 
   let monadic_proj_map_i ?patch f parameter error identity_elt merge map =
-    let p, init= 
-     match patch with 
-     | None -> (fun _ -> true), MB.empty 
-     | Some (p,init) -> p, init
-    in 
+    let p, init =
+      match patch with
+      | None -> (fun _ -> true), MB.empty
+      | Some (p, init) -> p, init
+    in
     MA.fold
       (fun key_a data_a (error, map_b) ->
         let error, key_b = f parameter error key_a in
-        if p key_b then 
-        match MB.find_option_without_logs parameter error key_b map_b with
-        | error, None ->
-          let error, data' = merge parameter error identity_elt key_a data_a in
-          MB.add_or_overwrite parameter error key_b data' map_b
-        | error, Some old ->
-          let error, data' = merge parameter error old key_a data_a in
-          MB.add_or_overwrite parameter error key_b data' map_b
-        else error, map_b)
+        if p key_b then (
+          match MB.find_option_without_logs parameter error key_b map_b with
+          | error, None ->
+            let error, data' =
+              merge parameter error identity_elt key_a data_a
+            in
+            MB.add_or_overwrite parameter error key_b data' map_b
+          | error, Some old ->
+            let error, data' = merge parameter error old key_a data_a in
+            MB.add_or_overwrite parameter error key_b data' map_b
+        ) else
+          error, map_b)
       map (error, init)
 
   let monadic_proj_map f parameter error identity_elt merge map =

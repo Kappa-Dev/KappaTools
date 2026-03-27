@@ -650,181 +650,252 @@ let fold_over_mixtures_in_alg_exprs f model accu =
   in
   accu
 
-let rec rename_pos_alg_expr 
-          rename_pos_mixture rename_pos_id rename expr = 
-    match expr with 
-     | Alg_expr.BIN_ALG_OP (op,e1,e2) -> 
-      Alg_expr.BIN_ALG_OP (op,
-                  Loc.rename_pos (rename_pos_alg_expr rename_pos_mixture rename_pos_id) rename e1, 
-                  Loc.rename_pos (rename_pos_alg_expr rename_pos_mixture rename_pos_id) rename e2
-                  )
-  | Alg_expr.UN_ALG_OP (op,e) -> 
-    Alg_expr.UN_ALG_OP (op,Loc.rename_pos ( rename_pos_alg_expr rename_pos_mixture rename_pos_id) rename e)
+let rec rename_pos_alg_expr rename_pos_mixture rename_pos_id rename expr =
+  match expr with
+  | Alg_expr.BIN_ALG_OP (op, e1, e2) ->
+    Alg_expr.BIN_ALG_OP
+      ( op,
+        Loc.rename_pos
+          (rename_pos_alg_expr rename_pos_mixture rename_pos_id)
+          rename e1,
+        Loc.rename_pos
+          (rename_pos_alg_expr rename_pos_mixture rename_pos_id)
+          rename e2 )
+  | Alg_expr.UN_ALG_OP (op, e) ->
+    Alg_expr.UN_ALG_OP
+      ( op,
+        Loc.rename_pos
+          (rename_pos_alg_expr rename_pos_mixture rename_pos_id)
+          rename e )
   | Alg_expr.ALG_VAR id -> Alg_expr.ALG_VAR (rename_pos_id rename id)
-  | Alg_expr.KAPPA_INSTANCE mixture -> 
+  | Alg_expr.KAPPA_INSTANCE mixture ->
     Alg_expr.KAPPA_INSTANCE (rename_pos_mixture rename mixture)
   | Alg_expr.TOKEN_ID id -> Alg_expr.TOKEN_ID (rename_pos_id rename id)
-  | Alg_expr.IF (a,b,c) -> 
-    Alg_expr.IF 
-      (Loc.rename_pos (rename_pos_bool rename_pos_mixture rename_pos_id) rename a, 
-       Loc.rename_pos (rename_pos_alg_expr rename_pos_mixture rename_pos_id) rename b,
-       Loc.rename_pos (rename_pos_alg_expr rename_pos_mixture rename_pos_id) rename c)
-  | Alg_expr.DIFF_TOKEN (a,b) -> 
-    Alg_expr.DIFF_TOKEN 
-        ( 
-          Loc.rename_pos (rename_pos_alg_expr rename_pos_mixture rename_pos_id) rename a, 
-          rename_pos_id rename b
-        )
-  | Alg_expr.DIFF_KAPPA_INSTANCE (a,b) -> 
-    Alg_expr.DIFF_KAPPA_INSTANCE 
-        ( 
-          Loc.rename_pos (rename_pos_alg_expr rename_pos_mixture rename_pos_id) rename a, 
-          rename_pos_mixture rename b
-        )
-  | Alg_expr.CONST _ 
-  | Alg_expr.STATE_ALG_OP _ ->  expr 
-and 
-rename_pos_bool 
-    rename_pos_mixture rename_pos_id rename bool  = 
-          match bool with 
-        | Alg_expr.BIN_BOOL_OP (op,bool1,bool2) -> 
-          Alg_expr.BIN_BOOL_OP (op, 
-              Loc.rename_pos (rename_pos_bool rename_pos_mixture rename_pos_id) rename bool1, 
-              Loc.rename_pos (rename_pos_bool rename_pos_mixture rename_pos_id) rename bool2
-                  )
-        | Alg_expr.UN_BOOL_OP (op,bool1) -> 
-           Alg_expr.UN_BOOL_OP (op, 
-              Loc.rename_pos (rename_pos_bool rename_pos_mixture rename_pos_id) rename bool1)
-        | Alg_expr.COMPARE_OP (op, e1, e2) -> 
-          Alg_expr.COMPARE_OP (op,
-                  Loc.rename_pos (rename_pos_alg_expr rename_pos_mixture rename_pos_id) rename e1, 
-                  Loc.rename_pos (rename_pos_alg_expr rename_pos_mixture rename_pos_id) rename e2
-                  )
-          | Alg_expr.TRUE | Alg_expr.FALSE -> bool 
+  | Alg_expr.IF (a, b, c) ->
+    Alg_expr.IF
+      ( Loc.rename_pos
+          (rename_pos_bool rename_pos_mixture rename_pos_id)
+          rename a,
+        Loc.rename_pos
+          (rename_pos_alg_expr rename_pos_mixture rename_pos_id)
+          rename b,
+        Loc.rename_pos
+          (rename_pos_alg_expr rename_pos_mixture rename_pos_id)
+          rename c )
+  | Alg_expr.DIFF_TOKEN (a, b) ->
+    Alg_expr.DIFF_TOKEN
+      ( Loc.rename_pos
+          (rename_pos_alg_expr rename_pos_mixture rename_pos_id)
+          rename a,
+        rename_pos_id rename b )
+  | Alg_expr.DIFF_KAPPA_INSTANCE (a, b) ->
+    Alg_expr.DIFF_KAPPA_INSTANCE
+      ( Loc.rename_pos
+          (rename_pos_alg_expr rename_pos_mixture rename_pos_id)
+          rename a,
+        rename_pos_mixture rename b )
+  | Alg_expr.CONST _ | Alg_expr.STATE_ALG_OP _ -> expr
 
+and rename_pos_bool rename_pos_mixture rename_pos_id rename bool =
+  match bool with
+  | Alg_expr.BIN_BOOL_OP (op, bool1, bool2) ->
+    Alg_expr.BIN_BOOL_OP
+      ( op,
+        Loc.rename_pos
+          (rename_pos_bool rename_pos_mixture rename_pos_id)
+          rename bool1,
+        Loc.rename_pos
+          (rename_pos_bool rename_pos_mixture rename_pos_id)
+          rename bool2 )
+  | Alg_expr.UN_BOOL_OP (op, bool1) ->
+    Alg_expr.UN_BOOL_OP
+      ( op,
+        Loc.rename_pos
+          (rename_pos_bool rename_pos_mixture rename_pos_id)
+          rename bool1 )
+  | Alg_expr.COMPARE_OP (op, e1, e2) ->
+    Alg_expr.COMPARE_OP
+      ( op,
+        Loc.rename_pos
+          (rename_pos_alg_expr rename_pos_mixture rename_pos_id)
+          rename e1,
+        Loc.rename_pos
+          (rename_pos_alg_expr rename_pos_mixture rename_pos_id)
+          rename e2 )
+  | Alg_expr.TRUE | Alg_expr.FALSE -> bool
 
-
-let rec rename_pos_alg_expr_with_errors  
-          rename_pos_mixture_with_errors rename_pos_id_with_errors 
-          parameters errors rename expr = 
-    match expr with 
-     | Alg_expr.BIN_ALG_OP (op,e1,e2) -> 
-        let errors, e1 = Loc.rename_pos_with_errors (rename_pos_alg_expr_with_errors  rename_pos_mixture_with_errors rename_pos_id_with_errors) parameters errors rename e1 in 
-        let errors, e2 = Loc.rename_pos_with_errors (rename_pos_alg_expr_with_errors  rename_pos_mixture_with_errors rename_pos_id_with_errors) parameters errors rename e2 in 
-      errors, Alg_expr.BIN_ALG_OP (op,e1,e2)
-  | Alg_expr.UN_ALG_OP (op,e) -> 
-    let errors, e = Loc.rename_pos_with_errors (rename_pos_alg_expr_with_errors  rename_pos_mixture_with_errors rename_pos_id_with_errors) parameters errors rename e in 
-     errors, Alg_expr.UN_ALG_OP (op, e) 
-  | Alg_expr.ALG_VAR id -> 
-    let errors, id = rename_pos_id_with_errors parameters errors rename id in 
-    errors, Alg_expr.ALG_VAR (id)
-  | Alg_expr.KAPPA_INSTANCE mixture -> 
-    let errors, mixture = rename_pos_mixture_with_errors parameters errors rename mixture in 
-    errors, Alg_expr.KAPPA_INSTANCE (mixture)
-  | Alg_expr.TOKEN_ID id -> 
-    let errors, id = rename_pos_id_with_errors parameters errors rename id in 
-    errors, Alg_expr.TOKEN_ID (id) 
-  | Alg_expr.IF (a,b,c) -> 
-    let errors, a = Loc.rename_pos_with_errors (rename_pos_bool_with_errors  rename_pos_mixture_with_errors  rename_pos_id_with_errors) parameters errors rename a in 
-    let errors, b = Loc.rename_pos_with_errors (rename_pos_alg_expr_with_errors  rename_pos_mixture_with_errors  rename_pos_id_with_errors) parameters errors rename b in 
-    let errors, c = Loc.rename_pos_with_errors (rename_pos_alg_expr_with_errors  rename_pos_mixture_with_errors  rename_pos_id_with_errors) parameters errors rename c in 
-    errors, Alg_expr.IF (a,b,c) 
-  | Alg_expr.DIFF_TOKEN (a,b) -> 
-    let errors, a = Loc.rename_pos_with_errors (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors rename_pos_id_with_errors) parameters errors rename a in 
-    let errors, b = rename_pos_id_with_errors parameters errors rename b in 
-    errors, Alg_expr.DIFF_TOKEN (a, b)  
-     | Alg_expr.DIFF_KAPPA_INSTANCE (a,b) -> 
-       let errors, a = Loc.rename_pos_with_errors (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors rename_pos_id_with_errors) parameters errors rename a in 
+let rec rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors
+    rename_pos_id_with_errors parameters errors rename expr =
+  match expr with
+  | Alg_expr.BIN_ALG_OP (op, e1, e2) ->
+    let errors, e1 =
+      Loc.rename_pos_with_errors
+        (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename e1
+    in
+    let errors, e2 =
+      Loc.rename_pos_with_errors
+        (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename e2
+    in
+    errors, Alg_expr.BIN_ALG_OP (op, e1, e2)
+  | Alg_expr.UN_ALG_OP (op, e) ->
+    let errors, e =
+      Loc.rename_pos_with_errors
+        (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename e
+    in
+    errors, Alg_expr.UN_ALG_OP (op, e)
+  | Alg_expr.ALG_VAR id ->
+    let errors, id = rename_pos_id_with_errors parameters errors rename id in
+    errors, Alg_expr.ALG_VAR id
+  | Alg_expr.KAPPA_INSTANCE mixture ->
+    let errors, mixture =
+      rename_pos_mixture_with_errors parameters errors rename mixture
+    in
+    errors, Alg_expr.KAPPA_INSTANCE mixture
+  | Alg_expr.TOKEN_ID id ->
+    let errors, id = rename_pos_id_with_errors parameters errors rename id in
+    errors, Alg_expr.TOKEN_ID id
+  | Alg_expr.IF (a, b, c) ->
+    let errors, a =
+      Loc.rename_pos_with_errors
+        (rename_pos_bool_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename a
+    in
+    let errors, b =
+      Loc.rename_pos_with_errors
+        (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename b
+    in
+    let errors, c =
+      Loc.rename_pos_with_errors
+        (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename c
+    in
+    errors, Alg_expr.IF (a, b, c)
+  | Alg_expr.DIFF_TOKEN (a, b) ->
+    let errors, a =
+      Loc.rename_pos_with_errors
+        (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename a
+    in
+    let errors, b = rename_pos_id_with_errors parameters errors rename b in
+    errors, Alg_expr.DIFF_TOKEN (a, b)
+  | Alg_expr.DIFF_KAPPA_INSTANCE (a, b) ->
+    let errors, a =
+      Loc.rename_pos_with_errors
+        (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename a
+    in
     let errors, b = rename_pos_mixture_with_errors parameters errors rename b in
-    errors, Alg_expr.DIFF_KAPPA_INSTANCE (a,b)
-  | Alg_expr.CONST _ 
-  | Alg_expr.STATE_ALG_OP _ ->  errors, expr 
-and 
-rename_pos_bool_with_errors  
-    rename_pos_mixture_with_errors rename_pos_id_with_errors parameters errors rename bool  = 
-          match bool with 
-        | Alg_expr.BIN_BOOL_OP (op,bool1,bool2) -> 
-            let errors, b1 =  Loc.rename_pos_with_errors (rename_pos_bool_with_errors rename_pos_mixture_with_errors  rename_pos_id_with_errors) parameters errors rename bool1 in 
-           let errors, b2 =  Loc.rename_pos_with_errors (rename_pos_bool_with_errors rename_pos_mixture_with_errors  rename_pos_id_with_errors) parameters errors rename bool2 in 
-          errors, Alg_expr.BIN_BOOL_OP (op, b1, b2) 
-        | Alg_expr.UN_BOOL_OP (op,bool1) -> 
-           let errors, b1 =  Loc.rename_pos_with_errors (rename_pos_bool_with_errors rename_pos_mixture_with_errors  rename_pos_id_with_errors) parameters errors rename bool1 in 
-           errors, Alg_expr.UN_BOOL_OP (op, b1) 
-        | Alg_expr.COMPARE_OP (op, e1, e2) -> 
-            let errors, e1 = 
-            Loc.rename_pos_with_errors (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors  rename_pos_id_with_errors) parameters errors rename e1
-        in 
-        let errors, e2 = 
-            Loc.rename_pos_with_errors (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors  rename_pos_id_with_errors) parameters errors rename e2
-        in 
-          errors, Alg_expr.COMPARE_OP (op,e1,e2) 
-          | Alg_expr.TRUE | Alg_expr.FALSE -> errors, bool 
+    errors, Alg_expr.DIFF_KAPPA_INSTANCE (a, b)
+  | Alg_expr.CONST _ | Alg_expr.STATE_ALG_OP _ -> errors, expr
 
-let rec diff_pos_e diff_pos_mix diff_pos_id e e' l = 
-  match e, e' with 
-  | Alg_expr.BIN_ALG_OP (_, e1, e2), Alg_expr.BIN_ALG_OP (_, e1', e2') -> 
-    diff_pos_annoted_e diff_pos_mix diff_pos_id  e2 e2' (diff_pos_annoted_e diff_pos_mix diff_pos_id  e1 e1' l)
-  | Alg_expr.UN_ALG_OP (_, e), Alg_expr.UN_ALG_OP (_, e') -> 
-      diff_pos_annoted_e diff_pos_mix diff_pos_id  e e' l
-  | Alg_expr.ALG_VAR id, Alg_expr.ALG_VAR id' -> 
-      diff_pos_id id id' l 
-   | Alg_expr.STATE_ALG_OP a, Alg_expr.STATE_ALG_OP a' -> 
-      Loc.diff_pos_flat a a' l 
-  | Alg_expr.KAPPA_INSTANCE i, Alg_expr.KAPPA_INSTANCE i' -> 
-      diff_pos_mix i i' l 
-  | Alg_expr.TOKEN_ID i, Alg_expr.TOKEN_ID i' -> 
-      diff_pos_id i i' l 
+and rename_pos_bool_with_errors rename_pos_mixture_with_errors
+    rename_pos_id_with_errors parameters errors rename bool =
+  match bool with
+  | Alg_expr.BIN_BOOL_OP (op, bool1, bool2) ->
+    let errors, b1 =
+      Loc.rename_pos_with_errors
+        (rename_pos_bool_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename bool1
+    in
+    let errors, b2 =
+      Loc.rename_pos_with_errors
+        (rename_pos_bool_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename bool2
+    in
+    errors, Alg_expr.BIN_BOOL_OP (op, b1, b2)
+  | Alg_expr.UN_BOOL_OP (op, bool1) ->
+    let errors, b1 =
+      Loc.rename_pos_with_errors
+        (rename_pos_bool_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename bool1
+    in
+    errors, Alg_expr.UN_BOOL_OP (op, b1)
+  | Alg_expr.COMPARE_OP (op, e1, e2) ->
+    let errors, e1 =
+      Loc.rename_pos_with_errors
+        (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename e1
+    in
+    let errors, e2 =
+      Loc.rename_pos_with_errors
+        (rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors
+           rename_pos_id_with_errors)
+        parameters errors rename e2
+    in
+    errors, Alg_expr.COMPARE_OP (op, e1, e2)
+  | Alg_expr.TRUE | Alg_expr.FALSE -> errors, bool
+
+let rec diff_pos_e diff_pos_mix diff_pos_id e e' l =
+  match e, e' with
+  | Alg_expr.BIN_ALG_OP (_, e1, e2), Alg_expr.BIN_ALG_OP (_, e1', e2') ->
+    diff_pos_annoted_e diff_pos_mix diff_pos_id e2 e2'
+      (diff_pos_annoted_e diff_pos_mix diff_pos_id e1 e1' l)
+  | Alg_expr.UN_ALG_OP (_, e), Alg_expr.UN_ALG_OP (_, e') ->
+    diff_pos_annoted_e diff_pos_mix diff_pos_id e e' l
+  | Alg_expr.ALG_VAR id, Alg_expr.ALG_VAR id' -> diff_pos_id id id' l
+  | Alg_expr.STATE_ALG_OP a, Alg_expr.STATE_ALG_OP a' ->
+    Loc.diff_pos_flat a a' l
+  | Alg_expr.KAPPA_INSTANCE i, Alg_expr.KAPPA_INSTANCE i' -> diff_pos_mix i i' l
+  | Alg_expr.TOKEN_ID i, Alg_expr.TOKEN_ID i' -> diff_pos_id i i' l
   | Alg_expr.DIFF_KAPPA_INSTANCE dk, Alg_expr.DIFF_KAPPA_INSTANCE dk' ->
-    Loc.diff_pos_pair 
-      (Loc.diff_pos_annoted (diff_pos_e diff_pos_mix diff_pos_id)) 
-      diff_pos_mix 
-      dk dk' l 
+    Loc.diff_pos_pair
+      (Loc.diff_pos_annoted (diff_pos_e diff_pos_mix diff_pos_id))
+      diff_pos_mix dk dk' l
   | Alg_expr.DIFF_TOKEN dk, Alg_expr.DIFF_TOKEN dk' ->
-    Loc.diff_pos_pair 
-      (Loc.diff_pos_annoted (diff_pos_e diff_pos_mix diff_pos_id)) 
-      diff_pos_id
-      dk dk' l 
-  | Alg_expr.IF (a,b,c), Alg_expr.IF (a',b',c') -> 
-     let l = diff_pos_annoted_bool diff_pos_mix diff_pos_id a a' l in 
-     let l = diff_pos_annoted_e diff_pos_mix diff_pos_id b b' l in 
-     let l = diff_pos_annoted_e diff_pos_mix diff_pos_id c c' l in 
+    Loc.diff_pos_pair
+      (Loc.diff_pos_annoted (diff_pos_e diff_pos_mix diff_pos_id))
+      diff_pos_id dk dk' l
+  | Alg_expr.IF (a, b, c), Alg_expr.IF (a', b', c') ->
+    let l = diff_pos_annoted_bool diff_pos_mix diff_pos_id a a' l in
+    let l = diff_pos_annoted_e diff_pos_mix diff_pos_id b b' l in
+    let l = diff_pos_annoted_e diff_pos_mix diff_pos_id c c' l in
     l
   | Alg_expr.CONST _, Alg_expr.CONST _ -> l
-  | (Alg_expr.BIN_ALG_OP _ 
-    | Alg_expr.UN_ALG_OP _
-    | Alg_expr.ALG_VAR _ 
-    | Alg_expr.STATE_ALG_OP _ 
-    | Alg_expr.KAPPA_INSTANCE _ 
-    | Alg_expr.TOKEN_ID _ 
-    | Alg_expr.DIFF_KAPPA_INSTANCE _ 
-    | Alg_expr.DIFF_TOKEN _  
-    | Alg_expr.IF _ 
-    | Alg_expr.CONST _),
-    (Alg_expr.BIN_ALG_OP _ 
-    | Alg_expr.UN_ALG_OP _
-    | Alg_expr.ALG_VAR _ 
-    | Alg_expr.STATE_ALG_OP _ 
-    | Alg_expr.KAPPA_INSTANCE _ 
-    | Alg_expr.TOKEN_ID _ 
-    | Alg_expr.DIFF_KAPPA_INSTANCE _ 
-    | Alg_expr.DIFF_TOKEN _  
-    | Alg_expr.IF _ 
-    | Alg_expr.CONST _) -> failwith (invalid_arg "diff_pos_e")
+  | ( ( Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _ | Alg_expr.ALG_VAR _
+      | Alg_expr.STATE_ALG_OP _ | Alg_expr.KAPPA_INSTANCE _
+      | Alg_expr.TOKEN_ID _ | Alg_expr.DIFF_KAPPA_INSTANCE _
+      | Alg_expr.DIFF_TOKEN _ | Alg_expr.IF _ | Alg_expr.CONST _ ),
+      ( Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _ | Alg_expr.ALG_VAR _
+      | Alg_expr.STATE_ALG_OP _ | Alg_expr.KAPPA_INSTANCE _
+      | Alg_expr.TOKEN_ID _ | Alg_expr.DIFF_KAPPA_INSTANCE _
+      | Alg_expr.DIFF_TOKEN _ | Alg_expr.IF _ | Alg_expr.CONST _ ) ) ->
+    failwith (invalid_arg "diff_pos_e")
+
 and diff_pos_bool diff_pos_mix diff_pos_id e e' l =
-  match e,e' with 
-    | Alg_expr.BIN_BOOL_OP (_,e1,e2), Alg_expr.BIN_BOOL_OP (_,e1',e2') -> 
-        diff_pos_annoted_bool diff_pos_mix diff_pos_id e2 e2' 
-          (diff_pos_annoted_bool diff_pos_mix diff_pos_id e1 e1' l)
-   | Alg_expr.UN_BOOL_OP (_,e), Alg_expr.UN_BOOL_OP (_,e') -> 
-        diff_pos_annoted_bool diff_pos_mix diff_pos_id e e' l 
-  | Alg_expr.COMPARE_OP (_,e1,e2), Alg_expr.COMPARE_OP(_,e1',e2') -> 
-    diff_pos_annoted_e diff_pos_mix diff_pos_id  e2 e2' (diff_pos_annoted_e diff_pos_mix diff_pos_id  e1 e1' l)
-  | Alg_expr.TRUE, Alg_expr.TRUE 
-  | Alg_expr.FALSE, Alg_expr.FALSE -> l 
-   | (Alg_expr.BIN_BOOL_OP _ | Alg_expr.UN_BOOL_OP _ | Alg_expr.COMPARE_OP _ | Alg_expr.TRUE | Alg_expr.FALSE ), 
-     (Alg_expr.BIN_BOOL_OP _ | Alg_expr.UN_BOOL_OP _ | Alg_expr.COMPARE_OP _ | Alg_expr.TRUE | Alg_expr.FALSE) -> failwith (invalid_arg "diff_pos_bool")
-  
-and diff_pos_annoted_e diff_pos_mix diff_pos_id e e' l = 
-  Loc.diff_pos_annoted (diff_pos_e diff_pos_mix diff_pos_id) e e' l 
-and diff_pos_annoted_bool diff_pos_mix diff_pos_id b b' l = 
-  Loc.diff_pos_annoted (diff_pos_bool diff_pos_mix diff_pos_id) b b' l 
+  match e, e' with
+  | Alg_expr.BIN_BOOL_OP (_, e1, e2), Alg_expr.BIN_BOOL_OP (_, e1', e2') ->
+    diff_pos_annoted_bool diff_pos_mix diff_pos_id e2 e2'
+      (diff_pos_annoted_bool diff_pos_mix diff_pos_id e1 e1' l)
+  | Alg_expr.UN_BOOL_OP (_, e), Alg_expr.UN_BOOL_OP (_, e') ->
+    diff_pos_annoted_bool diff_pos_mix diff_pos_id e e' l
+  | Alg_expr.COMPARE_OP (_, e1, e2), Alg_expr.COMPARE_OP (_, e1', e2') ->
+    diff_pos_annoted_e diff_pos_mix diff_pos_id e2 e2'
+      (diff_pos_annoted_e diff_pos_mix diff_pos_id e1 e1' l)
+  | Alg_expr.TRUE, Alg_expr.TRUE | Alg_expr.FALSE, Alg_expr.FALSE -> l
+  | ( ( Alg_expr.BIN_BOOL_OP _ | Alg_expr.UN_BOOL_OP _ | Alg_expr.COMPARE_OP _
+      | Alg_expr.TRUE | Alg_expr.FALSE ),
+      ( Alg_expr.BIN_BOOL_OP _ | Alg_expr.UN_BOOL_OP _ | Alg_expr.COMPARE_OP _
+      | Alg_expr.TRUE | Alg_expr.FALSE ) ) ->
+    failwith (invalid_arg "diff_pos_bool")
+
+and diff_pos_annoted_e diff_pos_mix diff_pos_id e e' l =
+  Loc.diff_pos_annoted (diff_pos_e diff_pos_mix diff_pos_id) e e' l
+
+and diff_pos_annoted_bool diff_pos_mix diff_pos_id b b' l =
+  Loc.diff_pos_annoted (diff_pos_bool diff_pos_mix diff_pos_id) b b' l

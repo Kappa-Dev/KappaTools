@@ -117,7 +117,7 @@ let on_message yield post =
                        in
                        let () = Kfiles.overwrite id content catalog in
                        Lwt.return (B (Nothing, msg_id, Result_util.ok ()))
-                      | "ProjectOverwriteAst" ->
+                     | "ProjectOverwriteAst" ->
                        let content =
                          JsonUtil.read_next_item Ast.read_parsing_compil st b
                        in
@@ -144,7 +144,11 @@ let on_message yield post =
           | B (Catalog, msg_id, x) -> reply post write_catalog_items msg_id x
           | B (Nothing, msg_id, x) ->
             reply post Yojson.Basic.write_null msg_id x
-          | B (Ast, msg_id, x) -> reply post (JsonUtil.write_compact_pair Ast.write_parsing_compil (JsonUtil.write_option Yojson.Basic.write_string)) msg_id x
+          | B (Ast, msg_id, x) ->
+            reply post
+              (JsonUtil.write_compact_pair Ast.write_parsing_compil
+                 (JsonUtil.write_option Yojson.Basic.write_string))
+              msg_id x
           | B (Info, msg_id, x) ->
             reply post
               (JsonUtil.write_compact_pair Yojson.Basic.write_string

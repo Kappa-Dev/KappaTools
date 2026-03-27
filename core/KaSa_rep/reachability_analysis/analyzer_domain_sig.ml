@@ -16,7 +16,7 @@
 module type Domain = sig
   type static_information
   type local_dynamic_information
-  
+
   type dynamic_information = {
     local: local_dynamic_information;
     global: Analyzer_headers.global_dynamic_information;
@@ -33,8 +33,8 @@ module type Domain = sig
     dynamic_information
 
   val initialize :
-     ?patch:(static_information*local_dynamic_information*Diff.new_indexs) ->  
-   Analyzer_headers.global_static_information ->
+    ?patch:static_information * local_dynamic_information * Diff.new_indexs ->
+    Analyzer_headers.global_static_information ->
     Analyzer_headers.global_dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->
     Exception.exceptions_caught_and_uncaught

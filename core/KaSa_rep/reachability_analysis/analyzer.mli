@@ -18,7 +18,8 @@
 module type Analyzer = sig
   type static_information
   type dynamic_information
- val main :
+
+  val main :
     Remanent_parameters_sig.parameters ->
     StoryProfiling.StoryStats.log_info ->
     Exception.exceptions_caught_and_uncaught ->
@@ -30,7 +31,6 @@ module type Analyzer = sig
     * (Analyzer_headers.global_static_information * static_information)
     * dynamic_information
 
-
   val update_main :
     Remanent_parameters_sig.parameters ->
     StoryProfiling.StoryStats.log_info ->
@@ -38,15 +38,18 @@ module type Analyzer = sig
     Ckappa_sig.Views_bdu.handler ->
     Cckappa_sig.compil ->
     Cckappa_sig.kappa_handler ->
-    Diff.new_indexs -> 
-    (Analyzer_headers.global_static_information,static_information, dynamic_information) Remanent_state.state -> 
+    Diff.new_indexs ->
+    ( Analyzer_headers.global_static_information,
+      static_information,
+      dynamic_information )
+    Remanent_state.state ->
     Exception.exceptions_caught_and_uncaught
     * StoryProfiling.StoryStats.log_info
     * (Analyzer_headers.global_static_information * static_information)
-    * dynamic_information  
+    * dynamic_information
 
   val export :
-    Analyzer_headers.global_static_information -> 
+    Analyzer_headers.global_static_information ->
     static_information ->
     dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->

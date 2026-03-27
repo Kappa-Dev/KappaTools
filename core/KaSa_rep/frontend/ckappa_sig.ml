@@ -14,8 +14,10 @@
 
 module Int_Set_and_Map = Map_wrapper.Make (Mods.IntSetMap)
 
-let hack_to_separate_sites_id_from_guard_id = 1000000 (* It would be better to use a Sum type to distinguish them *)
-                                                      (* The hack is useless when nsites > hack_to_separate_sites_id_from_guard_id *)
+let hack_to_separate_sites_id_from_guard_id = 1000000
+
+(* It would be better to use a Sum type to distinguish them *)
+(* The hack is useless when nsites > hack_to_separate_sites_id_from_guard_id *)
 let local_trace = true
 let _ = local_trace
 
@@ -211,7 +213,7 @@ let mvbdu_var_of_site (a : c_site_name) : c_mvbdu_var = a
 
 let mvbdu_var_of_guard (a : c_guard_parameter) (nsites : c_site_name) :
     c_mvbdu_var =
-  a + max nsites hack_to_separate_sites_id_from_guard_id 
+  a + max nsites hack_to_separate_sites_id_from_guard_id
 
 let mvbdu_var_of_site_or_guard_p (a : c_site_or_guard_p) (nsites : c_site_name)
     : c_mvbdu_var =
@@ -224,8 +226,8 @@ let int_of_working_set_index (a : c_working_set_index) : int = a
 
 let site_or_guard_p_of_mvbdu_var (a : c_mvbdu_var) (nsites : c_site_name) :
     c_site_or_guard_p =
-    let nsites = max nsites hack_to_separate_sites_id_from_guard_id in 
-    if a < nsites then
+  let nsites = max nsites hack_to_separate_sites_id_from_guard_id in
+  if a < nsites then
     Site a
   else
     Guard_p (a - nsites)
@@ -268,15 +270,19 @@ let get_agent_color n_sites parameters =
     (Remanent_parameters.get_agent_color_def parameters)
 
 let get_list_of_guard_parameters ?starting nr_guard_parameters =
-  match starting with 
-  | None -> List.init (int_of_guard_parameter nr_guard_parameters) guard_parameter_of_int
-  | Some starting_point -> 
-    let rec aux k acc = 
-      if k<starting_point then acc 
-      else 
-        aux (k-1) ((guard_parameter_of_int k)::acc) 
-      in aux (nr_guard_parameters -1) []
-
+  match starting with
+  | None ->
+    List.init
+      (int_of_guard_parameter nr_guard_parameters)
+      guard_parameter_of_int
+  | Some starting_point ->
+    let rec aux k acc =
+      if k < starting_point then
+        acc
+      else
+        aux (k - 1) (guard_parameter_of_int k :: acc)
+    in
+    aux (nr_guard_parameters - 1) []
 
 (***************************************************************)
 (*RENAME*)
@@ -1504,85 +1510,97 @@ let guard_to_bdu_opt parameters error handler_bdu guard bdu_restriction nsites =
 
 (*****************************************************************************)
 
-let rename_pos_link rename link  = 
-  match link with 
-  | LNK_VALUE (c_agent_id, agent_name, site_name, c_link_value, loc) -> 
-    LNK_VALUE(c_agent_id, agent_name, site_name, c_link_value, Loc.rename_loc rename loc) 
+let rename_pos_link rename link =
+  match link with
+  | LNK_VALUE (c_agent_id, agent_name, site_name, c_link_value, loc) ->
+    LNK_VALUE
+      ( c_agent_id,
+        agent_name,
+        site_name,
+        c_link_value,
+        Loc.rename_loc rename loc )
   | LNK_ANY pos -> LNK_ANY (Loc.rename_loc rename pos)
   | LNK_SOME pos -> LNK_SOME (Loc.rename_loc rename pos)
-  | LNK_TYPE (a,b) -> LNK_TYPE (Loc.rename_pos_flat rename a,Loc.rename_pos_flat rename b)
-  | FREE | LNK_MISSING -> link 
+  | LNK_TYPE (a, b) ->
+    LNK_TYPE (Loc.rename_pos_flat rename a, Loc.rename_pos_flat rename b)
+  | FREE | LNK_MISSING -> link
 
-let rename_pos_port rename (port:port) = 
+let rename_pos_port rename (port : port) =
   {
-    port_name = port.port_name ; 
-    port_int = port.port_int ; 
-    port_link = rename_pos_link rename port.port_link ; 
-    port_free = port.port_free 
+    port_name = port.port_name;
+    port_int = port.port_int;
+    port_link = rename_pos_link rename port.port_link;
+    port_free = port.port_free;
   }
 
+let rec rename_pos_interface rename_pos_counter rename interface =
+  match interface with
+  | EMPTY_INTF -> interface
+  | PORT_SEP (port, interface) ->
+    PORT_SEP
+      ( rename_pos_port rename port,
+        rename_pos_interface rename_pos_counter rename interface )
+  | COUNTER_SEP (counter, interface) ->
+    COUNTER_SEP
+      ( rename_pos_counter rename counter,
+        rename_pos_interface rename_pos_counter rename interface )
 
+let rename_pos_parametric_agent rename_pos_counter rename parametric_agent =
+  {
+    agent_name = parametric_agent.agent_name;
+    ag_intf =
+      rename_pos_interface rename_pos_counter rename parametric_agent.ag_intf;
+    agent_name_pos = Loc.rename_loc rename parametric_agent.agent_name_pos;
+  }
 
+let rename_pos_counter _rename c = c
+let rename_pos_counter_sig _rename c = c
+let rename_pos_agent = rename_pos_parametric_agent rename_pos_counter
+let rename_pos_agent_sig = rename_pos_parametric_agent rename_pos_counter_sig
 
-let rec rename_pos_interface rename_pos_counter rename interface = 
-  match interface with 
-  | EMPTY_INTF -> interface 
-  | PORT_SEP (port, interface) -> 
-        PORT_SEP(rename_pos_port rename port, 
-                rename_pos_interface rename_pos_counter rename interface)
-  | COUNTER_SEP (counter, interface) -> 
-    COUNTER_SEP(rename_pos_counter rename counter, 
-                rename_pos_interface rename_pos_counter rename interface)
-    
-let rename_pos_parametric_agent rename_pos_counter rename parametric_agent = 
-  { agent_name = parametric_agent.agent_name ; 
-    ag_intf = rename_pos_interface rename_pos_counter rename parametric_agent.ag_intf ; 
-    agent_name_pos = Loc.rename_loc rename parametric_agent.agent_name_pos 
-                      }
+let rec rename_pos_mixture rename mixture =
+  match mixture with
+  | SKIP mix -> SKIP (rename_pos_mixture rename mix)
+  | COMMA (agent, mixture) ->
+    COMMA (rename_pos_agent rename agent, rename_pos_mixture rename mixture)
+  | DOT (agent_id, agent, mixture) ->
+    DOT
+      ( agent_id,
+        rename_pos_agent rename agent,
+        rename_pos_mixture rename mixture )
+  | PLUS (agent_id, agent, mixture) ->
+    PLUS
+      ( agent_id,
+        rename_pos_agent rename agent,
+        rename_pos_mixture rename mixture )
+  | EMPTY_MIX -> EMPTY_MIX
 
-let rename_pos_counter _rename c = c 
-let rename_pos_counter_sig  _rename c = c                     
-let rename_pos_agent = rename_pos_parametric_agent rename_pos_counter 
-let rename_pos_agent_sig = rename_pos_parametric_agent rename_pos_counter_sig 
-let rec rename_pos_mixture rename mixture = 
-  match mixture with 
-    | SKIP mix -> SKIP (rename_pos_mixture rename mix)
-    | COMMA (agent,mixture) -> COMMA (rename_pos_agent rename agent, rename_pos_mixture rename mixture) 
-    | DOT (agent_id,agent,mixture) -> DOT (agent_id,rename_pos_agent rename agent, rename_pos_mixture rename mixture) 
-    | PLUS (agent_id,agent,mixture) -> PLUS (agent_id,rename_pos_agent rename agent, rename_pos_mixture rename mixture) 
-    | EMPTY_MIX -> EMPTY_MIX 
-    
-
-
-
-let rename_pos_rule rename_pos_pattern rename rule = 
-  {rule with 
-  position = Loc.rename_loc rename rule.position ;
-  prefix = rule.prefix ;
-  interprete_delta = rule.interprete_delta;
-  lhs = rename_pos_pattern rename rule.lhs ; 
-  rhs = rename_pos_pattern rename rule.rhs ; 
-  k_def = 
-    Loc.rename_pos 
+let rename_pos_rule rename_pos_pattern rename rule =
+  {
+    rule with
+    position = Loc.rename_loc rename rule.position;
+    prefix = rule.prefix;
+    interprete_delta = rule.interprete_delta;
+    lhs = rename_pos_pattern rename rule.lhs;
+    rhs = rename_pos_pattern rename rule.rhs;
+    k_def =
+      Loc.rename_pos
         (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern (fun _ a -> a))
-        rename rule.k_def ;
-  k_un =
-    Loc.rename_pos_opt 
-      (Loc.rename_pos 
-         (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern (fun _ a -> a)))
-        rename rule.k_un ;
-}
-  
+        rename rule.k_def;
+    k_un =
+      Loc.rename_pos_opt
+        (Loc.rename_pos
+           (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern (fun _ a -> a)))
+        rename rule.k_un;
+  }
 
-let rename_pos_perturbation_with_errors  rename_pos_pattern rename_pos_rule = 
-  Ast.rename_pos_perturbation_with_errors  
-    rename_pos_pattern rename_pos_pattern (fun _ e _ a -> e,a) rename_pos_rule 
+let rename_pos_perturbation_with_errors rename_pos_pattern rename_pos_rule =
+  Ast.rename_pos_perturbation_with_errors rename_pos_pattern rename_pos_pattern
+    (fun _ e _ a -> e, a)
+    rename_pos_rule
 
-let rename_pos_compil = 
-  Ast.rename_pos_compil 
-   rename_pos_agent 
-   rename_pos_agent_sig 
-   rename_pos_mixture 
-   rename_pos_mixture 
-   (fun _ a -> a)
-   (rename_pos_rule rename_pos_mixture)
+let rename_pos_compil =
+  Ast.rename_pos_compil rename_pos_agent rename_pos_agent_sig rename_pos_mixture
+    rename_pos_mixture
+    (fun _ a -> a)
+    (rename_pos_rule rename_pos_mixture)

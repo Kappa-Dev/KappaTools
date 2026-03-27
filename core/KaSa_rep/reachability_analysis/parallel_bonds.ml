@@ -506,38 +506,40 @@ module Domain = struct
     error, dynamic, result_restriction_bdu
 
   let initialize ?patch static dynamic error =
-     let parameters = Analyzer_headers.get_parameter static in
-    match patch with 
-    | Some (static, local,_) -> let error, () = 
-                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
-    in error, static, {local ; global = dynamic}, [  ]
-    | None -> 
-  
-    let error, dynamic, restriction_bdu =
-      init_restriction_bdu static dynamic error
-    in
-    let init_global_static_information =
-      {
-        global_static_information = static;
-        local_static_information =
-          Parallel_bonds_static.init_local_static restriction_bdu;
-      }
-    in
-    let init_local_dynamic_information =
-      {
-        store_value =
-          Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
-        store_value_current_working_set = None;
-      }
-    in
-    let init_global_dynamic_information =
-      { global = dynamic; local = init_local_dynamic_information }
-    in
-    let error, static, dynamic =
-      scan_rules init_global_static_information init_global_dynamic_information
-        error
-    in
-    error, static, dynamic, []
+    let parameters = Analyzer_headers.get_parameter static in
+    match patch with
+    | Some (static, local, _) ->
+      let error, () =
+        Exception.warn ~message:"Reinitialization is not implemented yet"
+          parameters error __POS__ Exit ()
+      in
+      error, static, { local; global = dynamic }, []
+    | None ->
+      let error, dynamic, restriction_bdu =
+        init_restriction_bdu static dynamic error
+      in
+      let init_global_static_information =
+        {
+          global_static_information = static;
+          local_static_information =
+            Parallel_bonds_static.init_local_static restriction_bdu;
+        }
+      in
+      let init_local_dynamic_information =
+        {
+          store_value =
+            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
+          store_value_current_working_set = None;
+        }
+      in
+      let init_global_dynamic_information =
+        { global = dynamic; local = init_local_dynamic_information }
+      in
+      let error, static, dynamic =
+        scan_rules init_global_static_information
+          init_global_dynamic_information error
+      in
+      error, static, dynamic, []
 
   let add_rules_tuples_into_wake_up_relation parameters error rule_tuples
       wake_up =

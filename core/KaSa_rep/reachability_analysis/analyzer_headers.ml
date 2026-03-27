@@ -38,7 +38,9 @@ type global_dynamic_information = {
   log_info: StoryProfiling.StoryStats.log_info;
 }
 
-type ('static, 'dynamic) kasa_state = (global_static_information,'static, 'dynamic) Remanent_state.state
+type ('static, 'dynamic) kasa_state =
+  (global_static_information, 'static, 'dynamic) Remanent_state.state
+
 type initial_state = Cckappa_sig.enriched_init
 
 let get_wake_up_relation static = static.global_wake_up_relation
@@ -260,8 +262,11 @@ let update_initial_state error static new_elts =
   let compil = get_cc_code static in
   let error, init =
     Int_storage.Nearly_inf_Imperatif.fold parameters error
-      (fun _parameters error k i l -> 
-        if k>=new_elts.Diff.next_init then error, i :: l else error, l)
+      (fun _parameters error k i l ->
+        if k >= new_elts.Diff.next_init then
+          error, i :: l
+        else
+          error, l)
       compil.Cckappa_sig.init []
   in
   error, List.rev init
@@ -325,44 +330,56 @@ let scan_rule ?patch_rule static error mvbdu_handler =
   let parameters = get_parameter static in
   let kappa_handler = get_kappa_handler static in
   let compilation = get_cc_code static in
-  let store_result = get_common_views static in 
+  let store_result = get_common_views static in
   let error, store_result =
-    Common_static.scan_rule_set ?patch:patch_rule parameters error kappa_handler compilation store_result 
+    Common_static.scan_rule_set ?patch:patch_rule parameters error kappa_handler
+      compilation store_result
   in
   let static = set_common_views store_result static in
   error, mvbdu_handler, static
 
 let initialize_global_information ?patch parameters log_info error mvbdu_handler
-    compilation kappa_handler = (* CHECK mvdu_handler and log_info are comming from dynamic *)
-  let error, init_common, wake_up, patch_compute_restriction_mvbdu, patch_collect_guard_mvbdus, patch_compute_working_set_mvbdu, patch_rule  =
-    match patch with 
-    | Some (static, new_elts ) -> 
-        error, 
-    
-        static.global_common_views, 
-        static.global_wake_up_relation, 
-        Some (new_elts, static.global_restriction_mvbdu, new_elts.Diff.next_nr_predicates), 
-        Some (new_elts, static.global_guard_mvbdus), 
-        Some (new_elts, static.global_working_set_mvbdu), 
-        Some (new_elts)
-    | None -> 
-        let error, init_common = Common_static.init_common_views parameters error in
-        let error, wake_up = Common_static.empty_site_to_rules parameters error in
-        error, init_common, wake_up, None, None, None, None 
-    in 
-    let nsites = Handler.get_nsites kappa_handler in
-    let nr_guard_parameters = Handler.get_nr_guard_parameters kappa_handler in
-    let error, mvbdu_handler, restriction_mvbdu =
-      Common_static.compute_restriction_mvbdu ?patch_compute_restriction_mvbdu parameters error mvbdu_handler
-        nr_guard_parameters nsites
+    compilation kappa_handler =
+  (* CHECK mvdu_handler and log_info are comming from dynamic *)
+  let ( error,
+        init_common,
+        wake_up,
+        patch_compute_restriction_mvbdu,
+        patch_collect_guard_mvbdus,
+        patch_compute_working_set_mvbdu,
+        patch_rule ) =
+    match patch with
+    | Some (static, new_elts) ->
+      ( error,
+        static.global_common_views,
+        static.global_wake_up_relation,
+        Some
+          ( new_elts,
+            static.global_restriction_mvbdu,
+            new_elts.Diff.next_nr_predicates ),
+        Some (new_elts, static.global_guard_mvbdus),
+        Some (new_elts, static.global_working_set_mvbdu),
+        Some new_elts )
+    | None ->
+      let error, init_common =
+        Common_static.init_common_views parameters error
+      in
+      let error, wake_up = Common_static.empty_site_to_rules parameters error in
+      error, init_common, wake_up, None, None, None, None
+  in
+  let nsites = Handler.get_nsites kappa_handler in
+  let nr_guard_parameters = Handler.get_nr_guard_parameters kappa_handler in
+  let error, mvbdu_handler, restriction_mvbdu =
+    Common_static.compute_restriction_mvbdu ?patch_compute_restriction_mvbdu
+      parameters error mvbdu_handler nr_guard_parameters nsites
   in
   let error, mvbdu_handler, guard_mvbdus =
-    Common_static.collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters error mvbdu_handler
-      compilation restriction_mvbdu nsites
+    Common_static.collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters
+      error mvbdu_handler compilation restriction_mvbdu nsites
   in
   let error, mvbdu_handler, working_set_mvbdu =
-    Common_static.compute_working_set_mvbdu ?patch_compute_working_set_mvbdu parameters error mvbdu_handler
-      compilation nsites
+    Common_static.compute_working_set_mvbdu ?patch_compute_working_set_mvbdu
+      parameters error mvbdu_handler compilation nsites
   in
   let init_global_static =
     {
@@ -378,15 +395,15 @@ let initialize_global_information ?patch parameters log_info error mvbdu_handler
   let error, mvbdu_handler, static =
     scan_rule ?patch_rule init_global_static error mvbdu_handler
   in
-  error, static, { mvbdu_handler; log_info } 
+  error, static, { mvbdu_handler; log_info }
 
-
-  (* TO DO *)
+(* TO DO *)
 let update_global_information parameters log_info error mvbdu_handler
-    compilation kappa_handler _new_elts _static _dynamic = (* TO DO *)
-    initialize_global_information parameters log_info error mvbdu_handler
-    compilation kappa_handler  
-    
+    compilation kappa_handler _new_elts _static _dynamic =
+  (* TO DO *)
+  initialize_global_information parameters log_info error mvbdu_handler
+    compilation kappa_handler
+
 let dummy_dead_rules _ error _ = error, false
 let dummy_side_effects _ error _ = error, None
 

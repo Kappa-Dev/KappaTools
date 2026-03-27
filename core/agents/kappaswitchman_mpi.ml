@@ -159,7 +159,7 @@ let on_message exec_command message_delimiter =
                        in
                        manager#project_overwrite id content >>= fun out ->
                        Lwt.return (B (Nothing, msg_id, out))
-                      | "ProjectOverwriteAst" ->
+                     | "ProjectOverwriteAst" ->
                        let ast =
                          JsonUtil.read_next_item Ast.read_parsing_compil st b
                        in
@@ -172,15 +172,15 @@ let on_message exec_command message_delimiter =
                        in
                        manager#init_static_analyser compil >>= fun out ->
                        Lwt.return (B (Nothing, msg_id, out))
-                      | "PATCH" ->
-                        let file_name =
+                     | "PATCH" ->
+                       let file_name =
                          JsonUtil.read_next_item Yojson.Basic.read_string st b
                        in
                        let compil =
                          JsonUtil.read_next_item Ast.read_parsing_compil st b
                        in
-                       manager#patch_static_analyser file_name compil >>= fun out ->
-                       Lwt.return (B (Ast, msg_id, out))
+                       manager#patch_static_analyser file_name compil
+                       >>= fun out -> Lwt.return (B (Ast, msg_id, out))
                      | "CONTACT_MAP" ->
                        let acc =
                          JsonUtil.read_next_item Yojson.Basic.read_json st b

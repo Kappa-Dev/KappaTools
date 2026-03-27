@@ -1946,14 +1946,15 @@ let evaluate_guard_opt guard guard_param_values =
 let init_of_ast ~warning ~syntax_version sigs counters_info contact_map tok algs
     inits guard_param_values =
   List.filter_map
-    (fun (ws_id,(guard, expr, ini)) ->
+    (fun (ws_id, (guard, expr, ini)) ->
       if evaluate_guard_opt guard guard_param_values then
         Some
-          ( ws_id, (guard,
-            alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok algs
-              expr,
-            init_of_ast ~warning ~syntax_version sigs counters_info tok
-              contact_map ini ))
+          ( ws_id,
+            ( guard,
+              alg_expr_of_ast ~warning ~syntax_version sigs counters_info tok
+                algs expr,
+              init_of_ast ~warning ~syntax_version sigs counters_info tok
+                contact_map ini ) )
       else
         None)
     inits
@@ -2509,15 +2510,19 @@ let translate_clte_into_cgte (ast_compil : Ast.parsing_compil) =
       (List.rev ast_compil.rules)
   in
 
-  let init : (int option * (Ast.mixture, Ast.mixture, string) Ast.init_statement) list =
+  let init :
+      (int option * (Ast.mixture, Ast.mixture, string) Ast.init_statement) list
+      =
     List.map
       (fun (ws_id, (guard, quantity_alg_expr, init_kind)) ->
-        ws_id, ( guard,
-          quantity_alg_expr,
-          match init_kind with
-          | Ast.INIT_TOK _ -> init_kind
-          | INIT_MIX mix_ ->
-            INIT_MIX (Loc.map_annot add_inverted_counter_to_init_mixture mix_) ))
+        ( ws_id,
+          ( guard,
+            quantity_alg_expr,
+            match init_kind with
+            | Ast.INIT_TOK _ -> init_kind
+            | INIT_MIX mix_ ->
+              INIT_MIX (Loc.map_annot add_inverted_counter_to_init_mixture mix_)
+          ) ))
       ast_compil.init
   in
   let variables =

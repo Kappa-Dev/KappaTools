@@ -28,7 +28,6 @@ type refined_compilation =
     Ckappa_sig.mixture Ckappa_sig.rule )
   Ast.compil
 
-
 let rename_pos_parsing_compil = Ast.rename_pos_parsing_compil
 
 type quark_map = Quark_type.quarks
@@ -154,7 +153,9 @@ type internal_scc_decomposition =
   list
   list
 
-type ('global, 'static, 'dynamic) reachability_result = ('global * 'static) * 'dynamic
+type ('global, 'static, 'dynamic) reachability_result =
+  ('global * 'static) * 'dynamic
+
 type subviews_info = unit
 
 type flow =
@@ -212,7 +213,8 @@ type ('global_static, 'static, 'dynamic) state = {
     Public_data.scc Public_data.AccuracyMap.t Public_data.AccuracyMap.t;
   signature: Signature.s option;
   bdu_handler: Mvbdu_wrapper.Mvbdu.handler;
-  reachability_state: ('global_static, 'static, 'dynamic) reachability_result option;
+  reachability_state:
+    ('global_static, 'static, 'dynamic) reachability_result option;
   subviews_info: subviews_info option;
   dead_rules: dead_rules option;
   conditionally_dead_rules: rule_deadness_conditions option;
@@ -226,14 +228,15 @@ type ('global_static, 'static, 'dynamic) state = {
   symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
   separating_transitions: separating_transitions option;
   transition_system_length: int list option;
-  global_static_information: 'global_static option; 
-  patch: Cckappa_sig.compil option ; 
+  global_static_information: 'global_static option;
+  patch: Cckappa_sig.compil option;
 }
 
-let get_global_static_information state = state.global_static_information 
-let set_global_static_information global_static_information state = 
-  let global_static_information = Some global_static_information in 
-  {state with global_static_information}
+let get_global_static_information state = state.global_static_information
+
+let set_global_static_information global_static_information state =
+  let global_static_information = Some global_static_information in
+  { state with global_static_information }
 
 let get_data state =
   ( state.kappa_handler,
@@ -292,8 +295,8 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
     transition_system_length = None;
-    patch = None; 
-    global_static_information = None; 
+    patch = None;
+    global_static_information = None;
   }
 
 (**************)
@@ -699,9 +702,7 @@ let set_internal_constraint_list list state =
   { state with internal_constraint_list = Some list }
 
 let get_constraint_list state = state.constraint_list
-
-let set_constraint_list list state =
-  { state with constraint_list = Some list }
+let set_constraint_list list state = { state with constraint_list = Some list }
 
 let get_symmetries accuracy state =
   Public_data.AccuracyMap.find_option accuracy state.symmetric_sites
@@ -729,39 +730,39 @@ let get_working_set_elements state =
         match ws_id with
         | None -> None
         | Some ws_id ->
-            match
-              Mods.IntMap.find_option ws_id compilation.Ast.working_set_values
-            with
-            | None -> None (*the rule was permanently deleted*)
-            | Some b -> Some
-            {
-              Public_data.rule_ws_id = ws_id;
-              Public_data.rule_ws_position = loc;
-              Public_data.rule_ws_enabled = b;
-            }
-          )
-      compilation.Ast.rules 
-      @
-      List.filter_map
-      (fun (ws_id, (_, _, init)) ->
-        match ws_id with
-        | None -> None
-        | Some ws_id ->
-          match init with 
-            Ast.INIT_TOK _ -> None (*ignore tokens*)
-          | Ast.INIT_MIX (_, loc) -> 
-            match
-              Mods.IntMap.find_option ws_id compilation.Ast.working_set_values
-            with
-            | None -> None (*the initial state was permanently deleted*)
-            | Some b -> Some
-            {
-              Public_data.rule_ws_id = ws_id;
-              Public_data.rule_ws_position = loc;
-              Public_data.rule_ws_enabled = b;
-            }
-          )
-      compilation.Ast.init 
+          (match
+             Mods.IntMap.find_option ws_id compilation.Ast.working_set_values
+           with
+          | None -> None (*the rule was permanently deleted*)
+          | Some b ->
+            Some
+              {
+                Public_data.rule_ws_id = ws_id;
+                Public_data.rule_ws_position = loc;
+                Public_data.rule_ws_enabled = b;
+              }))
+      compilation.Ast.rules
+    @ List.filter_map
+        (fun (ws_id, (_, _, init)) ->
+          match ws_id with
+          | None -> None
+          | Some ws_id ->
+            (match init with
+            | Ast.INIT_TOK _ -> None (*ignore tokens*)
+            | Ast.INIT_MIX (_, loc) ->
+              (match
+                 Mods.IntMap.find_option ws_id
+                   compilation.Ast.working_set_values
+               with
+              | None -> None (*the initial state was permanently deleted*)
+              | Some b ->
+                Some
+                  {
+                    Public_data.rule_ws_id = ws_id;
+                    Public_data.rule_ws_position = loc;
+                    Public_data.rule_ws_enabled = b;
+                  })))
+        compilation.Ast.init
 
 let reset_reachability_memoized_values state =
   {
@@ -781,116 +782,205 @@ let reset_reachability_memoized_values state =
     constraint_list = None;
   }
 
-let set_handler_opt h_opt state = 
-  match h_opt with 
-  | None -> state 
-  | Some x -> set_handler x state 
-  
-let _gen_opt set get update f y = 
-  match get y with 
-  | None -> y 
+let set_handler_opt h_opt state =
+  match h_opt with
+  | None -> state
+  | Some x -> set_handler x state
+
+let _gen_opt set get update f y =
+  match get y with
+  | None -> y
   | Some x -> set (Some (update f x)) y
 
-let gen set get update f y = 
-   match get y with 
-  | None -> y 
-  | Some x -> 
-    set (update f x) y
-  
-let _gen_error set get update parameters error f y = 
-    let error, x' = update parameters error f (get y) in 
+let gen set get update f y =
+  match get y with
+  | None -> y
+  | Some x -> set (update f x) y
+
+let _gen_error set get update parameters error f y =
+  let error, x' = update parameters error f (get y) in
+  error, set x' y
+
+let gen_opt_opt_error set get update parameters error f y =
+  match get y with
+  | None -> error, y
+  | Some x ->
+    let error, x' = update parameters error f x in
+    error, set (Some x') y
+
+let gen_opt_error set get update parameters error f y =
+  match get y with
+  | None -> error, y
+  | Some x ->
+    let error, x' = update parameters error f x in
     error, set x' y
 
-
-let gen_opt_opt_error set get update parameters error f y = 
-  match get y with 
-  | None -> error, y 
-  | Some x -> 
-    let error, x' = update parameters error f x in 
-    error, set (Some x') y    
-
-let gen_opt_error set get update parameters error f y = 
-  match get y with 
-  | None -> error, y 
-  | Some x -> 
-    let error, x' = update parameters error f x in 
-    error, set x' y    
-
 let rename_pos_in_init _f init = init
-let rename_pos_env _f env = env 
+let rename_pos_env _f env = env
+let rename_pos_in_bidirectional_influence_map _f map = map
+let rename_pos_in_local_influence_map_blackboard _f map = map
 
-let rename_pos_in_bidirectional_influence_map _f map = map 
-
-let rename_pos_in_local_influence_map_blackboard _f map = map 
-
-let rename_pos_reachability_result_with_errors 
-    rename_global_static rename_static rename_compil parameters errors rename result = 
-    (Loc.rename_pos_pair_with_errors 
-      (Loc.rename_pos_pair_with_errors rename_global_static rename_static) rename_compil) 
+let rename_pos_reachability_result_with_errors rename_global_static
+    rename_static rename_compil parameters errors rename result =
+  (Loc.rename_pos_pair_with_errors
+     (Loc.rename_pos_pair_with_errors rename_global_static rename_static)
+     rename_compil)
     parameters errors rename result
 
+let rename_pos_constraint_list rename (list : constraint_list) =
+  Loc.rename_pos_list
+    (Loc.rename_pos_pair
+       (fun _ a -> a)
+       (Loc.rename_pos_list
+          (Public_data.rename_pos_lemma (Loc.rename_pos_list (fun _ a -> a)))))
+    rename list
 
-let rename_pos_constraint_list rename (list:constraint_list) = 
-    Loc.rename_pos_list 
-      (Loc.rename_pos_pair 
-          (fun _ a -> a)
-          (Loc.rename_pos_list 
-                (Public_data.rename_pos_lemma 
-                  (Loc.rename_pos_list 
-                    ((fun _ a -> a))))))
-      rename 
-      list 
+let rename_pos rename_global_static rename_static rename_dynamic rename state =
+  let parameters = get_parameters state in
+  let errors = get_errors state in
+  let errors, state =
+    gen_opt_opt_error set_handler_opt get_handler
+      Cckappa_sig.rename_pos_kappa_handler_with_errors parameters errors rename
+      state
+  in
+  let state =
+    gen set_init_state get_init_state rename_pos_in_init rename state
+  in
+  let state = gen set_env get_env rename_pos_env rename state in
+  let state =
+    gen set_contact_map_int get_contact_map_int Contact_map.rename_pos_in_cm_int
+      rename state
+  in
+  let state =
+    gen
+      (set_contact_map Public_data.High)
+      (get_contact_map Public_data.High)
+      User_graph.rename_pos rename state
+  in
+  let state =
+    gen
+      (set_contact_map Public_data.Medium)
+      (get_contact_map Public_data.Medium)
+      User_graph.rename_pos rename state
+  in
+  let state =
+    gen
+      (set_contact_map Public_data.Low)
+      (get_contact_map Public_data.Low)
+      User_graph.rename_pos rename state
+  in
+  let state =
+    gen set_compilation get_compilation rename_pos_parsing_compil rename state
+  in
+  let state =
+    gen set_refined_compil get_refined_compil
+      (Ast.rename_pos_compil Ckappa_sig.rename_pos_agent
+         Ckappa_sig.rename_pos_agent_sig Ckappa_sig.rename_pos_mixture
+         Ckappa_sig.rename_pos_mixture
+         (fun _ a -> a)
+         (Ckappa_sig.rename_pos_rule Ckappa_sig.rename_pos_mixture))
+      rename state
+  in
+  let errors, state =
+    gen_opt_error set_c_compil get_c_compil
+      Cckappa_sig.rename_pos_compil_with_errors parameters errors rename state
+  in
+  let state =
+    gen
+      (set_influence_map Public_data.High)
+      (get_influence_map Public_data.High)
+      Public_data.rename_pos_influence_map rename state
+  in
+  let state =
+    gen
+      (set_influence_map Public_data.Medium)
+      (get_influence_map Public_data.Medium)
+      Public_data.rename_pos_influence_map rename state
+  in
+  let state =
+    gen
+      (set_influence_map Public_data.Low)
+      (get_influence_map Public_data.Low)
+      Public_data.rename_pos_influence_map rename state
+  in
+  let state =
+    gen
+      (set_bidirectional_influence_map Public_data.High)
+      (get_bidirectional_influence_map Public_data.High)
+      rename_pos_in_bidirectional_influence_map rename state
+  in
+  let state =
+    gen
+      (set_bidirectional_influence_map Public_data.Medium)
+      (get_bidirectional_influence_map Public_data.Medium)
+      rename_pos_in_bidirectional_influence_map rename state
+  in
+  let state =
+    gen
+      (set_bidirectional_influence_map Public_data.Low)
+      (get_bidirectional_influence_map Public_data.Low)
+      rename_pos_in_bidirectional_influence_map rename state
+  in
+  let state =
+    gen set_local_influence_map_blackboard get_local_influence_map_blackboard
+      rename_pos_in_local_influence_map_blackboard rename state
+  in
+  let state =
+    gen
+      (set_contact_map Public_data.Low)
+      (get_contact_map Public_data.Low)
+      Public_data.rename_pos_contact_map rename state
+  in
+  let state =
+    gen
+      (set_contact_map Public_data.Medium)
+      (get_contact_map Public_data.Medium)
+      Public_data.rename_pos_contact_map rename state
+  in
+  let state =
+    gen
+      (set_contact_map Public_data.High)
+      (get_contact_map Public_data.High)
+      Public_data.rename_pos_contact_map rename state
+  in
+  let errors, state =
+    gen_opt_error set_reachability_result get_reachability_result
+      (rename_pos_reachability_result_with_errors rename_global_static
+         rename_static rename_dynamic)
+      parameters errors rename state
+  in
+  let state =
+    gen set_dead_rules get_dead_rules Public_data.rename_pos_dead_rules rename
+      state
+  in
+  let state =
+    gen set_conditionally_dead_rules get_conditionally_dead_rules
+      Public_data.rename_pos_rule_deadness_conditions rename state
+  in
+  let state =
+    gen set_dead_agents get_dead_agents Public_data.rename_pos_dead_agents
+      rename state
+  in
+  let state =
+    gen set_conditionally_dead_agents get_conditionally_dead_agents
+      Public_data.rename_pos_agent_deadness_conditions rename state
+  in
+  let state =
+    gen set_constraint_list get_constraint_list rename_pos_constraint_list
+      rename state
+  in
+  let state =
+    gen set_separating_transitions get_separating_transitions
+      Public_data.rename_pos_separating_transitions rename state
+  in
+  set_errors errors state
 
-let rename_pos rename_global_static rename_static rename_dynamic rename state = 
-  let parameters = get_parameters state in 
-  let errors = get_errors state in 
-  let errors, state = gen_opt_opt_error set_handler_opt get_handler Cckappa_sig.rename_pos_kappa_handler_with_errors parameters errors rename state in 
-  let state = gen set_init_state get_init_state rename_pos_in_init rename state in 
-  let state = gen set_env get_env rename_pos_env rename state in 
-  let state = gen set_contact_map_int get_contact_map_int Contact_map.rename_pos_in_cm_int rename state in 
-  let state = gen (set_contact_map Public_data.High) (get_contact_map Public_data.High) User_graph.rename_pos rename state in 
-  let state = gen (set_contact_map Public_data.Medium) (get_contact_map Public_data.Medium) User_graph.rename_pos rename state in 
-  let state = gen (set_contact_map Public_data.Low) (get_contact_map Public_data.Low) User_graph.rename_pos rename state in 
-  let state = gen set_compilation get_compilation rename_pos_parsing_compil rename state in 
-  let state = gen set_refined_compil get_refined_compil 
-                      (Ast.rename_pos_compil 
-                         Ckappa_sig.rename_pos_agent 
-                         Ckappa_sig.rename_pos_agent_sig
-                         Ckappa_sig.rename_pos_mixture
-                         Ckappa_sig.rename_pos_mixture 
-                         (fun _ a -> a)
-                         (Ckappa_sig.rename_pos_rule Ckappa_sig.rename_pos_mixture)    
-                      ) 
-                      rename 
-                      state in 
-  let errors, state = gen_opt_error set_c_compil get_c_compil Cckappa_sig.rename_pos_compil_with_errors parameters errors rename state in 
-  let state = gen (set_influence_map Public_data.High) (get_influence_map Public_data.High) Public_data.rename_pos_influence_map rename state in 
-  let state = gen (set_influence_map Public_data.Medium) (get_influence_map Public_data.Medium) Public_data.rename_pos_influence_map rename state in 
-  let state = gen (set_influence_map Public_data.Low) (get_influence_map Public_data.Low) Public_data.rename_pos_influence_map rename state in 
-  let state = gen (set_bidirectional_influence_map Public_data.High) (get_bidirectional_influence_map Public_data.High)  rename_pos_in_bidirectional_influence_map rename state in 
-  let state = gen (set_bidirectional_influence_map Public_data.Medium) (get_bidirectional_influence_map Public_data.Medium)  rename_pos_in_bidirectional_influence_map rename state in 
-  let state = gen (set_bidirectional_influence_map Public_data.Low) (get_bidirectional_influence_map Public_data.Low)  rename_pos_in_bidirectional_influence_map rename state in 
-  let state = gen set_local_influence_map_blackboard get_local_influence_map_blackboard rename_pos_in_local_influence_map_blackboard rename state in 
-  let state = gen (set_contact_map Public_data.Low) (get_contact_map Public_data.Low) 
-  Public_data.rename_pos_contact_map rename state in 
-  let state = gen (set_contact_map Public_data.Medium) (get_contact_map Public_data.Medium) 
-  Public_data.rename_pos_contact_map rename state in 
-  let state = gen (set_contact_map Public_data.High) (get_contact_map Public_data.High) 
-  Public_data.rename_pos_contact_map rename state in 
-  let errors, state = gen_opt_error set_reachability_result get_reachability_result (rename_pos_reachability_result_with_errors rename_global_static rename_static rename_dynamic) parameters errors rename state in 
-  let state = gen set_dead_rules get_dead_rules (Public_data.rename_pos_dead_rules) 
-  rename state in 
-  let state = gen set_conditionally_dead_rules get_conditionally_dead_rules (Public_data.rename_pos_rule_deadness_conditions)  rename state in 
-  let state = gen set_dead_agents get_dead_agents (Public_data.rename_pos_dead_agents) 
-  rename state in 
-  let state = gen set_conditionally_dead_agents get_conditionally_dead_agents (Public_data.rename_pos_agent_deadness_conditions)  rename state in 
-  let state = gen set_constraint_list get_constraint_list rename_pos_constraint_list rename state in 
-  let state = gen set_separating_transitions get_separating_transitions Public_data.rename_pos_separating_transitions rename state in 
-  set_errors errors state 
+let reset_patch s =
+  let patch = None in
+  { s with patch }
 
+let store_patch patch s =
+  let patch = Some patch in
+  { s with patch }
 
-let reset_patch s = 
-    let patch = None in {s with patch}
-let store_patch patch s = 
-  let patch = Some patch in {s with patch}
-let get_patch s = s.patch  
+let get_patch s = s.patch

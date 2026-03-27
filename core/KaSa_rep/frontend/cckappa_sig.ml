@@ -199,7 +199,7 @@ type enriched_init = {
   e_init_c_factor: (mixture, string) Alg_expr.e;
   e_init_mixture: Ckappa_sig.mixture;
   e_init_c_mixture: mixture;
-  e_init_position: Loc.t ; 
+  e_init_position: Loc.t;
 }
 
 type compil = {
@@ -259,7 +259,7 @@ let dummy_init parameters error =
       e_init_mixture = Ckappa_sig.EMPTY_MIX;
       e_init_c_mixture =
         { c_mixture = Ckappa_sig.EMPTY_MIX; views; bonds; plus = []; dot = [] };
-        e_init_position = Loc.dummy ; 
+      e_init_position = Loc.dummy;
     } )
 
 (*******************************************************)
@@ -719,8 +719,8 @@ let rule_is_enabled_in_current_working_set parameters error rule_id compilation
     | error, None -> error, false (*permanently disabled*)
     | error, Some (_, bool) -> error, bool)
 
-let rule_is_permanently_disabled_in_current_working_set parameters error rule_id compilation
-    =
+let rule_is_permanently_disabled_in_current_working_set parameters error rule_id
+    compilation =
   match working_set_id_of_rule_id parameters error rule_id compilation with
   | error, None ->
     error, false (* rules that are not in the working set are always enabled *)
@@ -732,250 +732,290 @@ let rule_is_permanently_disabled_in_current_working_set parameters error rule_id
     | error, None -> error, true
     | error, Some _ -> error, false)
 
-let rename_pos_kappa_handler_with_errors parameters error rename kappa_handler = 
-  let error, agents_annotation = 
-     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.rename_pos
-              (fun _parameters error rename (a,b) -> 
-                error, (a, List.rev_map (Loc.rename_loc rename) (List.rev b) ))
-                parameters error 
-                rename kappa_handler.agents_annotation 
-  in 
+let rename_pos_kappa_handler_with_errors parameters error rename kappa_handler =
+  let error, agents_annotation =
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.rename_pos
+      (fun _parameters error rename (a, b) ->
+        error, (a, List.rev_map (Loc.rename_loc rename) (List.rev b)))
+      parameters error rename kappa_handler.agents_annotation
+  in
   error, { kappa_handler with agents_annotation }
 
-let rename_pos_port rename_pos_state rename port = 
-  { port 
-  with 
-    site_state = rename_pos_state rename port.site_state ; 
-    site_position = Loc.rename_loc rename port.site_position 
+let rename_pos_port rename_pos_state rename port =
+  {
+    port with
+    site_state = rename_pos_state rename port.site_state;
+    site_position = Loc.rename_loc rename port.site_position;
   }
 
-let rename_pos_interface rename_pos_state rename  = 
-  Ckappa_sig.Site_map_and_set.Map.map 
-     (rename_pos_port rename_pos_state rename) 
-    
-let rename_pos_proper_agent rename_pos_interface rename agent = 
-  { 
-    agent with 
-    agent_interface = rename_pos_interface rename agent.agent_interface ; 
-    agent_position = Loc.rename_loc rename agent.agent_position
+let rename_pos_interface rename_pos_state rename =
+  Ckappa_sig.Site_map_and_set.Map.map (rename_pos_port rename_pos_state rename)
+
+let rename_pos_proper_agent rename_pos_interface rename agent =
+  {
+    agent with
+    agent_interface = rename_pos_interface rename agent.agent_interface;
+    agent_position = Loc.rename_loc rename agent.agent_position;
   }
 
-let rename_pos_agent rename agent = 
-  match agent with 
-  | Agent proper_agent -> Agent (rename_pos_proper_agent (rename_pos_interface (fun _ a -> a)) rename proper_agent)
-  | Dead_agent (proper_agent,a,m,m') -> 
-    Dead_agent (rename_pos_proper_agent (rename_pos_interface (fun _ a -> a)) rename proper_agent,a,m,m')
-  | Ghost | Unknown_agent _ -> agent 
+let rename_pos_agent rename agent =
+  match agent with
+  | Agent proper_agent ->
+    Agent
+      (rename_pos_proper_agent
+         (rename_pos_interface (fun _ a -> a))
+         rename proper_agent)
+  | Dead_agent (proper_agent, a, m, m') ->
+    Dead_agent
+      ( rename_pos_proper_agent
+          (rename_pos_interface (fun _ a -> a))
+          rename proper_agent,
+        a,
+        m,
+        m' )
+  | Ghost | Unknown_agent _ -> agent
 
-let rename_pos_agent_sig = rename_pos_proper_agent (rename_pos_interface (fun _ a -> a)) 
+let rename_pos_agent_sig =
+  rename_pos_proper_agent (rename_pos_interface (fun _ a -> a))
 
+let lift f _parameters errors rename elt = errors, f rename elt
 
-let lift f _parameters errors rename elt = 
-  errors, f rename elt 
-  let rename_pos_views_with_errors parameters error = 
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.rename_pos 
-      (lift rename_pos_agent) parameters error 
-  
-let rename_pos_diff_views_with_errors parameters error = 
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.rename_pos 
-      (lift (rename_pos_proper_agent (fun _ a -> a))) parameters error  
-    
+let rename_pos_views_with_errors parameters error =
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.rename_pos
+    (lift rename_pos_agent) parameters error
+
+let rename_pos_diff_views_with_errors parameters error =
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.rename_pos
+    (lift (rename_pos_proper_agent (fun _ a -> a)))
+    parameters error
+
 let rename_pos_mixture_with_errors parameters error rename mixture =
-  let error, views = rename_pos_views_with_errors parameters error rename mixture.views in 
-  error, {mixture with views}
-  
-let rename_pos_enriched_var_with_errors parameters errors rename enriched_variable = 
-  let error, e_variable  = 
-    Ast.rename_pos_variable_def_with_errors 
-      rename_pos_mixture_with_errors 
+  let error, views =
+    rename_pos_views_with_errors parameters error rename mixture.views
+  in
+  error, { mixture with views }
+
+let rename_pos_enriched_var_with_errors parameters errors rename
+    enriched_variable =
+  let error, e_variable =
+    Ast.rename_pos_variable_def_with_errors rename_pos_mixture_with_errors
       (fun _ errors _ a -> errors, a)
       parameters errors rename enriched_variable.e_variable
-    in 
-  error, { enriched_variable with 
-      e_id = (fst enriched_variable.e_id, 
-              Loc.rename_loc rename (snd enriched_variable.e_id));
-      c_variable = 
-        Alg_expr_extra.rename_pos_alg_expr 
-            Ckappa_sig.rename_pos_mixture 
-            (fun _ a -> a) 
-            rename  enriched_variable.c_variable ; 
-      e_variable = e_variable ; 
-      expr_loc = Loc.rename_loc rename enriched_variable.expr_loc} 
-       
-  let rename_pos_actions rename actions = 
-    {actions with 
-    remove = 
-      Loc.rename_pos_list 
-        (fun rename (a,b,c) -> 
-             (a,
-              rename_pos_proper_agent (fun _ a -> a) rename b,
-              c) ) 
-        rename actions.remove } 
- 
-  let rename_pos_rule_with_errors parameters errors rename rule = 
-    let errors, rule_lhs = rename_pos_mixture_with_errors parameters errors rename rule.rule_lhs in 
-    let errors, rule_rhs = rename_pos_mixture_with_errors parameters errors rename rule.rule_rhs in 
-    let actions = rename_pos_actions rename rule.actions in 
-    let errors, diff_direct = rename_pos_diff_views_with_errors parameters errors rename rule.diff_direct in 
-    let errors, diff_reverse = rename_pos_diff_views_with_errors parameters errors rename rule.diff_reverse in 
-    errors, 
-      {rule with   
-        rule_lhs ; 
-        rule_rhs ; 
-        actions ; 
-        diff_direct ; 
-        diff_reverse } 
-     
-  let rename_pos_modif_expr_with_errors parameters errors rename modif_expr = 
-    match modif_expr with 
-    | APPLY (e,r,p) -> 
-      let errors, e = Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors (fun _ errors _ a -> errors, a) parameters errors rename e in 
-      let errors, r = rename_pos_rule_with_errors parameters errors rename r in 
-      let p = Loc.rename_loc rename p in 
-      errors, APPLY (e,r,p)
-   | UPDATE (s,p,e,p') -> 
-     let p = Loc.rename_loc rename p in 
-      let p' = Loc.rename_loc rename p' in 
-      let errors, e = Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_mixture_with_errors (fun _ errors _ a -> errors, a) parameters errors rename e in 
-      errors, UPDATE (s,p,e,p')
-   | STOP p -> errors, STOP (Loc.rename_loc rename p) 
-   | SNAPSHOT p -> errors, SNAPSHOT (Loc.rename_loc rename p) 
-
-  
-let _rename_pos_perturbation_with_errors 
-      rename_pos_mixture_with_errors 
-      _rename_pos_rule_with_errors 
-      parameters errors rename perturbation = 
-  let (e,m,e_opt,p) = perturbation in 
-  let errors, e = 
-    Loc.rename_pos_with_errors 
-        (Alg_expr_extra.rename_pos_alg_expr_with_errors 
-            rename_pos_mixture_with_errors (fun _ e _ a -> e,a))
-        parameters errors 
-        rename 
-        e
-  in 
-  let errors, m = 
-    Loc.rename_pos_list_with_errors 
-      rename_pos_modif_expr_with_errors 
-      parameters errors 
-      rename m
-  in  
-  let errors, e_opt = 
-    Loc.rename_pos_opt_with_errors  
-        (Alg_expr_extra.rename_pos_alg_expr_with_errors 
-            rename_pos_mixture_with_errors (fun _ e _ a -> e,a))
-        parameters errors 
-        rename 
-        e_opt 
-  in 
-  let p = Loc.rename_loc rename p in 
-  errors, (e,m,e_opt,p)      
-  
-  
-let rename_pos_enriched_rule_with_errors parameters error rename enriched_rule = 
-  let errors, e_rule_c_rule = rename_pos_rule_with_errors parameters error rename enriched_rule.e_rule_c_rule in 
-  let e_rule_label = Loc.rename_pos_opt (Loc.rename_pos_pair (fun _ a -> a) Loc.rename_loc) rename enriched_rule.e_rule_label in 
-  let e_rule_label_dot = Loc.rename_pos_opt (Loc.rename_pos_pair (fun _ a -> a) Loc.rename_loc) rename enriched_rule.e_rule_label_dot in 
-  let e_rule_guard_string = Loc.rename_pos_opt (LKappa.rename_pos_guard (fun _ a -> a)) rename enriched_rule.e_rule_guard_string in 
-  let e_rule_rule = Ckappa_sig.rename_pos_rule Ckappa_sig.rename_pos_mixture rename enriched_rule.e_rule_rule in 
-  errors, {enriched_rule with 
-    e_rule_c_rule ; 
-    e_rule_label ; 
-    e_rule_label_dot ; 
-    e_rule_guard_string ;
-    e_rule_rule ;  
-  }
-  
-let rename_pos_enriched_init_with_errors parameters errors rename enriched_init = 
-  let e_init_guard = 
-      Loc.rename_pos_opt 
-          (LKappa.rename_pos_guard  (fun _ a -> a)) rename enriched_init.e_init_guard 
-  in 
-  let e_init_factor = 
-      Alg_expr_extra.rename_pos_alg_expr 
-        Ckappa_sig.rename_pos_mixture (fun _ a -> a) 
-       rename  enriched_init.e_init_factor
-  in 
-  let errors, e_init_c_factor = 
-      Alg_expr_extra.rename_pos_alg_expr_with_errors 
-        rename_pos_mixture_with_errors (fun _ e _ a -> e,a)
-        parameters errors 
-        rename enriched_init.e_init_c_factor 
-  in 
-  let e_init_mixture = 
-    Ckappa_sig.rename_pos_mixture 
-      rename enriched_init.e_init_mixture 
-  in 
-  let errors, e_init_c_mixture = 
-    rename_pos_mixture_with_errors 
-      parameters errors rename enriched_init.e_init_c_mixture 
-  in 
-  let e_init_position = 
-    Loc.rename_loc rename enriched_init.e_init_position 
-  in 
-  errors, {
-    e_init_guard; 
-    e_init_working_set_id=enriched_init.e_init_working_set_id;
-    e_init_factor; 
-    e_init_c_factor; 
-    e_init_mixture; 
-    e_init_c_mixture; 
-    e_init_position;  
-  }
-
-
-let rename_pos_compil_with_errors parameters errors rename compil = 
-  let errors, variables = 
-     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.rename_pos 
-      rename_pos_enriched_var_with_errors   
-      parameters errors rename compil.variables 
-  in 
-  let errors, signatures = 
-     Int_storage.Nearly_inf_Imperatif.rename_pos 
-      (lift rename_pos_agent_sig) 
-      parameters errors rename compil.signatures 
   in
-  let errors, rules = 
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.rename_pos 
-        rename_pos_enriched_rule_with_errors 
-        parameters errors rename compil.rules 
-  in 
-  let errors, observables = 
-      Int_storage.Nearly_inf_Imperatif.rename_pos 
-        (Loc.rename_pos_with_errors 
-            (Alg_expr_extra.rename_pos_alg_expr_with_errors 
-                rename_pos_mixture_with_errors (fun _ e _ a -> (e,a)))) 
-            parameters errors rename compil.observables 
-  in 
-  let errors, init = 
-     Int_storage.Nearly_inf_Imperatif.rename_pos 
-        rename_pos_enriched_init_with_errors
-        parameters errors rename compil.init 
-  in  
-  let errors, perturbations = 
-     Int_storage.Nearly_inf_Imperatif.rename_pos
-        (Ckappa_sig.rename_pos_perturbation_with_errors 
-          rename_pos_mixture_with_errors 
-          rename_pos_rule_with_errors)
-        parameters errors rename compil.perturbations
-  in      
-    errors, 
-    {compil with variables ; signatures ; rules ; observables ; init ; perturbations } 
+  ( error,
+    {
+      enriched_variable with
+      e_id =
+        ( fst enriched_variable.e_id,
+          Loc.rename_loc rename (snd enriched_variable.e_id) );
+      c_variable =
+        Alg_expr_extra.rename_pos_alg_expr Ckappa_sig.rename_pos_mixture
+          (fun _ a -> a)
+          rename enriched_variable.c_variable;
+      e_variable;
+      expr_loc = Loc.rename_loc rename enriched_variable.expr_loc;
+    } )
 
-  (*  
-  
+let rename_pos_actions rename actions =
+  {
+    actions with
+    remove =
+      Loc.rename_pos_list
+        (fun rename (a, b, c) ->
+          a, rename_pos_proper_agent (fun _ a -> a) rename b, c)
+        rename actions.remove;
+  }
+
+let rename_pos_rule_with_errors parameters errors rename rule =
+  let errors, rule_lhs =
+    rename_pos_mixture_with_errors parameters errors rename rule.rule_lhs
+  in
+  let errors, rule_rhs =
+    rename_pos_mixture_with_errors parameters errors rename rule.rule_rhs
+  in
+  let actions = rename_pos_actions rename rule.actions in
+  let errors, diff_direct =
+    rename_pos_diff_views_with_errors parameters errors rename rule.diff_direct
+  in
+  let errors, diff_reverse =
+    rename_pos_diff_views_with_errors parameters errors rename rule.diff_reverse
+  in
+  errors, { rule with rule_lhs; rule_rhs; actions; diff_direct; diff_reverse }
+
+let rename_pos_modif_expr_with_errors parameters errors rename modif_expr =
+  match modif_expr with
+  | APPLY (e, r, p) ->
+    let errors, e =
+      Alg_expr_extra.rename_pos_alg_expr_with_errors
+        rename_pos_mixture_with_errors
+        (fun _ errors _ a -> errors, a)
+        parameters errors rename e
+    in
+    let errors, r = rename_pos_rule_with_errors parameters errors rename r in
+    let p = Loc.rename_loc rename p in
+    errors, APPLY (e, r, p)
+  | UPDATE (s, p, e, p') ->
+    let p = Loc.rename_loc rename p in
+    let p' = Loc.rename_loc rename p' in
+    let errors, e =
+      Alg_expr_extra.rename_pos_alg_expr_with_errors
+        rename_pos_mixture_with_errors
+        (fun _ errors _ a -> errors, a)
+        parameters errors rename e
+    in
+    errors, UPDATE (s, p, e, p')
+  | STOP p -> errors, STOP (Loc.rename_loc rename p)
+  | SNAPSHOT p -> errors, SNAPSHOT (Loc.rename_loc rename p)
+
+let _rename_pos_perturbation_with_errors rename_pos_mixture_with_errors
+    _rename_pos_rule_with_errors parameters errors rename perturbation =
+  let e, m, e_opt, p = perturbation in
+  let errors, e =
+    Loc.rename_pos_with_errors
+      (Alg_expr_extra.rename_pos_alg_expr_with_errors
+         rename_pos_mixture_with_errors (fun _ e _ a -> e, a))
+      parameters errors rename e
+  in
+  let errors, m =
+    Loc.rename_pos_list_with_errors rename_pos_modif_expr_with_errors parameters
+      errors rename m
+  in
+  let errors, e_opt =
+    Loc.rename_pos_opt_with_errors
+      (Alg_expr_extra.rename_pos_alg_expr_with_errors
+         rename_pos_mixture_with_errors (fun _ e _ a -> e, a))
+      parameters errors rename e_opt
+  in
+  let p = Loc.rename_loc rename p in
+  errors, (e, m, e_opt, p)
+
+let rename_pos_enriched_rule_with_errors parameters error rename enriched_rule =
+  let errors, e_rule_c_rule =
+    rename_pos_rule_with_errors parameters error rename
+      enriched_rule.e_rule_c_rule
+  in
+  let e_rule_label =
+    Loc.rename_pos_opt
+      (Loc.rename_pos_pair (fun _ a -> a) Loc.rename_loc)
+      rename enriched_rule.e_rule_label
+  in
+  let e_rule_label_dot =
+    Loc.rename_pos_opt
+      (Loc.rename_pos_pair (fun _ a -> a) Loc.rename_loc)
+      rename enriched_rule.e_rule_label_dot
+  in
+  let e_rule_guard_string =
+    Loc.rename_pos_opt
+      (LKappa.rename_pos_guard (fun _ a -> a))
+      rename enriched_rule.e_rule_guard_string
+  in
+  let e_rule_rule =
+    Ckappa_sig.rename_pos_rule Ckappa_sig.rename_pos_mixture rename
+      enriched_rule.e_rule_rule
+  in
+  ( errors,
+    {
+      enriched_rule with
+      e_rule_c_rule;
+      e_rule_label;
+      e_rule_label_dot;
+      e_rule_guard_string;
+      e_rule_rule;
+    } )
+
+let rename_pos_enriched_init_with_errors parameters errors rename enriched_init
+    =
+  let e_init_guard =
+    Loc.rename_pos_opt
+      (LKappa.rename_pos_guard (fun _ a -> a))
+      rename enriched_init.e_init_guard
+  in
+  let e_init_factor =
+    Alg_expr_extra.rename_pos_alg_expr Ckappa_sig.rename_pos_mixture
+      (fun _ a -> a)
+      rename enriched_init.e_init_factor
+  in
+  let errors, e_init_c_factor =
+    Alg_expr_extra.rename_pos_alg_expr_with_errors
+      rename_pos_mixture_with_errors
+      (fun _ e _ a -> e, a)
+      parameters errors rename enriched_init.e_init_c_factor
+  in
+  let e_init_mixture =
+    Ckappa_sig.rename_pos_mixture rename enriched_init.e_init_mixture
+  in
+  let errors, e_init_c_mixture =
+    rename_pos_mixture_with_errors parameters errors rename
+      enriched_init.e_init_c_mixture
+  in
+  let e_init_position = Loc.rename_loc rename enriched_init.e_init_position in
+  ( errors,
+    {
+      e_init_guard;
+      e_init_working_set_id = enriched_init.e_init_working_set_id;
+      e_init_factor;
+      e_init_c_factor;
+      e_init_mixture;
+      e_init_c_mixture;
+      e_init_position;
+    } )
+
+let rename_pos_compil_with_errors parameters errors rename compil =
+  let errors, variables =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.rename_pos
+      rename_pos_enriched_var_with_errors parameters errors rename
+      compil.variables
+  in
+  let errors, signatures =
+    Int_storage.Nearly_inf_Imperatif.rename_pos
+      (lift rename_pos_agent_sig)
+      parameters errors rename compil.signatures
+  in
+  let errors, rules =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.rename_pos
+      rename_pos_enriched_rule_with_errors parameters errors rename compil.rules
+  in
+  let errors, observables =
+    Int_storage.Nearly_inf_Imperatif.rename_pos
+      (Loc.rename_pos_with_errors
+         (Alg_expr_extra.rename_pos_alg_expr_with_errors
+            rename_pos_mixture_with_errors (fun _ e _ a -> e, a)))
+      parameters errors rename compil.observables
+  in
+  let errors, init =
+    Int_storage.Nearly_inf_Imperatif.rename_pos
+      rename_pos_enriched_init_with_errors parameters errors rename compil.init
+  in
+  let errors, perturbations =
+    Int_storage.Nearly_inf_Imperatif.rename_pos
+      (Ckappa_sig.rename_pos_perturbation_with_errors
+         rename_pos_mixture_with_errors rename_pos_rule_with_errors)
+      parameters errors rename compil.perturbations
+  in
+  ( errors,
+    {
+      compil with
+      variables;
+      signatures;
+      rules;
+      observables;
+      init;
+      perturbations;
+    } )
+
+(*
 
 
-type compil = {
-  counter_default:
-    Ckappa_sig.c_state option Ckappa_sig.AgentSite_map_and_set.Map.t;
-  working_set_valuations:
-    (Ckappa_sig.c_guard_parameter * bool) Ckappa_sig.Ws_index_map_and_set.Map.t;
-  (*maps working_set rules to their boolean parameter and a boolean that tells us if they 
-    are enabled or not*)
-   init: enriched_init Int_storage.Nearly_inf_Imperatif.t;
-  (*initial graph declaration*)
-  perturbations:
-    (mixture, rule) Ckappa_sig.perturbation Int_storage.Nearly_inf_Imperatif.t;
-}*) 
+
+   type compil = {
+     counter_default:
+       Ckappa_sig.c_state option Ckappa_sig.AgentSite_map_and_set.Map.t;
+     working_set_valuations:
+       (Ckappa_sig.c_guard_parameter * bool) Ckappa_sig.Ws_index_map_and_set.Map.t;
+     (*maps working_set rules to their boolean parameter and a boolean that tells us if they
+       are enabled or not*)
+      init: enriched_init Int_storage.Nearly_inf_Imperatif.t;
+     (*initial graph declaration*)
+     perturbations:
+       (mixture, rule) Ckappa_sig.perturbation Int_storage.Nearly_inf_Imperatif.t;
+   }*)

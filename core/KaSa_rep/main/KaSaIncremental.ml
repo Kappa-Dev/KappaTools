@@ -14,9 +14,11 @@ let help_message =
   \    enable/disable <label>\n\
   \        Enables (or disables) the rule with label <label> in the working set.\n\
   \    update file foo.ka\n\
-  \        Replace the content of the current version of foo.ka with the new one.\n\
+  \        Replace the content of the current version of foo.ka with the new \
+   one.\n\
   \    update file foo.ka as foo'.ka\n\
-  \        Replace the content of the current verion of the file foo'.ka with the content of the file foo.ka\n\
+  \        Replace the content of the current verion of the file foo'.ka with \
+   the content of the file foo.ka\n\
   \    add <rule>\n\
   \        (Not implemented yet TODO) Adds a rule to the working set.\n"
 
@@ -95,7 +97,12 @@ let main () =
   let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
   let print_result parameters state print_analysis start_time =
     let state, _ = Export_to_KaSa.get_reachability_analysis state in
-    let state = if print_analysis then Export_to_KaSa.output_reachability_result state else state in
+    let state =
+      if print_analysis then
+        Export_to_KaSa.output_reachability_result state
+      else
+        state
+    in
     let error = Export_to_KaSa.get_errors state in
     let () = Exception.print parameters error in
     KaSaUtil.print_efficiency parameters state start_time
@@ -133,21 +140,30 @@ let main () =
         let start_time = Sys.time () in
         let () = print_result parameters state true start_time in
         loop state
-      | input when String.length input > 12 && String.sub input 0 12 = "update file " -> 
+      | input
+        when String.length input > 12 && String.sub input 0 12 = "update file "
+        ->
         let start_time = Sys.time () in
-        let l = String.split_on_char ' ' input in 
-        let state = 
-          match l with 
-          | ["update";"file";patch_file_name] -> 
-            let old_file_name = patch_file_name in 
-            let state = Export_to_KaSa.patch ~patch_file_name ~old_file_name state in state
-          | ["update";"file";patch_file_name;"as";old_file_name]  -> 
-            let state = Export_to_KaSa.patch ~patch_file_name ~old_file_name state in state
-          | _ -> 
+        let l = String.split_on_char ' ' input in
+        let state =
+          match l with
+          | [ "update"; "file"; patch_file_name ] ->
+            let old_file_name = patch_file_name in
+            let state =
+              Export_to_KaSa.patch ~patch_file_name ~old_file_name state
+            in
+            state
+          | [ "update"; "file"; patch_file_name; "as"; old_file_name ] ->
+            let state =
+              Export_to_KaSa.patch ~patch_file_name ~old_file_name state
+            in
+            state
+          | _ ->
             let error = Export_to_KaSa.get_errors state in
             let error, () =
               Exception.warn parameters error __POS__
-                ~message:("Parsing error: " ^ input) Exit ()
+                ~message:("Parsing error: " ^ input)
+                Exit ()
             in
             Export_to_KaSa.set_errors error state
         in
@@ -172,13 +188,15 @@ let main () =
             true, Export_to_KaSa.enable_rule i state
           | Enable_index (false, i) ->
             let () =
-              Loggers.fprintf log "Disabling initial states or rules at index %s...\n"
+              Loggers.fprintf log
+                "Disabling initial states or rules at index %s...\n"
                 (String.concat "," (List.map string_of_int (List.rev i)))
             in
             true, Export_to_KaSa.disable_rule_index i state
           | Enable_index (true, i) ->
             let () =
-              Loggers.fprintf log "Enabling initial states or rules at index %s...\n"
+              Loggers.fprintf log
+                "Enabling initial states or rules at index %s...\n"
                 (String.concat "," (List.map string_of_int (List.rev i)))
             in
             true, Export_to_KaSa.enable_rule_index i state

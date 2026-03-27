@@ -13,7 +13,9 @@ type preprocessed_ast = {
   cflowFile: string option;
   ast_compiled_data: LKappa_compiler.ast_compiled_data;
   overwrite_init:
-    (int option * (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statement) list option;
+    (int option * (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statement)
+    list
+    option;
   overwrite_t0: float option;
 }
 

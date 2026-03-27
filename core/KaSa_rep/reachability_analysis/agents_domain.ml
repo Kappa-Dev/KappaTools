@@ -318,52 +318,55 @@ module Domain = struct
 
   let initialize ?patch static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
-    match patch with 
-    | Some (static, local,_) -> let error, () = 
-                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
-    in error, static, {local ; global = dynamic}, [  ]
-    | None -> 
-    let init_global_static_information =
-      {
-        global_static_information = static;
-        domain_static_information = Ckappa_sig.Rule_map_and_set.Map.empty;
-        agents_without_interface = Ckappa_sig.Agent_map_and_set.Map.empty;
-      }
-    in
-    let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    let nagents =
-      Ckappa_sig.int_of_agent_name
-        (Handler.nagents parameters error kappa_handler)
-      - 1
-    in
-    let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
-    let error, bdu_handler, mvbdu_false =
-      Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
-    in
-    let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
-    let error, init_seen_agents_array =
-      if nagents < 0 then
-        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters
-          error 0
-      else
-        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init parameters
-          error nagents (fun _ error _ -> error, mvbdu_false)
-    in
-    let init_global_dynamic_information =
-      {
-        global = dynamic;
-        local =
-          {
-            agents_liveness = init_seen_agents_array;
-            liveness_current_working_set = None;
-          };
-      }
-    in
-    let error, static, dynamic =
-      scan_rule_set init_global_static_information
-        init_global_dynamic_information error
-    in
-    error, static, dynamic, []
+    match patch with
+    | Some (static, local, _) ->
+      let error, () =
+        Exception.warn ~message:"Reinitialization is not implemented yet"
+          parameters error __POS__ Exit ()
+      in
+      error, static, { local; global = dynamic }, []
+    | None ->
+      let init_global_static_information =
+        {
+          global_static_information = static;
+          domain_static_information = Ckappa_sig.Rule_map_and_set.Map.empty;
+          agents_without_interface = Ckappa_sig.Agent_map_and_set.Map.empty;
+        }
+      in
+      let kappa_handler = Analyzer_headers.get_kappa_handler static in
+      let nagents =
+        Ckappa_sig.int_of_agent_name
+          (Handler.nagents parameters error kappa_handler)
+        - 1
+      in
+      let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+      let error, bdu_handler, mvbdu_false =
+        Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+      in
+      let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
+      let error, init_seen_agents_array =
+        if nagents < 0 then
+          Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create
+            parameters error 0
+        else
+          Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init parameters
+            error nagents (fun _ error _ -> error, mvbdu_false)
+      in
+      let init_global_dynamic_information =
+        {
+          global = dynamic;
+          local =
+            {
+              agents_liveness = init_seen_agents_array;
+              liveness_current_working_set = None;
+            };
+        }
+      in
+      let error, static, dynamic =
+        scan_rule_set init_global_static_information
+          init_global_dynamic_information error
+      in
+      error, static, dynamic, []
 
   let complete_wake_up_relation _static error wake_up = error, wake_up
 

@@ -41,7 +41,7 @@ type c_mvbdu_var
 
 (****************************************************************************)
 
-val hack_to_separate_sites_id_from_guard_id: c_site_name 
+val hack_to_separate_sites_id_from_guard_id : c_site_name
 val rule_id_to_json : c_rule_id -> Yojson.Basic.t
 val rule_id_of_json : Yojson.Basic.t -> c_rule_id
 val write_c_rule_id : Buffer.t -> c_rule_id -> unit
@@ -141,7 +141,9 @@ val get_agent_shape :
 val get_agent_color :
   c_site_name -> Remanent_parameters_sig.parameters -> Graph_loggers_sig.color
 
-val get_list_of_guard_parameters : ?starting:c_guard_parameter -> c_guard_parameter -> c_guard_parameter list
+val get_list_of_guard_parameters :
+  ?starting:c_guard_parameter -> c_guard_parameter -> c_guard_parameter list
+
 val compare_unit : unit -> unit -> int
 val compare_unit_agent_name : unit -> unit -> c_agent_name
 val compare_unit_guard_parameter : unit -> unit -> c_guard_parameter
@@ -764,14 +766,18 @@ val guard_to_bdu_opt :
   * Views_bdu.handler
   * Views_bdu.mvbdu
 
-  val rename_pos_agent_sig: agent_sig Loc.rename_pos 
-  val rename_pos_agent: agent Loc.rename_pos 
-  val rename_pos_mixture: mixture Loc.rename_pos 
-  val rename_pos_rule: 'mixture Loc.rename_pos  -> 'mixture rule Loc.rename_pos 
-  val rename_pos_perturbation_with_errors: 
-  ('parameters,'errors,'c) Loc.rename_pos_with_errors -> 
-  ('parameters,'errors,'d) Loc.rename_pos_with_errors -> 
-  ('parameters,'errors,('c, 'c, 'e, 'd) Ast.perturbation) Loc.rename_pos_with_errors
+val rename_pos_agent_sig : agent_sig Loc.rename_pos
+val rename_pos_agent : agent Loc.rename_pos
+val rename_pos_mixture : mixture Loc.rename_pos
+val rename_pos_rule : 'mixture Loc.rename_pos -> 'mixture rule Loc.rename_pos
 
-  
-  val rename_pos_compil: (agent, agent_sig, mixture, mixture, mixture rule) compil Loc.rename_pos 
+val rename_pos_perturbation_with_errors :
+  ('parameters, 'errors, 'c) Loc.rename_pos_with_errors ->
+  ('parameters, 'errors, 'd) Loc.rename_pos_with_errors ->
+  ( 'parameters,
+    'errors,
+    ('c, 'c, 'e, 'd) Ast.perturbation )
+  Loc.rename_pos_with_errors
+
+val rename_pos_compil :
+  (agent, agent_sig, mixture, mixture, mixture rule) compil Loc.rename_pos

@@ -908,21 +908,21 @@ let fold_expr_perturbation f_alg f_bool acc x =
   let a2 = List.fold_left (fold_expr_modification f_alg) a1 x.effect in
   f_bool a2 x.repeat
 
-let rename_pos_print_expr rename_expr rename print_expr = 
-  match print_expr with 
+let rename_pos_print_expr rename_expr rename print_expr =
+  match print_expr with
   | Str_pexpr s -> Str_pexpr (Loc.rename_pos_flat rename s)
-  | Alg_pexpr e -> Alg_pexpr (Loc.rename_pos rename_expr rename e) 
+  | Alg_pexpr e -> Alg_pexpr (Loc.rename_pos rename_expr rename e)
 
-let rename_pos_print_expr_with_errors rename_expr parameters errors rename print_expr = 
-  match print_expr with 
-  | Str_pexpr s -> 
-    let errors, s = 
-      Loc.rename_pos_flat_with_errors parameters errors rename s 
-    in 
-    errors, Str_pexpr s 
-  | Alg_pexpr e -> 
-    let errors, e = 
-      Loc.rename_pos_with_errors rename_expr parameters errors rename e 
-    in 
-    errors, Alg_pexpr e 
-    
+let rename_pos_print_expr_with_errors rename_expr parameters errors rename
+    print_expr =
+  match print_expr with
+  | Str_pexpr s ->
+    let errors, s =
+      Loc.rename_pos_flat_with_errors parameters errors rename s
+    in
+    errors, Str_pexpr s
+  | Alg_pexpr e ->
+    let errors, e =
+      Loc.rename_pos_with_errors rename_expr parameters errors rename e
+    in
+    errors, Alg_pexpr e

@@ -102,41 +102,44 @@ module Domain = struct
     add_oriented_relation parameter error r_id site2 site1 map
 
   let initialize ?patch static dynamic error =
-   let parameters = Analyzer_headers.get_parameter static in
-    match patch with 
-    | Some (static, local,_) -> let error, () = 
-                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
-    in error, static, {local ; global = dynamic}, [  ]
-    | None -> 
-  
-   
-    let init_local =
-      {
-        contact_map_dynamic =
-          Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty;
-        bonds_per_site = Ckappa_sig.AgentSite_map_and_set.Map.empty;
-      }
-    in
-    let init_global_dynamic_information =
-      { local = init_local; global = dynamic }
-    in
-    let bonds_lhs = Analyzer_headers.get_bonds_lhs static in
-    let bonds_to_rules = Ckappa_sig.PairAgentSiteState_map_and_set.Map.empty in
-    let p (_, a, b, c) = a, b, c in
-    let error, bonds_to_rules =
-      Ckappa_sig.Rule_map_and_set.Map.fold
-        (fun r_id set (error, bonds_to_rules) ->
-          Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
-            (fun (site1, site2) (error, bonds_to_rules) ->
-              add_relation parameters error r_id (p site1) (p site2)
-                bonds_to_rules)
-            set (error, bonds_to_rules))
-        bonds_lhs (error, bonds_to_rules)
-    in
-    let init_global_static_information =
-      { global_static_information = static; bonds_to_rules }
-    in
-    error, init_global_static_information, init_global_dynamic_information, []
+    let parameters = Analyzer_headers.get_parameter static in
+    match patch with
+    | Some (static, local, _) ->
+      let error, () =
+        Exception.warn ~message:"Reinitialization is not implemented yet"
+          parameters error __POS__ Exit ()
+      in
+      error, static, { local; global = dynamic }, []
+    | None ->
+      let init_local =
+        {
+          contact_map_dynamic =
+            Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty;
+          bonds_per_site = Ckappa_sig.AgentSite_map_and_set.Map.empty;
+        }
+      in
+      let init_global_dynamic_information =
+        { local = init_local; global = dynamic }
+      in
+      let bonds_lhs = Analyzer_headers.get_bonds_lhs static in
+      let bonds_to_rules =
+        Ckappa_sig.PairAgentSiteState_map_and_set.Map.empty
+      in
+      let p (_, a, b, c) = a, b, c in
+      let error, bonds_to_rules =
+        Ckappa_sig.Rule_map_and_set.Map.fold
+          (fun r_id set (error, bonds_to_rules) ->
+            Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
+              (fun (site1, site2) (error, bonds_to_rules) ->
+                add_relation parameters error r_id (p site1) (p site2)
+                  bonds_to_rules)
+              set (error, bonds_to_rules))
+          bonds_lhs (error, bonds_to_rules)
+      in
+      let init_global_static_information =
+        { global_static_information = static; bonds_to_rules }
+      in
+      error, init_global_static_information, init_global_dynamic_information, []
 
   let complete_wake_up_relation _static error wake_up = error, wake_up
 

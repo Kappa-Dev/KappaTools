@@ -20,7 +20,7 @@ module type Composite_domain = sig
   type dynamic_information
 
   val initialize :
-    ?patch:(static_information*dynamic_information*Diff.new_indexs) ->  
+    ?patch:static_information * dynamic_information * Diff.new_indexs ->
     Analyzer_headers.global_static_information ->
     Analyzer_headers.global_dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->

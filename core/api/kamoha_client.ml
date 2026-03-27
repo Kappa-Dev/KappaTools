@@ -43,7 +43,11 @@ let receive mailbox x =
                      Yojson.Basic.read_int)
                   p lb)
            | B (Ast, thread) ->
-             Lwt.wakeup thread (read_result (JsonUtil.read_compact_pair Ast.read_parsing_compil (JsonUtil.read_option Yojson.Basic.read_string)) p lb)
+             Lwt.wakeup thread
+               (read_result
+                  (JsonUtil.read_compact_pair Ast.read_parsing_compil
+                     (JsonUtil.read_option Yojson.Basic.read_string))
+                  p lb)
          in
          Hashtbl.remove mailbox id))
     x

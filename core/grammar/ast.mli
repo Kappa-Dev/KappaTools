@@ -136,7 +136,8 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) instruction =
   | SIG of 'agent_sig
   | TOKENSIG of string Loc.annoted
   | VOLSIG of string * float * string  (** type, volume, parameter *)
-  | INIT of (('pattern, 'mixture, 'id) init_statement * bool) (*init, is_in_working_set*)
+  | INIT of (('pattern, 'mixture, 'id) init_statement * bool)
+    (*init, is_in_working_set*)
   | DECLARE of ('pattern, 'id) variable_def
   | OBS of ('pattern, 'id) variable_def (*for backward compatibility*)
   | PLOT of ('pattern, 'id) Alg_expr.e Loc.annoted
@@ -227,57 +228,91 @@ val write_parsing_compil : Buffer.t -> parsing_compil -> unit
 val read_parsing_compil : Yojson.lexer_state -> Lexing.lexbuf -> parsing_compil
 val working_set_index_to_string : int -> string
 
-val rename_pos_perturbation: 
-  ((Loc.t -> Loc.t option) -> 'pattern -> 'pattern) -> 
-  ((Loc.t -> Loc.t option) -> 'mixture -> 'mixture) -> 
-  ((Loc.t -> Loc.t option) -> 'id -> 'id) -> 
-  ((Loc.t -> Loc.t option) -> 'rule -> 'rule) -> 
-  (Loc.t -> Loc.t option) -> ('pattern, 'mixture, 'id, 'rule) perturbation  -> 
-  ('pattern, 'mixture, 'id, 'rule) perturbation 
+val rename_pos_perturbation :
+  ((Loc.t -> Loc.t option) -> 'pattern -> 'pattern) ->
+  ((Loc.t -> Loc.t option) -> 'mixture -> 'mixture) ->
+  ((Loc.t -> Loc.t option) -> 'id -> 'id) ->
+  ((Loc.t -> Loc.t option) -> 'rule -> 'rule) ->
+  (Loc.t -> Loc.t option) ->
+  ('pattern, 'mixture, 'id, 'rule) perturbation ->
+  ('pattern, 'mixture, 'id, 'rule) perturbation
 
-val rename_pos_perturbation_with_errors: 
-  ('parameters -> 'errors -> (Loc.t -> Loc.t option) -> 'pattern -> 'errors * 'pattern) -> 
-  ('parameters -> 'errors ->(Loc.t -> Loc.t option) -> 'mixture -> 'errors * 'mixture) -> 
-  ('parameters -> 'errors ->(Loc.t -> Loc.t option) -> 'id -> 'errors * 'id) -> 
-  ('parameters -> 'errors ->(Loc.t -> Loc.t option) -> 'rule -> 'errors * 'rule) -> 
-  'parameters -> 'errors -> (Loc.t -> Loc.t option) -> ('pattern, 'mixture, 'id, 'rule) perturbation  -> 
-  'errors * ('pattern, 'mixture, 'id, 'rule) perturbation 
+val rename_pos_perturbation_with_errors :
+  ('parameters ->
+  'errors ->
+  (Loc.t -> Loc.t option) ->
+  'pattern ->
+  'errors * 'pattern) ->
+  ('parameters ->
+  'errors ->
+  (Loc.t -> Loc.t option) ->
+  'mixture ->
+  'errors * 'mixture) ->
+  ('parameters -> 'errors -> (Loc.t -> Loc.t option) -> 'id -> 'errors * 'id) ->
+  ('parameters ->
+  'errors ->
+  (Loc.t -> Loc.t option) ->
+  'rule ->
+  'errors * 'rule) ->
+  'parameters ->
+  'errors ->
+  (Loc.t -> Loc.t option) ->
+  ('pattern, 'mixture, 'id, 'rule) perturbation ->
+  'errors * ('pattern, 'mixture, 'id, 'rule) perturbation
 
-val rename_pos_variable_def_with_errors:
-('paramters -> 'errors -> (Loc.t -> Loc.t option) -> 'pattern -> 'errors * 'pattern) -> 
-('paramters -> 'errors -> (Loc.t -> Loc.t option) -> 'id -> 'errors * 'id) -> 
- 'paramters -> 'errors -> (Loc.t -> Loc.t option) -> ('pattern, 'id) variable_def -> 
-  'errors * ('pattern, 'id) variable_def 
+val rename_pos_variable_def_with_errors :
+  ('paramters ->
+  'errors ->
+  (Loc.t -> Loc.t option) ->
+  'pattern ->
+  'errors * 'pattern) ->
+  ('paramters -> 'errors -> (Loc.t -> Loc.t option) -> 'id -> 'errors * 'id) ->
+  'paramters ->
+  'errors ->
+  (Loc.t -> Loc.t option) ->
+  ('pattern, 'id) variable_def ->
+  'errors * ('pattern, 'id) variable_def
 
-  
-val rename_pos_command: 
-((Loc.t -> Loc.t option) -> 'pattern -> 'pattern) -> 
-((Loc.t -> Loc.t option) -> 'mixture -> 'mixture) -> 
-((Loc.t -> Loc.t option) -> 'id -> 'id) -> 
-((Loc.t -> Loc.t option) -> 'rule -> 'rule) -> 
-(Loc.t -> Loc.t option) -> ('pattern, 'mixture, 'id, 'rule) command -> ('pattern, 'mixture, 'id, 'rule) command 
-val rename_pos_parsing_instruction: (Loc.t -> Loc.t option) -> parsing_instruction -> parsing_instruction
-val rename_pos_parsing_compil: (Loc.t -> Loc.t option) -> parsing_compil -> parsing_compil 
-val rename_pos_compil: 
-    ((Loc.t -> Loc.t option) -> 'agent -> 'agent) -> 
-    ((Loc.t -> Loc.t option) -> 'agent_sig -> 'agent_sig) -> 
-    ((Loc.t -> Loc.t option) -> 'pattern -> 'pattern) -> 
-    ((Loc.t -> Loc.t option) -> 'mixture -> 'mixture) -> 
-    ((Loc.t -> Loc.t option) -> 'id -> 'id) -> 
-    ((Loc.t -> Loc.t option) -> 'rule -> 'rule) ->  
-    (Loc.t -> Loc.t option) -> 
-    ('agent,'agent_sig,'pattern,'mixture,'id,'rule) compil -> ('agent,'agent_sig,'pattern,'mixture,'id,'rule) compil 
+val rename_pos_command :
+  ((Loc.t -> Loc.t option) -> 'pattern -> 'pattern) ->
+  ((Loc.t -> Loc.t option) -> 'mixture -> 'mixture) ->
+  ((Loc.t -> Loc.t option) -> 'id -> 'id) ->
+  ((Loc.t -> Loc.t option) -> 'rule -> 'rule) ->
+  (Loc.t -> Loc.t option) ->
+  ('pattern, 'mixture, 'id, 'rule) command ->
+  ('pattern, 'mixture, 'id, 'rule) command
 
-val diff_pos_rule: rule Loc.diff_pos 
-  
-val diff_pos_parsing_compil_rule: 
-      ('rule -> 'rule -> (Loc.t * Loc.t) list -> (Loc.t * Loc.t) list) -> 
-      'rule compil_rule ->  'rule compil_rule -> 
-      (Loc.t * Loc.t) list -> (Loc.t * Loc.t) list 
-     
-val diff_pos_mixture: mixture Loc.diff_pos 
-val diff_pos_id: string Loc.diff_pos 
+val rename_pos_parsing_instruction :
+  (Loc.t -> Loc.t option) -> parsing_instruction -> parsing_instruction
 
-val diff_pos_init_statement: 
-  'pattern Loc.diff_pos -> 'mixture Loc.diff_pos -> 'id Loc.diff_pos ->
-  ('pattern, 'mixture, 'id) init_statement Loc.diff_pos 
+val rename_pos_parsing_compil :
+  (Loc.t -> Loc.t option) -> parsing_compil -> parsing_compil
+
+val rename_pos_compil :
+  ((Loc.t -> Loc.t option) -> 'agent -> 'agent) ->
+  ((Loc.t -> Loc.t option) -> 'agent_sig -> 'agent_sig) ->
+  ((Loc.t -> Loc.t option) -> 'pattern -> 'pattern) ->
+  ((Loc.t -> Loc.t option) -> 'mixture -> 'mixture) ->
+  ((Loc.t -> Loc.t option) -> 'id -> 'id) ->
+  ((Loc.t -> Loc.t option) -> 'rule -> 'rule) ->
+  (Loc.t -> Loc.t option) ->
+  ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil ->
+  ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil
+
+val diff_pos_rule : rule Loc.diff_pos
+
+val diff_pos_parsing_compil_rule :
+  ('rule -> 'rule -> (Loc.t * Loc.t) list -> (Loc.t * Loc.t) list) ->
+  'rule compil_rule ->
+  'rule compil_rule ->
+  (Loc.t * Loc.t) list ->
+  (Loc.t * Loc.t) list
+
+val diff_pos_mixture : mixture Loc.diff_pos
+val diff_pos_id : string Loc.diff_pos
+
+val diff_pos_init_statement :
+  'pattern Loc.diff_pos ->
+  'mixture Loc.diff_pos ->
+  'id Loc.diff_pos ->
+  ('pattern, 'mixture, 'id) init_statement Loc.diff_pos

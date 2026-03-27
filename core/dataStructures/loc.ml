@@ -206,105 +206,100 @@ let string_option_annoted_of_json ~filenames =
   annoted_of_yojson ~filenames
     (JsonUtil.to_option (JsonUtil.to_string ?error_msg:None))
 
-type 'a rename_pos = (t -> t option)-> 'a -> 'a 
-type ('parameters,'errors,'a) rename_pos_with_errors = 'parameters -> 'errors -> (t -> t option)-> 'a -> 'errors * 'a 
+type 'a rename_pos = (t -> t option) -> 'a -> 'a
 
-let rename_loc rename pos = 
-   match rename pos with 
-    | None ->  pos 
-    | Some pos -> pos
+type ('parameters, 'errors, 'a) rename_pos_with_errors =
+  'parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a
 
-let rename_pos rename_pos rename (elt,pos) = 
-  (rename_pos rename elt,rename_loc rename pos) 
+let rename_loc rename pos =
+  match rename pos with
+  | None -> pos
+  | Some pos -> pos
 
-let rename_pos_with_errors rename_pos_with_errors parameters error rename (elt,pos) = 
-  let error, elt = rename_pos_with_errors parameters error rename elt in 
+let rename_pos rename_pos rename (elt, pos) =
+  rename_pos rename elt, rename_loc rename pos
+
+let rename_pos_with_errors rename_pos_with_errors parameters error rename
+    (elt, pos) =
+  let error, elt = rename_pos_with_errors parameters error rename elt in
   error, (elt, rename_loc rename pos)
 
-let rename_pos_flat rename (elt,pos) = 
-  rename_pos (fun _ a -> a) rename  (elt,pos) 
+let rename_pos_flat rename (elt, pos) =
+  rename_pos (fun _ a -> a) rename (elt, pos)
 
-let rename_pos_flat_with_errors parameters errors rename (elt,pos) =       
-   rename_pos_with_errors  (fun _ e _ a -> e, a) parameters errors rename (elt,pos)
-let rename_pos_opt rename_pos rename elt_opt = 
-  match elt_opt with 
-  | None -> None 
-  | Some a -> Some (rename_pos rename a) 
+let rename_pos_flat_with_errors parameters errors rename (elt, pos) =
+  rename_pos_with_errors
+    (fun _ e _ a -> e, a)
+    parameters errors rename (elt, pos)
 
-let rename_pos_opt_with_errors rename_pos parameters errors rename elt_opt = 
-  match elt_opt with 
-  | None -> errors, None 
-  | Some a -> 
-    let errors, elt = rename_pos parameters errors rename a in 
-    errors, Some (elt) 
-    
+let rename_pos_opt rename_pos rename elt_opt =
+  match elt_opt with
+  | None -> None
+  | Some a -> Some (rename_pos rename a)
 
-let rename_pos_list rename_pos rename list = 
-  List.rev_map 
-  (rename_pos rename)
-  (List.rev list)
+let rename_pos_opt_with_errors rename_pos parameters errors rename elt_opt =
+  match elt_opt with
+  | None -> errors, None
+  | Some a ->
+    let errors, elt = rename_pos parameters errors rename a in
+    errors, Some elt
 
-let rename_pos_list_with_errors rename_pos_with_errors parameters errors rename list =
-  List.fold_left 
-    (fun (errors, l) elt -> 
-        let errors, elt = 
-          rename_pos_with_errors parameters errors rename elt
-        in (errors, elt::l))
-   (errors, []) (List.rev list) 
+let rename_pos_list rename_pos rename list =
+  List.rev_map (rename_pos rename) (List.rev list)
 
-let rename_pos_pair rename_pos1 rename_pos2 rename p = 
-  (rename_pos1 rename (fst p), 
-   rename_pos2 rename (snd p))
-   
-let rename_pos_pair_with_errors rename_pos1 rename_pos2 parameters errors rename p = 
-  let errors, a = rename_pos1 parameters errors rename (fst p) in 
-  let errors, b = rename_pos2 parameters errors rename (snd p) in 
-  errors, (a,b) 
-   
-type 'a diff_pos = ('a -> 'a -> (t*t) list -> (t*t) list)
+let rename_pos_list_with_errors rename_pos_with_errors parameters errors rename
+    list =
+  List.fold_left
+    (fun (errors, l) elt ->
+      let errors, elt = rename_pos_with_errors parameters errors rename elt in
+      errors, elt :: l)
+    (errors, []) (List.rev list)
 
-let diff_pos_empty = [] 
+let rename_pos_pair rename_pos1 rename_pos2 rename p =
+  rename_pos1 rename (fst p), rename_pos2 rename (snd p)
 
-let diff_pos loc loc' l = 
-  if loc == loc' || loc = loc' 
-  then l 
-  else (loc,loc')::l 
+let rename_pos_pair_with_errors rename_pos1 rename_pos2 parameters errors rename
+    p =
+  let errors, a = rename_pos1 parameters errors rename (fst p) in
+  let errors, b = rename_pos2 parameters errors rename (snd p) in
+  errors, (a, b)
 
+type 'a diff_pos = 'a -> 'a -> (t * t) list -> (t * t) list
 
-let diff_pos_flat _ _ l = l 
+let diff_pos_empty = []
 
-let diff_pos_annoted diff_pos' (a,pos) (a',pos') l = 
+let diff_pos loc loc' l =
+  if loc == loc' || loc = loc' then
+    l
+  else
+    (loc, loc') :: l
+
+let diff_pos_flat _ _ l = l
+
+let diff_pos_annoted diff_pos' (a, pos) (a', pos') l =
   diff_pos' a a' (diff_pos pos pos' l)
 
-let diff_pos_opt diff_pos a a' l = 
-  match a,a' with 
-  | Some a,Some a' -> diff_pos a a' l 
-  | None, None -> l 
+let diff_pos_opt diff_pos a a' l =
+  match a, a' with
+  | Some a, Some a' -> diff_pos a a' l
+  | None, None -> l
   | Some _, None | None, Some _ -> raise (invalid_arg "diff_pos_opt")
 
-let diff_pos_pair diff_pos diff_pos' (a,b) (a',b') l = 
+let diff_pos_pair diff_pos diff_pos' (a, b) (a', b') l =
   diff_pos' b b' (diff_pos a a' l)
 
-let diff_pos_list diff_pos l l' acc = 
-  List.fold_left2 
-    (fun acc a a' -> diff_pos a a' acc)
-    acc l l' 
+let diff_pos_list diff_pos l l' acc =
+  List.fold_left2 (fun acc a a' -> diff_pos a a' acc) acc l l'
 
-module LocMap = 
-  Map.Make (struct 
-    type t_above = t
-    type t = t_above  
-   (** type t = t *)
-    
-      let compare=compare 
+module LocMap = Map.Make (struct
+  type t_above = t
+
+  type t = t_above
+  (** type t = t *)
+
+  let compare = compare
 end)
 
-let fun_of_list l = 
-  let m = 
-    List.fold_left 
-      (fun m (a,b) -> LocMap.add a b m) 
-      LocMap.empty l 
-  in 
-  (fun elt -> LocMap.find_opt elt m)
-
-  
+let fun_of_list l =
+  let m = List.fold_left (fun m (a, b) -> LocMap.add a b m) LocMap.empty l in
+  fun elt -> LocMap.find_opt elt m

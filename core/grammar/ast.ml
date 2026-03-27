@@ -13,10 +13,9 @@ let merge_version a b =
   | V4, _ | _, V4 -> V4
   | V3, V3 -> V3
 
-
 type internal = string option Loc.annoted list
 
-  type port = {
+type port = {
   port_name: string Loc.annoted;
   port_int: internal;
   port_int_mod: string Loc.annoted option;
@@ -1062,7 +1061,6 @@ let print_configuration f ((n, _), l) =
 
 let print_guard = Pp.option ~with_space:false LKappa.print_guard
 
-
 let print_working_set_prefix id working_set_values =
   string_of_int id ^ ". "
   ^
@@ -1073,21 +1071,19 @@ let print_working_set_prefix id working_set_values =
 
 let print_init c f = function
   | ws_id, (g, (n, _), INIT_MIX (m, _)) ->
-    Format.fprintf f "@[%s@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]@]" 
-    (match ws_id with
-           | None -> ""
-           | Some id -> print_working_set_prefix id c.working_set_values)
-    print_guard g
-      print_ast_alg_expr n
+    Format.fprintf f "@[%s@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]@]"
+      (match ws_id with
+      | None -> ""
+      | Some id -> print_working_set_prefix id c.working_set_values)
+      print_guard g print_ast_alg_expr n
       (print_ast_mix ~print_counter)
       m
   | ws_id, (g, (n, _), INIT_TOK t) ->
-    Format.fprintf f "@[%s@[%%init: @[%a@]@ %a %a@]]" 
-    (match ws_id with
-           | None -> ""
-           | Some id -> print_working_set_prefix id c.working_set_values)
-    print_guard g
-      print_ast_alg_expr n
+    Format.fprintf f "@[%s@[%%init: @[%a@]@ %a %a@]]"
+      (match ws_id with
+      | None -> ""
+      | Some id -> print_working_set_prefix id c.working_set_values)
+      print_guard g print_ast_alg_expr n
       (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
       t
 
@@ -1211,31 +1207,32 @@ let print_parsing_compil_kappa f c =
 
 let print_working_set f c =
   Format.fprintf f "@[<v>%a%a@]@."
-    (Pp.list (fun f -> Format.fprintf f "@.") (fun f init ->
+    (Pp.list
+       (fun f -> Format.fprintf f "@.")
+       (fun f init ->
          match init with
          | ws_id, (g, (n, _), INIT_MIX (m, _)) ->
            (match ws_id with
-            | None -> ()
-            | Some id -> 
-              Format.fprintf f "@[%s@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]" 
-                (print_working_set_prefix id c.working_set_values)
-                print_guard g
-                print_ast_alg_expr n
-                (print_ast_mix ~print_counter)
-                m)
+           | None -> ()
+           | Some id ->
+             Format.fprintf f "@[%s@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]"
+               (print_working_set_prefix id c.working_set_values)
+               print_guard g print_ast_alg_expr n
+               (print_ast_mix ~print_counter)
+               m)
          | ws_id, (g, (n, _), INIT_TOK t) ->
            (match ws_id with
-            | None -> ()
-            | Some id -> 
-              Format.fprintf f "@[%s@[%%init: @[%a@]@ %a %a@]]" 
-                (print_working_set_prefix id c.working_set_values)
-                print_guard g
-                print_ast_alg_expr n
-                (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
-                t)
-       ))
+           | None -> ()
+           | Some id ->
+             Format.fprintf f "@[%s@[%%init: @[%a@]@ %a %a@]]"
+               (print_working_set_prefix id c.working_set_values)
+               print_guard g print_ast_alg_expr n
+               (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
+               t)))
     c.init
-    (Pp.list (fun f -> Format.fprintf f "@.") (fun f (ws_id, s, guard, (r, _)) ->
+    (Pp.list
+       (fun f -> Format.fprintf f "@.")
+       (fun f (ws_id, s, guard, (r, _)) ->
          match ws_id with
          | None -> ()
          | Some id ->
@@ -1632,7 +1629,8 @@ let merge_tokens =
 let sig_from_inits =
   List.fold_left (fun (ags, toks) -> function
     | _, (_, _, INIT_MIX (m, _)) -> merge_agents ags m, toks
-    | _, (_, na, INIT_TOK l) -> ags, merge_tokens toks (List.map (fun x -> na, x) l))
+    | _, (_, na, INIT_TOK l) ->
+      ags, merge_tokens toks (List.map (fun x -> na, x) l))
 
 let sig_from_rule (ags, toks) r =
   match r.rewrite with
@@ -1766,12 +1764,12 @@ let compil_to_json c =
       ( "init",
         JsonUtil.of_list
           (JsonUtil.of_pair
-            (JsonUtil.of_option JsonUtil.of_int)
-            (JsonUtil.of_triple
-               (LKappa.string_guard_option_to_json ~filenames)
-               (Loc.yojson_of_annoted ~filenames
-                  (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json))
-               (init_to_json ~filenames mix_to_json var_to_json)))
+             (JsonUtil.of_option JsonUtil.of_int)
+             (JsonUtil.of_triple
+                (LKappa.string_guard_option_to_json ~filenames)
+                (Loc.yojson_of_annoted ~filenames
+                   (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json))
+                (init_to_json ~filenames mix_to_json var_to_json)))
           c.init );
       ( "perturbations",
         JsonUtil.of_list
@@ -1880,14 +1878,14 @@ let compil_of_json = function
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "AST init")
              (JsonUtil.to_pair
                 (JsonUtil.to_option
-                  (JsonUtil.to_int
+                   (JsonUtil.to_int
                       ~error_msg:
                         (JsonUtil.exn_msg_cant_import_from_json "AST init")))
-               (JsonUtil.to_triple
-                  (LKappa.string_guard_option_of_json ~filenames)
-                  (Loc.annoted_of_yojson ~filenames
-                     (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
-                  (init_of_json ~filenames mix_of_json var_of_json)))
+                (JsonUtil.to_triple
+                   (LKappa.string_guard_option_of_json ~filenames)
+                   (Loc.annoted_of_yojson ~filenames
+                      (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
+                   (init_of_json ~filenames mix_of_json var_of_json)))
              (List.assoc "init" l);
          perturbations =
            JsonUtil.to_list
@@ -1982,632 +1980,694 @@ let write_parsing_compil b ast = Yojson.Basic.write_json b (compil_to_json ast)
 let read_parsing_compil p lb = compil_of_json (Yojson.Basic.read_json p lb)
 let print_ast_mix = print_ast_mix ~print_counter
 let working_set_index_to_string k = "@rule-" ^ string_of_int k
- 
 
 (*** rename pos *)
 
-let rename_pos_internal = 
-  Loc.rename_pos_list Loc.rename_pos_flat 
- 
+let rename_pos_internal = Loc.rename_pos_list Loc.rename_pos_flat
 
-let rename_pos_port rename port = 
+let rename_pos_port rename port =
   {
-    port_name = Loc.rename_pos_flat rename port.port_name; 
-    port_int = rename_pos_internal rename port.port_int; 
-    port_int_mod = Loc.rename_pos_opt Loc.rename_pos_flat rename port.port_int_mod;
-    port_link = 
-    Loc.rename_pos_list 
-      (Loc.rename_pos 
-          (LKappa.rename_pos_link Loc.rename_pos_flat  (fun _ a -> a)))
-      rename port.port_link ;
-    port_link_mod = 
-      Loc.rename_pos_opt 
+    port_name = Loc.rename_pos_flat rename port.port_name;
+    port_int = rename_pos_internal rename port.port_int;
+    port_int_mod =
+      Loc.rename_pos_opt Loc.rename_pos_flat rename port.port_int_mod;
+    port_link =
+      Loc.rename_pos_list
+        (Loc.rename_pos
+           (LKappa.rename_pos_link Loc.rename_pos_flat (fun _ a -> a)))
+        rename port.port_link;
+    port_link_mod =
+      Loc.rename_pos_opt
         (Loc.rename_pos_opt Loc.rename_pos_flat)
-        rename 
-        port.port_link_mod 
-        }
-
-let rename_pos_counter rename counter = 
-  {
-    counter_name = 
-    Loc.rename_pos_flat rename counter.counter_name ; 
-    counter_test = 
-    Loc.rename_pos_opt Loc.rename_pos_flat rename counter.counter_test ; 
-    counter_delta = 
-    Loc.rename_pos_flat rename counter.counter_delta
+        rename port.port_link_mod;
   }
-       
 
-let rename_pos_site rename_pos rename site = 
-  match site with 
+let rename_pos_counter rename counter =
+  {
+    counter_name = Loc.rename_pos_flat rename counter.counter_name;
+    counter_test =
+      Loc.rename_pos_opt Loc.rename_pos_flat rename counter.counter_test;
+    counter_delta = Loc.rename_pos_flat rename counter.counter_delta;
+  }
+
+let rename_pos_site rename_pos rename site =
+  match site with
   | Port port -> Port (rename_pos_port rename port)
   | Counter a -> Counter (rename_pos rename a)
-  
 
-let rename_pos_parametric_agent rename_pos rename agent = 
-  match agent with 
-  | Present (a,l,agent_mod) ->  Present (Loc.rename_pos_flat rename a,Loc.rename_pos_list (rename_pos_site rename_pos) rename l,agent_mod) 
-  | Absent loc -> Absent(Loc.rename_loc rename loc) 
+let rename_pos_parametric_agent rename_pos rename agent =
+  match agent with
+  | Present (a, l, agent_mod) ->
+    Present
+      ( Loc.rename_pos_flat rename a,
+        Loc.rename_pos_list (rename_pos_site rename_pos) rename l,
+        agent_mod )
+  | Absent loc -> Absent (Loc.rename_loc rename loc)
 
-let rename_pos_agent = rename_pos_parametric_agent rename_pos_counter  
-let rename_pos_agent_sig = 
-  rename_pos_parametric_agent (Counters_info.rename_pos_counter_sig)
+let rename_pos_agent = rename_pos_parametric_agent rename_pos_counter
 
-let rename_pos_mixture = 
-    Loc.rename_pos_list (Loc.rename_pos_list rename_pos_agent)
+let rename_pos_agent_sig =
+  rename_pos_parametric_agent Counters_info.rename_pos_counter_sig
 
-let rename_pos_edit_notation rename edit_notation = 
+let rename_pos_mixture =
+  Loc.rename_pos_list (Loc.rename_pos_list rename_pos_agent)
+
+let rename_pos_edit_notation rename edit_notation =
   {
-    mix = rename_pos_mixture rename edit_notation.mix; 
-    delta_token = 
-      Loc.rename_pos_list (fun rename (expr,string) -> 
-          Loc.rename_pos 
-            (Alg_expr_extra.rename_pos_alg_expr  
-                rename_pos_mixture (fun _ a -> a)) rename expr, 
-          Loc.rename_pos_flat rename string)
-          rename edit_notation.delta_token 
-  }    
-
-let rename_pos_arrow_notation rename arrow_notation = 
- {
-    lhs = rename_pos_mixture rename arrow_notation.lhs; 
-    rhs = rename_pos_mixture rename arrow_notation.rhs; 
-    rm_token = 
-        Loc.rename_pos_list 
-          (fun rename (a,b) -> 
-              Loc.rename_pos (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a -> a)) rename a, 
-              Loc.rename_pos_flat rename b
-            ) rename arrow_notation.rm_token ; 
-    add_token = 
-        Loc.rename_pos_list 
-          (fun rename (a,b) -> 
-              Loc.rename_pos (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a -> a)) rename a, 
-              Loc.rename_pos_flat rename b
-            ) rename arrow_notation.add_token}
-
-        
-let rename_pos_rule_content rename rule_content = 
-  match rule_content with 
-  | Edit edit_notation -> Edit (rename_pos_edit_notation rename edit_notation) 
-  | Arrow arrow_notation -> Arrow (rename_pos_arrow_notation rename arrow_notation)
-  
-let rename_pos_rule rename rule = 
-  { rule with 
-    rewrite = rename_pos_rule_content rename rule.rewrite ; 
-    k_def = 
-      Loc.rename_pos 
-        (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a -> a))
-        rename rule.k_def ; 
-    k_un = 
-      Loc.rename_pos_opt
-         (Loc.rename_pos_pair 
-             (
-                Loc.rename_pos 
-                  (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a -> a)))
-             ( 
-                Loc.rename_pos_opt 
-                   (
-                    Loc.rename_pos 
-                      (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a -> a))))
-        )
-        rename rule.k_un ; 
-        k_op = 
-        Loc.rename_pos_opt 
-           (Loc.rename_pos 
-              (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a -> a)))
-           rename rule.k_op ; 
-    k_op_un = 
-      Loc.rename_pos_opt
-         (Loc.rename_pos_pair 
-             (
-                Loc.rename_pos 
-                  (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a -> a)))
-             ( 
-                Loc.rename_pos_opt 
-                   (
-                    Loc.rename_pos 
-                      (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a -> a))))
-        )
-        rename rule.k_op_un ; 
+    mix = rename_pos_mixture rename edit_notation.mix;
+    delta_token =
+      Loc.rename_pos_list
+        (fun rename (expr, string) ->
+          ( Loc.rename_pos
+              (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a ->
+                   a))
+              rename expr,
+            Loc.rename_pos_flat rename string ))
+        rename edit_notation.delta_token;
   }
 
+let rename_pos_arrow_notation rename arrow_notation =
+  {
+    lhs = rename_pos_mixture rename arrow_notation.lhs;
+    rhs = rename_pos_mixture rename arrow_notation.rhs;
+    rm_token =
+      Loc.rename_pos_list
+        (fun rename (a, b) ->
+          ( Loc.rename_pos
+              (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a ->
+                   a))
+              rename a,
+            Loc.rename_pos_flat rename b ))
+        rename arrow_notation.rm_token;
+    add_token =
+      Loc.rename_pos_list
+        (fun rename (a, b) ->
+          ( Loc.rename_pos
+              (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a ->
+                   a))
+              rename a,
+            Loc.rename_pos_flat rename b ))
+        rename arrow_notation.add_token;
+  }
 
-let rename_pos_modif_expr rename_pos_pattern _rename_pos_mixture rename_pos_id rename_pos_rule rename modif = 
-  match modif with 
-  | APPLY (e, rule) -> 
-    APPLY 
-    (
-      Loc.rename_pos 
-        (Alg_expr_extra.rename_pos_alg_expr
-          rename_pos_pattern (fun _ a -> a) ) 
-        rename e, 
-      Loc.rename_pos rename_pos_rule rename rule  
-    )
-  | UPDATE (id,e) -> 
-    UPDATE 
-     (
-      Loc.rename_pos rename_pos_id rename id,
-       Loc.rename_pos 
-        (Alg_expr_extra.rename_pos_alg_expr
-          rename_pos_pattern rename_pos_id ) 
-        rename e)
-  | STOP list -> 
-      STOP 
-        ( Loc.rename_pos_list 
-             (Primitives.rename_pos_print_expr 
-               (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id))
-             rename 
-             list ) 
-  | SNAPSHOT (bool, list) -> 
-      SNAPSHOT (bool,   Loc.rename_pos_list 
-             (Primitives.rename_pos_print_expr 
-               (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id))
-             rename 
-             list ) 
-  | PRINT (a,b) -> 
-      PRINT 
-        ((Loc.rename_pos_list 
-             (Primitives.rename_pos_print_expr 
-               (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id))
-               rename a ),
-        (Loc.rename_pos_list 
-             (Primitives.rename_pos_print_expr 
-               (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id))
-               rename b) )
-  | CFLOWLABEL (b,s) -> 
-      CFLOWLABEL(b, Loc.rename_pos_flat rename s) 
-  | CFLOWMIX (b,s) -> 
-      CFLOWMIX(b, Loc.rename_pos rename_pos_pattern rename s) 
-  | DIN (a,l) -> DIN (a, 
-                  Loc.rename_pos_list  (Primitives.rename_pos_print_expr 
-               (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id)) 
-                rename l)
-  | DINOFF l -> DINOFF (Loc.rename_pos_list  (Primitives.rename_pos_print_expr 
-               (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id)) 
-                rename l)
-  | SPECIES_OF (b,l,mixture) -> 
-    SPECIES_OF (b, 
-      Loc.rename_pos_list 
-          (Primitives.rename_pos_print_expr 
-               (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id))
-          rename l, 
-      Loc.rename_pos rename_pos_pattern rename mixture 
-    )
-  | PLOTENTRY  -> modif 
+let rename_pos_rule_content rename rule_content =
+  match rule_content with
+  | Edit edit_notation -> Edit (rename_pos_edit_notation rename edit_notation)
+  | Arrow arrow_notation ->
+    Arrow (rename_pos_arrow_notation rename arrow_notation)
 
-let rename_pos_modif_expr_with_errors  rename_pos_pattern _rename_pos_mixture rename_pos_id rename_pos_rule parameters errors rename modif = 
-  match modif with 
-  | APPLY (e, rule) -> 
-    let errors, e = 
-      Loc.rename_pos_with_errors  
-        (Alg_expr_extra.rename_pos_alg_expr_with_errors 
-          rename_pos_pattern (fun _ e _ a -> e,a) ) 
+let rename_pos_rule rename rule =
+  {
+    rule with
+    rewrite = rename_pos_rule_content rename rule.rewrite;
+    k_def =
+      Loc.rename_pos
+        (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a -> a))
+        rename rule.k_def;
+    k_un =
+      Loc.rename_pos_opt
+        (Loc.rename_pos_pair
+           (Loc.rename_pos
+              (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a ->
+                   a)))
+           (Loc.rename_pos_opt
+              (Loc.rename_pos
+                 (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture
+                    (fun _ a -> a)))))
+        rename rule.k_un;
+    k_op =
+      Loc.rename_pos_opt
+        (Loc.rename_pos
+           (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a -> a)))
+        rename rule.k_op;
+    k_op_un =
+      Loc.rename_pos_opt
+        (Loc.rename_pos_pair
+           (Loc.rename_pos
+              (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture (fun _ a ->
+                   a)))
+           (Loc.rename_pos_opt
+              (Loc.rename_pos
+                 (Alg_expr_extra.rename_pos_alg_expr rename_pos_mixture
+                    (fun _ a -> a)))))
+        rename rule.k_op_un;
+  }
+
+let rename_pos_modif_expr rename_pos_pattern _rename_pos_mixture rename_pos_id
+    rename_pos_rule rename modif =
+  match modif with
+  | APPLY (e, rule) ->
+    APPLY
+      ( Loc.rename_pos
+          (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern (fun _ a -> a))
+          rename e,
+        Loc.rename_pos rename_pos_rule rename rule )
+  | UPDATE (id, e) ->
+    UPDATE
+      ( Loc.rename_pos rename_pos_id rename id,
+        Loc.rename_pos
+          (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id)
+          rename e )
+  | STOP list ->
+    STOP
+      (Loc.rename_pos_list
+         (Primitives.rename_pos_print_expr
+            (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id))
+         rename list)
+  | SNAPSHOT (bool, list) ->
+    SNAPSHOT
+      ( bool,
+        Loc.rename_pos_list
+          (Primitives.rename_pos_print_expr
+             (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern
+                rename_pos_id))
+          rename list )
+  | PRINT (a, b) ->
+    PRINT
+      ( Loc.rename_pos_list
+          (Primitives.rename_pos_print_expr
+             (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern
+                rename_pos_id))
+          rename a,
+        Loc.rename_pos_list
+          (Primitives.rename_pos_print_expr
+             (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern
+                rename_pos_id))
+          rename b )
+  | CFLOWLABEL (b, s) -> CFLOWLABEL (b, Loc.rename_pos_flat rename s)
+  | CFLOWMIX (b, s) -> CFLOWMIX (b, Loc.rename_pos rename_pos_pattern rename s)
+  | DIN (a, l) ->
+    DIN
+      ( a,
+        Loc.rename_pos_list
+          (Primitives.rename_pos_print_expr
+             (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern
+                rename_pos_id))
+          rename l )
+  | DINOFF l ->
+    DINOFF
+      (Loc.rename_pos_list
+         (Primitives.rename_pos_print_expr
+            (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id))
+         rename l)
+  | SPECIES_OF (b, l, mixture) ->
+    SPECIES_OF
+      ( b,
+        Loc.rename_pos_list
+          (Primitives.rename_pos_print_expr
+             (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern
+                rename_pos_id))
+          rename l,
+        Loc.rename_pos rename_pos_pattern rename mixture )
+  | PLOTENTRY -> modif
+
+let rename_pos_modif_expr_with_errors rename_pos_pattern _rename_pos_mixture
+    rename_pos_id rename_pos_rule parameters errors rename modif =
+  match modif with
+  | APPLY (e, rule) ->
+    let errors, e =
+      Loc.rename_pos_with_errors
+        (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern
+           (fun _ e _ a -> e, a))
         parameters errors rename e
-    in 
-    let errors, rule =  Loc.rename_pos_with_errors rename_pos_rule parameters errors rename rule in 
-    errors, APPLY (e,rule) 
-  | UPDATE (id,e) -> 
-     let errors, id = 
-      Loc.rename_pos_with_errors rename_pos_id parameters errors rename id 
-     in 
-     let errors, e = 
-      Loc.rename_pos_with_errors  
-        (Alg_expr_extra.rename_pos_alg_expr_with_errors 
-          rename_pos_pattern (fun _ e _ a -> e,a) ) 
+    in
+    let errors, rule =
+      Loc.rename_pos_with_errors rename_pos_rule parameters errors rename rule
+    in
+    errors, APPLY (e, rule)
+  | UPDATE (id, e) ->
+    let errors, id =
+      Loc.rename_pos_with_errors rename_pos_id parameters errors rename id
+    in
+    let errors, e =
+      Loc.rename_pos_with_errors
+        (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern
+           (fun _ e _ a -> e, a))
         parameters errors rename e
-      in 
-      errors, UPDATE (id,e) 
-  | STOP list -> 
-      let errors, list = 
-        Loc.rename_pos_list_with_errors
-             (Primitives.rename_pos_print_expr_with_errors 
-               (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern rename_pos_id))
-             parameters errors rename list
-      in 
-      errors, STOP list 
-  | SNAPSHOT (bool, list) -> 
-      let errors, list = 
-        Loc.rename_pos_list_with_errors
-             (Primitives.rename_pos_print_expr_with_errors 
-               (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern rename_pos_id))
-             parameters errors rename list
-      in 
-      errors, SNAPSHOT (bool, list)  
-  | PRINT (a,b) -> 
-      let errors, a = 
-        Loc.rename_pos_list_with_errors
-             (Primitives.rename_pos_print_expr_with_errors 
-               (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern rename_pos_id))
-             parameters errors rename a
-      in 
-      let errors, b = 
-        Loc.rename_pos_list_with_errors
-             (Primitives.rename_pos_print_expr_with_errors 
-               (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern rename_pos_id))
-             parameters errors rename b
-      in 
-      
-      errors, PRINT (a,b) 
-  | CFLOWLABEL (b,s) -> 
-      let errors, s = 
-        Loc.rename_pos_flat_with_errors parameters errors rename s
-      in 
-      errors, CFLOWLABEL(b, s) 
-  | CFLOWMIX (b,s) -> 
-      let errors, s = 
-        Loc.rename_pos_with_errors rename_pos_pattern parameters errors rename s
-      in 
-      errors, CFLOWMIX(b, s) 
-  | DIN (a,l) -> 
-      let errors, l = 
-         Loc.rename_pos_list_with_errors  
-            (Primitives.rename_pos_print_expr_with_errors
-               (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern rename_pos_id)) 
-                parameters errors rename l
-      in 
-      errors, DIN (a, l) 
-    | DINOFF l -> 
-        let errors, l = 
-          Loc.rename_pos_list_with_errors 
-             (Primitives.rename_pos_print_expr_with_errors
-               (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern rename_pos_id)) 
-                parameters errors rename l
-    in 
-      errors, DINOFF l 
-  | SPECIES_OF (b,l,mixture) -> 
-    let errors, l = 
-       Loc.rename_pos_list_with_errors
-          (Primitives.rename_pos_print_expr_with_errors
-               (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern rename_pos_id))
-          parameters errors rename l in 
-    let errors, mixture = 
-      Loc.rename_pos_with_errors rename_pos_pattern parameters errors rename mixture 
-    in 
-    errors, SPECIES_OF (b,l,mixture) 
-  | PLOTENTRY  -> errors, modif 
+    in
+    errors, UPDATE (id, e)
+  | STOP list ->
+    let errors, list =
+      Loc.rename_pos_list_with_errors
+        (Primitives.rename_pos_print_expr_with_errors
+           (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern
+              rename_pos_id))
+        parameters errors rename list
+    in
+    errors, STOP list
+  | SNAPSHOT (bool, list) ->
+    let errors, list =
+      Loc.rename_pos_list_with_errors
+        (Primitives.rename_pos_print_expr_with_errors
+           (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern
+              rename_pos_id))
+        parameters errors rename list
+    in
+    errors, SNAPSHOT (bool, list)
+  | PRINT (a, b) ->
+    let errors, a =
+      Loc.rename_pos_list_with_errors
+        (Primitives.rename_pos_print_expr_with_errors
+           (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern
+              rename_pos_id))
+        parameters errors rename a
+    in
+    let errors, b =
+      Loc.rename_pos_list_with_errors
+        (Primitives.rename_pos_print_expr_with_errors
+           (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern
+              rename_pos_id))
+        parameters errors rename b
+    in
 
+    errors, PRINT (a, b)
+  | CFLOWLABEL (b, s) ->
+    let errors, s =
+      Loc.rename_pos_flat_with_errors parameters errors rename s
+    in
+    errors, CFLOWLABEL (b, s)
+  | CFLOWMIX (b, s) ->
+    let errors, s =
+      Loc.rename_pos_with_errors rename_pos_pattern parameters errors rename s
+    in
+    errors, CFLOWMIX (b, s)
+  | DIN (a, l) ->
+    let errors, l =
+      Loc.rename_pos_list_with_errors
+        (Primitives.rename_pos_print_expr_with_errors
+           (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern
+              rename_pos_id))
+        parameters errors rename l
+    in
+    errors, DIN (a, l)
+  | DINOFF l ->
+    let errors, l =
+      Loc.rename_pos_list_with_errors
+        (Primitives.rename_pos_print_expr_with_errors
+           (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern
+              rename_pos_id))
+        parameters errors rename l
+    in
+    errors, DINOFF l
+  | SPECIES_OF (b, l, mixture) ->
+    let errors, l =
+      Loc.rename_pos_list_with_errors
+        (Primitives.rename_pos_print_expr_with_errors
+           (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern
+              rename_pos_id))
+        parameters errors rename l
+    in
+    let errors, mixture =
+      Loc.rename_pos_with_errors rename_pos_pattern parameters errors rename
+        mixture
+    in
+    errors, SPECIES_OF (b, l, mixture)
+  | PLOTENTRY -> errors, modif
 
-
-let rename_pos_perturbation 
-      rename_pos_pattern 
-      rename_pos_mixture 
-      rename_pos_id 
-      rename_pos_rule 
-      rename perturbation = 
-    Loc.rename_pos 
-        (fun rename (a,b,c,d) -> 
-          (a,
-          Loc.rename_pos_opt 
-          (Loc.rename_pos 
-              (Alg_expr_extra.rename_pos_bool rename_pos_pattern rename_pos_id))
-            rename b,
-     Loc.rename_pos_list 
-          (rename_pos_modif_expr rename_pos_pattern rename_pos_mixture rename_pos_id rename_pos_rule)
+let rename_pos_perturbation rename_pos_pattern rename_pos_mixture rename_pos_id
+    rename_pos_rule rename perturbation =
+  Loc.rename_pos
+    (fun rename (a, b, c, d) ->
+      ( a,
+        Loc.rename_pos_opt
+          (Loc.rename_pos
+             (Alg_expr_extra.rename_pos_bool rename_pos_pattern rename_pos_id))
+          rename b,
+        Loc.rename_pos_list
+          (rename_pos_modif_expr rename_pos_pattern rename_pos_mixture
+             rename_pos_id rename_pos_rule)
           rename c,
-     Loc.rename_pos_opt 
-        (Loc.rename_pos (Alg_expr_extra.rename_pos_bool rename_pos_pattern rename_pos_id ))  rename    d))
-        rename perturbation 
+        Loc.rename_pos_opt
+          (Loc.rename_pos
+             (Alg_expr_extra.rename_pos_bool rename_pos_pattern rename_pos_id))
+          rename d ))
+    rename perturbation
 
-let rename_pos_perturbation_with_errors 
-      rename_pos_pattern 
-      rename_pos_mixture 
-      rename_pos_id 
-      rename_pos_rule 
-      = 
-    Loc.rename_pos_with_errors  
-        (fun parameters errors rename (a,b,c,d) -> 
-          let a = a in 
-          let errors, b = 
-            Loc.rename_pos_opt_with_errors
-             (Loc.rename_pos_with_errors  
-              (Alg_expr_extra.rename_pos_bool_with_errors rename_pos_pattern rename_pos_id))
-              parameters errors rename b
-          in 
-          let errors, c = 
-            Loc.rename_pos_list_with_errors 
-                (rename_pos_modif_expr_with_errors rename_pos_pattern rename_pos_mixture rename_pos_id rename_pos_rule)
-          parameters errors rename c 
-          in
-          let errors, d =  
-            Loc.rename_pos_opt_with_errors 
-             (Loc.rename_pos_with_errors (Alg_expr_extra.rename_pos_bool_with_errors rename_pos_pattern rename_pos_id ))  
-             parameters errors rename  d
-          in 
-          errors, (a,b,c,d))  
+let rename_pos_perturbation_with_errors rename_pos_pattern rename_pos_mixture
+    rename_pos_id rename_pos_rule =
+  Loc.rename_pos_with_errors (fun parameters errors rename (a, b, c, d) ->
+      let a = a in
+      let errors, b =
+        Loc.rename_pos_opt_with_errors
+          (Loc.rename_pos_with_errors
+             (Alg_expr_extra.rename_pos_bool_with_errors rename_pos_pattern
+                rename_pos_id))
+          parameters errors rename b
+      in
+      let errors, c =
+        Loc.rename_pos_list_with_errors
+          (rename_pos_modif_expr_with_errors rename_pos_pattern
+             rename_pos_mixture rename_pos_id rename_pos_rule)
+          parameters errors rename c
+      in
+      let errors, d =
+        Loc.rename_pos_opt_with_errors
+          (Loc.rename_pos_with_errors
+             (Alg_expr_extra.rename_pos_bool_with_errors rename_pos_pattern
+                rename_pos_id))
+          parameters errors rename d
+      in
+      errors, (a, b, c, d))
 
+let rename_pos_configuration rename (a, b) =
+  Loc.rename_pos_flat rename a, Loc.rename_pos_list Loc.rename_pos_flat rename b
 
-let rename_pos_configuration rename (a,b) = 
-    ( 
-      Loc.rename_pos_flat rename a, 
-      Loc.rename_pos_list Loc.rename_pos_flat rename b 
-    )        
+let rename_pos_variable_def rename_pos_pattern rename_id rename (a, b) =
+  ( Loc.rename_pos_flat rename a,
+    Loc.rename_pos
+      (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_id)
+      rename b )
 
-let rename_pos_variable_def rename_pos_pattern rename_id rename (a,b) = 
-  (
-    Loc.rename_pos_flat rename a, 
-    Loc.rename_pos (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_id) 
-    rename b 
-    )
+let rename_pos_variable_def_with_errors rename_pos_pattern_with_errors
+    rename_pos_id_with_errors parameters error rename (a, b) =
+  let a = Loc.rename_pos_flat rename a in
+  let error, b =
+    Loc.rename_pos_with_errors
+      (Alg_expr_extra.rename_pos_alg_expr_with_errors
+         rename_pos_pattern_with_errors rename_pos_id_with_errors)
+      parameters error rename b
+  in
+  error, (a, b)
 
-let rename_pos_variable_def_with_errors  rename_pos_pattern_with_errors  rename_pos_id_with_errors parameters error rename (a,b) = 
-  let a = Loc.rename_pos_flat rename a in 
-  let error, b = 
-    Loc.rename_pos_with_errors 
-        (Alg_expr_extra.rename_pos_alg_expr_with_errors rename_pos_pattern_with_errors rename_pos_id_with_errors)
-        parameters error rename b 
-in 
-  error, (a,b)
+let rename_pos_init_t rename_pos_mixture rename_pos_id rename init_t =
+  match init_t with
+  | INIT_MIX m -> INIT_MIX (Loc.rename_pos rename_pos_mixture rename m)
+  | INIT_TOK l ->
+    INIT_TOK (Loc.rename_pos_list (Loc.rename_pos rename_pos_id) rename l)
 
-let rename_pos_init_t rename_pos_mixture rename_pos_id rename init_t = 
-  match init_t with 
-  | INIT_MIX m -> INIT_MIX(Loc.rename_pos rename_pos_mixture rename m) 
-  | INIT_TOK l -> INIT_TOK(Loc.rename_pos_list (Loc.rename_pos rename_pos_id) rename l)
+let rename_pos_init_statement rename_pos_pattern rename_pos_mixture
+    rename_pos_id rename (a, b, c) =
+  ( Loc.rename_pos_opt (LKappa.rename_pos_guard (fun _ a -> a)) rename a,
+    Loc.rename_pos
+      (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id)
+      rename b,
+    rename_pos_init_t rename_pos_mixture rename_pos_id rename c )
 
- let rename_pos_init_statement rename_pos_pattern rename_pos_mixture rename_pos_id rename 
- (a,b,c) = 
- (
-  Loc.rename_pos_opt (LKappa.rename_pos_guard (fun _ a -> a)) rename a,
-  Loc.rename_pos (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id) rename b,
-  rename_pos_init_t rename_pos_mixture rename_pos_id rename c
-  ) 
-  
-  
- let rename_pos_instruction
-      _rename_pos_agent 
-      rename_pos_agent_sig 
-      rename_pos_pattern 
-      rename_pos_mixture rename_pos_id rename_pos_rule 
-      rename instruction = 
-  match instruction with 
+let rename_pos_instruction _rename_pos_agent rename_pos_agent_sig
+    rename_pos_pattern rename_pos_mixture rename_pos_id rename_pos_rule rename
+    instruction =
+  match instruction with
   | SIG agent_sig -> SIG (rename_pos_agent_sig rename agent_sig)
   | TOKENSIG string -> TOKENSIG (Loc.rename_pos_flat rename string)
-  | INIT (init, is_in_ws) -> INIT (rename_pos_init_statement rename_pos_pattern rename_pos_mixture rename_pos_id rename init, is_in_ws)
-  | DECLARE var_def -> 
-      DECLARE (rename_pos_variable_def rename_pos_pattern rename_pos_id rename var_def)
-  | OBS var_def -> OBS (rename_pos_variable_def rename_pos_pattern rename_pos_id rename var_def)
-  | VOLSIG _  -> instruction  
-  | PLOT e -> 
-    PLOT (Loc.rename_pos 
-            (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id)
-            rename e)
-  | PERT e -> 
-    PERT 
-       (rename_pos_perturbation 
-          rename_pos_pattern rename_pos_mixture rename_pos_id rename_pos_rule
-          rename e)
-  | CONFIG configuration -> CONFIG (rename_pos_configuration rename configuration)  
-  | RULE (label, guard, rule, is_in_working_set) -> 
-      RULE (Loc.rename_pos_opt Loc.rename_pos_flat rename label , 
-            Loc.rename_pos_opt (LKappa.rename_pos_guard rename_pos_id) rename guard, 
-            Loc.rename_pos rename_pos_rule rename rule, 
-            is_in_working_set)    
-  | GUARD_PARAM (label,bool) -> 
+  | INIT (init, is_in_ws) ->
+    INIT
+      ( rename_pos_init_statement rename_pos_pattern rename_pos_mixture
+          rename_pos_id rename init,
+        is_in_ws )
+  | DECLARE var_def ->
+    DECLARE
+      (rename_pos_variable_def rename_pos_pattern rename_pos_id rename var_def)
+  | OBS var_def ->
+    OBS
+      (rename_pos_variable_def rename_pos_pattern rename_pos_id rename var_def)
+  | VOLSIG _ -> instruction
+  | PLOT e ->
+    PLOT
+      (Loc.rename_pos
+         (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id)
+         rename e)
+  | PERT e ->
+    PERT
+      (rename_pos_perturbation rename_pos_pattern rename_pos_mixture
+         rename_pos_id rename_pos_rule rename e)
+  | CONFIG configuration ->
+    CONFIG (rename_pos_configuration rename configuration)
+  | RULE (label, guard, rule, is_in_working_set) ->
+    RULE
+      ( Loc.rename_pos_opt Loc.rename_pos_flat rename label,
+        Loc.rename_pos_opt (LKappa.rename_pos_guard rename_pos_id) rename guard,
+        Loc.rename_pos rename_pos_rule rename rule,
+        is_in_working_set )
+  | GUARD_PARAM (label, bool) ->
     GUARD_PARAM (Loc.rename_pos_flat rename label, bool)
-  | CONFLICT (s1,s2,s3) -> 
-    CONFLICT (Loc.rename_pos_flat rename s1, Loc.rename_pos_flat rename s2, Loc.rename_pos_flat rename s3)
-   | SEQUENTIAL_BOND (s1,s2,s3) -> 
-    SEQUENTIAL_BOND (Loc.rename_pos_flat rename s1, Loc.rename_pos_flat rename s2, Loc.rename_pos_flat rename s3)
+  | CONFLICT (s1, s2, s3) ->
+    CONFLICT
+      ( Loc.rename_pos_flat rename s1,
+        Loc.rename_pos_flat rename s2,
+        Loc.rename_pos_flat rename s3 )
+  | SEQUENTIAL_BOND (s1, s2, s3) ->
+    SEQUENTIAL_BOND
+      ( Loc.rename_pos_flat rename s1,
+        Loc.rename_pos_flat rename s2,
+        Loc.rename_pos_flat rename s3 )
 
-let rename_pos_command 
-      rename_pos_pattern rename_pos_mixture rename_pos_id rename_pos_rule 
-      rename command 
-      = 
-      match command with 
-      | RUN bool -> RUN (Loc.rename_pos (Alg_expr_extra.rename_pos_bool rename_pos_pattern rename_pos_id) rename bool)
-      | MODIFY l -> 
-        MODIFY 
-          (Loc.rename_pos_list 
-              (rename_pos_modif_expr rename_pos_pattern rename_pos_mixture rename_pos_id rename_pos_rule)
-              rename l)
-      | QUIT -> command 
+let rename_pos_command rename_pos_pattern rename_pos_mixture rename_pos_id
+    rename_pos_rule rename command =
+  match command with
+  | RUN bool ->
+    RUN
+      (Loc.rename_pos
+         (Alg_expr_extra.rename_pos_bool rename_pos_pattern rename_pos_id)
+         rename bool)
+  | MODIFY l ->
+    MODIFY
+      (Loc.rename_pos_list
+         (rename_pos_modif_expr rename_pos_pattern rename_pos_mixture
+            rename_pos_id rename_pos_rule)
+         rename l)
+  | QUIT -> command
 
-let rename_pos_compil_rule rename_pos_rule rename (i,label,guard,rule) = 
-    (
-      i,
-      Loc.rename_pos_opt Loc.rename_pos_flat rename label, 
-      Loc.rename_pos_opt (LKappa.rename_pos_guard (fun _ a -> a)) rename guard, 
-      Loc.rename_pos rename_pos_rule rename rule
-      )
+let rename_pos_compil_rule rename_pos_rule rename (i, label, guard, rule) =
+  ( i,
+    Loc.rename_pos_opt Loc.rename_pos_flat rename label,
+    Loc.rename_pos_opt (LKappa.rename_pos_guard (fun _ a -> a)) rename guard,
+    Loc.rename_pos rename_pos_rule rename rule )
 
-let rename_pos_compil 
-      _rename_pos_agent rename_pos_agent_sig rename_pos_pattern 
-      rename_pos_mixture rename_pos_id rename_pos_rule 
-      rename compil = 
-      {compil with 
-        variables = 
-          Loc.rename_pos_list 
-            (rename_pos_variable_def rename_pos_pattern rename_pos_id)
-            rename 
-            compil.variables; 
-        signatures = 
-          Loc.rename_pos_list 
-            rename_pos_agent_sig rename compil.signatures; 
-        rules = 
-          Loc.rename_pos_list 
-            (rename_pos_compil_rule rename_pos_rule)
-            rename compil.rules ; 
-        observables = 
-        Loc.rename_pos_list 
-          (Loc.rename_pos 
-            (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id))
-          rename  compil.observables; 
-        init = 
-           Loc.rename_pos_list 
-            (fun rename (ws_id, init) -> ws_id, rename_pos_init_statement 
-                rename_pos_pattern rename_pos_mixture rename_pos_id rename init)
-                rename compil.init ; 
-        perturbations = 
-            Loc.rename_pos_list 
-              (rename_pos_perturbation 
-                  rename_pos_pattern rename_pos_mixture rename_pos_id rename_pos_rule)
-              rename compil.perturbations ; 
-        configurations = 
-            Loc.rename_pos_list 
-              rename_pos_configuration 
-              rename compil.configurations; 
-        tokens = 
-            Loc.rename_pos_list 
-              Loc.rename_pos_flat 
-              rename 
-              compil.tokens; 
-        conflicts = 
-            Loc.rename_pos_list 
-                (fun rename (a,b,c) -> 
-                  Loc.rename_pos rename_pos_id rename a, 
-                  Loc.rename_pos rename_pos_id rename b, 
-                  Loc.rename_pos rename_pos_id rename c) 
-                rename compil.conflicts; 
-        sequential_bonds =  
-            Loc.rename_pos_list 
-                (fun rename (a,b,c) -> 
-                  Loc.rename_pos rename_pos_id rename a, 
-                  Loc.rename_pos rename_pos_id rename b, 
-                  Loc.rename_pos rename_pos_id rename c) 
-                rename compil.sequential_bonds; 
-     } 
+let rename_pos_compil _rename_pos_agent rename_pos_agent_sig rename_pos_pattern
+    rename_pos_mixture rename_pos_id rename_pos_rule rename compil =
+  {
+    compil with
+    variables =
+      Loc.rename_pos_list
+        (rename_pos_variable_def rename_pos_pattern rename_pos_id)
+        rename compil.variables;
+    signatures =
+      Loc.rename_pos_list rename_pos_agent_sig rename compil.signatures;
+    rules =
+      Loc.rename_pos_list
+        (rename_pos_compil_rule rename_pos_rule)
+        rename compil.rules;
+    observables =
+      Loc.rename_pos_list
+        (Loc.rename_pos
+           (Alg_expr_extra.rename_pos_alg_expr rename_pos_pattern rename_pos_id))
+        rename compil.observables;
+    init =
+      Loc.rename_pos_list
+        (fun rename (ws_id, init) ->
+          ( ws_id,
+            rename_pos_init_statement rename_pos_pattern rename_pos_mixture
+              rename_pos_id rename init ))
+        rename compil.init;
+    perturbations =
+      Loc.rename_pos_list
+        (rename_pos_perturbation rename_pos_pattern rename_pos_mixture
+           rename_pos_id rename_pos_rule)
+        rename compil.perturbations;
+    configurations =
+      Loc.rename_pos_list rename_pos_configuration rename compil.configurations;
+    tokens = Loc.rename_pos_list Loc.rename_pos_flat rename compil.tokens;
+    conflicts =
+      Loc.rename_pos_list
+        (fun rename (a, b, c) ->
+          ( Loc.rename_pos rename_pos_id rename a,
+            Loc.rename_pos rename_pos_id rename b,
+            Loc.rename_pos rename_pos_id rename c ))
+        rename compil.conflicts;
+    sequential_bonds =
+      Loc.rename_pos_list
+        (fun rename (a, b, c) ->
+          ( Loc.rename_pos rename_pos_id rename a,
+            Loc.rename_pos rename_pos_id rename b,
+            Loc.rename_pos rename_pos_id rename c ))
+        rename compil.sequential_bonds;
+  }
 
-let rename_pos_parsing_instruction rename (instruction:parsing_instruction) = 
-  rename_pos_instruction 
-      rename_pos_agent 
-      rename_pos_agent_sig 
-      rename_pos_mixture 
-      rename_pos_mixture 
-      (fun _ a -> a) rename_pos_rule rename instruction 
+let rename_pos_parsing_instruction rename (instruction : parsing_instruction) =
+  rename_pos_instruction rename_pos_agent rename_pos_agent_sig
+    rename_pos_mixture rename_pos_mixture
+    (fun _ a -> a)
+    rename_pos_rule rename instruction
 
-let rename_pos_parsing_compil = 
-  rename_pos_compil 
-      rename_pos_agent rename_pos_agent_sig rename_pos_mixture 
-      rename_pos_mixture (fun _ a -> a) rename_pos_rule 
+let rename_pos_parsing_compil =
+  rename_pos_compil rename_pos_agent rename_pos_agent_sig rename_pos_mixture
+    rename_pos_mixture
+    (fun _ a -> a)
+    rename_pos_rule
 
-let diff_pos_counter_test = Loc.diff_pos_flat  
+let diff_pos_counter_test = Loc.diff_pos_flat
 
-let diff_pos_counter (c:counter) c' l = 
-  let l = Loc.diff_pos_annoted Loc.diff_pos_flat c.counter_name c'.counter_name l in
-  let l = Loc.diff_pos_opt (Loc.diff_pos_annoted  diff_pos_counter_test) c.counter_test c'.counter_test l in 
-  let l = Loc.diff_pos_annoted Loc.diff_pos_flat c.counter_delta c'.counter_delta l in 
-  l 
-
-let diff_pos_internal (a:internal) a' l = 
-  Loc.diff_pos_list (Loc.diff_pos_annoted (Loc.diff_pos_flat)) a a' l 
-
-let diff_pos_port (a:port) a' l = 
-   let l = Loc.diff_pos_annoted Loc.diff_pos_flat a.port_name a'.port_name l in 
-   let l = diff_pos_internal a.port_int a'.port_int l in 
-   let l = Loc.diff_pos_opt (Loc.diff_pos_annoted Loc.diff_pos_flat) a.port_int_mod a'.port_int_mod l in 
-   let l = Loc.diff_pos_list (Loc.diff_pos_annoted (LKappa.diff_pos_link (Loc.diff_pos_annoted Loc.diff_pos_flat) Loc.diff_pos_flat)) a.port_link a'.port_link l in 
-   let l = Loc.diff_pos_opt (Loc.diff_pos_opt (Loc.diff_pos_annoted Loc.diff_pos_flat)) a.port_link_mod a'.port_link_mod l in 
-   l 
-let diff_pos_site diff_pos (a:'counter site) a' l = 
-    match a,a' with 
-    | Port p, Port p' -> diff_pos_port p p' l 
-    | Counter c,Counter c' -> diff_pos c c' l 
-    | Port _, Counter _ | Counter _, Port _ -> raise (invalid_arg "diff_pos_site")
-
-let diff_agent_mod (a:agent_mod) a' l = 
-  Loc.diff_pos_flat a a' l 
-
-let diff_pos_parametric_agent diff_pos_counter (a:'a parametric_agent) a' l = 
-  match a,a' with 
-   | Present (a,b,c), Present(a',b',c') -> 
-    let l = Loc.diff_pos_annoted Loc.diff_pos_flat a a' l in 
-    let l = Loc.diff_pos_list (diff_pos_site diff_pos_counter) b b' l in 
-    let l = diff_agent_mod c c' l in 
-    l 
-   | Absent pos, Absent pos' -> Loc.diff_pos pos pos' l 
-   | Present _, Absent _ | Absent _, Present _ -> 
-    failwith (invalid_arg "diff_pos_rule_content")
-let diff_pos_agent (a:agent) a' l = 
-  diff_pos_parametric_agent diff_pos_counter a a' l 
-
-let diff_pos_mixture (m:mixture) m' l = 
-  Loc.diff_pos_list 
-    (Loc.diff_pos_list diff_pos_agent) m m' l 
-
-let diff_pos_edit_notation (e:edit_notation) e' l = 
-  let l = diff_pos_mixture e.mix e'.mix l in 
-  let l = Loc.diff_pos_list 
-            (Loc.diff_pos_pair 
-             (Loc.diff_pos_annoted 
-             (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat))  
-             (Loc.diff_pos_annoted Loc.diff_pos_flat))
-             e.delta_token e'.delta_token 
-            l 
+let diff_pos_counter (c : counter) c' l =
+  let l =
+    Loc.diff_pos_annoted Loc.diff_pos_flat c.counter_name c'.counter_name l
   in
-  l  
+  let l =
+    Loc.diff_pos_opt
+      (Loc.diff_pos_annoted diff_pos_counter_test)
+      c.counter_test c'.counter_test l
+  in
+  let l =
+    Loc.diff_pos_annoted Loc.diff_pos_flat c.counter_delta c'.counter_delta l
+  in
+  l
 
-let diff_pos_arrow_notation (e:arrow_notation) e' l = 
-  let l = diff_pos_mixture e.lhs e'.lhs l in 
-  let l = Loc.diff_pos_list 
-            (Loc.diff_pos_pair 
-                  (Loc.diff_pos_annoted 
-             (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)) 
-                  (Loc.diff_pos_annoted Loc.diff_pos_flat) ) 
-            e.rm_token e'.rm_token l in 
-  let l = diff_pos_mixture e.rhs e'.rhs l in 
-  let l = Loc.diff_pos_list
-            (Loc.diff_pos_pair 
-                  (Loc.diff_pos_annoted 
-             (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)) 
-                  (Loc.diff_pos_annoted Loc.diff_pos_flat) ) 
-             e.add_token e'.add_token l in 
-l
+let diff_pos_internal (a : internal) a' l =
+  Loc.diff_pos_list (Loc.diff_pos_annoted Loc.diff_pos_flat) a a' l
 
+let diff_pos_port (a : port) a' l =
+  let l = Loc.diff_pos_annoted Loc.diff_pos_flat a.port_name a'.port_name l in
+  let l = diff_pos_internal a.port_int a'.port_int l in
+  let l =
+    Loc.diff_pos_opt
+      (Loc.diff_pos_annoted Loc.diff_pos_flat)
+      a.port_int_mod a'.port_int_mod l
+  in
+  let l =
+    Loc.diff_pos_list
+      (Loc.diff_pos_annoted
+         (LKappa.diff_pos_link
+            (Loc.diff_pos_annoted Loc.diff_pos_flat)
+            Loc.diff_pos_flat))
+      a.port_link a'.port_link l
+  in
+  let l =
+    Loc.diff_pos_opt
+      (Loc.diff_pos_opt (Loc.diff_pos_annoted Loc.diff_pos_flat))
+      a.port_link_mod a'.port_link_mod l
+  in
+  l
 
- let diff_pos_rule_content  (r:rule_content) (r':rule_content) l = 
-  match r, r' with 
-  | Edit e,Edit e' -> diff_pos_edit_notation e e' l 
-  | Arrow e, Arrow e' -> diff_pos_arrow_notation e e' l 
-  | Edit _, Arrow _ | Arrow _, Edit _ -> failwith (invalid_arg "diff_pos_rule_content")
+let diff_pos_site diff_pos (a : 'counter site) a' l =
+  match a, a' with
+  | Port p, Port p' -> diff_pos_port p p' l
+  | Counter c, Counter c' -> diff_pos c c' l
+  | Port _, Counter _ | Counter _, Port _ -> raise (invalid_arg "diff_pos_site")
 
-let diff_pos_rule (rule:rule) (rule':rule) l = 
-  let l = diff_pos_rule_content rule.rewrite rule'.rewrite l in 
-  let l = Loc.diff_pos_annoted 
-            (Alg_expr_extra.diff_pos_e diff_pos_mixture (fun _ _ l -> l)) 
-            rule.k_def rule'.k_def l 
-  in 
-  let l = 
-    Loc.diff_pos_opt 
-       (Loc.diff_pos_pair 
-          (Loc.diff_pos_annoted (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)) 
-          (Loc.diff_pos_opt (Loc.diff_pos_annoted (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)))
-          )
-      rule.k_un rule'.k_un l in 
-  let l = Loc.diff_pos_opt
-          (Loc.diff_pos_annoted 
-            (Alg_expr_extra.diff_pos_e diff_pos_mixture (fun _ _ l -> l)))
-            rule.k_op rule'.k_op l 
-  in 
- let l = 
-    Loc.diff_pos_opt 
-       (Loc.diff_pos_pair 
-          (Loc.diff_pos_annoted (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)) 
-          (Loc.diff_pos_opt (Loc.diff_pos_annoted (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat)))
-          )
-      rule.k_op_un rule'.k_op_un l in 
-  l 
+let diff_agent_mod (a : agent_mod) a' l = Loc.diff_pos_flat a a' l
 
-let diff_pos_id _ _ l = l 
+let diff_pos_parametric_agent diff_pos_counter (a : 'a parametric_agent) a' l =
+  match a, a' with
+  | Present (a, b, c), Present (a', b', c') ->
+    let l = Loc.diff_pos_annoted Loc.diff_pos_flat a a' l in
+    let l = Loc.diff_pos_list (diff_pos_site diff_pos_counter) b b' l in
+    let l = diff_agent_mod c c' l in
+    l
+  | Absent pos, Absent pos' -> Loc.diff_pos pos pos' l
+  | Present _, Absent _ | Absent _, Present _ ->
+    failwith (invalid_arg "diff_pos_rule_content")
 
-let diff_pos_parsing_compil_rule diff_pos_rule (r:'a compil_rule) r' l = 
-      let (_,b,c,d) = r in 
-      let (_,b',c',d') = r' in 
-      let l = Loc.diff_pos_opt (Loc.diff_pos_annoted Loc.diff_pos_flat) b b' l in 
-      let l = Loc.diff_pos_opt (LKappa.diff_pos_guard Loc.diff_pos_flat) c c' l in 
-      let l = Loc.diff_pos_annoted diff_pos_rule d d' l in 
-      l  
-  
-let diff_pos_init_t diff_pos_mixture diff_pos_id init_t (init_t':('a,'b) init_t) l  = 
-  match init_t, init_t' with 
-  | INIT_MIX mix, INIT_MIX mix' -> Loc.diff_pos_annoted diff_pos_mixture mix mix' l 
-  | INIT_TOK tok, INIT_TOK tok' -> Loc.diff_pos_list (Loc.diff_pos_annoted diff_pos_id) tok tok' l 
-  | INIT_MIX _, INIT_TOK _ | INIT_TOK _, INIT_MIX _ -> 
+let diff_pos_agent (a : agent) a' l =
+  diff_pos_parametric_agent diff_pos_counter a a' l
+
+let diff_pos_mixture (m : mixture) m' l =
+  Loc.diff_pos_list (Loc.diff_pos_list diff_pos_agent) m m' l
+
+let diff_pos_edit_notation (e : edit_notation) e' l =
+  let l = diff_pos_mixture e.mix e'.mix l in
+  let l =
+    Loc.diff_pos_list
+      (Loc.diff_pos_pair
+         (Loc.diff_pos_annoted
+            (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat))
+         (Loc.diff_pos_annoted Loc.diff_pos_flat))
+      e.delta_token e'.delta_token l
+  in
+  l
+
+let diff_pos_arrow_notation (e : arrow_notation) e' l =
+  let l = diff_pos_mixture e.lhs e'.lhs l in
+  let l =
+    Loc.diff_pos_list
+      (Loc.diff_pos_pair
+         (Loc.diff_pos_annoted
+            (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat))
+         (Loc.diff_pos_annoted Loc.diff_pos_flat))
+      e.rm_token e'.rm_token l
+  in
+  let l = diff_pos_mixture e.rhs e'.rhs l in
+  let l =
+    Loc.diff_pos_list
+      (Loc.diff_pos_pair
+         (Loc.diff_pos_annoted
+            (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat))
+         (Loc.diff_pos_annoted Loc.diff_pos_flat))
+      e.add_token e'.add_token l
+  in
+  l
+
+let diff_pos_rule_content (r : rule_content) (r' : rule_content) l =
+  match r, r' with
+  | Edit e, Edit e' -> diff_pos_edit_notation e e' l
+  | Arrow e, Arrow e' -> diff_pos_arrow_notation e e' l
+  | Edit _, Arrow _ | Arrow _, Edit _ ->
+    failwith (invalid_arg "diff_pos_rule_content")
+
+let diff_pos_rule (rule : rule) (rule' : rule) l =
+  let l = diff_pos_rule_content rule.rewrite rule'.rewrite l in
+  let l =
+    Loc.diff_pos_annoted
+      (Alg_expr_extra.diff_pos_e diff_pos_mixture (fun _ _ l -> l))
+      rule.k_def rule'.k_def l
+  in
+  let l =
+    Loc.diff_pos_opt
+      (Loc.diff_pos_pair
+         (Loc.diff_pos_annoted
+            (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat))
+         (Loc.diff_pos_opt
+            (Loc.diff_pos_annoted
+               (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat))))
+      rule.k_un rule'.k_un l
+  in
+  let l =
+    Loc.diff_pos_opt
+      (Loc.diff_pos_annoted
+         (Alg_expr_extra.diff_pos_e diff_pos_mixture (fun _ _ l -> l)))
+      rule.k_op rule'.k_op l
+  in
+  let l =
+    Loc.diff_pos_opt
+      (Loc.diff_pos_pair
+         (Loc.diff_pos_annoted
+            (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat))
+         (Loc.diff_pos_opt
+            (Loc.diff_pos_annoted
+               (Alg_expr_extra.diff_pos_e diff_pos_mixture Loc.diff_pos_flat))))
+      rule.k_op_un rule'.k_op_un l
+  in
+  l
+
+let diff_pos_id _ _ l = l
+
+let diff_pos_parsing_compil_rule diff_pos_rule (r : 'a compil_rule) r' l =
+  let _, b, c, d = r in
+  let _, b', c', d' = r' in
+  let l = Loc.diff_pos_opt (Loc.diff_pos_annoted Loc.diff_pos_flat) b b' l in
+  let l = Loc.diff_pos_opt (LKappa.diff_pos_guard Loc.diff_pos_flat) c c' l in
+  let l = Loc.diff_pos_annoted diff_pos_rule d d' l in
+  l
+
+let diff_pos_init_t diff_pos_mixture diff_pos_id init_t
+    (init_t' : ('a, 'b) init_t) l =
+  match init_t, init_t' with
+  | INIT_MIX mix, INIT_MIX mix' ->
+    Loc.diff_pos_annoted diff_pos_mixture mix mix' l
+  | INIT_TOK tok, INIT_TOK tok' ->
+    Loc.diff_pos_list (Loc.diff_pos_annoted diff_pos_id) tok tok' l
+  | INIT_MIX _, INIT_TOK _ | INIT_TOK _, INIT_MIX _ ->
     failwith (invalid_arg "diff_pos_init_t")
 
-    
-let diff_pos_init_statement diff_pos_pattern diff_pos_mixture diff_pos_id (init:('a,'b,'c) init_statement) init' l = 
-  let (g_opt, e, init_t) = init in 
-  let (g_opt', e', init_t') = init' in 
-  let l = Loc.diff_pos_opt (LKappa.diff_pos_guard Loc.diff_pos_flat) g_opt g_opt' l in 
-  let l = Loc.diff_pos_annoted (Alg_expr_extra.diff_pos_e diff_pos_pattern Loc.diff_pos_flat) e e' l in 
-  let l = diff_pos_init_t diff_pos_mixture diff_pos_id init_t init_t' l in 
-  l 
+let diff_pos_init_statement diff_pos_pattern diff_pos_mixture diff_pos_id
+    (init : ('a, 'b, 'c) init_statement) init' l =
+  let g_opt, e, init_t = init in
+  let g_opt', e', init_t' = init' in
+  let l =
+    Loc.diff_pos_opt (LKappa.diff_pos_guard Loc.diff_pos_flat) g_opt g_opt' l
+  in
+  let l =
+    Loc.diff_pos_annoted
+      (Alg_expr_extra.diff_pos_e diff_pos_pattern Loc.diff_pos_flat)
+      e e' l
+  in
+  let l = diff_pos_init_t diff_pos_mixture diff_pos_id init_t init_t' l in
+  l

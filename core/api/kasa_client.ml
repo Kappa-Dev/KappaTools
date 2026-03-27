@@ -280,6 +280,4 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       self#message request
       >>= Api_common.result_bind_with_lwt ~ok:(fun _ ->
               Result_util.ok () |> Lwt.return)
-
-     
   end

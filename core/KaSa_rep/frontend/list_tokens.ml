@@ -524,7 +524,7 @@ let scan_compil_incremental parameters error compil remanent =
   let also_explore_tested_agents =
     Remanent_parameters.lexical_analysis_of_tested_only_patterns parameters
   in
-  let remanent = error, remanent in 
+  let remanent = error, remanent in
   let scan_tested_mixture =
     if also_explore_tested_agents then
       scan_mixture
@@ -552,51 +552,65 @@ let scan_compil_incremental parameters error compil remanent =
 
 let scan_compil parameters error compil =
   let error, remanent = empty_handler parameters error in
-  scan_compil_incremental parameters error compil remanent 
+  scan_compil_incremental parameters error compil remanent
 
- let scan_incremental_compil parameters error compil old_remanent = 
-   let error, remanent = scan_compil_incremental parameters error compil old_remanent in 
-   let () =
-    if Remanent_parameters.get_trace parameters then 
+let scan_incremental_compil parameters error compil old_remanent =
+  let error, remanent =
+    scan_compil_incremental parameters error compil old_remanent
+  in
+  let () =
+    if Remanent_parameters.get_trace parameters then (
       let () =
-          if remanent.Cckappa_sig.nvars > old_remanent.Cckappa_sig.nvars 
-          then
-              let rec aux n acc = 
-              if n = old_remanent.Cckappa_sig.nvars then acc 
-              else aux (n-1) (n::acc)
-          in 
-          let l = aux remanent.Cckappa_sig.nvars [] in 
+        if remanent.Cckappa_sig.nvars > old_remanent.Cckappa_sig.nvars then (
+          let rec aux n acc =
+            if n = old_remanent.Cckappa_sig.nvars then
+              acc
+            else
+              aux (n - 1) (n :: acc)
+          in
+          let l = aux remanent.Cckappa_sig.nvars [] in
           Loggers.fprintf
             (Remanent_parameters.get_logger parameters)
             "New variables with id (%a)"
-            (Format.pp_print_list Format.pp_print_int) l 
-          else ()
-      in 
-      let doit get_field label = 
+            (Format.pp_print_list Format.pp_print_int)
+            l
+        ) else
+          ()
+      in
+      let doit get_field label =
         let () =
-          if get_field remanent > get_field old_remanent
-          then
-              let rec aux n acc = 
-              if n = get_field old_remanent 
-              then acc 
-              else aux (n-1) (n::acc)
-          in 
-          let l = aux (get_field remanent) [] in 
-          Loggers.fprintf
-            (Remanent_parameters.get_logger parameters)
-            "New %s with id (%a)"
-            label 
-            (Format.pp_print_list Format.pp_print_int) l 
-          else ()
-        in () 
-      in 
-      let () = doit (fun x -> x.Cckappa_sig.nvars) "variables" in 
-      let () = doit (fun x -> Ckappa_sig.int_of_agent_name x.Cckappa_sig.nagents) "agent names" in 
-      let () = doit (fun x -> x.Cckappa_sig.nrules) "rules" in 
-      let () = doit (fun x -> Ckappa_sig.int_of_site_name x.Cckappa_sig.nsites) "site names" in  
+          if get_field remanent > get_field old_remanent then (
+            let rec aux n acc =
+              if n = get_field old_remanent then
+                acc
+              else
+                aux (n - 1) (n :: acc)
+            in
+            let l = aux (get_field remanent) [] in
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameters)
+              "New %s with id (%a)" label
+              (Format.pp_print_list Format.pp_print_int)
+              l
+          ) else
+            ()
+        in
+        ()
+      in
+      let () = doit (fun x -> x.Cckappa_sig.nvars) "variables" in
+      let () =
+        doit
+          (fun x -> Ckappa_sig.int_of_agent_name x.Cckappa_sig.nagents)
+          "agent names"
+      in
+      let () = doit (fun x -> x.Cckappa_sig.nrules) "rules" in
+      let () =
+        doit
+          (fun x -> Ckappa_sig.int_of_site_name x.Cckappa_sig.nsites)
+          "site names"
+      in
       ()
-    else 
-      () 
-    in 
-      error, remanent 
-
+    ) else
+      ()
+  in
+  error, remanent

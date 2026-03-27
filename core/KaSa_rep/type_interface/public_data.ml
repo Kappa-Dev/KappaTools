@@ -381,6 +381,7 @@ type element_in_working_set = {
   rule_ws_position: Loc.t;
   rule_ws_enabled: bool;
 }
+
 let direction_to_json d =
   match d with
   | Direct_rule -> `String "direct"
@@ -467,6 +468,7 @@ type var = {
   var_ast: string;
   var_position: Loc.t;
 }
+
 let var_to_json var =
   `Assoc
     [
@@ -1203,73 +1205,77 @@ let lemmas_list_to_json constraints =
 
 let print_formula = Logical_formulae.print_formula
 
-let rename_pos_rule rename rule = 
-  {rule with rule_position = Loc.rename_loc rename rule.rule_position}
+let rename_pos_rule rename rule =
+  { rule with rule_position = Loc.rename_loc rename rule.rule_position }
 
-  let rename_pos_agent_kind rename agent_kind = 
-  {agent_kind with agent_position = Loc.rename_pos_list Loc.rename_loc rename agent_kind.agent_position}
+let rename_pos_agent_kind rename agent_kind =
+  {
+    agent_kind with
+    agent_position =
+      Loc.rename_pos_list Loc.rename_loc rename agent_kind.agent_position;
+  }
 
-let rename_pos_var rename var = 
-  {var with var_position = Loc.rename_loc rename var.var_position}
+let rename_pos_var rename var =
+  { var with var_position = Loc.rename_loc rename var.var_position }
 
-
-let rename_pos_influence_node rename_pos_rule rename_pos_var rename node = 
-  match node with 
-  | Rule rule -> Rule (rename_pos_rule rename rule) 
+let rename_pos_influence_node rename_pos_rule rename_pos_var rename node =
+  match node with
+  | Rule rule -> Rule (rename_pos_rule rename rule)
   | Var var -> Var (rename_pos_var rename var)
 
-let rename_pos_refined_influence_node = 
-  rename_pos_influence_node rename_pos_rule rename_pos_var 
+let rename_pos_refined_influence_node =
+  rename_pos_influence_node rename_pos_rule rename_pos_var
 
-let rename_pos_contact_map = User_graph.rename_pos 
+let rename_pos_contact_map = User_graph.rename_pos
 
-let rename_pos_influence_map rename influence_map = 
-  {influence_map 
-  with 
-    nodes = Loc.rename_pos_list rename_pos_refined_influence_node  rename  influence_map.nodes}
-
-let rename_pos_dead_rules rename dead_rules = 
-  Loc.rename_pos_list rename_pos_rule rename dead_rules 
-
-let rename_pos_dead_agents rename dead_agents = 
-  Loc.rename_pos_list rename_pos_agent_kind rename dead_agents 
-
-let rename_pos_rule_deadness_conditions rename rule_deadness_conditions = 
-  Loc.rename_pos_list 
-      (Loc.rename_pos_pair 
-          rename_pos_rule 
-          (Logical_formulae.rename_pos (fun _ a -> a) ))
-      rename rule_deadness_conditions
-
-let rename_pos_agent_deadness_conditions rename agent_deadness_conditions = 
-  Loc.rename_pos_list 
-      (Loc.rename_pos_pair 
-          rename_pos_agent_kind 
-          (Logical_formulae.rename_pos (fun _ a -> a) ))
-      rename agent_deadness_conditions
-
-let rename_pos_formula rename_pos rename formula = 
-  Logical_formulae.rename_pos rename_pos rename formula 
-
-let rename_pos_lemma rename_pos_site_graph rename lemma = 
-  { 
-    hyp = rename_pos_site_graph rename lemma.hyp ; 
-    refinement = Loc.rename_pos_list 
-                        (Loc.rename_pos_pair 
-                                rename_pos_site_graph 
-                                (Loc.rename_pos_opt (rename_pos_formula (fun _ a -> a))))
-                        rename lemma.refinement 
+let rename_pos_influence_map rename influence_map =
+  {
+    influence_map with
+    nodes =
+      Loc.rename_pos_list rename_pos_refined_influence_node rename
+        influence_map.nodes;
   }
-let rename_pos_poly_constraint_list rename_pos_site_graph rename poly_constraint_list = 
-  Loc.rename_pos_list 
-    (Loc.rename_pos_pair 
-        (fun _ a -> a)
-        (Loc.rename_pos_list 
-              (rename_pos_lemma rename_pos_site_graph)))
-    rename 
-    poly_constraint_list 
 
-let rename_pos_separating_transitions rename (l:separating_transitions) = 
-  Loc.rename_pos_list 
-    (Loc.rename_pos_pair rename_pos_rule (fun _ a -> a)) 
-    rename l 
+let rename_pos_dead_rules rename dead_rules =
+  Loc.rename_pos_list rename_pos_rule rename dead_rules
+
+let rename_pos_dead_agents rename dead_agents =
+  Loc.rename_pos_list rename_pos_agent_kind rename dead_agents
+
+let rename_pos_rule_deadness_conditions rename rule_deadness_conditions =
+  Loc.rename_pos_list
+    (Loc.rename_pos_pair rename_pos_rule
+       (Logical_formulae.rename_pos (fun _ a -> a)))
+    rename rule_deadness_conditions
+
+let rename_pos_agent_deadness_conditions rename agent_deadness_conditions =
+  Loc.rename_pos_list
+    (Loc.rename_pos_pair rename_pos_agent_kind
+       (Logical_formulae.rename_pos (fun _ a -> a)))
+    rename agent_deadness_conditions
+
+let rename_pos_formula rename_pos rename formula =
+  Logical_formulae.rename_pos rename_pos rename formula
+
+let rename_pos_lemma rename_pos_site_graph rename lemma =
+  {
+    hyp = rename_pos_site_graph rename lemma.hyp;
+    refinement =
+      Loc.rename_pos_list
+        (Loc.rename_pos_pair rename_pos_site_graph
+           (Loc.rename_pos_opt (rename_pos_formula (fun _ a -> a))))
+        rename lemma.refinement;
+  }
+
+let rename_pos_poly_constraint_list rename_pos_site_graph rename
+    poly_constraint_list =
+  Loc.rename_pos_list
+    (Loc.rename_pos_pair
+       (fun _ a -> a)
+       (Loc.rename_pos_list (rename_pos_lemma rename_pos_site_graph)))
+    rename poly_constraint_list
+
+let rename_pos_separating_transitions rename (l : separating_transitions) =
+  Loc.rename_pos_list
+    (Loc.rename_pos_pair rename_pos_rule (fun _ a -> a))
+    rename l

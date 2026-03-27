@@ -169,24 +169,27 @@ functor
 
     let initialize ?patch static dynamic error =
       let parameters = Analyzer_headers.get_parameter static in
-      match patch with 
-        | Some (static, local,_) -> let error, () = 
-                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
-    in error, static, {local ; global = dynamic}, [  ]
-        | None -> 
+      match patch with
+      | Some (static, local, _) ->
+        let error, () =
+          Exception.warn ~message:"Reinitialization is not implemented yet"
+            parameters error __POS__ Exit ()
+        in
+        error, static, { local; global = dynamic }, []
+      | None ->
         let error, static =
-        compute_local_static_information static dynamic error
-      in
-      let error, store_value =
-        Ckappa_sig
-        .Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
-        .create parameters error (0, 0)
-      in
-      let init_local_dynamic_information = { dummy = (); store_value } in
-      let dynamic =
-        { global = dynamic; local = init_local_dynamic_information }
-      in
-      error, static, dynamic, []
+          compute_local_static_information static dynamic error
+        in
+        let error, store_value =
+          Ckappa_sig
+          .Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+          .create parameters error (0, 0)
+        in
+        let init_local_dynamic_information = { dummy = (); store_value } in
+        let dynamic =
+          { global = dynamic; local = init_local_dynamic_information }
+        in
+        error, static, dynamic, []
 
     (* fold over all the rules, all the tuples of interest, all the sites in
        these tuples, and apply the function Common_static.add_dependency_site_rule

@@ -88,33 +88,47 @@ val string_option_annoted_to_json :
 val string_option_annoted_of_json :
   filenames:string array -> Yojson.Basic.t -> string option annoted
 
-type 'a rename_pos = (t -> t option)-> 'a -> 'a 
+type 'a rename_pos = (t -> t option) -> 'a -> 'a
 
-val rename_loc: t rename_pos 
-val rename_pos: 'a rename_pos -> 'a annoted rename_pos 
-val rename_pos_flat: 'a annoted rename_pos 
-val rename_pos_opt: 'a rename_pos -> 'a option rename_pos 
-val rename_pos_pair: 'a rename_pos -> 'b rename_pos -> ('a*'b) rename_pos 
-val rename_pos_list: ((t -> t option) -> 'a -> 'a) -> (t -> t option) ->  'a list -> 'a list 
+val rename_loc : t rename_pos
+val rename_pos : 'a rename_pos -> 'a annoted rename_pos
+val rename_pos_flat : 'a annoted rename_pos
+val rename_pos_opt : 'a rename_pos -> 'a option rename_pos
+val rename_pos_pair : 'a rename_pos -> 'b rename_pos -> ('a * 'b) rename_pos
 
+val rename_pos_list :
+  ((t -> t option) -> 'a -> 'a) -> (t -> t option) -> 'a list -> 'a list
 
-type ('parameters,'errors,'a) rename_pos_with_errors = 'parameters -> 'errors -> (t -> t option)-> 'a -> 'errors * 'a 
+type ('parameters, 'errors, 'a) rename_pos_with_errors =
+  'parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a
 
+val rename_pos_with_errors :
+  ('parameters, 'errors, 'a) rename_pos_with_errors ->
+  ('parameters, 'errors, 'a annoted) rename_pos_with_errors
 
-val rename_pos_with_errors: 
-   ('parameters,'errors,'a) rename_pos_with_errors -> ('parameters,'errors,'a annoted) rename_pos_with_errors 
-val rename_pos_opt_with_errors:  ('parameters,'errors,'a) rename_pos_with_errors -> ('parameters,'errors,'a option) rename_pos_with_errors 
-val rename_pos_list_with_errors: ('parameters,'errors,'a) rename_pos_with_errors -> ('parameters,'errors,'a list) rename_pos_with_errors 
-val rename_pos_flat_with_errors: ('parameters,'errors,'a annoted) rename_pos_with_errors
-val rename_pos_pair_with_errors: ('parameters,'errors,'a) rename_pos_with_errors ->('parameters,'errors,'b) rename_pos_with_errors -> ('parameters,'errors,'a*'b) rename_pos_with_errors 
+val rename_pos_opt_with_errors :
+  ('parameters, 'errors, 'a) rename_pos_with_errors ->
+  ('parameters, 'errors, 'a option) rename_pos_with_errors
 
-type 'a diff_pos = ('a -> 'a -> (t*t) list -> (t*t) list)
-val diff_pos: t diff_pos 
-val diff_pos_annoted: 'a diff_pos -> 'a annoted diff_pos 
-val diff_pos_flat: 'a diff_pos 
-val diff_pos_opt: 'a diff_pos -> 'a option diff_pos 
-val diff_pos_list: 'a diff_pos -> 'a list diff_pos 
-val diff_pos_pair: 'a diff_pos -> 'b diff_pos -> ('a*'b) diff_pos  
-val diff_pos_empty: (t*t) list 
+val rename_pos_list_with_errors :
+  ('parameters, 'errors, 'a) rename_pos_with_errors ->
+  ('parameters, 'errors, 'a list) rename_pos_with_errors
 
-val fun_of_list: (t*t) list -> (t -> t option)
+val rename_pos_flat_with_errors :
+  ('parameters, 'errors, 'a annoted) rename_pos_with_errors
+
+val rename_pos_pair_with_errors :
+  ('parameters, 'errors, 'a) rename_pos_with_errors ->
+  ('parameters, 'errors, 'b) rename_pos_with_errors ->
+  ('parameters, 'errors, 'a * 'b) rename_pos_with_errors
+
+type 'a diff_pos = 'a -> 'a -> (t * t) list -> (t * t) list
+
+val diff_pos : t diff_pos
+val diff_pos_annoted : 'a diff_pos -> 'a annoted diff_pos
+val diff_pos_flat : 'a diff_pos
+val diff_pos_opt : 'a diff_pos -> 'a option diff_pos
+val diff_pos_list : 'a diff_pos -> 'a list diff_pos
+val diff_pos_pair : 'a diff_pos -> 'b diff_pos -> ('a * 'b) diff_pos
+val diff_pos_empty : (t * t) list
+val fun_of_list : (t * t) list -> t -> t option

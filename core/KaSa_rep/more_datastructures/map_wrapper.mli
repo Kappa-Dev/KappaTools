@@ -431,7 +431,7 @@ module type Projection = sig
     Exception.exceptions_caught_and_uncaught * 'b map_b
 
   val monadic_proj_map_i :
-    ?patch:((elt_b -> bool) * 'b map_b) -> 
+    ?patch:(elt_b -> bool) * 'b map_b ->
     (Remanent_parameters_sig.parameters ->
     Exception.exceptions_caught_and_uncaught ->
     elt_a ->

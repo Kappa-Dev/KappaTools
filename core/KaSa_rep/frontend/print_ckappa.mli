@@ -42,7 +42,7 @@ val print_agent_name :
   Ckappa_sig.agent_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught
 
-val print_mixture : 
+val print_mixture :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.mixture ->

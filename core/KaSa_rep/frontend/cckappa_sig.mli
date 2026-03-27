@@ -192,7 +192,7 @@ type enriched_init = {
   e_init_c_factor: (mixture, string) Alg_expr.e;
   e_init_mixture: Ckappa_sig.mixture;
   e_init_c_mixture: mixture;
-  e_init_position: Loc.t; 
+  e_init_position: Loc.t;
 }
 
 type compil = {
@@ -340,8 +340,14 @@ val working_set_id_of_rule_id :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.c_working_set_index option
 
-val rename_pos_kappa_handler_with_errors : 
-  (Remanent_parameters_sig.parameters, Exception_without_parameter.exceptions_caught_and_uncaught, kappa_handler) Loc.rename_pos_with_errors
+val rename_pos_kappa_handler_with_errors :
+  ( Remanent_parameters_sig.parameters,
+    Exception_without_parameter.exceptions_caught_and_uncaught,
+    kappa_handler )
+  Loc.rename_pos_with_errors
 
-val rename_pos_compil_with_errors : 
-  (Remanent_parameters_sig.parameters, Exception_without_parameter.exceptions_caught_and_uncaught, compil) Loc.rename_pos_with_errors  
+val rename_pos_compil_with_errors :
+  ( Remanent_parameters_sig.parameters,
+    Exception_without_parameter.exceptions_caught_and_uncaught,
+    compil )
+  Loc.rename_pos_with_errors

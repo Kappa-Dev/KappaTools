@@ -637,51 +637,54 @@ module Domain = struct
 
   let initialize ?patch static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
-    match patch with 
-    | Some (static, local,_) -> let error, () = 
-                    Exception.warn ~message:"Reinitialization is not implemented yet" parameters error __POS__ Exit () 
-    in error, static, {local ; global = dynamic}, [  ]
-    | None -> 
-   let log_info = Analyzer_headers.get_log_info dynamic in
-    let error, log_info =
-      StoryProfiling.StoryStats.add_event parameters error
-        (StoryProfiling.Domain_initialization domain_name) None log_info
-    in
-    let dynamic = Analyzer_headers.set_log_info log_info dynamic in
-    let init_local_static_information =
-      {
-        store_basic_static_information =
-          Site_across_bonds_domain_static.init_basic_static_information;
-      }
-    in
-    let init_global_static_information =
-      {
-        global_static_information = static;
-        local_static_information = init_local_static_information;
-      }
-    in
-    let init_local_dynamic_information =
-      {
-        store_value =
-          Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map
-          .empty;
-        store_value_current_working_set = None;
-      }
-    in
-    let init_global_dynamic_information =
-      { global = dynamic; local = init_local_dynamic_information }
-    in
-    let error, static, dynamic =
-      scan_rules init_global_static_information init_global_dynamic_information
-        error
-    in
-    let log_info = get_log_info dynamic in
-    let error, log_info =
-      StoryProfiling.StoryStats.close_event parameters error
-        (StoryProfiling.Domain_initialization domain_name) None log_info
-    in
-    let dynamic = set_log_info log_info dynamic in
-    error, static, dynamic, []
+    match patch with
+    | Some (static, local, _) ->
+      let error, () =
+        Exception.warn ~message:"Reinitialization is not implemented yet"
+          parameters error __POS__ Exit ()
+      in
+      error, static, { local; global = dynamic }, []
+    | None ->
+      let log_info = Analyzer_headers.get_log_info dynamic in
+      let error, log_info =
+        StoryProfiling.StoryStats.add_event parameters error
+          (StoryProfiling.Domain_initialization domain_name) None log_info
+      in
+      let dynamic = Analyzer_headers.set_log_info log_info dynamic in
+      let init_local_static_information =
+        {
+          store_basic_static_information =
+            Site_across_bonds_domain_static.init_basic_static_information;
+        }
+      in
+      let init_global_static_information =
+        {
+          global_static_information = static;
+          local_static_information = init_local_static_information;
+        }
+      in
+      let init_local_dynamic_information =
+        {
+          store_value =
+            Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map
+            .empty;
+          store_value_current_working_set = None;
+        }
+      in
+      let init_global_dynamic_information =
+        { global = dynamic; local = init_local_dynamic_information }
+      in
+      let error, static, dynamic =
+        scan_rules init_global_static_information
+          init_global_dynamic_information error
+      in
+      let log_info = get_log_info dynamic in
+      let error, log_info =
+        StoryProfiling.StoryStats.close_event parameters error
+          (StoryProfiling.Domain_initialization domain_name) None log_info
+      in
+      let dynamic = set_log_info log_info dynamic in
+      error, static, dynamic, []
 
   (***************************************************************************)
   (*IMPLEMENTATION*)

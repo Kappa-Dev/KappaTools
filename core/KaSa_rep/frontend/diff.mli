@@ -1,91 +1,108 @@
-type ('rule, 'init) summary_file 
-type ('rule, 'init) summary 
-type diff_elt = {new_elt: int list; removed_elt: int list ; pos_renaming: (Loc.t * Loc.t) list }
-type diff = 
- {
-    diff_rules: diff_elt ; 
-    diff_init: diff_elt ; 
- }
+type ('rule, 'init) summary_file
+type ('rule, 'init) summary
 
- type new_indexs=
- { 
-   next_rule: Ckappa_sig.c_rule_id ; 
-   next_init: int; 
-   next_nsites: Ckappa_sig.c_site_name;
-   next_nr_predicates: Ckappa_sig.c_guard_parameter
- }
+type diff_elt = {
+  new_elt: int list;
+  removed_elt: int list;
+  pos_renaming: (Loc.t * Loc.t) list;
+}
 
-val starting_new_elt: new_indexs 
+type diff = { diff_rules: diff_elt; diff_init: diff_elt }
 
-val summarize_from_ast:  
+type new_indexs = {
+  next_rule: Ckappa_sig.c_rule_id;
+  next_init: int;
+  next_nsites: Ckappa_sig.c_site_name;
+  next_nr_predicates: Ckappa_sig.c_guard_parameter;
+}
+
+val starting_new_elt : new_indexs
+
+val summarize_from_ast :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Ast.parsing_compil -> 
+  Ast.parsing_compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * (Ast.rule Ast.compil_rule,
-             (Ast.mixture, Ast.mixture, string) Ast.init_statement) summary 
-  
-val summarize_from_ckappa: 
-Remanent_parameters_sig.parameters ->
+  * ( Ast.rule Ast.compil_rule,
+      (Ast.mixture, Ast.mixture, string) Ast.init_statement )
+    summary
+
+val summarize_from_ckappa :
+  Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Ckappa_sig.c_compil -> 
+  Ckappa_sig.c_compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  *   (Ckappa_sig.enriched_rule, Ckappa_sig.enriched_init) summary 
+  * (Ckappa_sig.enriched_rule, Ckappa_sig.enriched_init) summary
 
-val summarize_from_cckappa: 
-Remanent_parameters_sig.parameters ->
+val summarize_from_cckappa :
+  Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  Cckappa_sig.compil -> 
+  Cckappa_sig.compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init)  summary 
+  * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init) summary
 
-
-val dump_summary: 
+val dump_summary :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  ('a,'b) summary -> unit 
+  ('a, 'b) summary ->
+  unit
 
-val is_new_rule: 
+val is_new_rule :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  ('a, 'b) summary ->  
-  filename:string -> 
-  rule:string ->   
-  Exception_without_parameter.exceptions_caught_and_uncaught * bool 
- 
-val is_new_init_state: 
-  Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught ->
-  ('a, 'b) summary ->  
-  filename:string -> 
-  init_state:string -> 
-  Exception_without_parameter.exceptions_caught_and_uncaught * bool 
+  ('a, 'b) summary ->
+  filename:string ->
+  rule:string ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * bool
 
-val diff: 
-  'rule Loc.diff_pos -> 'init Loc.diff_pos -> 
+val is_new_init_state :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  before:('rule,'init) summary -> 
-  filename:string -> 
-  after:('rule,'init) summary_file -> 
+  ('a, 'b) summary ->
+  filename:string ->
+  init_state:string ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * bool
+
+val diff :
+  'rule Loc.diff_pos ->
+  'init Loc.diff_pos ->
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  before:('rule, 'init) summary ->
+  filename:string ->
+  after:('rule, 'init) summary_file ->
   Exception_without_parameter.exceptions_caught_and_uncaught * diff
 
-val dump_diff: Remanent_parameters_sig.parameters ->
+val dump_diff :
+  Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  diff -> Exception_without_parameter.exceptions_caught_and_uncaught
+  diff ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
 
-val get_file: Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught -> filename:string ->
-  ('rule,'init) summary -> 
-    Exception_without_parameter.exceptions_caught_and_uncaught * ('rule,'init) summary_file 
+val get_file :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  filename:string ->
+  ('rule, 'init) summary ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('rule, 'init) summary_file
 
-val renaming_of_diff: diff -> (Loc.t -> Loc.t option) 
+val renaming_of_diff : diff -> Loc.t -> Loc.t option
+val cut : diff -> Ast.parsing_compil -> Ast.parsing_compil
 
-val cut: diff -> Ast.parsing_compil -> Ast.parsing_compil
+val get_new_indexs :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Cckappa_sig.compil ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * new_indexs
 
-val get_new_indexs: Remanent_parameters_sig.parameters -> 
-  Exception_without_parameter.exceptions_caught_and_uncaught -> Cckappa_sig.kappa_handler -> Cckappa_sig.compil  -> Exception_without_parameter.exceptions_caught_and_uncaught * new_indexs
-val fuse: Remanent_parameters_sig.parameters -> 
-  Exception_without_parameter.exceptions_caught_and_uncaught -> 
-Cckappa_sig.kappa_handler -> Cckappa_sig.compil -> Cckappa_sig.compil -> Exception_without_parameter.exceptions_caught_and_uncaught * 
-Cckappa_sig.kappa_handler * Cckappa_sig.compil 
+val fuse :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Cckappa_sig.kappa_handler ->
+  Cckappa_sig.compil ->
+  Cckappa_sig.compil ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * Cckappa_sig.kappa_handler
+  * Cckappa_sig.compil

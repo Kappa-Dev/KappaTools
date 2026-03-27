@@ -31,7 +31,7 @@ module type Type = sig
   type ode_flow
   type ctmc_flow
 
-  val init : ?files:(string list) -> unit -> state
+  val init : ?files:string list -> unit -> state
   val set_errors : errors -> state -> state
   val set_parameters : parameters -> state -> state
   val get_parameters : state -> parameters
@@ -138,28 +138,33 @@ module type Type = sig
   val enable_rule_index : int list -> state -> state
   val disable_rule_index : int list -> state -> state
 
-  val summarize_from_ast: state -> state * (Ast.rule Ast.compil_rule,
-          (Ast.mixture, Ast.mixture, string) Ast.init_statement) Diff.summary
+  val summarize_from_ast :
+    state ->
+    state
+    * ( Ast.rule Ast.compil_rule,
+        (Ast.mixture, Ast.mixture, string) Ast.init_statement )
+      Diff.summary
 
-  (*val summarize_from_ckappa: state -> state * 
-  (Ckappa_sig.enriched_rule, Ckappa_sig.enriched_init) Diff.summary *)
+  (*val summarize_from_ckappa: state -> state *
+    (Ckappa_sig.enriched_rule, Ckappa_sig.enriched_init) Diff.summary *)
 
-(*val summarize_from_cckappa: state -> state * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init)  Diff.summary *)
+  (*val summarize_from_cckappa: state -> state * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init)  Diff.summary *)
 
-  val dump_summary: ('a,'b) Diff.summary -> state -> state 
+  val dump_summary : ('a, 'b) Diff.summary -> state -> state
+  val rename_pos : state Loc.rename_pos
+  val add_rule : Ast.rule Ast.compil_rule -> state -> state
 
-  val rename_pos: state Loc.rename_pos 
-  
-  val add_rule: Ast.rule Ast.compil_rule -> state -> state 
-  val add_init: (Ast.mixture, Ast.mixture, string) Ast.init_statement -> state -> state 
+  val add_init :
+    (Ast.mixture, Ast.mixture, string) Ast.init_statement -> state -> state
 
-  val patch: 
-           ?debug:bool ->
-             ?do_we_show_title:bool -> 
-           patch_file_name:string ->
-           old_file_name:string ->
-           state -> state
- end
+  val patch :
+    ?debug:bool ->
+    ?do_we_show_title:bool ->
+    patch_file_name:string ->
+    old_file_name:string ->
+    state ->
+    state
+end
 
 module Export =
 functor
@@ -168,7 +173,9 @@ functor
   struct
     include Export.Export (A)
 
-    let init ?files ()  = init ?files ~called_from:Remanent_parameters_sig.KaSa ()
+    let init ?files () =
+      init ?files ~called_from:Remanent_parameters_sig.KaSa ()
+
     let get_contact_map = get_contact_map
     let dump_contact_map = dump_contact_map
     let get_internal_contact_map = get_internal_contact_map
@@ -186,12 +193,12 @@ functor
     let disable_rule = disable_rule
     let enable_rule_index = enable_rule_index
     let disable_rule_index = disable_rule_index
+    let summarize_from_ast = summarize_from_ast
+    let dump_summary = dump_summary
+    let add_rule = add_rule
+    let add_init = add_init
 
-    let summarize_from_ast = summarize_from_ast 
-    let dump_summary = dump_summary 
-    let  add_rule = add_rule 
-    let  add_init = add_init 
-    
-    let patch ?debug ?do_we_show_title ~patch_file_name = patch ?debug ?do_we_show_title ?compil:None ~patch_file_name ~called_from:Remanent_parameters_sig.KaSa
-     
+    let patch ?debug ?do_we_show_title ~patch_file_name =
+      patch ?debug ?do_we_show_title ?compil:None ~patch_file_name
+        ~called_from:Remanent_parameters_sig.KaSa
   end

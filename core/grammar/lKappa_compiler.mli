@@ -40,7 +40,8 @@ val init_of_ast :
   int Mods.StringMap.t ->
   (int option * (Ast.mixture, Ast.mixture, string) Ast.init_statement) list ->
   bool Mods.StringMap.t ->
-  (int option * (LKappa.rule_agent list, Raw_mixture.t, int) Ast.init_statement) list
+  (int option * (LKappa.rule_agent list, Raw_mixture.t, int) Ast.init_statement)
+  list
 
 type ast_compiled_data = {
   agents_sig: Signature.s;

@@ -28,7 +28,9 @@ type compilation_result
 
 type global_static_information
 type global_dynamic_information
-type ('static, 'dynamic) kasa_state = (global_static_information, 'static, 'dynamic) Remanent_state.state
+
+type ('static, 'dynamic) kasa_state =
+  (global_static_information, 'static, 'dynamic) Remanent_state.state
 
 (** This is the type of the encoding of a chemical mixture as a result of
     compilation *)
@@ -36,7 +38,7 @@ type ('static, 'dynamic) kasa_state = (global_static_information, 'static, 'dyna
 type initial_state = Cckappa_sig.enriched_init
 
 val initialize_global_information :
-  ?patch:(global_static_information*Diff.new_indexs) -> 
+  ?patch:global_static_information * Diff.new_indexs ->
   Remanent_parameters_sig.parameters ->
   StoryProfiling.StoryStats.log_info ->
   Exception.exceptions_caught_and_uncaught ->
@@ -47,16 +49,15 @@ val initialize_global_information :
   * global_static_information
   * global_dynamic_information
 
-
 val update_global_information :
   Remanent_parameters_sig.parameters ->
   StoryProfiling.StoryStats.log_info ->
   Exception.exceptions_caught_and_uncaught ->
   Mvbdu_wrapper.Mvbdu.handler ->
   Cckappa_sig.compil ->
-  Cckappa_sig.kappa_handler -> 
-  Diff.new_indexs -> 
-  global_static_information -> 
+  Cckappa_sig.kappa_handler ->
+  Diff.new_indexs ->
+  global_static_information ->
   global_dynamic_information ->
   Exception.exceptions_caught_and_uncaught
   * global_static_information
@@ -240,10 +241,10 @@ val compute_initial_state :
   global_static_information ->
   Exception.exceptions_caught_and_uncaught * initial_state list
 
-val update_initial_state: 
+val update_initial_state :
   Exception.exceptions_caught_and_uncaught ->
-  global_static_information -> 
-  Diff.new_indexs -> 
+  global_static_information ->
+  Diff.new_indexs ->
   Exception.exceptions_caught_and_uncaught * initial_state list
 
 val get_kappa_handler : global_static_information -> Cckappa_sig.kappa_handler

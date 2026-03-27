@@ -161,5 +161,4 @@ let print_cycles sigs form contact_map =
            s'))
     form o
 
-
-let rename_pos_in_cm_int _rename t = t 
+let rename_pos_in_cm_int _rename t = t

@@ -96,7 +96,7 @@ module Domain = struct
   (** [get_scan_rule_set static] *)
 
   let initialize ?patch static dynamic error =
-    let _ = patch in 
+    let _ = patch in
     let init_global_static_information =
       { global_static_information = static; domain_static_information = () }
     in

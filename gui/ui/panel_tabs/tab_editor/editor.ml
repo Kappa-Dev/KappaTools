@@ -202,7 +202,8 @@ let working_set_elements_checkboxes =
         in
         manager#get_working_set_elements >|= fun x ->
         (match x.Result_util.value with
-        | Result.Ok rules -> add_checkbox_to_working_set_elements rules codemirror
+        | Result.Ok rules ->
+          add_checkbox_to_working_set_elements rules codemirror
         | Result.Error _ -> ()))
 
 let onload () : unit =

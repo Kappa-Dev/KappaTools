@@ -21,7 +21,9 @@ type counter_sig = {
   counter_sig_default: int;
 }
 
-val rename_pos_counter_sig : (Loc.t -> Loc.t option) -> counter_sig -> counter_sig 
+val rename_pos_counter_sig :
+  (Loc.t -> Loc.t option) -> counter_sig -> counter_sig
+
 type t = counter_sig option array array
 
 val print_counter : t -> int -> int -> Format.formatter -> unit

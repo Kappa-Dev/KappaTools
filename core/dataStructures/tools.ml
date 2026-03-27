@@ -471,11 +471,10 @@ let map_opt f opt =
   | None -> None
   | Some a -> Some (f a)
 
-
-let update_pos_list update_pos f l = 
-  let _,l = 
-    List.fold_left 
-      (fun (i,acc) elt -> ((i+1),(update_pos f i elt)::acc))
-      (0,[]) l    
-  in List.rev l 
-      
+let update_pos_list update_pos f l =
+  let _, l =
+    List.fold_left
+      (fun (i, acc) elt -> i + 1, update_pos f i elt :: acc)
+      (0, []) l
+  in
+  List.rev l

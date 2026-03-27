@@ -69,16 +69,19 @@ type ('a, 'b) binary_no_output =
   'b ->
   Exception.exceptions_caught_and_uncaught
 
-type 'a loc_pos = (Remanent_parameters_sig.parameters,
-  Exception.exceptions_caught_and_uncaught, 'a) Loc.rename_pos_with_errors 
+type 'a loc_pos =
+  ( Remanent_parameters_sig.parameters,
+    Exception.exceptions_caught_and_uncaught,
+    'a )
+  Loc.rename_pos_with_errors
+
 module type Storage = sig
   type 'a t
   type key
   type dimension
 
-  val init_key: key 
-  val compare_key: key -> key -> bool 
-  
+  val init_key : key
+  val compare_key : key -> key -> bool
   val create : (dimension, 'a t) unary
   val create_biggest_key : (key, 'a t) unary
   val expand_and_copy : ('a t, dimension, 'a t) binary
@@ -109,9 +112,8 @@ module type Storage = sig
 
   val for_all : ((key, 'a, bool) binary, 'a t, bool) binary
   val free_all : ('a t, 'a t) unary
-
-  val rename_pos : 'a loc_pos  -> 'a t loc_pos  
- end
+  val rename_pos : 'a loc_pos -> 'a t loc_pos
+end
 
 (** Cartesian product *)
 module Extend (Extension : Storage) (Underlying : Storage) :

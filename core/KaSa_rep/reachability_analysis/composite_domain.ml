@@ -18,7 +18,7 @@ module type Composite_domain = sig
   type dynamic_information
 
   val initialize :
-    ?patch:(static_information*dynamic_information*Diff.new_indexs) ->  
+    ?patch:static_information * dynamic_information * Diff.new_indexs ->
     Analyzer_headers.global_static_information ->
     Analyzer_headers.global_dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->
@@ -440,11 +440,11 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     )
 
   let initialize ?patch static dynamic error =
-    let patch_domain = 
-      match patch with 
-      | None -> None 
-      | Some (a,b,c) -> Some (snd a,b.domain.local,c)
-    in 
+    let patch_domain =
+      match patch with
+      | None -> None
+      | Some (a, b, c) -> Some (snd a, b.domain.local, c)
+    in
     let error, domain_static, domain_dynamic, event_list =
       Domain.initialize ?patch:patch_domain static dynamic error
     in

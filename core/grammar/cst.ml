@@ -7,27 +7,23 @@
 (******************************************************************************)
 
 let compute_ws_values ~all_rules_in_ws ~rules_in_ws rules inits compil =
-  let init_rev, working_set_values, nr_working_set_params = 
-  List.fold_left
+  let init_rev, working_set_values, nr_working_set_params =
+    List.fold_left
       (fun (inits, ws_values, k) (ws_index, (guard, alg, init_t)) ->
         match ws_index with
         | None ->
           if all_rules_in_ws then
             ( (Some k, (guard, alg, init_t)) :: inits,
               Mods.IntMap.add k true ws_values,
-              k + 1
-              )
+              k + 1 )
           else
             (ws_index, (guard, alg, init_t)) :: inits, ws_values, k
         | Some _ ->
           ( (Some k, (guard, alg, init_t)) :: inits,
             Mods.IntMap.add k true ws_values,
-            k + 1
-            ))
-      ( [],
-        compil.Ast.working_set_values,
-        compil.nr_working_set_params )
-        inits
+            k + 1 ))
+      ([], compil.Ast.working_set_values, compil.nr_working_set_params)
+      inits
   in
   let rules_rev, working_set_values, nr_working_set_params, _ =
     List.fold_left
@@ -46,10 +42,7 @@ let compute_ws_values ~all_rules_in_ws ~rules_in_ws rules inits compil =
             Mods.IntMap.add k true ws_values,
             k + 1,
             i + 1 ))
-      ( [],
-        working_set_values,
-        nr_working_set_params,
-        List.length compil.rules )
+      ([], working_set_values, nr_working_set_params, List.length compil.rules)
       rules
   in
   {
@@ -76,12 +69,13 @@ let append_to_ast_compil rev_instr ?(all_rules_in_ws = false)
           { r with Ast.tokens = str_pos :: r.Ast.tokens }, rules, inits
         | Ast.VOLSIG (vol_type, vol, vol_param) ->
           ( { r with Ast.volumes = (vol_type, vol, vol_param) :: r.Ast.volumes },
-            rules, inits )
+            rules,
+            inits )
         | Ast.INIT ((guard, alg, init_t), is_in_working_set) ->
-                    if is_in_working_set then
-          r, rules, (Some 1, (guard, alg, init_t)) :: inits
-                    else 
-          r, rules, (None, (guard, alg, init_t)) :: inits
+          if is_in_working_set then
+            r, rules, (Some 1, (guard, alg, init_t)) :: inits
+          else
+            r, rules, (None, (guard, alg, init_t)) :: inits
         | Ast.DECLARE var ->
           { r with Ast.variables = var :: r.Ast.variables }, rules, inits
         | Ast.OBS (((lbl, pos), _) as var) ->
@@ -91,7 +85,8 @@ let append_to_ast_compil rev_instr ?(all_rules_in_ws = false)
               Ast.variables = var :: r.Ast.variables;
               Ast.observables = (Alg_expr.ALG_VAR lbl, pos) :: r.Ast.observables;
             },
-            rules, inits )
+            rules,
+            inits )
         | Ast.PLOT expr ->
           { r with Ast.observables = expr :: r.Ast.observables }, rules, inits
         | Ast.PERT ((alarm, pre, effect, opt), pos) ->
@@ -100,31 +95,36 @@ let append_to_ast_compil rev_instr ?(all_rules_in_ws = false)
               Ast.perturbations =
                 ((alarm, pre, effect, opt), pos) :: r.Ast.perturbations;
             },
-            rules, inits )
+            rules,
+            inits )
         | Ast.CONFIG (param_name, value_list) ->
           ( {
               r with
               Ast.configurations =
                 (param_name, value_list) :: r.Ast.configurations;
             },
-            rules, inits )
+            rules,
+            inits )
         | Ast.GUARD_PARAM ((params_sig, _), b) ->
           ( {
               r with
               Ast.guard_param_values =
                 Mods.StringMap.add params_sig b r.Ast.guard_param_values;
             },
-            rules, inits )
+            rules,
+            inits )
         | Ast.CONFLICT (agent, site1, site2) ->
           ( { r with Ast.conflicts = (agent, site1, site2) :: r.Ast.conflicts },
-            rules, inits )
+            rules,
+            inits )
         | Ast.SEQUENTIAL_BOND (agent, site1, site2) ->
           ( {
               r with
               Ast.sequential_bonds =
                 (agent, site1, site2) :: r.Ast.sequential_bonds;
             },
-            rules, inits ))
+            rules,
+            inits ))
       (compil, [], []) (List.rev rev_instr)
   in
   compute_ws_values ~all_rules_in_ws ~rules_in_ws rules inits compil
