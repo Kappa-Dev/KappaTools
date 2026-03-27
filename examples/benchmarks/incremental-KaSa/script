@@ -11,8 +11,8 @@ KAPPA_OUTPUT_DIR="${SCRIPT_DIR}/../../../output/"
 INPUT_INCREMENTAL_TMP="${MODELS_DIRECTORY}inc_analysis_input_tmp.txt"
 
 # default values for variables
-TIMEOUT=3m
-REPS=2 # how often to repeat each experiment
+TIMEOUT=50m
+REPS=10 # how often to repeat each experiment
 NR_RULES=10 # how many rules to remove
 
 # help message
@@ -64,6 +64,12 @@ while getopts ":t:r:s:idh" opt; do
             ;;
     esac
 done
+
+if $DEBUG ; then
+    TIMEOUT=3m
+    REPS=2
+    NR_RULES=10
+fi
 
 shift $((OPTIND - 1))
 

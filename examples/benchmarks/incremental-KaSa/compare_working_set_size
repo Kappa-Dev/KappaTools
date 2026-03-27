@@ -10,8 +10,8 @@ KAPPA_OUTPUT_DIR="${SCRIPT_DIR}/../../../output/"
 INPUT_INCREMENTAL_TMP="${MODELS_DIRECTORY}inc_analysis_input_tmp.txt"
 
 # default values for variables
-TIMEOUT=3m
-REPS=2 # how often to repeat each experiment
+TIMEOUT=50m
+REPS=10 # how often to repeat each experiment
 
 # help message
 print_help() {
@@ -69,6 +69,8 @@ if $DEBUG; then
     MIN_NR_RULES=0
     MAX_NR_RULES=4
     STEP=1
+    TIMEOUT=3m
+    REPS=2
 fi
 
 echo "Using a timeout of $TIMEOUT."
