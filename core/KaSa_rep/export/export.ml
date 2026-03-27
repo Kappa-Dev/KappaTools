@@ -2128,7 +2128,8 @@ functor
     let get_data = Remanent_state.get_data
 
     let toggle_working_set_boolean_parameters_in_compilation error bool state
-        working_set_indexes =
+        working_set_indexes permanently_disable =
+      let bool = if permanently_disable then false else bool in
       let parameters = get_parameters state in
       let state, compilation = get_compilation state in
       let state, c_compil = get_c_compilation state in
@@ -2147,20 +2148,26 @@ functor
           in
             (match Mods.IntMap.find_option guard_int working_set_values with
           | None ->
+            if permanently_disable then
+              error, working_set_values, working_set_valuations, changed
+            else
               let error, () =
               Exception.warn parameters error __POS__
                 ~message:
                   ("Index out of bounds: there is no rule with index "
                   ^ Ckappa_sig.string_of_working_set_index working_set_index
-                  ^ " in the working set")
+                  ^ " in the working set. Or it may already have been permanently disabled.")
                 Exit ()
             in
             error, working_set_values, working_set_valuations, false
           | Some old_bool ->
-            if old_bool = bool then
+            if old_bool = bool && not permanently_disable then
               error, working_set_values, working_set_valuations, changed
             else (
               let working_set_values =
+              if permanently_disable then 
+                Mods.IntMap.remove guard_int working_set_values
+            else
                 Mods.IntMap.add guard_int bool working_set_values
               in
               let error, (guard_id, _) =
@@ -2200,11 +2207,11 @@ functor
           ) else
             error, state, false
 
-    let enable_or_disable_rule bool working_set_indexes state =
+    let enable_or_disable_rule bool permanently_disable working_set_indexes state =
       let error = get_errors state in
       let error, state, changed =
         toggle_working_set_boolean_parameters_in_compilation error bool state
-          working_set_indexes in 
+          working_set_indexes permanently_disable in 
       if changed then (
         let state, (static, dynamic) = get_reachability_analysis state in
         let state, c_compil = get_c_compilation state in
@@ -2265,20 +2272,20 @@ functor
       let state, ws_id = ws_id_from_rule_name name state in
       match ws_id with
       | None -> state
-      | Some ws_id -> enable_or_disable_rule true [ ws_id ] state
+      | Some ws_id -> enable_or_disable_rule true false [ ws_id ] state
 
     let disable_rule name state =
       let state, ws_id = ws_id_from_rule_name name state in
       match ws_id with
       | None -> state
-      | Some ws_id -> enable_or_disable_rule false [ ws_id ] state
+      | Some ws_id -> enable_or_disable_rule false false [ ws_id ] state
 
     let enable_rule_index index =
-      enable_or_disable_rule true
+      enable_or_disable_rule true false
         (List.map Ckappa_sig.working_set_index_of_int index)
 
     let disable_rule_index index =
-      enable_or_disable_rule false
+      enable_or_disable_rule false false
         (List.map Ckappa_sig.working_set_index_of_int index)
 
  let working_set_id_of_rule_id i state = 
@@ -2317,7 +2324,7 @@ functor
       let state = set_errors errors state in 
       state, id_opt  
 
-    let disable_rule_c_id_list list state = 
+    let permanently_disable_rule_c_id_list list state = 
       let state, l = 
         List.fold_left 
         (fun (state, l) index -> 
@@ -2327,10 +2334,10 @@ functor
         | None -> state, l 
         | Some i -> state, i::l) 
         (state, [])  (List.rev list) in 
-        enable_or_disable_rule false l state 
+        enable_or_disable_rule false true l state 
 
 
-    let disable_init_c_id_list list state = 
+    let permanently_disable_init_c_id_list list state = 
       let state, l = 
         List.fold_left 
         (fun (state, l) index -> 
@@ -2340,7 +2347,7 @@ functor
         | None -> state, l 
         | Some i -> state, i::l) 
         (state, [])  (List.rev list) in 
-        enable_or_disable_rule false l state 
+        enable_or_disable_rule false true l state 
 
   (* Incremental analysis *)
     let summarize_from_ast state = 
@@ -2407,10 +2414,10 @@ functor
        in 
        let state = set_errors errors state in 
        let state = rename_pos (Diff.renaming_of_diff diff) state in 
-       let state = disable_rule_c_id_list 
+       let state = permanently_disable_rule_c_id_list 
         (List.rev_map Ckappa_sig.rule_id_of_int
        (List.rev diff.Diff.diff_rules.removed_elt)) state in 
-       let state = disable_init_c_id_list diff.Diff.diff_init.removed_elt state in
+       let state = permanently_disable_init_c_id_list diff.Diff.diff_init.removed_elt state in
        let state, _state' = parse_token 
                     (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
                     ~patch:state' ~current:state in 

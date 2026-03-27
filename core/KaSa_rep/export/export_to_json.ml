@@ -223,7 +223,7 @@ functor
       Public_data.working_set_elements_to_json rules
 
     let enable_or_disable_rule state ws_id bool =
-      enable_or_disable_rule bool
+      enable_or_disable_rule bool false
         [ Ckappa_sig.working_set_index_of_int ws_id ]
         state
 

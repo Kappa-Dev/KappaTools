@@ -729,19 +729,17 @@ let get_working_set_elements state =
         match ws_id with
         | None -> None
         | Some ws_id ->
-          let enabled =
             match
               Mods.IntMap.find_option ws_id compilation.Ast.working_set_values
             with
-            | None -> false
-            | Some b -> b
-          in
-          Some
+            | None -> None (*the rule was permanently deleted*)
+            | Some b -> Some
             {
               Public_data.rule_ws_id = ws_id;
               Public_data.rule_ws_position = loc;
-              Public_data.rule_ws_enabled = enabled;
-            })
+              Public_data.rule_ws_enabled = b;
+            }
+          )
       compilation.Ast.rules 
       @
       List.filter_map
@@ -752,19 +750,17 @@ let get_working_set_elements state =
           match init with 
             Ast.INIT_TOK _ -> None (*ignore tokens*)
           | Ast.INIT_MIX (_, loc) -> 
-          let enabled =
             match
               Mods.IntMap.find_option ws_id compilation.Ast.working_set_values
             with
-            | None -> false
-            | Some b -> b
-          in
-          Some
+            | None -> None (*the initial state was permanently deleted*)
+            | Some b -> Some
             {
               Public_data.rule_ws_id = ws_id;
               Public_data.rule_ws_position = loc;
-              Public_data.rule_ws_enabled = enabled;
-            })
+              Public_data.rule_ws_enabled = b;
+            }
+          )
       compilation.Ast.init 
 
 let reset_reachability_memoized_values state =
