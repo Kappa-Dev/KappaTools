@@ -5,20 +5,19 @@
 \begin{table}[ht]
 \centering
 \small
-\begin{tabular}{l c c c c c c c c c}
+\begin{tabular}{l c c c c}
 \toprule
-\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{2}{c}{\textbf{full}} & \multicolumn{2}{c}{\textbf{partial}} & \multicolumn{4}{c}{\textbf{incremental}} \\
-\cmidrule(lr){3-4}
-\cmidrule(lr){5-6}
-\cmidrule(lr){7-10}
-& & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{static\\analysis} & \bfseries\shortstack{print\\result} & \bfseries\shortstack{activate/\\deactivate} & \bfseries\shortstack{print\\result} \\
+\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{1}{c}{\textbf{non-incremental}} & \multicolumn{2}{c}{\textbf{incremental}} \\
+\cmidrule(lr){3-3}
+\cmidrule(lr){4-5}
+& & \bfseries\shortstack{analysis} & \bfseries\shortstack{initial\\analysis} & \bfseries\shortstack{projection}\\
 \midrule
-\texttt{korkut\_20170113} & 3915 & 24.8 & 0.295 & 24.7 & 0.309 & 26.2 & 0.328 & 0.032 & 0.326 \\
-\texttt{korkut\_20170206} & 5749 & 198 & 0.869 & 196 & 0.847 & 472 & 0.847 & 0.0668 & 0.828 \\
-\texttt{tgf\_20180419} & 291 & 2.13 & 0.0124 & 1.9 & 0.0136 & 4.43 & 0.0172 & 0.0304 & 0.0076 \\
-\texttt{tgf\_v19} & 96 & 0.709 & 0.0168 & 0.52 & 0.014 & 1.5 & 0.0332 & 0.1 & 0.006 \\
-\texttt{wnt\_20151228} & 355 & 3.53 & 2.6 & 3.33 & 1.37 & 5.01 & 3.07 & 0.414 & 0.0304 \\
-\texttt{wnt\_20170322} & 1469 & 28.2 & 0.0336 & 26.9 & 0.0492 & 32.4 & 0.068 & 0.109 & 0.0144 \\
+\texttt{korkut\_20170113} & 3915 & 24.7 & 26.1 & 0.352 \\
+\texttt{korkut\_20170206} & 5749 & 196 & 467 & 0.88 \\
+\texttt{tgf\_20180419} & 291 & 2.1 & 4.41 & 0.0332 \\
+\texttt{tgf\_v19} & 96 & 0.715 & 1.52 & 0.0844 \\
+\texttt{wnt\_20151228} & 355 & 6.1 & 5 & 0.398 \\
+\texttt{wnt\_20170322} & 1469 & 27.5 & 32 & 0.154 \\
 \bottomrule
 \end{tabular}
 \caption{Timing table}
