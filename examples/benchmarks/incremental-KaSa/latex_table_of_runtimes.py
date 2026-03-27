@@ -68,7 +68,7 @@ def main(inp_path, out_path):
             if model not in model_nr_rules:
                 model_nr_rules[model] = nr_rules
 
-    total_step_count = 4
+    total_step_count = 3
     col_spec = "l c " + " ".join(["c"] * total_step_count)
 
     # Build LaTeX
@@ -83,19 +83,15 @@ def main(inp_path, out_path):
     lines.append(r"\begin{tabular}{" + col_spec + "}")
     lines.append(r"\toprule")
 
-    # First header row
-    lines.append(r"\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{1}{c}{\textbf{non-incremental}} & \multicolumn{3}{c}{\textbf{incremental}} \\")
-    lines.append(r"\cmidrule(lr){3-3}")
-    lines.append(r"\cmidrule(lr){4-6}")
-    # Second header row
-    lines.append(r"& & \bfseries\shortstack{analysis} & \bfseries\shortstack{initial\\analysis} & \bfseries\shortstack{projection} & \bfseries\shortstack{add rules}\\")
+    # header row
+    lines.append(r"\textbf{Model} & \textbf{Nr. of rules} & \bfseries\shortstack{initial\\analysis} &  \bfseries\shortstack{add\\rules} & \bfseries\shortstack{disable\\rules}\\")
     lines.append(r"\midrule")
 
     for model in data.keys():
         row_elems = []
         row_elems.append(r"\texttt{" + latex_escape(model) + "}")
         row_elems.append(latex_escape(model_nr_rules.get(model, "")))
-        analysis_items = [("1_full",["1_init"]), ("2_decremental",["1_init", "4_disable"]), ("3_incremental",["1_init"])]
+        analysis_items = [("1_full",["1_init"]), ("2_incremental",["1_init"]), ("3_decremental",["4_disable"])]
         for a, steps in analysis_items:
             for s in steps:
                 val = data[model].get(a, {}).get(s, "")
