@@ -4,6 +4,8 @@ DEBUG=false
 INSTALL_DEPS=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PWD=$(pwd)
+SCRIPT_DIR=$(realpath "$SCRIPT_DIR" --relative-to="$PWD")
 
 KASA_BINARY="${SCRIPT_DIR}/../../../bin/KaSa"
 KASA_INC_BINARY="${SCRIPT_DIR}/../../../bin/KaSaIncremental"
