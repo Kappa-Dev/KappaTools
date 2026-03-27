@@ -71,7 +71,6 @@ let parse_input s =
     Parsing_error ("Unknown command: " ^ s)
 
 let main () =
-  let initial_start_time = Sys.time () in
   let errors = Exception.empty_exceptions_caught_and_uncaught in
   let _, parameters, _ = Get_option.get_option errors in
   let module A =
@@ -99,8 +98,6 @@ let main () =
     let () = Exception.print parameters error in
     KaSaUtil.print_efficiency parameters state start_time
   in
-  let state = Export_to_KaSa.output_reachability_result state in
-  let () = print_result parameters state initial_start_time in
   let rec loop state =
     let log = Remanent_parameters.get_logger parameters in
     Loggers.fprintf log "> ";
