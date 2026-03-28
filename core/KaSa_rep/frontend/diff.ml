@@ -20,6 +20,12 @@ type new_indexs = {
   next_init: int;
   next_nsites: Ckappa_sig.c_site_name;
   next_nr_predicates: Ckappa_sig.c_guard_parameter;
+  former_dual:
+    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+    Ckappa_sig
+    .Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
+    .t
+    option;
 }
 
 let starting_new_elt =
@@ -28,6 +34,7 @@ let starting_new_elt =
     next_init = 0;
     next_nsites = Ckappa_sig.site_name_of_int 0;
     next_nr_predicates = Ckappa_sig.guard_parameter_of_int 0;
+    former_dual = None;
   }
 
 let empty_summary_file =
@@ -467,12 +474,14 @@ let get_new_indexs parameters errors handler c_compil =
   in
   let next_nsites = Handler.get_nsites handler in
   let next_nr_predicates = Handler.get_nr_guard_parameters handler in
+  let dual = handler.Cckappa_sig.dual in
   let new_indexs =
     {
       next_rule = Ckappa_sig.rule_id_of_int n;
       next_init = n';
       next_nsites;
       next_nr_predicates;
+      former_dual = Some dual;
     }
   in
   errors, new_indexs

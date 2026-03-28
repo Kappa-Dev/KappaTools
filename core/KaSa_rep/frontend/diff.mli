@@ -14,6 +14,12 @@ type new_indexs = {
   next_init: int;
   next_nsites: Ckappa_sig.c_site_name;
   next_nr_predicates: Ckappa_sig.c_guard_parameter;
+  former_dual:
+    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+    Ckappa_sig
+    .Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
+    .t
+    option;
 }
 
 val starting_new_elt : new_indexs
