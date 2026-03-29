@@ -69,11 +69,7 @@ let add_dependence parameters error ~agent_name ~site ~counter ~counter_set
   in
   error, (counter_set, packs, backward_dependences, equivalence_relation)
 
-let quotient_packs parameters error packs equivalence =
-  let error, agent_array =
-    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters
-      error 1
-  in
+let quotient_packs parameters error ~former_packs packs equivalence =
   let error, (equivalence, packs) =
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters error
       (fun parameters error agent_name site_map (equivalence, new_packs) ->
@@ -122,15 +118,11 @@ let quotient_packs parameters error packs equivalence =
             error agent_name new_site_map new_packs
         in
         error, (equivalence, new_agent_array))
-      packs (equivalence, agent_array)
+      packs (equivalence, (*agent_array*) former_packs)
   in
   error, equivalence, packs
 
-let quotient_back parameters error back equivalence =
-  let error, new_back =
-    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
-    .create parameters error (1, 1)
-  in
+let quotient_back parameters error ~former_backward_dependences back equivalence =
   let error, (equivalence, back) =
     Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
     .fold parameters error
@@ -163,30 +155,39 @@ let quotient_back parameters error back equivalence =
           .set parameters error (agent_name, site) new_set new_back
         in
         error, (equivalence, new_back))
-      back (equivalence, new_back)
+      back (equivalence, former_backward_dependences)
   in
   error, equivalence, back
 
-let quotient parameters error packs backward equivalence =
+let quotient ~former_packs ~former_backward_dependences parameters error packs backward equivalence =
   let error, equivalence, packs =
-    quotient_packs parameters error packs equivalence
+    quotient_packs parameters error ~former_packs packs equivalence
   in
   let error, equivalence, backward =
-    quotient_back parameters error backward equivalence
+    quotient_back parameters error ~former_backward_dependences backward equivalence
   in
   error, equivalence, packs, backward
 
-let compute_packs parameters error handler compil =
-  let error, packs =
-    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters
-      error 0
-  in
-  let error, backward_dependences =
-    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
-    .create parameters error (0, 0)
-  in
-  let counter_set = Ckappa_sig.AgentSite_map_and_set.Set.empty in
+let compute_packs ?patch_packs parameters error handler compil =
+  let error, former_packs, former_backward_dependences, counter_set = 
+    match patch_packs with 
+    | None -> 
+      let error, packs =
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+      in
+      let error, backward_dependences =
+        Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create parameters error (0, 0)
+      in
+      let counter_set = Ckappa_sig.AgentSite_map_and_set.Set.empty in
+      error, packs, backward_dependences, counter_set 
+    | Some (counter_set,packs,backward_dependences,  _) -> 
+      error, packs, backward_dependences, counter_set 
+  in 
   let error, equivalence_relation = EQUREL.create parameters error (1, 1) in
+  let error, empty_packs = Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+      in
+  let error, empty_backward_dependences =  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create parameters error (0, 0)
+  in
   let error, (counter_set, packs, backward_dependences, equivalence_relation) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
       (fun parameters error _rule_id rule
@@ -283,10 +284,10 @@ let compute_packs parameters error handler compil =
         in
         error, (counter_set, packs, backward_dependences, equivalence_relation))
       compil.Cckappa_sig.rules
-      (counter_set, packs, backward_dependences, equivalence_relation)
+      (counter_set, empty_packs, empty_backward_dependences, equivalence_relation)
   in
   let error, _, packs, backward_dependences =
-    quotient parameters error packs backward_dependences equivalence_relation
+    quotient ~former_packs ~former_backward_dependences parameters error packs backward_dependences equivalence_relation
   in
   error, (counter_set, packs, backward_dependences)
 
@@ -554,13 +555,16 @@ let collect_updates parameters handler error ag_id agl diff_agr backward
   Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.set parameters error
     ag_id agent_restriction restriction
 
-let compute_rule_restrictions parameters error handler (_packs, backward) compil
+let compute_rule_restrictions ?patch_restrictions parameters error handler (_packs, backward) compil
     =
-  let error, rule_restrictions =
-    Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters
-      error 0
+  let (error, rule_restrictions), start  =
+     match patch_restrictions with 
+     | None -> 
+      (Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters
+        error 0), None 
+      | Some (a,new_index) -> (error, a),Some new_index.Diff.next_rule  
   in
-  Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+  Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters error
     (fun parameters error rule_id rule rule_restrictions ->
       let error, restriction =
         match
@@ -763,12 +767,14 @@ let convert_view parameters error handler compil packs agent_type ag =
           error, ((agent_type, counter), interface) :: list)
         agent_packs [])
 
-let compute_rule_creation parameters error handler (packs, _backward) compil =
-  let error, creation =
-    Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters
-      error 0
+let compute_rule_creation ?patch_creation parameters error handler (packs, _backward) compil =
+  let (error, creation), start =
+    match patch_creation with 
+    | None -> (Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters
+      error 0), None 
+    | Some (a,b) -> (error,a),Some (b.Diff.next_rule)
   in
-  Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+  Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters error
     (fun parameters error rule_id rule rule_creations ->
       let error, creation =
         match
@@ -817,15 +823,23 @@ let compute_rule_creation parameters error handler (packs, _backward) compil =
         error rule_id creation rule_creations)
     compil.Cckappa_sig.rules creation
 
-let compute_static parameters error handler compil =
+let compute_static ?patch parameters error handler compil =
+  let patch_packs, patch_restrictions, patch_creation = 
+    match patch with 
+      | None -> None, None, None 
+      | Some (static,diff_elts) -> 
+          Some(static.Counters_domain_type.counters, static.Counters_domain_type.packs,static.Counters_domain_type.backward_pointers,diff_elts), 
+          Some(static.Counters_domain_type.rule_restrictions,diff_elts), 
+          Some(static.Counters_domain_type.rule_creation,diff_elts)
+  in 
   let error, (counter_set, packs, backward) =
-    compute_packs parameters error handler compil
+    compute_packs ?patch_packs parameters error handler compil
   in
   let error, rule_restrictions =
-    compute_rule_restrictions parameters error handler (packs, backward) compil
+    compute_rule_restrictions ?patch_restrictions parameters error handler (packs, backward) compil
   in
   let error, rule_creation =
-    compute_rule_creation parameters error handler (packs, backward) compil
+    compute_rule_creation ?patch_creation parameters error handler (packs, backward) compil
   in
   ( error,
     {

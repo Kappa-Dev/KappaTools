@@ -147,7 +147,7 @@ functor
     (*rule*)
     (*****************************************************************)
 
-    let compute_local_static_information global_static_information _dynamic
+    let compute_local_static_information ?patch global_static_information _dynamic
         error =
       let parameters =
         Analyzer_headers.get_parameter global_static_information
@@ -157,7 +157,7 @@ functor
         Analyzer_headers.get_kappa_handler global_static_information
       in
       let error, local_static_information =
-        Counters_domain_static.compute_static parameters error kappa_handler
+        Counters_domain_static.compute_static ?patch parameters error kappa_handler
           compil
       in
       let static = { global_static_information; local_static_information } in
@@ -169,27 +169,22 @@ functor
 
     let initialize ?patch static dynamic error =
       let parameters = Analyzer_headers.get_parameter static in
-      match patch with
-      | Some (static, local, _) ->
-        let error, () =
-          Exception.warn ~message:"Reinitialization is not implemented yet"
-            parameters error __POS__ Exit ()
-        in
-        error, static, { local; global = dynamic }, []
-      | None ->
-        let error, static =
-          compute_local_static_information static dynamic error
-        in
-        let error, store_value =
+      let (error, local), patch_static = 
+        match patch with 
+        | None ->  
+          let error, store_value = 
           Ckappa_sig
           .Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
-          .create parameters error (0, 0)
-        in
-        let init_local_dynamic_information = { dummy = (); store_value } in
-        let dynamic =
-          { global = dynamic; local = init_local_dynamic_information }
-        in
-        error, static, dynamic, []
+          .create parameters error (0, 0) in 
+          (error, { dummy = (); store_value }), None 
+        | Some (a,local,b) -> (error, local), Some (a.local_static_information,(b:Diff.new_indexs)) 
+      in 
+      let dynamic = {global = dynamic ; local} in 
+      let patch = patch_static in 
+      let error, static =
+          compute_local_static_information ?patch static dynamic error
+      in
+      error, static, dynamic, []
 
     (* fold over all the rules, all the tuples of interest, all the sites in
        these tuples, and apply the function Common_static.add_dependency_site_rule

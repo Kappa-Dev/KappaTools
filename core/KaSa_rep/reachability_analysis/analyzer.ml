@@ -207,7 +207,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       add_event parameters error analysis_event None dynamic
     in
     let error, static, dynamic =
-      match patch with
+     match patch with
       | Some _ ->
         let error, () =
           Exception.warn ~message:"Reinitialization is not implemented yet"

@@ -1,4 +1,5 @@
 val compute_static :
+  ?patch:(Counters_domain_type.static *  Diff.new_indexs) -> 
   Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
