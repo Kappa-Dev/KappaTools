@@ -14,6 +14,7 @@ type new_indexs = {
   next_init: int;
   next_nsites: Ckappa_sig.c_site_name;
   next_nr_predicates: Ckappa_sig.c_guard_parameter;
+  next_agent: Ckappa_sig.c_agent_name;
   former_dual:
     (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
     Ckappa_sig

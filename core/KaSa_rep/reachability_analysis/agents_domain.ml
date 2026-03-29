@@ -283,11 +283,20 @@ module Domain = struct
             agent_type rule_id_list map)
         (error, map) l
 
-  let scan_rule_set static dynamic error =
+  let scan_rule_set ?start static dynamic error =
     let parameters = get_parameter static in
     let compil = get_compil static in
+    let start, init =
+      match start with
+      | None ->
+        ( None,
+          ( Ckappa_sig.Rule_map_and_set.Map.empty,
+            Ckappa_sig.Agent_map_and_set.Map.empty ) )
+      | Some (i, acc) -> Some i, acc
+    in
     let error, (result, agents) =
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters
+        error
         (fun parameters error rule_id rule
              (store_result, agents_without_interface) ->
           let error, (agents_test_list, agents_created_list) =
@@ -306,9 +315,7 @@ module Domain = struct
               rule.Cckappa_sig.e_rule_c_rule agents_without_interface
           in
           error, (result, agents_without_interface))
-        compil.Cckappa_sig.rules
-        ( Ckappa_sig.Rule_map_and_set.Map.empty,
-          Ckappa_sig.Agent_map_and_set.Map.empty )
+        compil.Cckappa_sig.rules init
     in
     let static = set_agents_without_interface agents static in
     let static = set_domain_static_information result static in
@@ -318,55 +325,134 @@ module Domain = struct
 
   let initialize ?patch static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
-    match patch with
-    | Some (static, local, _) ->
-      let error, () =
-        Exception.warn ~message:"Reinitialization is not implemented yet"
-          parameters error __POS__ Exit ()
-      in
-      error, static, { local; global = dynamic }, []
-    | None ->
-      let init_global_static_information =
+    let init_global_static_information =
+      match patch with
+      | None ->
         {
           global_static_information = static;
           domain_static_information = Ckappa_sig.Rule_map_and_set.Map.empty;
           agents_without_interface = Ckappa_sig.Agent_map_and_set.Map.empty;
         }
-      in
-      let kappa_handler = Analyzer_headers.get_kappa_handler static in
-      let nagents =
-        Ckappa_sig.int_of_agent_name
-          (Handler.nagents parameters error kappa_handler)
-        - 1
-      in
-      let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
-      let error, bdu_handler, mvbdu_false =
-        Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
-      in
-      let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
-      let error, init_seen_agents_array =
-        if nagents < 0 then
-          Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create
-            parameters error 0
-        else
-          Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init parameters
-            error nagents (fun _ error _ -> error, mvbdu_false)
-      in
-      let init_global_dynamic_information =
-        {
-          global = dynamic;
-          local =
-            {
-              agents_liveness = init_seen_agents_array;
-              liveness_current_working_set = None;
-            };
-        }
-      in
-      let error, static, dynamic =
-        scan_rule_set init_global_static_information
-          init_global_dynamic_information error
-      in
-      error, static, dynamic, []
+      | Some (static', _, _) ->
+        { static' with global_static_information = static }
+    in
+    (*
+
+         match patch with
+         | None ->
+           let dynamic, (error, init_dead_rule_array) =
+           if nrules = 0 then
+             dynamic,
+             Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create parameters
+               error 0
+           else
+             let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+             let error, bdu_handler, mvbdu_false =
+               Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+             in
+             let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
+             dynamic,
+             Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.init parameters error
+               (nrules - 1) (fun _ error _ -> error, mvbdu_false)
+           in
+           error,
+           {
+             rule_liveness = init_dead_rule_array;
+             liveness_current_working_set = None;
+           },
+           dynamic
+         | Some(_,local,new_elts) when new_elts.Diff.next_rule = Ckappa_sig.rule_id_of_int nrules ->
+           error, local, dynamic
+         | Some(_,local,new_elts) ->
+           let next_rule = Ckappa_sig.int_of_rule_id (new_elts.Diff.next_rule) in
+           let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+           let error, bdu_handler, mvbdu_false =
+             Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+           in
+            let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
+           let error, init_dead_rule_array =
+             Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.expand_and_copy parameters error local.rule_liveness (nrules - 1)
+           in
+           let rec aux (k:int) (error, array) =
+             if k<next_rule then error, array
+             else
+               aux (k-1) (Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set parameters error (Ckappa_sig.rule_id_of_int k) mvbdu_false array)
+           in
+           let error, init_dead_rule_array = aux (nrules-1) (error, init_dead_rule_array) in
+           error, {local with rule_liveness = init_dead_rule_array}, dynamic
+       in
+    *)
+    let kappa_handler = Analyzer_headers.get_kappa_handler static in
+    let nagents = Handler.nagents parameters error kappa_handler in
+    let nagents_int = Ckappa_sig.int_of_agent_name nagents in
+    let error, global, local =
+      match patch with
+      | None ->
+        let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+        let error, bdu_handler, mvbdu_false =
+          Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+        in
+        let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
+        let error, init_seen_agents_array =
+          if nagents_int < 1 then
+            Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create
+              parameters error 0
+          else
+            Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init
+              parameters error (nagents_int - 1) (fun _ error _ ->
+                error, mvbdu_false)
+        in
+        let init_global_dynamic_information =
+          {
+            agents_liveness = init_seen_agents_array;
+            liveness_current_working_set = None;
+          }
+        in
+        error, dynamic, init_global_dynamic_information
+      | Some (_, local, diff_elts) when diff_elts.Diff.next_agent = nagents ->
+        error, dynamic, local
+      | Some (_, local, new_elts) ->
+        let next_agent =
+          Ckappa_sig.int_of_agent_name new_elts.Diff.next_agent
+        in
+        let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+        let error, bdu_handler, mvbdu_false =
+          Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+        in
+        let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
+        let error, init_dead_agent_array =
+          Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.expand_and_copy
+            parameters error local.agents_liveness (nagents_int - 1)
+        in
+        let rec aux (k : int) (error, array) =
+          if k < next_agent then
+            error, array
+          else
+            aux (k - 1)
+              (Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set
+                 parameters error
+                 (Ckappa_sig.agent_name_of_int k)
+                 mvbdu_false array)
+        in
+        let error, agents_liveness =
+          aux (nagents_int - 1) (error, init_dead_agent_array)
+        in
+        error, dynamic, { local with agents_liveness }
+    in
+    let dynamic = { global; local } in
+    let start =
+      match patch with
+      | None -> None
+      | Some (static, _, diff_elts) ->
+        Some
+          ( diff_elts.next_rule,
+            ( get_domain_static_information static,
+              get_agents_without_interface static ) )
+    in
+    let error, static, dynamic =
+      scan_rule_set ?start init_global_static_information dynamic error
+    in
+    error, static, dynamic, []
 
   let complete_wake_up_relation _static error wake_up = error, wake_up
 
