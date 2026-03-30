@@ -82,7 +82,7 @@ module type Analyzer = sig
     * dynamic_information
     * static_information
 
-    val get_bdu_handler: dynamic_information -> Ckappa_sig.Views_bdu.handler 
+  val get_bdu_handler : dynamic_information -> Ckappa_sig.Views_bdu.handler
 end
 
 module Make : functor (Domain : Composite_domain.Composite_domain) -> Analyzer

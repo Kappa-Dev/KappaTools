@@ -82,7 +82,7 @@ module type Analyzer = sig
     * dynamic_information
     * static_information
 
-     val get_bdu_handler: dynamic_information -> Ckappa_sig.Views_bdu.handler 
+  val get_bdu_handler : dynamic_information -> Ckappa_sig.Views_bdu.handler
 end
 
 (***************************************************************************)
@@ -209,75 +209,73 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       add_event parameters error analysis_event None dynamic
     in
     let error, static, dynamic =
-        let rec aux error dynamic =
-          let error, dynamic, next_opt =
-            Domain.next_rule static dynamic error
+      let rec aux error dynamic =
+        let error, dynamic, next_opt = Domain.next_rule static dynamic error in
+        match next_opt with
+        | None -> error, static, dynamic
+        | Some rule_id ->
+          let error =
+            if
+              local_trace
+              || Remanent_parameters.get_dump_reachability_analysis_iteration
+                   parameters
+              || Remanent_parameters.get_trace parameters
+            then (
+              let error, rule_id_string =
+                try Handler.string_of_rule parameters error compil rule_id
+                with _ ->
+                  Exception.warn parameters error __POS__ Exit
+                    (Ckappa_sig.string_of_rule_id rule_id)
+              in
+              let () = Loggers.print_newline log in
+              let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in
+              let () = Loggers.print_newline log in
+              error
+            ) else
+              error
           in
-          match next_opt with
-          | None -> error, static, dynamic
-          | Some rule_id ->
-            let error =
+          let error, dynamic, is_enabled =
+            Domain.is_enabled static dynamic error rule_id
+          in
+          (match is_enabled with
+          | None ->
+            let _ =
               if
                 local_trace
                 || Remanent_parameters.get_dump_reachability_analysis_iteration
                      parameters
                 || Remanent_parameters.get_trace parameters
               then (
-                let error, rule_id_string =
-                  try Handler.string_of_rule parameters error compil rule_id
-                  with _ ->
-                    Exception.warn parameters error __POS__ Exit
-                      (Ckappa_sig.string_of_rule_id rule_id)
+                let () =
+                  Loggers.fprintf log
+                    "\t\tthe precondition is not satisfied yet"
                 in
                 let () = Loggers.print_newline log in
-                let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in
+                ()
+              )
+            in
+            aux error dynamic
+          | Some precondition ->
+            let _ =
+              if
+                local_trace
+                || Remanent_parameters.get_dump_reachability_analysis_iteration
+                     parameters
+                || Remanent_parameters.get_trace parameters
+              then (
+                let () =
+                  Loggers.fprintf log "\t\tthe precondition is satisfied"
+                in
                 let () = Loggers.print_newline log in
-                error
-              ) else
-                error
+                ()
+              )
             in
-            let error, dynamic, is_enabled =
-              Domain.is_enabled static dynamic error rule_id
+            let error, dynamic, () =
+              Domain.apply_rule static dynamic error rule_id precondition
             in
-            (match is_enabled with
-            | None ->
-              let _ =
-                if
-                  local_trace
-                  || Remanent_parameters
-                     .get_dump_reachability_analysis_iteration parameters
-                  || Remanent_parameters.get_trace parameters
-                then (
-                  let () =
-                    Loggers.fprintf log
-                      "\t\tthe precondition is not satisfied yet"
-                  in
-                  let () = Loggers.print_newline log in
-                  ()
-                )
-              in
-              aux error dynamic
-            | Some precondition ->
-              let _ =
-                if
-                  local_trace
-                  || Remanent_parameters
-                     .get_dump_reachability_analysis_iteration parameters
-                  || Remanent_parameters.get_trace parameters
-                then (
-                  let () =
-                    Loggers.fprintf log "\t\tthe precondition is satisfied"
-                  in
-                  let () = Loggers.print_newline log in
-                  ()
-                )
-              in
-              let error, dynamic, () =
-                Domain.apply_rule static dynamic error rule_id precondition
-              in
-              aux error dynamic)
-        in
-        aux error dynamic
+            aux error dynamic)
+      in
+      aux error dynamic
     in
     let error, dynamic, () = Domain.stabilize static dynamic error in
     let error, dynamic =
@@ -354,8 +352,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     in
     error, dynamic, static
 
-  let get_bdu_handler dynamic = 
-    let global = Domain.get_global_dynamic_information dynamic in 
-    Analyzer_headers.get_mvbdu_handler global 
-  end
-
+  let get_bdu_handler dynamic =
+    let global = Domain.get_global_dynamic_information dynamic in
+    Analyzer_headers.get_mvbdu_handler global
+end

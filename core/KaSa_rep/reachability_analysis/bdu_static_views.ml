@@ -933,13 +933,14 @@ let scan_rule_static parameters log_info error handler_bdu
 
 (***************************************************************************)
 
-let scan_rule_set ?start parameters log_info handler_bdu error handler_kappa compiled
-    store_potential_side_effects store_remanent_triple guard_mvbdus
+let scan_rule_set ?start parameters log_info handler_bdu error handler_kappa
+    compiled store_potential_side_effects store_remanent_triple guard_mvbdus
     restriction_bdu init =
   (*let error, init = init_bdu_analysis_static parameters error in*)
   let nsites = Handler.get_nsites handler_kappa in
   let error, (handler_bdu, log_info, store_results) =
-    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters error
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters
+      error
       (fun parameters error rule_id rule (handler_bdu, log_info, store_result) ->
         let error, log_info, handler_bdu, store_result =
           scan_rule_static parameters log_info error handler_bdu rule_id
@@ -952,9 +953,10 @@ let scan_rule_set ?start parameters log_info handler_bdu error handler_kappa com
       (handler_bdu, log_info, init)
   in
   let error, site_to_renamed_site_list =
-    match start with 
-    | None -> collect_site_to_renamed_site_list parameters error store_remanent_triple
-      nsites store_results.site_to_renamed_site_list
+    match start with
+    | None ->
+      collect_site_to_renamed_site_list parameters error store_remanent_triple
+        nsites store_results.site_to_renamed_site_list
     | Some _ -> error, store_results.site_to_renamed_site_list
   in
   ( error,
@@ -978,10 +980,10 @@ let scan_rule_static_pattern parameters
 let scan_rule_set_pattern ?start parameters error
     (*store_new_index_pair_map*)
       store_remanent_triple compiled init =
-   (*let init = init_bdu_analysis_static_pattern in *)  
- 
+  (*let init = init_bdu_analysis_static_pattern in *)
   let error, store_results =
-    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters error
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters
+      error
       (fun parameters error _ rule store_result ->
         let error, store_result =
           scan_rule_static_pattern parameters

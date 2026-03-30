@@ -146,6 +146,5 @@ module type Domain = sig
     Ckappa_sig.c_rule_id ->
     Exception.exceptions_caught_and_uncaught * Ckappa_sig.side_effects option
 
-  val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary 
- 
+  val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
 end

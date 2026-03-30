@@ -167,8 +167,8 @@ module Domain = struct
   let or_mvbdu parameters error dynamic mvbdu mvbdu' bdu_restriction =
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, output =
-      Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error mvbdu
-        mvbdu' bdu_restriction
+      Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error mvbdu mvbdu'
+        bdu_restriction
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, output
@@ -492,15 +492,15 @@ module Domain = struct
     match mvbdu_opt with
     | None -> Exception.warn parameters error __POS__ Exit (dynamic, event_list)
     | Some old_mvbdu ->
-       let restriction_bdu = get_restriction_mvbdu static in
-       let error, dynamic, new_mvbdu =
-            or_mvbdu parameters error dynamic 
-              old_mvbdu bdu_guard restriction_bdu
-          in
-      let b = Ckappa_sig.Views_bdu.equal  old_mvbdu new_mvbdu in 
-      if b || true then error, (dynamic, event_list) 
-        else 
-           let error, local =
+      let restriction_bdu = get_restriction_mvbdu static in
+      let error, dynamic, new_mvbdu =
+        or_mvbdu parameters error dynamic old_mvbdu bdu_guard restriction_bdu
+      in
+      let b = Ckappa_sig.Views_bdu.equal old_mvbdu new_mvbdu in
+      if b || true then
+        error, (dynamic, event_list)
+      else (
+        let error, local =
           Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set parameters
             error agent_type new_mvbdu local
         in
@@ -553,7 +553,7 @@ module Domain = struct
             event_list rule_id_list
         in
         error, (dynamic, event_list)
-      
+      )
 
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare

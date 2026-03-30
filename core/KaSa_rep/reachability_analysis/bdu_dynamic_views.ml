@@ -164,9 +164,9 @@ let store_covering_classes_modification_side_effects parameters error
 let store_update ?start parameters log_info error store_test_modification_map
     store_potential_side_effects store_covering_classes_id covering_classes
     store_result =
-    let _ = start in 
-    (* Do not know how to do it incrementally *)
-    (* Recompute it instead, for the moment *) 
+  let _ = start in
+  (* Do not know how to do it incrementally *)
+  (* Recompute it instead, for the moment *)
   let error, log_info =
     StoryProfiling.StoryStats.add_event parameters error
       StoryProfiling.Regular_influences None log_info
@@ -239,9 +239,9 @@ let store_update ?start parameters log_info error store_test_modification_map
   (lhs)*)
 
 let collect_dual_map ?start parameters error kappa_handler store_result =
-  let _ = start in 
-   (* Do not know how to do it incrementally *)
-    (* Recompute it instead, for the moment *) 
+  let _ = start in
+  (* Do not know how to do it incrementally *)
+  (* Recompute it instead, for the moment *)
   let error, store_result =
     Ckappa_sig
     .Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
@@ -318,9 +318,9 @@ let init_bdu_analysis_dynamic =
 (**************************************************************************)
 (*rules*)
 
-let scan_rule_set_dynamic ?start parameters log_info error compiled kappa_handler
-    handler_bdu store_test_modif_map covering_classes store_covering_classes_id
-    store_potential_side_effects =
+let scan_rule_set_dynamic ?start parameters log_info error compiled
+    kappa_handler handler_bdu store_test_modif_map covering_classes
+    store_covering_classes_id store_potential_side_effects =
   let error, handler_bdu, log_info, store_result =
     scan_rule_dynamic ?start parameters log_info error compiled kappa_handler
       handler_bdu covering_classes store_covering_classes_id

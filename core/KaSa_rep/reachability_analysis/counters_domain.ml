@@ -147,8 +147,8 @@ functor
     (*rule*)
     (*****************************************************************)
 
-    let compute_local_static_information ?patch global_static_information _dynamic
-        error =
+    let compute_local_static_information ?patch global_static_information
+        _dynamic error =
       let parameters =
         Analyzer_headers.get_parameter global_static_information
       in
@@ -157,8 +157,8 @@ functor
         Analyzer_headers.get_kappa_handler global_static_information
       in
       let error, local_static_information =
-        Counters_domain_static.compute_static ?patch parameters error kappa_handler
-          compil
+        Counters_domain_static.compute_static ?patch parameters error
+          kappa_handler compil
       in
       let static = { global_static_information; local_static_information } in
       error, static
@@ -169,20 +169,23 @@ functor
 
     let initialize ?patch static dynamic error =
       let parameters = Analyzer_headers.get_parameter static in
-      let (error, local), patch_static = 
-        match patch with 
-        | None ->  
-          let error, store_value = 
-          Ckappa_sig
-          .Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
-          .create parameters error (0, 0) in 
-          (error, { dummy = (); store_value }), None 
-        | Some (a,local,b) -> (error, local), Some (a.local_static_information,(b:Diff.new_indexs)) 
-      in 
-      let dynamic = {global = dynamic ; local} in 
-      let patch = patch_static in 
+      let (error, local), patch_static =
+        match patch with
+        | None ->
+          let error, store_value =
+            Ckappa_sig
+            .Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+            .create parameters error (0, 0)
+          in
+          (error, { dummy = (); store_value }), None
+        | Some (a, local, b) ->
+          ( (error, local),
+            Some (a.local_static_information, (b : Diff.new_indexs)) )
+      in
+      let dynamic = { global = dynamic; local } in
+      let patch = patch_static in
       let error, static =
-          compute_local_static_information ?patch static dynamic error
+        compute_local_static_information ?patch static dynamic error
       in
       error, static, dynamic, []
 
