@@ -492,31 +492,12 @@ module Domain = struct
     match mvbdu_opt with
     | None -> Exception.warn parameters error __POS__ Exit (dynamic, event_list)
     | Some old_mvbdu ->
-     (* let restriction_bdu = get_restriction_mvbdu static in*)
-     (* let error, dynamic, is_true =
-        is_true_mvbdu parameters error dynamic old_mvbdu restriction_bdu
-      in*)
-     (* if is_true then
-        error, (dynamic, event_list)
-      else *) 
        let restriction_bdu = get_restriction_mvbdu static in
        let error, dynamic, new_mvbdu =
             or_mvbdu parameters error dynamic 
               old_mvbdu bdu_guard restriction_bdu
           in
       let b = Ckappa_sig.Views_bdu.equal  old_mvbdu new_mvbdu in 
-      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "MVBDU has changed in Agent Domain" in 
-        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Previous value" in  
-        let () = Ckappa_sig.Views_bdu.print parameters old_mvbdu in 
-        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "UPDATE" in  
-        let () = Ckappa_sig.Views_bdu.print parameters bdu_guard in 
-        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "PARAMETERS RANGE" in  
-        let () = Ckappa_sig.Views_bdu.print parameters restriction_bdu in 
-        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "RESULT" in  
-
-        let () = Ckappa_sig.Views_bdu.print parameters new_mvbdu in 
-        let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)  in 
-    
       if b || true then error, (dynamic, event_list) 
         else 
            let error, local =
