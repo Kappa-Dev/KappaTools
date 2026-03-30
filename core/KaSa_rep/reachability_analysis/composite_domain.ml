@@ -367,48 +367,12 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
           (fun (check_rules, modified_sites, bonds, others) event ->
             match event with
             | Communication.Check_rule r_id ->
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameter)
-                  "Check rule %i"
-                  (Ckappa_sig.int_of_rule_id r_id)
-              in
-              let () =
-                Loggers.print_newline (Remanent_parameters.get_logger parameter)
-              in
-              r_id :: check_rules, modified_sites, bonds, others
+               r_id :: check_rules, modified_sites, bonds, others
             | Communication.Modified_sites site ->
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameter)
-                  "Check modified site "
-              in
-              let () =
-                Loggers.print_newline (Remanent_parameters.get_logger parameter)
-              in
-
               check_rules, site :: modified_sites, bonds, others
             | Communication.See_a_new_bond bond ->
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameter)
-                  "Check modified bond "
-              in
-              let () =
-                Loggers.print_newline (Remanent_parameters.get_logger parameter)
-              in
-
               check_rules, modified_sites, bond :: bonds, event :: others
             | Communication.Dummy ->
-              let () =
-                Loggers.fprintf
-                  (Remanent_parameters.get_logger parameter)
-                  "Chek dummy"
-              in
-              let () =
-                Loggers.print_newline (Remanent_parameters.get_logger parameter)
-              in
-
               check_rules, modified_sites, bonds, event :: others)
           ([], [], [], []) event_list
       in

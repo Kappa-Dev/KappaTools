@@ -497,7 +497,7 @@ module Domain = struct
         or_mvbdu parameters error dynamic old_mvbdu bdu_guard restriction_bdu
       in
       let b = Ckappa_sig.Views_bdu.equal old_mvbdu new_mvbdu in
-      if b || true then
+      if b then
         error, (dynamic, event_list)
       else (
         let error, local =
