@@ -169,24 +169,46 @@ let add_checkbox_to_working_set_elements rules codemirror =
            ]
          [ rule_checkbox rule_id enabled ])
   in
-  List.iter
-    (fun rule ->
-      let range = rule.Public_data.rule_ws_position in
-      match React.S.value State_file.current_filename with
-      | Some file_id ->
-        if range.Loc.file = file_id then
-          Codemirror.setGutterMarker
-            ~line:(range.Loc.from_position.Loc.line - 1)
-            ~cm:codemirror
-            ~dom:
-              (build_checkbox
-                 (string_of_int rule.Public_data.rule_ws_id)
-                 rule.Public_data.rule_ws_enabled)
-            ~gutter_id:working_set_gutter
-        else
-          ()
-      | None -> ())
-    rules
+  let build_warning position =
+    State_error.add_error __LOC__
+      [
+        {
+          Result_util.severity = Logs.Warning;
+          Result_util.range = Some position;
+          Result_util.text =
+            "Disabling/enabling does not work when there are multiple rules on \
+             one line.";
+        };
+      ]
+  in
+  let _ =
+    List.fold_left
+      (fun visited_lines rule ->
+        let range = rule.Public_data.rule_ws_position in
+        match React.S.value State_file.current_filename with
+        | Some file_id ->
+          if range.Loc.file = file_id then (
+            let line = range.Loc.from_position.Loc.line - 1 in
+            if List.mem line visited_lines then (
+              let () = build_warning range in
+              visited_lines
+            ) else (
+              let () =
+                Codemirror.setGutterMarker ~line ~cm:codemirror
+                  ~dom:
+                    (build_checkbox
+                       (string_of_int rule.Public_data.rule_ws_id)
+                       rule.Public_data.rule_ws_enabled)
+                  ~gutter_id:working_set_gutter
+              in
+              line :: visited_lines
+            )
+          ) else
+            visited_lines
+        | None -> visited_lines)
+      [] rules
+  in
+  ()
 
 let codemirror_ref : codemirror Js.t option ref = ref None
 
