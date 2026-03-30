@@ -62,11 +62,12 @@ let parse_input s =
   (* ---- ADD ---- *)
   if String.starts_with ~prefix:"add" s then (
     let s = String.trim (String.sub s 3 (String.length s - 3)) in
-    Add s (* ---- ENABLE ---- *)
-  ) else if String.starts_with ~prefix:"enable" s then (
+    Add s
+  ) else if (* ---- ENABLE ---- *) String.starts_with ~prefix:"enable" s then (
     let s = String.trim (String.sub s 6 (String.length s - 6)) in
-    parse_enable_label s true (* ---- DISABLE ---- *)
-  ) else if String.starts_with ~prefix:"disable" s then (
+    parse_enable_label s true
+  ) else if (* ---- DISABLE ---- *)
+            String.starts_with ~prefix:"disable" s then (
     let s = String.trim (String.sub s 7 (String.length s - 7)) in
     parse_enable_label s false
   ) else
@@ -105,11 +106,12 @@ let main () =
     in
     let error = Export_to_KaSa.get_errors state in
     let () = Exception.print parameters error in
-    KaSaUtil.print_efficiency parameters state start_time
+    let () = KaSaUtil.print_efficiency parameters state start_time in
+    state
   in
-  let () = print_result parameters state false initial_start_time in
+  let state = print_result parameters state false initial_start_time in
+  let log = Remanent_parameters.get_logger parameters in
   let rec loop state =
-    let log = Remanent_parameters.get_logger parameters in
     Loggers.fprintf log "> ";
     Loggers.flush_logger log;
     let state =
@@ -138,7 +140,7 @@ let main () =
         loop state
       | "print result" | "p result" | "p" ->
         let start_time = Sys.time () in
-        let () = print_result parameters state true start_time in
+        let state = print_result parameters state true start_time in
         loop state
       | input
         when String.length input > 12 && String.sub input 0 12 = "update file "
@@ -167,7 +169,7 @@ let main () =
             in
             Export_to_KaSa.set_errors error state
         in
-        let () = print_result parameters state false start_time in
+        let state = print_result parameters state false start_time in
         loop state
       | input ->
         let start_time = Sys.time () in
@@ -208,12 +210,13 @@ let main () =
             in
             false, Export_to_KaSa.set_errors error state
         in
-        let () =
+        let state =
           if success then
-            print_result parameters state false start_time
+            print_result parameters state true start_time
           else (
             let error = Export_to_KaSa.get_errors state in
-            Exception.print parameters error
+            let () = Exception.print parameters error in
+            state
           )
         in
         loop state
