@@ -489,12 +489,12 @@ module Domain = struct
   (*RULES*)
   (****************************************************************)
 
-  let scan_rules static dynamic error =
+  let scan_rules ?start static dynamic error =
     let parameters = get_parameter static in
     let compil = get_compil static in
     let kappa_handler = get_kappa_handler static in
     let error, static =
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters error
         (fun parameters error rule_id rule static ->
           let error, static =
             scan_rule parameters error kappa_handler rule_id
@@ -503,6 +503,13 @@ module Domain = struct
           error, static)
         compil.Cckappa_sig.rules static
     in
+       match start with 
+    | Some _ -> 
+      (* We do not allow to add new covering classes, during incremental analysis.  *)
+      (* We leave it as future works. *)
+      (* This is sound, but it may lead less precise analysis result. *)
+      error, static, dynamic 
+    | None -> 
     (*------------------------------------------------------------*)
     (*partition map with key is the pair of the bonds in the rhs*)
     let store_potential_tuple_pair = get_potential_tuple_pair static in
@@ -637,33 +644,24 @@ module Domain = struct
 
   let initialize ?patch static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
-    match patch with
-    | Some (static, local, _) ->
-      let error, () =
-        Exception.warn ~message:"Reinitialization is not implemented yet"
-          parameters error __POS__ Exit ()
-      in
-      error, static, { local; global = dynamic }, []
-    | None ->
-      let log_info = Analyzer_headers.get_log_info dynamic in
-      let error, log_info =
+    let log_info = Analyzer_headers.get_log_info dynamic in
+    let error, log_info =
         StoryProfiling.StoryStats.add_event parameters error
           (StoryProfiling.Domain_initialization domain_name) None log_info
-      in
-      let dynamic = Analyzer_headers.set_log_info log_info dynamic in
-      let init_local_static_information =
+    in
+    let dynamic = Analyzer_headers.set_log_info log_info dynamic in 
+    let init_local_static_information, init_local_dynamic_information, start = 
+      match patch with
+    | Some (static, local, diff_elt) ->
+          static.local_static_information, local, Some (diff_elt.Diff.next_rule)
+    | None ->
+        let init_local_static_information =
         {
           store_basic_static_information =
             Site_across_bonds_domain_static.init_basic_static_information;
         }
       in
-      let init_global_static_information =
-        {
-          global_static_information = static;
-          local_static_information = init_local_static_information;
-        }
-      in
-      let init_local_dynamic_information =
+       let init_local_dynamic_information =
         {
           store_value =
             Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map
@@ -671,19 +669,27 @@ module Domain = struct
           store_value_current_working_set = None;
         }
       in
-      let init_global_dynamic_information =
+    init_local_static_information, init_local_dynamic_information, None 
+    in 
+    let init_global_static_information =
+        {
+          global_static_information = static;
+          local_static_information = init_local_static_information;
+        }
+    in
+    let init_global_dynamic_information =
         { global = dynamic; local = init_local_dynamic_information }
-      in
-      let error, static, dynamic =
-        scan_rules init_global_static_information
+    in
+    let error, static, dynamic =
+        scan_rules ?start init_global_static_information
           init_global_dynamic_information error
-      in
-      let log_info = get_log_info dynamic in
-      let error, log_info =
+    in
+    let log_info = get_log_info dynamic in
+    let error, log_info =
         StoryProfiling.StoryStats.close_event parameters error
           (StoryProfiling.Domain_initialization domain_name) None log_info
-      in
-      let dynamic = set_log_info log_info dynamic in
+    in
+    let dynamic = set_log_info log_info dynamic in
       error, static, dynamic, []
 
   (***************************************************************************)

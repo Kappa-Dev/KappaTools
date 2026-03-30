@@ -515,8 +515,8 @@ module Domain = struct
   let initialize ?patch static dynamic error =
     let error, init_global_static_information, init_global_dynamic_information, start = 
       match patch with
-    | Some (static, local, new_elts) -> 
-      error, static, { local; global = dynamic }, Some new_elts.Diff.next_rule 
+    | Some (static', local, new_elts) -> 
+      error, { static' with global_static_information = static }, { local; global = dynamic }, Some new_elts.Diff.next_rule 
     | None ->
       let error, dynamic, restriction_bdu =
         init_restriction_bdu static dynamic error
