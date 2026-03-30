@@ -68,30 +68,28 @@ def main(inp_path, out_path):
             if model not in model_nr_rules:
                 model_nr_rules[model] = nr_rules
 
-    total_step_count = 3
+    total_step_count = 4
     col_spec = "l c " + " ".join(["c"] * total_step_count)
 
     # Build LaTeX
     lines = []
-    lines.append(r"\documentclass{article}")
-    lines.append(r"\usepackage{booktabs}")
-    lines.append(r"\usepackage[margin=1in,landscape]{geometry}")
-    lines.append(r"\begin{document}")
-    lines.append(r"\begin{table}[ht]")
     lines.append(r"\centering")
     lines.append(r"\small")
     lines.append(r"\begin{tabular}{" + col_spec + "}")
     lines.append(r"\toprule")
-
-    # header row
-    lines.append(r"\textbf{Model} & \textbf{Nr. of rules} & \bfseries\shortstack{initial\\analysis} &  \bfseries\shortstack{add\\rules} & \bfseries\shortstack{disable\\rules}\\")
+    # First header row
+    lines.append(r"\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{1}{c}{\textbf{non-incremental}} & \multicolumn{3}{c}{\textbf{incremental}} \\")
+    lines.append(r"\cmidrule(lr){3-3}")
+    lines.append(r"\cmidrule(lr){4-6}")
+    # Second header row
+    lines.append(r"& & \bfseries\shortstack{analysis} & \bfseries\shortstack{initial\\analysis} & \bfseries\shortstack{disable\\rules} & \bfseries\shortstack{add\\a rule}\\")
     lines.append(r"\midrule")
 
-    for model in data.keys():
+    for model in sorted(data.keys(), key=lambda k: model_nr_rules.get(k, "")):# sort by number of rules in the model
         row_elems = []
         row_elems.append(r"\texttt{" + latex_escape(model) + "}")
         row_elems.append(latex_escape(model_nr_rules.get(model, "")))
-        analysis_items = [("1_full",["1_init"]), ("2_incremental",["1_init"]), ("3_decremental",["4_disable"])]
+        analysis_items = [("1_full",["1_init"]), ("2_decremental",["1_init", "4_disable"]), ("3_incremental",["1_init"])]
         for a, steps in analysis_items:
             for s in steps:
                 val = data[model].get(a, {}).get(s, "")
@@ -102,9 +100,6 @@ def main(inp_path, out_path):
         lines.append(" & ".join(row_elems) + r" \\")
     lines.append(r"\bottomrule")
     lines.append(r"\end{tabular}")
-    lines.append(r"\caption{Timing table}")
-    lines.append(r"\end{table}")
-    lines.append(r"\end{document}")
 
     # write output
     with open(out_path, "w") as outf:

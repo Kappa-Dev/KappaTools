@@ -1,5 +1,12 @@
 #!/bin/bash
 
+## BENCHMARKS for the incremental implementation of KaSa, for the Tool paper at CMSB2026
+
+# It analyzer 6 large Kappa models with the incremental analysis, with 0,10,20... rules in the working set.
+# Then it outputs a table with the runtime of the analysis for each model depending on the size of the working set.
+
+# The output is in output/experiments_output_compare_ws.tex
+
 DEBUG=false
 INSTALL_DEPS=false
 
@@ -22,7 +29,7 @@ Options:
   -t <timeout>   Set timeout value (default: $TIMEOUT)
   -r <int>       Set how many reps to do for each experiment (default: $REPS)
   -i             Install dependencies before building and running
-  -d             Set DEBUG to true
+  -d             Set DEBUG to true (it runs the analysis with less reps, smaller models and more verbose output)
   -h             Show this help message and exit
 EOF
 }
@@ -137,12 +144,17 @@ echo "Analyzing models: $AVAILABLE_MODELS"
 GLOBAL_OUTPUT_FILE="${OUTPUT_DIR}experiments_output.csv"
 echo "analysis_type,step_name,substep_name,rep,nr_removed_rules,time" > "$GLOBAL_OUTPUT_FILE"
 
+store_runtime_from_profiling () {
+    # take the line we are interested in from profiling.html and copy the runtime to the output file in a csv format
+    grep --text "End</TD><TD>$1" "$PROFILING_FILE" | tail -1 | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$2,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+}
+
 # Analyze each model
 for MODEL in "${MODELS[@]}"; do
     EXAMPLE_MODEL=${!MODEL}
     var_tmp="${MODEL}_nr_rules"
     value_tmp=${!var_tmp}
-    NR_RULES_MODEL=$(($value_tmp-1))
+    NR_RULES_MODEL=$((value_tmp-1))
 
     # Analyze the model for each size of working set
     for ((NR_RULES=MIN_NR_RULES; NR_RULES <= MAX_NR_RULES; NR_RULES=NR_RULES+STEP)) do
@@ -206,22 +218,15 @@ for MODEL in "${MODELS[@]}"; do
                 break
             fi
 
-            grep "End</TD><TD>Global initialization" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$MODEL,1_initialization,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-            grep "End</TD><TD>Initial states computation" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$MODEL,2_initial_state,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-
-            grep -m 1 "End</TD><TD>Compute fixpoint of reachability analysis" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$MODEL,$MODEL,3_fixpoint,$i,$NR_RULES,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
-
+            store_runtime_from_profiling "Global initialization" "$MODEL,$MODEL,1_initialization,$i,$NR_RULES"
+            store_runtime_from_profiling "Initial states computation" "$MODEL,$MODEL,2_initial_state,$i,$NR_RULES"
+            store_runtime_from_profiling "Compute fixpoint of reachability analysis" "$MODEL,$MODEL,3_fixpoint,$i,$NR_RULES"
         done
 
         rm "$INPUT_INCREMENTAL_TMP"
 
         echo "✅ Completed: $MODEL with $NR_RULES rules in the working set."
         echo "The results of the incremental analysis can be found in: $STDOUT_OUTPUT_FILE_INCREMENTAL"
-
-        # Check for exceptions in STDOUT_OUTPUT_FILE
-        if grep -qi "exception:" "$STDOUT_OUTPUT_FILE_INCREMENTAL"; then
-            echo "🚨 Exception raised during analysis of $MODEL with $NR_RULES rules in the working set."
-        fi 
     done
 done
 
@@ -235,7 +240,7 @@ echo "📝 The mean of all runtimes can be found in: $OUTPUT_MEAN_RUNTIMES"
 OUTPUT_LATEX_RUNTIMES="${OUTPUT_DIR}experiments_output_compare_ws.tex"
 
 cmd=(python3 
-    "${SCRIPT_DIR}/../../../examples/benchmarks/incremental-KaSa/latex_table_compare_ws.py" 
+    "${SCRIPT_DIR}/latex_table_compare_ws.py" 
     "$OUTPUT_MEAN_RUNTIMES" "$OUTPUT_LATEX_RUNTIMES"
     )
         printf '%q ' "${cmd[@]}"

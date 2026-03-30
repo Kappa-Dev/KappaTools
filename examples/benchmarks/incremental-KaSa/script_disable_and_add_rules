@@ -1,5 +1,15 @@
 #!/bin/bash
 
+## BENCHMARKS for the incremental implementation of KaSa, for the Tool paper at CMSB2026
+
+# It analyzer 6 large Kappa models in 4 different ways:
+# 1) non-incremental analysis
+# 2) incremental analysis with 10 random rules in the working set
+# 3) given the incremetal analysis with 10 rules in the working set, it disables some of the rules
+# 4) I re-do the incremental analysis with 10 rules in the working set and one random rule removed. This one rule is added with "update file" to find out how much time it takes to add rules.
+
+# The output is in output/experiments_output.tex
+
 DEBUG=false
 INSTALL_DEPS=false
 
@@ -27,7 +37,7 @@ Options:
   -r <int>       Set how many reps to do for each experiment (default: $REPS)
   -s <int>       Set how many rules to remove in each experiment (default: $NR_RULES)
   -i             Install dependencies before building and running
-  -d             Set DEBUG to true
+  -d             Set DEBUG to true (it runs the analysis with less reps, smaller models and more verbose output)
   -h             Show this help message and exit
 EOF
 }
@@ -108,7 +118,7 @@ OUTPUT_DIR="${SCRIPT_DIR}/output/"
 PROFILING_FILE="${KAPPA_OUTPUT_DIR}profiling.html"
 
 if $DEBUG ; then
-    MODELS=("egfr_net")
+    MODELS=("egfr_net" "tgf_v19")
 fi
 
 AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
@@ -138,7 +148,7 @@ echo "model,nr_rules,analysis_type,step_name,substep_name,rep,nr_removed_rules,t
 
 store_runtime_from_profiling () {
     # take the line we are interested in from profiling.html and copy the runtime to the output file in a csv format
-    grep --text "End</TD><TD>$1" "$PROFILING_FILE" | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$2,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
+    grep --text "End</TD><TD>$1" "$PROFILING_FILE" | tail -1 | sed -e "s/[^0-9.-]//g" -e "s/[0-9.-]*/$2,&/g" -e 's/-/e-/g' >> "${GLOBAL_OUTPUT_FILE}"
 }
 
 # Analyze each model
@@ -151,7 +161,7 @@ for MODEL in "${MODELS[@]}"; do
     echo
     echo "Processing model: $MODEL ($value_tmp rules)"
 
-    # output files
+    # define output files (for the stdout output of the analysis)
     OUTPUT_FILE="${OUTPUT_DIR}${MODEL}_experiments_output"
     STDOUT_OUTPUT_FILE_FULL="${OUTPUT_FILE}_full.txt"
     STDOUT_OUTPUT_FILE_DECREMENTAL="${OUTPUT_FILE}_decremental.txt"
@@ -170,40 +180,29 @@ for MODEL in "${MODELS[@]}"; do
 
     for (( i=1; i<=REPS; i++ )) # take the mean runtime of multiple repetitions
     do
+        # NON-INCREMENTAL ANALYSIS
 
-        # choose 10 random rules to be added to the working set
-        random_rules=$(shuf -i 0-$NR_RULES_MODEL -n "$NR_RULES" | paste -sd,)
-
-        if $DEBUG; then 
-            echo "Random list of rules that are in the working set: $random_rules"
-        fi
-
-        # INITIAL INCREMENTAL ANALYSIS with the 10 rules removed and empty working set
         if $DEBUG; then
             echo "⌛ Starting non-incremental analysis:"
         fi
 
-        # interactive input for the incremental analysis
-        echo "q" > "$INPUT_INCREMENTAL_TMP"
-
         cmd=(
             timeout "$TIMEOUT"
-            "$KASA_INC_BINARY"
+            "$KASA_BINARY"
             "$EXAMPLE_MODEL"
             -syntax "$SYNTAX"
             $OPTIONS
-            --remove-rules "$random_rules"
+
             )
-        # print command
-        if $DEBUG; then 
-            printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
+        if $DEBUG; then
+            printf '%q ' "${cmd[@]}"
             printf '\n'
         fi
-        # execute analysis
-        { cat "$INPUT_INCREMENTAL_TMP" | ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_FULL"
+        { ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_FULL"
         EXIT_STATUS=$?
 
         # copy runtimes from output/profiling.html to the csv output file
+
         store_runtime_from_profiling "Global initialization" "$MODEL,$NR_RULES_MODEL,1_full,1_init,1_initialization,$i,$NR_RULES"
         store_runtime_from_profiling "Initial states computation" "$MODEL,$NR_RULES_MODEL,1_full,1_init,2_initial_state,$i,$NR_RULES"
         store_runtime_from_profiling "Compute fixpoint of reachability analysis" "$MODEL,$NR_RULES_MODEL,1_full,1_init,3_fixpoint,$i,$NR_RULES"
@@ -215,50 +214,20 @@ for MODEL in "${MODELS[@]}"; do
             break
         fi
 
-        # INCREMENTAL ADDING OF RULES
-
-        if $DEBUG; then
-            echo "➕ Starting incremental analysis:"
-        fi
-
-        # we take the model with 10 rules removed and then compute the time it takes to add them
-        echo "update file $EXAMPLE_MODEL" > "$INPUT_INCREMENTAL_TMP"
-        echo "q" >> "$INPUT_INCREMENTAL_TMP"
-
-        if $DEBUG; then
-            echo "INCREMENTAL COMMANDS:"
-            cat "$INPUT_INCREMENTAL_TMP"
-        fi
-
-        cmd=(
-        timeout "$TIMEOUT"
-        "$KASA_INC_BINARY"
-        "$EXAMPLE_MODEL"
-        -syntax "$SYNTAX"
-        $OPTIONS
-        --remove-rules "$random_rules"
-        )
-        if $DEBUG; then
-            printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
-            printf '\n'
-        fi
-        { cat "$INPUT_INCREMENTAL_TMP" | ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_INCREMENTAL"
-        EXIT_STATUS=$?
-
-        # Check if the program was killed by timeout
-        if [ $EXIT_STATUS -eq 124 ]; then
-            echo "⚠️ Timeout or memory overflow occurred for $MODEL in the incremental analysis."
-            break
-        fi
-
-        # copy runtimes from output/profiling.html to the csv output file
-        store_runtime_from_profiling "Update global initialization" "$MODEL,$NR_RULES_MODEL,2_incremental,1_init,1_initialization,$i,$NR_RULES"
-        store_runtime_from_profiling "Add new initial states computation" "$MODEL,$NR_RULES_MODEL,2_incremental,1_init,2_initial_state,$i,$NR_RULES"
-        store_runtime_from_profiling "Restart fixpoint computation for the reachability analysis" "$MODEL,$NR_RULES_MODEL,2_incremental,1_init,3_fixpoint,$i,$NR_RULES"
-        store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,2_incremental,1_init,5_print,$i,$NR_RULES"
-
-        # DECREMENTAL ANALYSIS
         
+        # DECREMENTAL ANALYSIS
+
+        if $DEBUG; then
+            echo "➖ Starting decremental analysis:"
+        fi
+        
+        # choose 10 random rules to be added to the working set
+        random_rules=$(shuf -i 0-$NR_RULES_MODEL -n "$NR_RULES" | paste -sd,)
+
+        if $DEBUG; then 
+            echo "Random list of rules that are in the working set: $random_rules"
+        fi
+
         # choose a random valuation (true or false) for each of the rules in the working set
         false_indices=()
         for ((n=0; n<NR_RULES; n++)); do
@@ -272,10 +241,6 @@ for MODEL in "${MODELS[@]}"; do
 
         if $DEBUG; then
             echo "Random list of working set indices that will be disabled: $disabled_rules"
-        fi
-
-        if $DEBUG; then
-            echo "➖ Starting decremental analysis:"
         fi
 
         echo "disable $disabled_rules" > "$INPUT_INCREMENTAL_TMP"
@@ -308,8 +273,63 @@ for MODEL in "${MODELS[@]}"; do
         fi
 
         # copy runtimes from output/profiling.html to the csv output file
-        store_runtime_from_profiling "Enable or disable a rule" "$MODEL,$NR_RULES_MODEL,3_decremental,4_disable,4_disable,$i,$NR_RULES"
-        store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,3_decremental,4_disable,5_print,$i,$NR_RULES"
+        # initial analysis
+        store_runtime_from_profiling "Global initialization" "$MODEL,$NR_RULES_MODEL,2_decremental,1_init,1_initialization,$i,$NR_RULES"
+        store_runtime_from_profiling "Initial states computation" "$MODEL,$NR_RULES_MODEL,2_decremental,1_init,2_initial_state,$i,$NR_RULES"
+        store_runtime_from_profiling "Compute fixpoint of reachability analysis" "$MODEL,$NR_RULES_MODEL,2_decremental,1_init,3_fixpoint,$i,$NR_RULES"
+        # projection to the chosen valuation (and printing)
+        store_runtime_from_profiling "Enable or disable a rule" "$MODEL,$NR_RULES_MODEL,2_decremental,4_disable,4_disable,$i,$NR_RULES"
+        store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,2_decremental,4_disable,5_print,$i,$NR_RULES" 
+
+        # INCREMENTAL ADDING OFcode RULES
+        # I redo the analysis instead of just adding the rules to he previous instance of the analysis, because the "update file" resets the profiling.html
+
+        if $DEBUG; then
+            echo "➕ Starting incremental analysis:"
+        fi
+
+        # we take the model with 1 rule removed and then compute the time it takes to add it
+        echo "update file $EXAMPLE_MODEL" > "$INPUT_INCREMENTAL_TMP"
+        echo "q" >> "$INPUT_INCREMENTAL_TMP"
+
+        # choose the last element of the working set and remove it from the model
+        last_element=${random_rules##*,}
+
+        if $DEBUG; then
+            echo "Removed rule:"
+            echo "$last_element"
+            echo "INCREMENTAL COMMANDS:"
+            cat "$INPUT_INCREMENTAL_TMP"
+        fi
+
+        cmd=(
+        timeout "$TIMEOUT"
+        "$KASA_INC_BINARY"
+        "$EXAMPLE_MODEL"
+        -syntax "$SYNTAX"
+        $OPTIONS
+        --rules-in-working-set "$random_rules"
+        --remove-rules "$last_element"
+        )
+        if $DEBUG; then
+            printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
+            printf '\n'
+        fi
+        { cat "$INPUT_INCREMENTAL_TMP" | ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_INCREMENTAL"
+        EXIT_STATUS=$?
+
+        # Check if the program was killed by timeout
+        if [ $EXIT_STATUS -eq 124 ]; then
+            echo "⚠️ Timeout or memory overflow occurred for $MODEL in the incremental analysis."
+            break
+        fi
+
+        # copy runtimes from output/profiling.html to the csv output file
+        store_runtime_from_profiling "Update global initialization" "$MODEL,$NR_RULES_MODEL,3_incremental,1_init,1_initialization,$i,$NR_RULES"
+        store_runtime_from_profiling "Add new initial states computation" "$MODEL,$NR_RULES_MODEL,3_incremental,1_init,2_initial_state,$i,$NR_RULES"
+        store_runtime_from_profiling "Restart fixpoint computation for the reachability analysis" "$MODEL,$NR_RULES_MODEL,3_incremental,1_init,3_fixpoint,$i,$NR_RULES"
+        store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,3_incremental,1_init,5_print,$i,$NR_RULES"
+
     done
 
     rm "$INPUT_INCREMENTAL_TMP"
@@ -333,8 +353,8 @@ OUTPUT_LATEX_RUNTIMES="${OUTPUT_DIR}experiments_output.tex"
 # draw a latex table with the runtimes
 
 cmd=(python3 
-    "${SCRIPT_DIR}/../../../examples/benchmarks/incremental-KaSa/latex_table_of_runtimes.py" 
-    $OUTPUT_MEAN_RUNTIMES $OUTPUT_LATEX_RUNTIMES
+    "${SCRIPT_DIR}/latex_table_of_runtimes.py" 
+    "$OUTPUT_MEAN_RUNTIMES" "$OUTPUT_LATEX_RUNTIMES"
     )
 printf '%q ' "${cmd[@]}"
 printf '\n'

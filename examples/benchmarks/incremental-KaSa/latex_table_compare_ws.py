@@ -4,9 +4,9 @@ latex_table_compare_ws.py
 Usage:
     python3 latex_table_compare_ws.py input.csv output.tex
 
-Assumptions about CSV columns (no header):
-    0: analysis_type (like "1_full")
-    1: step_name     (like "1_init")
+Assumptions about CSV columns: analysis_type,step_name,nr_removed_rules,time
+    0: model_name (like "tgf_v19")
+    1: model_name_again (like "tgf_v19")
     2: nr_removed_rules  (int)
     3: time (float)
 
@@ -14,7 +14,7 @@ The script writes a LaTeX table that summarizes the benchmark results.
 """
 import sys
 import csv
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 def latex_escape(s: str) -> str:
     # minimal escaping for LaTeX special chars
@@ -42,7 +42,7 @@ def format_time(t):
     return "{:.4g}".format(f)
 
 def main(inp_path, out_path):
-    # data[nr_removed_rules][step_name] = time
+    # data[nr_removed_rules][model_name] = time
     data = defaultdict(lambda: defaultdict(dict))
     with open(inp_path, newline='') as f:
         reader = csv.reader(f)
@@ -65,22 +65,15 @@ def main(inp_path, out_path):
 
     # Build LaTeX
     lines = []
-    lines.append(r"\documentclass{article}")
-    lines.append(r"\usepackage{booktabs}")
-    lines.append(r"\usepackage[margin=1in,landscape]{geometry}")
-    lines.append(r"\begin{document}")
-    lines.append(r"\begin{table}[ht]")
     lines.append(r"\centering")
     lines.append(r"\small")
     lines.append(r"\begin{tabular}{" + col_spec + "}")
     lines.append(r"\toprule")
-    # First header row
     header = r"\bfseries\shortstack{Nr. of rules\\in working set} "
     for step in all_steps:
         header += r"& \texttt{" + latex_escape(step) + "} "
     header += r"\\"
     lines.append(header)
-    # Second header row
     lines.append(r"\midrule")
 
     for test_instance in sorted(data.keys()):
@@ -96,9 +89,6 @@ def main(inp_path, out_path):
         lines.append(" & ".join(row_elems) + r" \\")
     lines.append(r"\bottomrule")
     lines.append(r"\end{tabular}")
-    lines.append(r"\caption{Timing table}")
-    lines.append(r"\end{table}")
-    lines.append(r"\end{document}")
 
     # write output
     with open(out_path, "w") as outf:
