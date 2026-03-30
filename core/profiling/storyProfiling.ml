@@ -385,8 +385,8 @@ module StoryStats : StoryStats = struct
           if next_depth = 1 then
             Exception.warn parameter error __POS__
               ~message:
-                "Inconsistent profiling information, depth should not be equal \
-                 to 1 when closing an event"
+                (Format.sprintf "Inconsistent profiling information, depth should not be equal \
+                 to 1 when closing the event %s" (string_of_step_kind step_kind)) 
               (Failure "Depth=1 in close_event") ()
           else
             error, ()
