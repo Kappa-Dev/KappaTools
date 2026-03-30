@@ -81,6 +81,8 @@ module type Analyzer = sig
     Exception.exceptions_caught_and_uncaught
     * dynamic_information
     * static_information
+
+     val get_bdu_handler: dynamic_information -> Ckappa_sig.Views_bdu.handler 
 end
 
 (***************************************************************************)
@@ -207,14 +209,6 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       add_event parameters error analysis_event None dynamic
     in
     let error, static, dynamic =
-     match patch with
-      | Some _ ->
-        let error, () =
-          Exception.warn ~message:"Reinitialization is not implemented yet"
-            parameters error __POS__ Exit ()
-        in
-        error, static, dynamic
-      | None ->
         let rec aux error dynamic =
           let error, dynamic, next_opt =
             Domain.next_rule static dynamic error
@@ -359,4 +353,9 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
         dynamic
     in
     error, dynamic, static
-end
+
+  let get_bdu_handler dynamic = 
+    let global = Domain.get_global_dynamic_information dynamic in 
+    Analyzer_headers.get_mvbdu_handler global 
+  end
+

@@ -579,6 +579,8 @@ functor
       let error, log_info, (global, static), dynamic =
         Reachability.main parameters log_info error bdu_handler c_compil handler
       in
+      let bdu_handler = Reachability.get_bdu_handler dynamic in 
+      let state = Remanent_state.set_bdu_handler bdu_handler state in 
       let error, dynamic, state =
         Reachability.export global static dynamic error state
       in
@@ -602,6 +604,8 @@ functor
         Reachability.update_main parameters log_info error bdu_handler c_compil
           handler new_indexs state
       in
+      let bdu_handler = Reachability.get_bdu_handler dynamic in 
+      let state = Remanent_state.set_bdu_handler bdu_handler state in 
       let error, dynamic, state =
         Reachability.export global static dynamic error state
       in

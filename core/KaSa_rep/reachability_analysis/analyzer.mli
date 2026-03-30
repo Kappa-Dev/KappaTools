@@ -81,6 +81,8 @@ module type Analyzer = sig
     Exception.exceptions_caught_and_uncaught
     * dynamic_information
     * static_information
+
+    val get_bdu_handler: dynamic_information -> Ckappa_sig.Views_bdu.handler 
 end
 
 module Make : functor (Domain : Composite_domain.Composite_domain) -> Analyzer
