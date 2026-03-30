@@ -164,6 +164,15 @@ module Domain = struct
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, is_true
 
+  let or_mvbdu parameters error dynamic mvbdu mvbdu' bdu_restriction =
+    let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, output =
+      Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error mvbdu
+        mvbdu' bdu_restriction
+    in
+    let dynamic = set_mvbdu_handler bdu_handler dynamic in
+    error, dynamic, output
+
   (*--------------------------------------------------------------------*)
 
   type 'a zeroary =
@@ -480,30 +489,40 @@ module Domain = struct
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameters
         error agent_type local
     in
-    let bdu_handler = get_mvbdu_handler dynamic in
     match mvbdu_opt with
     | None -> Exception.warn parameters error __POS__ Exit (dynamic, event_list)
     | Some old_mvbdu ->
-      let restriction_bdu = get_restriction_mvbdu static in
-      let error, dynamic, is_true =
+     (* let restriction_bdu = get_restriction_mvbdu static in*)
+     (* let error, dynamic, is_true =
         is_true_mvbdu parameters error dynamic old_mvbdu restriction_bdu
-      in
-      if is_true then
+      in*)
+     (* if is_true then
         error, (dynamic, event_list)
-      else (
-        let error, (bdu_handler, new_mvbdu) =
-          let restriction_bdu = get_restriction_mvbdu static in
-          let error, bdu_handler, new_mvbdu =
-            Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error
+      else *) 
+       let restriction_bdu = get_restriction_mvbdu static in
+       let error, dynamic, new_mvbdu =
+            or_mvbdu parameters error dynamic 
               old_mvbdu bdu_guard restriction_bdu
           in
-          error, (bdu_handler, new_mvbdu)
-        in
-        let error, local =
+      let b = Ckappa_sig.Views_bdu.equal  old_mvbdu new_mvbdu in 
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "MVBDU has changed in Agent Domain" in 
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Previous value" in  
+        let () = Ckappa_sig.Views_bdu.print parameters old_mvbdu in 
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "UPDATE" in  
+        let () = Ckappa_sig.Views_bdu.print parameters bdu_guard in 
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "PARAMETERS RANGE" in  
+        let () = Ckappa_sig.Views_bdu.print parameters restriction_bdu in 
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "RESULT" in  
+
+        let () = Ckappa_sig.Views_bdu.print parameters new_mvbdu in 
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)  in 
+    
+      if b || true then error, (dynamic, event_list) 
+        else 
+           let error, local =
           Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set parameters
             error agent_type new_mvbdu local
         in
-        let dynamic = set_mvbdu_handler bdu_handler dynamic in
         let dynamic = set_seen_agent local dynamic in
         let error, rule_id_list =
           match
@@ -553,7 +572,7 @@ module Domain = struct
             event_list rule_id_list
         in
         error, (dynamic, event_list)
-      )
+      
 
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare
