@@ -579,56 +579,13 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     let parameters =
       Analyzer_headers.get_parameter (get_global_static_information static)
     in
-    let () =
-      Loggers.fprintf
-        (Remanent_parameters.get_logger parameters)
-        "START PRE APPLY %i"
-        (Ckappa_sig.int_of_rule_id r_id)
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
     let error, dynamic, (precondition, event_list) =
       pre_apply_rule static dynamic error r_id precondition
     in
-    let () =
-      Loggers.fprintf
-        (Remanent_parameters.get_logger parameters)
-        "START APPLY SIDE EFFECTS  %i"
-        (Ckappa_sig.int_of_rule_id r_id)
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-
     let error, dynamic, (_precondition, event_list) =
       apply_side_effect static dynamic error r_id precondition event_list
     in
-    let () =
-      Loggers.fprintf
-        (Remanent_parameters.get_logger parameters)
-        "START APPLY EVENT LIST %i (%i events)"
-        (Ckappa_sig.int_of_rule_id r_id)
-        (List.length event_list)
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-
-    let output = apply_event_list static dynamic error event_list in
-    let () =
-      Loggers.fprintf
-        (Remanent_parameters.get_logger parameters)
-        "END APPLY EVENT LIST %i"
-        (Ckappa_sig.int_of_rule_id r_id)
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-    output
+    apply_event_list static dynamic error event_list 
 
   let stabilize static dynamic error =
     lift_zeroary Domain.stabilize static dynamic error
