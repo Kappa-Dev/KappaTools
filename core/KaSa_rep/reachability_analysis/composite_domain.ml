@@ -576,9 +576,6 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
       error, dynamic, (precondition, event_list)
 
   let apply_rule static dynamic error r_id precondition =
-    let parameters =
-      Analyzer_headers.get_parameter (get_global_static_information static)
-    in
     let error, dynamic, (precondition, event_list) =
       pre_apply_rule static dynamic error r_id precondition
     in

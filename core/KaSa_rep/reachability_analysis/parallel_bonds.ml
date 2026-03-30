@@ -411,15 +411,22 @@ module Domain = struct
     in
     error, (tuples_of_interest, map)
 
-  let scan_rules static dynamic error =
+  let scan_rules ?start static dynamic error =
     let parameters = get_parameter static in
     let compil = get_compil static in
     let error, static =
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters error
         (fun _ error rule_id rule static ->
           scan_rule static dynamic error rule_id rule.Cckappa_sig.e_rule_c_rule)
         compil.Cckappa_sig.rules static
     in
+    match start with 
+    | Some _ -> 
+      (* We do not allow to add new covering classes, during incremental analysis.  *)
+      (* We leave it as future works. *)
+      (* This is sound, but it may lead less precise analysis result. *)
+      error, static, dynamic 
+    | None -> 
     (*------------------------------------------------------*)
     (*A(x!1, y), B(x!1, y): first site is an action binding*)
     (*------------------------------------------------------*)
@@ -506,14 +513,10 @@ module Domain = struct
     error, dynamic, result_restriction_bdu
 
   let initialize ?patch static dynamic error =
-    let parameters = Analyzer_headers.get_parameter static in
-    match patch with
-    | Some (static, local, _) ->
-      let error, () =
-        Exception.warn ~message:"Reinitialization is not implemented yet"
-          parameters error __POS__ Exit ()
-      in
-      error, static, { local; global = dynamic }, []
+    let error, init_global_static_information, init_global_dynamic_information, start = 
+      match patch with
+    | Some (static, local, new_elts) -> 
+      error, static, { local; global = dynamic }, Some new_elts.Diff.next_rule 
     | None ->
       let error, dynamic, restriction_bdu =
         init_restriction_bdu static dynamic error
@@ -535,11 +538,13 @@ module Domain = struct
       let init_global_dynamic_information =
         { global = dynamic; local = init_local_dynamic_information }
       in
-      let error, static, dynamic =
-        scan_rules init_global_static_information
+      error, init_global_static_information, init_global_dynamic_information, None 
+    in 
+    let error, static, dynamic =
+       scan_rules ?start init_global_static_information
           init_global_dynamic_information error
-      in
-      error, static, dynamic, []
+    in
+    error, static, dynamic, []
 
   let add_rules_tuples_into_wake_up_relation parameters error rule_tuples
       wake_up =
