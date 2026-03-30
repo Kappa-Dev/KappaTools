@@ -70,7 +70,7 @@ module Domain = struct
   let set_domain_static domain static =
     { static with domain_static_information = domain }
 
-  let _get_domain_static static = static.domain_static_information
+  let get_domain_static static = static.domain_static_information
 
   let set_domain_static_pattern domain static =
     { static with domain_static_information_pattern = domain }
@@ -337,7 +337,7 @@ module Domain = struct
   (**************************************************************************)
   (** [scan_rule_set static] *)
 
-  let scan_rule_set_static static dynamic error =
+  let scan_rule_set_static ?start static dynamic error =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let compiled = get_compil static in
@@ -348,9 +348,9 @@ module Domain = struct
     let guard_mvbdus = get_guard_mvbdus static in
     let restriction_bdu = get_restriction_mvbdu static in
     let error, (handler_bdu, log_info, result) =
-      Bdu_static_views.scan_rule_set parameters log_info handler_bdu error
+      Bdu_static_views.scan_rule_set ?start parameters log_info handler_bdu error
         kappa_handler compiled potential_side_effects remanent_triple
-        guard_mvbdus restriction_bdu
+        guard_mvbdus restriction_bdu (get_domain_static static) 
     in
     let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
@@ -359,13 +359,13 @@ module Domain = struct
     (*pattern*)
     (*-----------------------------------------------------------------------*)
     let error, result =
-      Bdu_static_views.scan_rule_set_pattern parameters error remanent_triple
-        compiled
+      Bdu_static_views.scan_rule_set_pattern ?start parameters error remanent_triple
+        compiled (get_domain_static_pattern static)
     in
     let static = set_domain_static_pattern result static in
     error, static, dynamic
 
-  let scan_rule_set_dynamic static dynamic error =
+  let scan_rule_set_dynamic ?start static dynamic error =
     let parameters = get_parameter static in
     let compiled = get_compil static in
     let kappa_handler = get_kappa_handler static in
@@ -376,7 +376,7 @@ module Domain = struct
     let potential_side_effects = get_potential_side_effects static in
     let log_info = get_log_info dynamic in
     let error, (handler_bdu, log_info, store_result) =
-      Bdu_dynamic_views.scan_rule_set_dynamic parameters log_info error compiled
+      Bdu_dynamic_views.scan_rule_set_dynamic ?start parameters log_info error compiled
         kappa_handler handler_bdu store_test_modif_map covering_classes
         covering_classes_id potential_side_effects
     in
@@ -387,66 +387,72 @@ module Domain = struct
 
   (**************************************************************************)
 
+  (* We do not allow to add new covering classes, during incremental analysis.  *)
+  (* We leave it as future works. *)
+  (* This is sound, but it may lead less precise analysis result. *)
   let initialize ?patch static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
-    match patch with
-    | Some (static, local, _) ->
-      let error, () =
-        Exception.warn ~message:"Reinitialization is not implemented yet"
-          parameters error __POS__ Exit ()
-      in
-      error, static, { local; global = dynamic }, []
-    | None ->
-      let log_info = Analyzer_headers.get_log_info dynamic in
-      let error, log_info =
-        StoryProfiling.StoryStats.add_event parameters error
-          (StoryProfiling.Domain_initialization domain_name) None log_info
-      in
-      let compil = Analyzer_headers.get_cc_code static in
-      let handler_kappa = Analyzer_headers.get_kappa_handler static in
-      let dynamic = Analyzer_headers.set_log_info log_info dynamic in
-      let error, init_bdu_analysis_static =
-        Bdu_static_views.init_bdu_analysis_static parameters error
-      in
-      let init_bdu_analysis_static_pattern =
-        Bdu_static_views.init_bdu_analysis_static_pattern
-      in
-      let error, init_covering_class =
-        Covering_classes_main.scan_predicate_covering_classes parameters error
-          handler_kappa compil
-      in
-      let init_global_static =
-        {
-          global_static_information = static;
-          domain_static_information = init_bdu_analysis_static;
-          domain_static_information_pattern = init_bdu_analysis_static_pattern;
-          domain_static_information_covering_class = init_covering_class;
+    let log_info = Analyzer_headers.get_log_info dynamic in
+    let error, log_info =
+               StoryProfiling.StoryStats.add_event parameters error
+                (StoryProfiling.Domain_initialization domain_name) None log_info
+            in
+            let dynamic = Analyzer_headers.set_log_info log_info dynamic in
+           
+    let error, init_global_static, init_global_dynamic, start = 
+      match patch with 
+      | None -> 
+        begin 
+            let compil = Analyzer_headers.get_cc_code static in
+            let handler_kappa = Analyzer_headers.get_kappa_handler static in
+           let error, init_bdu_analysis_static =
+              Bdu_static_views.init_bdu_analysis_static parameters error
+            in
+            let init_bdu_analysis_static_pattern =
+              Bdu_static_views.init_bdu_analysis_static_pattern
+            in
+            let error, init_covering_class =
+              Covering_classes_main.scan_predicate_covering_classes parameters error
+              handler_kappa compil
+            in
+            let init_global_static =
+              {
+               global_static_information = static;
+               domain_static_information = init_bdu_analysis_static;
+               domain_static_information_pattern = init_bdu_analysis_static_pattern;
+               domain_static_information_covering_class = init_covering_class;
+              }
+            in
+            let init_fixpoint = AgentCV_map_and_set.Map.empty in
+            let init_bdu_analysis_dynamic =
+              Bdu_dynamic_views.init_bdu_analysis_dynamic
+            in
+            let init_global_dynamic =
+             {
+                global = dynamic;
+                local =
+                  {
+                    fixpoint_result = init_fixpoint;
+                    fixpoint_result_current_working_set = None;
+                    domain_dynamic_information = init_bdu_analysis_dynamic;
+                    subviews = None;
+                    ranges = None;
+                    separating_edges = None;
+                    transition_system_length = None;
+                };
         }
       in
-      let init_fixpoint = AgentCV_map_and_set.Map.empty in
-      let init_bdu_analysis_dynamic =
-        Bdu_dynamic_views.init_bdu_analysis_dynamic
-      in
-      let init_global_dynamic =
-        {
-          global = dynamic;
-          local =
-            {
-              fixpoint_result = init_fixpoint;
-              fixpoint_result_current_working_set = None;
-              domain_dynamic_information = init_bdu_analysis_dynamic;
-              subviews = None;
-              ranges = None;
-              separating_edges = None;
-              transition_system_length = None;
-            };
-        }
-      in
-      let error, init_static, init_dynamic =
-        scan_rule_set_static init_global_static init_global_dynamic error
-      in
+      error, init_global_static, init_global_dynamic, None 
+      end 
+    | Some (static', local, new_elts ) -> 
+            error, {static' with global_static_information = static}, { global = dynamic ; local}, 
+            Some (new_elts.Diff.next_rule) 
+  in 
+  let error, init_static, init_dynamic =
+        scan_rule_set_static ?start init_global_static init_global_dynamic error
+  in
       let error, static, dynamic =
-        scan_rule_set_dynamic init_static init_dynamic error
+        scan_rule_set_dynamic ?start init_static init_dynamic error
       in
       let log_info = get_log_info dynamic in
       let error, log_info =
