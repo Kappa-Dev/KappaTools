@@ -43,9 +43,9 @@ val string_of_rule : Public_data.rule -> string
 val print_rule :
   Public_data.rule -> ([> `PCDATA ] as 'a) Html.elt list -> 'a Html.elt list
 
-val string_of_agent : Public_data.agent_kind -> string
+val string_of_agent : (int, int) Public_data.agent_kind -> string
 
 val print_agent_kind :
-  Public_data.agent_kind ->
+  (int, int) Public_data.agent_kind ->
   ([> `PCDATA ] as 'a) Html.elt list ->
   'a Html.elt list
