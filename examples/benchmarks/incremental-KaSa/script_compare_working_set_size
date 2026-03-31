@@ -2,6 +2,8 @@
 
 ## BENCHMARKS for the incremental implementation of KaSa, for the Tool paper at CMSB2026
 
+# pre-requisites: python3 with the libraries "pandas" and "matplotlib"
+
 # It analyzer 6 large Kappa models with the incremental analysis, with 0,10,20... rules in the working set.
 # Then it outputs a table with the runtime of the analysis for each model depending on the size of the working set.
 
