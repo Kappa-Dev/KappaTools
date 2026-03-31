@@ -415,77 +415,78 @@ module Domain = struct
     let parameters = get_parameter static in
     let compil = get_compil static in
     let error, static =
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters error
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters
+        error
         (fun _ error rule_id rule static ->
           scan_rule static dynamic error rule_id rule.Cckappa_sig.e_rule_c_rule)
         compil.Cckappa_sig.rules static
     in
-    match start with 
-    | Some _ -> 
+    match start with
+    | Some _ ->
       (* We do not allow to add new covering classes, during incremental analysis.  *)
       (* We leave it as future works. *)
       (* This is sound, but it may lead less precise analysis result. *)
-      error, static, dynamic 
-    | None -> 
-    (*------------------------------------------------------*)
-    (*A(x!1, y), B(x!1, y): first site is an action binding*)
-    (*------------------------------------------------------*)
-    let lift_map error s =
-      Ckappa_sig.Rule_map_and_set.Map.fold
-        (fun _ big_store (error, set) ->
-          Parallel_bonds_static.project_away_ag_id_and_convert_into_set
-            parameters error big_store set)
-        s
-        (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty)
-    in
-    let error, store_result1 =
-      lift_map error (get_rule_double_bonds_lhs static)
-    in
-    let error, store_result2 =
-      lift_map error (get_rule_double_bonds_rhs static)
-    in
-    let error, store_result =
-      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union parameters
-        error store_result1 store_result2
-    in
-    let error, (store_result, map) =
-      apply_closure_to_tuples_of_interest parameters error store_result
-    in
-    let static = set_tuples_of_interest store_result static in
-    let static = set_closure map static in
-    (*------------------------------------------------------*)
-    let tuples_of_interest = store_result in
-    let store_action_binding = get_action_binding static in
-    let error, store_result =
-      Parallel_bonds_static.collect_fst_site_create_parallel_bonds_rhs
-        parameters error store_action_binding tuples_of_interest
-    in
-    let static = set_fst_site_create_parallel_bonds_rhs store_result static in
-    (*------------------------------------------------------*)
-    (*A(x, y!1), B(x, y!1): second site is an action binding *)
-    let error, store_result =
-      Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
-        parameters error store_action_binding tuples_of_interest
-    in
-    let static = set_snd_site_create_parallel_bonds_rhs store_result static in
-    (*------------------------------------------------------*)
-    (*map tuples to sites*)
-    let tuples_of_interest = get_tuples_of_interest static in
-    let error, store_result =
-      Parallel_bonds_static.collect_tuple_to_sites parameters error
-        tuples_of_interest
-    in
-    let static = set_tuple_to_sites store_result static in
-    (*------------------------------------------------------*)
-    (*map sites to tuple*)
-    let tuple_to_sites = get_tuple_to_sites static in
-    let store_sites_to_tuple = get_sites_to_tuple static in
-    let error, store_result =
-      Parallel_bonds_static.collect_sites_to_tuple parameters error
-        tuple_to_sites store_sites_to_tuple
-    in
-    let static = set_sites_to_tuple store_result static in
-    error, static, dynamic
+      error, static, dynamic
+    | None ->
+      (*------------------------------------------------------*)
+      (*A(x!1, y), B(x!1, y): first site is an action binding*)
+      (*------------------------------------------------------*)
+      let lift_map error s =
+        Ckappa_sig.Rule_map_and_set.Map.fold
+          (fun _ big_store (error, set) ->
+            Parallel_bonds_static.project_away_ag_id_and_convert_into_set
+              parameters error big_store set)
+          s
+          (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty)
+      in
+      let error, store_result1 =
+        lift_map error (get_rule_double_bonds_lhs static)
+      in
+      let error, store_result2 =
+        lift_map error (get_rule_double_bonds_rhs static)
+      in
+      let error, store_result =
+        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
+          parameters error store_result1 store_result2
+      in
+      let error, (store_result, map) =
+        apply_closure_to_tuples_of_interest parameters error store_result
+      in
+      let static = set_tuples_of_interest store_result static in
+      let static = set_closure map static in
+      (*------------------------------------------------------*)
+      let tuples_of_interest = store_result in
+      let store_action_binding = get_action_binding static in
+      let error, store_result =
+        Parallel_bonds_static.collect_fst_site_create_parallel_bonds_rhs
+          parameters error store_action_binding tuples_of_interest
+      in
+      let static = set_fst_site_create_parallel_bonds_rhs store_result static in
+      (*------------------------------------------------------*)
+      (*A(x, y!1), B(x, y!1): second site is an action binding *)
+      let error, store_result =
+        Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
+          parameters error store_action_binding tuples_of_interest
+      in
+      let static = set_snd_site_create_parallel_bonds_rhs store_result static in
+      (*------------------------------------------------------*)
+      (*map tuples to sites*)
+      let tuples_of_interest = get_tuples_of_interest static in
+      let error, store_result =
+        Parallel_bonds_static.collect_tuple_to_sites parameters error
+          tuples_of_interest
+      in
+      let static = set_tuple_to_sites store_result static in
+      (*------------------------------------------------------*)
+      (*map sites to tuple*)
+      let tuple_to_sites = get_tuple_to_sites static in
+      let store_sites_to_tuple = get_sites_to_tuple static in
+      let error, store_result =
+        Parallel_bonds_static.collect_sites_to_tuple parameters error
+          tuple_to_sites store_sites_to_tuple
+      in
+      let static = set_sites_to_tuple store_result static in
+      error, static, dynamic
 
   (***************************************************************)
 
@@ -513,36 +514,45 @@ module Domain = struct
     error, dynamic, result_restriction_bdu
 
   let initialize ?patch static dynamic error =
-    let error, init_global_static_information, init_global_dynamic_information, start = 
+    let ( error,
+          init_global_static_information,
+          init_global_dynamic_information,
+          start ) =
       match patch with
-    | Some (static', local, new_elts) -> 
-      error, { static' with global_static_information = static }, { local; global = dynamic }, Some new_elts.Diff.next_rule 
-    | None ->
-      let error, dynamic, restriction_bdu =
-        init_restriction_bdu static dynamic error
-      in
-      let init_global_static_information =
-        {
-          global_static_information = static;
-          local_static_information =
-            Parallel_bonds_static.init_local_static restriction_bdu;
-        }
-      in
-      let init_local_dynamic_information =
-        {
-          store_value =
-            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
-          store_value_current_working_set = None;
-        }
-      in
-      let init_global_dynamic_information =
-        { global = dynamic; local = init_local_dynamic_information }
-      in
-      error, init_global_static_information, init_global_dynamic_information, None 
-    in 
+      | Some (static', local, new_elts) ->
+        ( error,
+          { static' with global_static_information = static },
+          { local; global = dynamic },
+          Some new_elts.Diff.next_rule )
+      | None ->
+        let error, dynamic, restriction_bdu =
+          init_restriction_bdu static dynamic error
+        in
+        let init_global_static_information =
+          {
+            global_static_information = static;
+            local_static_information =
+              Parallel_bonds_static.init_local_static restriction_bdu;
+          }
+        in
+        let init_local_dynamic_information =
+          {
+            store_value =
+              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
+            store_value_current_working_set = None;
+          }
+        in
+        let init_global_dynamic_information =
+          { global = dynamic; local = init_local_dynamic_information }
+        in
+        ( error,
+          init_global_static_information,
+          init_global_dynamic_information,
+          None )
+    in
     let error, static, dynamic =
-       scan_rules ?start init_global_static_information
-          init_global_dynamic_information error
+      scan_rules ?start init_global_static_information
+        init_global_dynamic_information error
     in
     error, static, dynamic, []
 

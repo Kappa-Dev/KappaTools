@@ -23,14 +23,15 @@ type guard_p_dic = (unit, unit) Ckappa_sig.Dictionary_of_guards.dictionary
 
 type kappa_handler = {
   nrules: int;
-  ninits: int; 
+  ninits: int;
   nvars: int;
   nagents: Ckappa_sig.c_agent_name;
   nsites: Ckappa_sig.c_site_name; (*highest number of sites of any agent*)
   nguard_params: Ckappa_sig.c_guard_parameter;
   agents_dic: Ckappa_sig.agent_dic;
   agents_annotation:
-    (string * (Loc.t * ((Ckappa_sig.c_rule_id,int)Public_data.ast_origin option))list)
+    (string
+    * (Loc.t * (Ckappa_sig.c_rule_id, int) Public_data.ast_origin option) list)
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t;
   interface_constraints:
     Ckappa_sig.agent_specification
@@ -709,8 +710,8 @@ let working_set_id_of_rule_id parameters error rule_id compilation =
 
 let working_set_id_of_init_id parameters error rule_id compilation =
   match
-    Int_storage.Nearly_inf_Imperatif.get parameters error
-      rule_id compilation.init
+    Int_storage.Nearly_inf_Imperatif.get parameters error rule_id
+      compilation.init
   with
   | error, None ->
     Exception.warn parameters error __POS__ ~message:"init_id does not exist"
@@ -773,9 +774,16 @@ let rename_pos_kappa_handler_with_errors parameters error rename kappa_handler =
   let error, agents_annotation =
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.rename_pos
       (fun _parameters error rename (a, b) ->
-        error, (a, List.rev_map (Loc.rename_pos_pair (Loc.rename_loc ) (fun _ a -> a) rename) (List.rev (b:(Loc.t *
-           (Ckappa_sig.c_rule_id, delta) Public_data.ast_origin option)
-          list))))
+        ( error,
+          ( a,
+            List.rev_map
+              (Loc.rename_pos_pair Loc.rename_loc (fun _ a -> a) rename)
+              (List.rev
+                 (b
+                   : (Loc.t
+                     * (Ckappa_sig.c_rule_id, delta) Public_data.ast_origin
+                       option)
+                     list)) ) ))
       parameters error rename kappa_handler.agents_annotation
   in
   error, { kappa_handler with agents_annotation }

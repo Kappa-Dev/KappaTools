@@ -367,7 +367,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
           (fun (check_rules, modified_sites, bonds, others) event ->
             match event with
             | Communication.Check_rule r_id ->
-               r_id :: check_rules, modified_sites, bonds, others
+              r_id :: check_rules, modified_sites, bonds, others
             | Communication.Modified_sites site ->
               check_rules, site :: modified_sites, bonds, others
             | Communication.See_a_new_bond bond ->
@@ -582,7 +582,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     let error, dynamic, (_precondition, event_list) =
       apply_side_effect static dynamic error r_id precondition event_list
     in
-    apply_event_list static dynamic error event_list 
+    apply_event_list static dynamic error event_list
 
   let stabilize static dynamic error =
     lift_zeroary Domain.stabilize static dynamic error

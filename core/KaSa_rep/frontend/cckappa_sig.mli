@@ -23,14 +23,15 @@ type guard_p_dic = (unit, unit) Ckappa_sig.Dictionary_of_guards.dictionary
 
 type kappa_handler = {
   nrules: int;
-  ninits: int; 
+  ninits: int;
   nvars: int;
   nagents: Ckappa_sig.c_agent_name;
   nsites: Ckappa_sig.c_site_name;
   nguard_params: Ckappa_sig.c_guard_parameter;
   agents_dic: Ckappa_sig.agent_dic;
   agents_annotation:
-    (string * (Loc.t * ((Ckappa_sig.c_rule_id,int)Public_data.ast_origin option))list)
+    (string
+    * (Loc.t * (Ckappa_sig.c_rule_id, int) Public_data.ast_origin option) list)
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t;
   interface_constraints:
     Ckappa_sig.agent_specification
@@ -333,7 +334,6 @@ val rule_is_permanently_disabled_in_current_working_set :
   compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught * bool
 
-
 val init_is_enabled_in_current_working_set :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
@@ -356,8 +356,8 @@ val working_set_id_of_rule_id :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.c_working_set_index option
 
-val working_set_id_of_init_id : 
- Remanent_parameters_sig.parameters ->
+val working_set_id_of_init_id :
+  Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   int ->
   compil ->

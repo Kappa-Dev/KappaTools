@@ -927,7 +927,7 @@ let print_agent_annotation parameters error handler =
       in
       let () =
         List.iter
-          (fun (position,_) ->
+          (fun (position, _) ->
             let () =
               Loggers.fprintf
                 (Remanent_parameters.get_logger parameters)

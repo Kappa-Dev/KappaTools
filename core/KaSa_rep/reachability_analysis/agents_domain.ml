@@ -345,52 +345,6 @@ module Domain = struct
       | Some (static', _, _) ->
         { static' with global_static_information = static }
     in
-    (*
-
-         match patch with
-         | None ->
-           let dynamic, (error, init_dead_rule_array) =
-           if nrules = 0 then
-             dynamic,
-             Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create parameters
-               error 0
-           else
-             let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
-             let error, bdu_handler, mvbdu_false =
-               Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
-             in
-             let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
-             dynamic,
-             Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.init parameters error
-               (nrules - 1) (fun _ error _ -> error, mvbdu_false)
-           in
-           error,
-           {
-             rule_liveness = init_dead_rule_array;
-             liveness_current_working_set = None;
-           },
-           dynamic
-         | Some(_,local,new_elts) when new_elts.Diff.next_rule = Ckappa_sig.rule_id_of_int nrules ->
-           error, local, dynamic
-         | Some(_,local,new_elts) ->
-           let next_rule = Ckappa_sig.int_of_rule_id (new_elts.Diff.next_rule) in
-           let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
-           let error, bdu_handler, mvbdu_false =
-             Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
-           in
-            let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
-           let error, init_dead_rule_array =
-             Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.expand_and_copy parameters error local.rule_liveness (nrules - 1)
-           in
-           let rec aux (k:int) (error, array) =
-             if k<next_rule then error, array
-             else
-               aux (k-1) (Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set parameters error (Ckappa_sig.rule_id_of_int k) mvbdu_false array)
-           in
-           let error, init_dead_rule_array = aux (nrules-1) (error, init_dead_rule_array) in
-           error, {local with rule_liveness = init_dead_rule_array}, dynamic
-       in
-    *)
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
     let nagents = Handler.nagents parameters error kappa_handler in
     let nagents_int = Ckappa_sig.int_of_agent_name nagents in
@@ -777,24 +731,28 @@ module Domain = struct
     let event_list' = [] in
     error, dynamic, event_list'
 
-  let filter static error info = 
+  let filter static error info =
     let parameters = get_parameter static in
-    let compil = get_compil static in  
-    let p error (_,origin) = 
-      match origin with 
-      | None -> error, true 
-      | Some Public_data.From_rule  rule_id -> 
-        Cckappa_sig.rule_is_enabled_in_current_working_set 
-          parameters error rule_id  compil  
-      | Some Public_data.From_init init_id -> 
-        Cckappa_sig.init_is_enabled_in_current_working_set 
-          parameters error init_id  compil  in 
-        List.fold_left 
-            (fun (error, l) elt -> 
-              let error, b = p error elt in 
-              if b then (error, elt::l) else (error, l))
-            (error, []) (List.rev info)
-     
+    let compil = get_compil static in
+    let p error (_, origin) =
+      match origin with
+      | None -> error, true
+      | Some (Public_data.From_rule rule_id) ->
+        Cckappa_sig.rule_is_enabled_in_current_working_set parameters error
+          rule_id compil
+      | Some (Public_data.From_init init_id) ->
+        Cckappa_sig.init_is_enabled_in_current_working_set parameters error
+          init_id compil
+    in
+    List.fold_left
+      (fun (error, l) elt ->
+        let error, b = p error elt in
+        if b then
+          error, elt :: l
+        else
+          error, l)
+      (error, []) (List.rev info)
+
   let export static dynamic error kasa_state =
     let parameters = get_parameter static in
     let compil = get_compil static in
@@ -815,33 +773,34 @@ module Domain = struct
             let error, info =
               Handler.info_of_agent parameters error kappa_handler compil agent
             in
-            let a, list, c = info in 
-            let error, list = filter static error list in 
-            match list with 
-            | [] ->   error, (dead_agents_list, conditionally_dead_agents_list, dynamic)
-            | _ -> 
-            let info = a, list, c in 
-            let agent = Remanent_state.info_to_agent info in
-            let error, dynamic, is_false =
-              is_false_mvbdu parameters error dynamic mvbdu
-            in
-            if is_false then
-              ( error,
-                ( agent :: dead_agents_list,
-                  conditionally_dead_agents_list,
-                  dynamic ) )
-            else (
-              let bdu_handler = get_mvbdu_handler dynamic in
-              let error, bdu_handler, formula =
-                Handler.mvbdu_to_string_formula parameters error kappa_handler
-                  bdu_handler mvbdu
+            let a, list, c = info in
+            let error, list = filter static error list in
+            match list with
+            | [] ->
+              error, (dead_agents_list, conditionally_dead_agents_list, dynamic)
+            | _ ->
+              let info = a, list, c in
+              let agent = Remanent_state.info_to_agent info in
+              let error, dynamic, is_false =
+                is_false_mvbdu parameters error dynamic mvbdu
               in
-              let dynamic = set_mvbdu_handler bdu_handler dynamic in
-              ( error,
-                ( dead_agents_list,
-                  (agent, formula) :: conditionally_dead_agents_list,
-                  dynamic ) )
-            )
+              if is_false then
+                ( error,
+                  ( agent :: dead_agents_list,
+                    conditionally_dead_agents_list,
+                    dynamic ) )
+              else (
+                let bdu_handler = get_mvbdu_handler dynamic in
+                let error, bdu_handler, formula =
+                  Handler.mvbdu_to_string_formula parameters error kappa_handler
+                    bdu_handler mvbdu
+                in
+                let dynamic = set_mvbdu_handler bdu_handler dynamic in
+                ( error,
+                  ( dead_agents_list,
+                    (agent, formula) :: conditionally_dead_agents_list,
+                    dynamic ) )
+              )
           ) else
             error, (dead_agents_list, conditionally_dead_agents_list, dynamic))
         array ([], [], dynamic)

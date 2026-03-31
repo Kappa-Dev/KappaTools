@@ -36,7 +36,8 @@ type _ handle =
   | Ws_elements_kasa : Public_data.working_set_elements handle
   | Agents_kasa : (int, int) Public_data.dead_agents handle
   | Rules_kasa_with_conditions : Public_data.rule_deadness_conditions handle
-  | Agents_kasa_with_conditions : (int, int) Public_data.agent_deadness_conditions handle
+  | Agents_kasa_with_conditions
+      : (int, int) Public_data.agent_deadness_conditions handle
   | Transitions_kasa : (Public_data.rule * (string * string) list) list handle
   | Constraints_kasa
       : (string * Public_data.agent list Public_data.lemma list) list handle
@@ -131,9 +132,10 @@ let receive mailbox x =
            | B (Agents_kasa_with_conditions, thread) ->
              let json = read_result Yojson.Basic.read_json p lb in
              Lwt.wakeup thread
-               (Result_util.map (
-                Public_data.conditionally_dead_agents_of_json 
-                  (fun a -> JsonUtil.to_int a) (fun a -> JsonUtil.to_int a)) 
+               (Result_util.map
+                  (Public_data.conditionally_dead_agents_of_json
+                     (fun a -> JsonUtil.to_int a)
+                     (fun a -> JsonUtil.to_int a))
                   json)
            | B (Rules_kasa_with_conditions, thread) ->
              let json = read_result Yojson.Basic.read_json p lb in
@@ -143,11 +145,11 @@ let receive mailbox x =
            | B (Agents_kasa, thread) ->
              let json = read_result Yojson.Basic.read_json p lb in
              Lwt.wakeup thread
-               (Result_util.map (Public_data.json_to_dead_agents
-               (fun a -> JsonUtil.to_int a) 
-                  (fun a -> JsonUtil.to_int a) )
-               json 
-              )
+               (Result_util.map
+                  (Public_data.json_to_dead_agents
+                     (fun a -> JsonUtil.to_int a)
+                     (fun a -> JsonUtil.to_int a))
+                  json)
            | B (Transitions_kasa, thread) ->
              let json = read_result Yojson.Basic.read_json p lb in
              Lwt.wakeup thread

@@ -68,7 +68,10 @@ let info_to_rule (s1, loc, direction, s2, _guard, id) =
   }
 
 type dead_agents = (Ckappa_sig.c_rule_id, int) Public_data.dead_agents
-type agent_deadness_conditions = (Ckappa_sig.c_rule_id, int) Public_data.agent_deadness_conditions
+
+type agent_deadness_conditions =
+  (Ckappa_sig.c_rule_id, int) Public_data.agent_deadness_conditions
+
 type separating_transitions = Public_data.separating_transitions
 
 (******************************************************************************)

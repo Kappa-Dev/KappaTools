@@ -382,7 +382,9 @@ val info_of_agent :
   Cckappa_sig.compil ->
   Quark_type.agent_quark ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * (string * (Loc.t * (Ckappa_sig.c_rule_id, int) Public_data.ast_origin option) list  * Quark_type.agent_quark)
+  * (string
+    * (Loc.t * (Ckappa_sig.c_rule_id, int) Public_data.ast_origin option) list
+    * Quark_type.agent_quark)
 
 val info_of_rule :
   Remanent_parameters_sig.parameters ->
@@ -482,7 +484,7 @@ val nrules :
   Cckappa_sig.kappa_handler ->
   int
 
-val ninit:
+val ninit :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->

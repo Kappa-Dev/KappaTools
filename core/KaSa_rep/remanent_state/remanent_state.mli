@@ -42,7 +42,10 @@ val info_to_rule :
   Public_data.rule
 
 val info_to_agent :
-  string * (Loc.t * (Ckappa_sig.c_rule_id, int) Public_data.ast_origin option) list * Ckappa_sig.c_agent_name -> (Ckappa_sig.c_rule_id, int) Public_data.agent_kind
+  string
+  * (Loc.t * (Ckappa_sig.c_rule_id, int) Public_data.ast_origin option) list
+  * Ckappa_sig.c_agent_name ->
+  (Ckappa_sig.c_rule_id, int) Public_data.agent_kind
 
 type separating_transitions = Public_data.separating_transitions
 

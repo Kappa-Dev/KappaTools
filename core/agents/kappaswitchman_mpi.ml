@@ -39,7 +39,8 @@ type _ handle =
   | Ws_elements_kasa : Public_data.working_set_elements handle
   | Agents_kasa : (int, int) Public_data.dead_agents handle
   | Rules_kasa_with_conditions : Public_data.rule_deadness_conditions handle
-  | Agents_kasa_with_conditions : (int, int) Public_data.agent_deadness_conditions handle
+  | Agents_kasa_with_conditions
+      : (int, int) Public_data.agent_deadness_conditions handle
   | Transitions_kasa : (Public_data.rule * (string * string) list) list handle
   | Constraints_kasa
       : (string * Public_data.agent list Public_data.lemma list) list handle
@@ -493,9 +494,10 @@ let on_message exec_command message_delimiter =
           | B (Agents_kasa, msg_id, x) ->
             reply post
               (fun b n ->
-                Yojson.Basic.write_json b ((Public_data.json_of_dead_agents 
-                JsonUtil.of_int JsonUtil.of_int)
-                n))
+                Yojson.Basic.write_json b
+                  ((Public_data.json_of_dead_agents JsonUtil.of_int
+                      JsonUtil.of_int)
+                     n))
               msg_id x
           | B (Rules_kasa_with_conditions, msg_id, x) ->
             reply post
@@ -507,7 +509,9 @@ let on_message exec_command message_delimiter =
             reply post
               (fun b n ->
                 Yojson.Basic.write_json b
-                  ((Public_data.conditionally_dead_agents_to_json JsonUtil.of_int JsonUtil.of_int) n))
+                  ((Public_data.conditionally_dead_agents_to_json
+                      JsonUtil.of_int JsonUtil.of_int)
+                     n))
               msg_id x
           | B (Transitions_kasa, msg_id, x) ->
             reply post
