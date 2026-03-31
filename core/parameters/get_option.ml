@@ -423,6 +423,7 @@ let options =
         "dump debugging information",
         [ debug, 3 ],
         Hidden );
+      
       ( "--unsafe-mode",
         Bool Config.unsafe,
         "exceptions are gathered at the end of the computation, instead of \
@@ -434,6 +435,11 @@ let options =
         "prompt CPU time and various datas",
         [ debug, 5 ],
         Expert );
+          ( "--do-restart-fixpoint-iterations",
+        Bool Config.do_restart_fixpoint_iterations,
+        "if false -> do not restart itterations in incremental analysis",
+        [],
+        Hidden );
       ( "--backdoor-dump-nbr-rules",
         Bool Config.backdoor_nbr_of_rules,
         "dump the number of rules",

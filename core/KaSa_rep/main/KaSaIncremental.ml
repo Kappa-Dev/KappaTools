@@ -147,17 +147,22 @@ let main () =
         ->
         let start_time = Sys.time () in
         let l = String.split_on_char ' ' input in
+        let do_not_restart_fixpoint_computation = 
+          match !Config.do_restart_fixpoint_iterations with 
+          | true -> Some false 
+          | false -> Some true 
+          in 
         let state =
           match l with
           | [ "update"; "file"; patch_file_name ] ->
             let old_file_name = patch_file_name in
             let state =
-              Export_to_KaSa.patch ~patch_file_name ~old_file_name state
+              Export_to_KaSa.patch ?do_not_restart_fixpoint_computation ~patch_file_name ~old_file_name state
             in
             state
           | [ "update"; "file"; patch_file_name; "as"; old_file_name ] ->
             let state =
-              Export_to_KaSa.patch ~patch_file_name ~old_file_name state
+              Export_to_KaSa.patch ?do_not_restart_fixpoint_computation ~patch_file_name ~old_file_name state
             in
             state
           | _ ->

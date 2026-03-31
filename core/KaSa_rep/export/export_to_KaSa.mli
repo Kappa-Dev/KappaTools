@@ -155,6 +155,7 @@ module type Type = sig
     (Ast.mixture, Ast.mixture, string) Ast.init_statement -> state -> state
 
   val patch :
+    ?do_not_restart_fixpoint_computation:bool ->  
     ?debug:bool ->
     ?do_we_show_title:bool ->
     patch_file_name:string ->

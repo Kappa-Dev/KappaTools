@@ -32,6 +32,7 @@ module type Analyzer = sig
     * dynamic_information
 
   val update_main :
+    ?do_not_restart_fixpoint_computation:bool ->
     Remanent_parameters_sig.parameters ->
     StoryProfiling.StoryStats.log_info ->
     Exception.exceptions_caught_and_uncaught ->

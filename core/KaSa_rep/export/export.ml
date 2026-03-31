@@ -592,7 +592,7 @@ functor
       in
       state, ((global, static), dynamic)
 
-    let update_reachability_result show_title new_indexs state =
+    let update_reachability_result ?do_not_restart_fixpoint_computation show_title new_indexs state =
       let state, c_compil = get_c_compilation state in
       let state, handler = get_handler state in
       let () = show_title state in
@@ -601,7 +601,7 @@ functor
       let parameters = Remanent_state.get_parameters state in
       let error = Remanent_state.get_errors state in
       let error, log_info, (global, static), dynamic =
-        Reachability.update_main parameters log_info error bdu_handler c_compil
+        Reachability.update_main ?do_not_restart_fixpoint_computation parameters log_info error bdu_handler c_compil
           handler new_indexs state
       in
       let bdu_handler = Reachability.get_bdu_handler dynamic in
@@ -2426,7 +2426,7 @@ functor
           (Remanent_state.set_handler handler state),
         state' )
 
-    let patch ?debug ?do_we_show_title ~called_from ?compil ?patch_file_name
+    let patch ?debug ?do_not_restart_fixpoint_computation ?do_we_show_title ~called_from ?compil ?patch_file_name
         ~old_file_name state =
       let parameters = get_parameters state in
       let log = Remanent_parameters.get_logger parameters in
@@ -2503,6 +2503,7 @@ functor
       let state = set_errors errors state in
       let state, ((_global_static, _static), _dynamic) =
         update_reachability_result
+          ?do_not_restart_fixpoint_computation 
           (compute_show_title (fun _ -> do_we_show_title) (Some "Apply patch"))
           new_indexs state
       in
