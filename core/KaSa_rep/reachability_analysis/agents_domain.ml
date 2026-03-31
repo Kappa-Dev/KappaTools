@@ -777,6 +777,24 @@ module Domain = struct
     let event_list' = [] in
     error, dynamic, event_list'
 
+  let filter static error info = 
+    let parameters = get_parameter static in
+    let compil = get_compil static in  
+    let p error (_,origin) = 
+      match origin with 
+      | None -> error, true 
+      | Some Public_data.From_rule  rule_id -> 
+        Cckappa_sig.rule_is_enabled_in_current_working_set 
+          parameters error rule_id  compil  
+      | Some Public_data.From_init init_id -> 
+        Cckappa_sig.init_is_enabled_in_current_working_set 
+          parameters error init_id  compil  in 
+        List.fold_left 
+            (fun (error, l) elt -> 
+              let error, b = p error elt in 
+              if b then (error, elt::l) else (error, l))
+            (error, []) (List.rev info)
+     
   let export static dynamic error kasa_state =
     let parameters = get_parameter static in
     let compil = get_compil static in
@@ -797,6 +815,12 @@ module Domain = struct
             let error, info =
               Handler.info_of_agent parameters error kappa_handler compil agent
             in
+            let a, list, c = info in 
+            let error, list = filter static error list in 
+            match list with 
+            | [] ->   error, (dead_agents_list, conditionally_dead_agents_list, dynamic)
+            | _ -> 
+            let info = a, list, c in 
             let agent = Remanent_state.info_to_agent info in
             let error, dynamic, is_false =
               is_false_mvbdu parameters error dynamic mvbdu

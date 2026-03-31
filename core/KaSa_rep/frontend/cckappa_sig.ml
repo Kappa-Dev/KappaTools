@@ -707,6 +707,16 @@ let working_set_id_of_rule_id parameters error rule_id compilation =
       Exit None
   | error, Some rule_info -> error, rule_info.e_rule_working_set_id
 
+let working_set_id_of_init_id parameters error rule_id compilation =
+  match
+    Int_storage.Nearly_inf_Imperatif.get parameters error
+      rule_id compilation.init
+  with
+  | error, None ->
+    Exception.warn parameters error __POS__ ~message:"init_id does not exist"
+      Exit None
+  | error, Some rule_info -> error, rule_info.e_init_working_set_id
+
 let rule_is_enabled_in_current_working_set parameters error rule_id compilation
     =
   match working_set_id_of_rule_id parameters error rule_id compilation with
@@ -725,6 +735,32 @@ let rule_is_permanently_disabled_in_current_working_set parameters error rule_id
   match working_set_id_of_rule_id parameters error rule_id compilation with
   | error, None ->
     error, false (* rules that are not in the working set are always enabled *)
+  | error, Some ws_id ->
+    (match
+       Ckappa_sig.Ws_index_map_and_set.Map.find_option parameters error ws_id
+         compilation.working_set_valuations
+     with
+    | error, None -> error, true
+    | error, Some _ -> error, false)
+
+let init_is_enabled_in_current_working_set parameters error init_id compilation
+    =
+  match working_set_id_of_init_id parameters error init_id compilation with
+  | error, None ->
+    error, true (* inits that are not in the working set are always enabled *)
+  | error, Some ws_id ->
+    (match
+       Ckappa_sig.Ws_index_map_and_set.Map.find_option parameters error ws_id
+         compilation.working_set_valuations
+     with
+    | error, None -> error, false (*permanently disabled*)
+    | error, Some (_, bool) -> error, bool)
+
+let init_is_permanently_disabled_in_current_working_set parameters error rule_id
+    compilation =
+  match working_set_id_of_init_id parameters error rule_id compilation with
+  | error, None ->
+    error, false (* inits that are not in the working set are always enabled *)
   | error, Some ws_id ->
     (match
        Ckappa_sig.Ws_index_map_and_set.Map.find_option parameters error ws_id
