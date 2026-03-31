@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 
 def main(input_file, output_file):
@@ -15,4 +16,7 @@ def main(input_file, output_file):
     grouped2.to_csv(output_file, index=False)
 
 if __name__ == "__main__":
-    main("examples/benchmarks/incremental-KaSa/output/experiments_output.csv", "examples/benchmarks/incremental-KaSa/output/experiments_output_mean.csv")
+    if len(sys.argv) < 3:
+        print("Usage: python3 mean_of_reps.py input.csv output.csv")
+        sys.exit(1)
+    main(sys.argv[1], sys.argv[2])

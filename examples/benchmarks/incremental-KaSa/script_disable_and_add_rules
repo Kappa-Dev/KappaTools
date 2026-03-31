@@ -14,6 +14,7 @@ DEBUG=false
 INSTALL_DEPS=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${SCRIPT_DIR}/../../.."
 PWD=$(pwd)
 SCRIPT_DIR=$(realpath "$SCRIPT_DIR" --relative-to="$PWD")
 
@@ -126,7 +127,6 @@ AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
 
 # Install the dependencies
 if $INSTALL_DEPS; then
-    cd "${SCRIPT_DIR}/../../.."
     echo "Installing dependencies:"
     opam install . --update-invariant
 fi
@@ -341,7 +341,7 @@ for MODEL in "${MODELS[@]}"; do
 done
 
 # compute the mean runtime of the multiple repetitions
-python3 examples/benchmarks/incremental-KaSa/mean_of_reps.py
+python3 examples/benchmarks/incremental-KaSa/mean_of_reps.py "${OUTPUT_DIR}experiments_output.csv" "${OUTPUT_DIR}experiments_output_mean.csv"
 
 OUTPUT_MEAN_RUNTIMES="${OUTPUT_DIR}experiments_output_mean.csv"
 

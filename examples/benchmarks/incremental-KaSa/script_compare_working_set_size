@@ -5,12 +5,16 @@
 # It analyzer 6 large Kappa models with the incremental analysis, with 0,10,20... rules in the working set.
 # Then it outputs a table with the runtime of the analysis for each model depending on the size of the working set.
 
-# The output is in output/experiments_output_compare_ws.tex
+# The output is in output/experiments_output_compare_ws.tex (table)
+# or in output/experiments_output_compare_ws_plot.png (plot)
 
 DEBUG=false
 INSTALL_DEPS=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${SCRIPT_DIR}/../../.."
+PWD=$(pwd)
+SCRIPT_DIR=$(realpath "$SCRIPT_DIR" --relative-to="$PWD")
 
 KASA_INC_BINARY="${SCRIPT_DIR}/../../../bin/KaSaIncremental"
 KAPPA_OUTPUT_DIR="${SCRIPT_DIR}/../../../output/"
@@ -123,7 +127,6 @@ AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
 AVAILABLE_MODELS=${AVAILABLE_MODELS%, }
 
 if $INSTALL_DEPS; then
-    cd "${SCRIPT_DIR}/../../.."
     # Install the dependencies
     echo "Installing dependencies:"
     opam install . --update-invariant
@@ -230,7 +233,7 @@ for MODEL in "${MODELS[@]}"; do
     done
 done
 
-python3 examples/benchmarks/incremental-KaSa/mean_of_reps.py
+python3 examples/benchmarks/incremental-KaSa/mean_of_reps.py "${OUTPUT_DIR}experiments_output.csv" "${OUTPUT_DIR}experiments_output_mean.csv"
 
 OUTPUT_MEAN_RUNTIMES="${OUTPUT_DIR}experiments_output_mean.csv"
 
@@ -243,9 +246,16 @@ cmd=(python3
     "${SCRIPT_DIR}/latex_table_compare_ws.py" 
     "$OUTPUT_MEAN_RUNTIMES" "$OUTPUT_LATEX_RUNTIMES"
     )
-        printf '%q ' "${cmd[@]}"
-        printf '\n'
-        { ${cmd[@]}; }
+printf '%q ' "${cmd[@]}"
+printf '\n'
+{ ${cmd[@]}; }
 
 echo "📊 The latex table of the runtimes can be found in: $OUTPUT_LATEX_RUNTIMES"
 
+cmd=(python3 
+    "${SCRIPT_DIR}/plot.py" "${OUTPUT_DIR}experiments_output_mean.csv" "${OUTPUT_DIR}runtimes"
+    )
+printf '%q ' "${cmd[@]}"
+printf '\n'
+{ ${cmd[@]}; }
+echo "📈 The png plot of the runtimes can be found in: ${OUTPUT_DIR}runtimes.png"
