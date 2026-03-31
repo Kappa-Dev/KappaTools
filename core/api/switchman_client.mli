@@ -46,13 +46,13 @@ object
     (Yojson.Basic.t, Result_util.message list) Result_util.t Lwt.t
 
   method get_dead_agents :
-    (Public_data.dead_agents, Result_util.message list) Result_util.t Lwt.t
+    ((int, int) Public_data.dead_agents, Result_util.message list) Result_util.t Lwt.t
 
   method get_dead_rules :
     (Public_data.rule list, Result_util.message list) Result_util.t Lwt.t
 
   method get_conditionally_dead_agents :
-    ( Public_data.agent_deadness_conditions,
+    ( (int, int) Public_data.agent_deadness_conditions,
       Result_util.message list )
     Result_util.t
     Lwt.t

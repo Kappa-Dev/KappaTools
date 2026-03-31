@@ -53,6 +53,7 @@ let empty_handler parameters error =
       Cckappa_sig.nvars = 0;
       Cckappa_sig.nagents = Ckappa_sig.dummy_agent_name;
       Cckappa_sig.nrules = 0;
+      Cckappa_sig.ninits = 0; 
       Cckappa_sig.nsites = Ckappa_sig.dummy_site_name_2;
       Cckappa_sig.nguard_params = Ckappa_sig.dummy_guard_parameter;
       Cckappa_sig.agents_dic = Ckappa_sig.Dictionary_of_agents.init ();
@@ -325,10 +326,10 @@ let declare_dual parameter error handler ag site state ag' site' state' =
   in
   error, { handler with Cckappa_sig.dual }
 
-let scan_agent ~get_counter_name parameters (error, handler) agent =
+let scan_agent ast_origin ~get_counter_name parameters (error, handler) agent =
   let error, (handler, ag_id) =
     declare_agent parameters error handler agent.Ckappa_sig.agent_name
-      (Some agent.Ckappa_sig.agent_name_pos)
+      (Some (agent.Ckappa_sig.agent_name_pos, ast_origin))
   in
   let rec aux error interface handler =
     match interface with
@@ -411,15 +412,15 @@ let get_counter_name_sig c = c.Ckappa_sig.counter_sig_name
 let scan_agent_sig = scan_agent ~get_counter_name:get_counter_name_sig
 let scan_agent = scan_agent ~get_counter_name
 
-let rec scan_mixture parameters remanent mixture =
+let rec scan_mixture ast_origin parameters remanent mixture =
   match mixture with
   | Ckappa_sig.EMPTY_MIX -> remanent
-  | Ckappa_sig.SKIP mixture -> scan_mixture parameters remanent mixture
+  | Ckappa_sig.SKIP mixture -> scan_mixture ast_origin parameters remanent mixture
   | Ckappa_sig.COMMA (agent, mixture)
   | Ckappa_sig.DOT (_, agent, mixture)
   | Ckappa_sig.PLUS (_, agent, mixture) ->
-    let remanent = scan_agent parameters remanent agent in
-    scan_mixture parameters remanent mixture
+    let remanent = scan_agent ast_origin parameters remanent agent in
+    scan_mixture ast_origin parameters remanent mixture
 
 let scan_token parameters remanent _alg =
   (*TO DO*)
@@ -446,18 +447,28 @@ let scan_guard parameters (error, handler) guard =
         declare_guard_p parameters error handler guardp)
       (error, handler) guard_parameters
 
-let scan_initial_states parameters =
-  List.fold_left (fun remanent (_, (guard, (alg, _pos), init_t)) ->
+let next i = 
+  match i with None -> None 
+  | Some (Public_data.From_init i) -> Some (Public_data.From_init (i+1))
+  | Some (Public_data.From_rule i) -> Some (Public_data.From_rule (Ckappa_sig.next_rule_id i))
+
+
+let scan_initial_states ast_origin parameters remanent l =
+  fst (List.fold_left (fun (remanent,i) (_, (guard, (alg, _pos), init_t)) ->
       let remanent = scan_guard parameters remanent guard in
       let remanent = scan_alg parameters remanent alg in
+      let remanent = 
       match init_t with
       | Ast.INIT_MIX (mixture, _pos') ->
-        scan_mixture parameters remanent mixture
+        scan_mixture i parameters remanent mixture
       | Ast.INIT_TOK tk_l ->
-        List.fold_left (scan_token parameters) remanent tk_l)
+        List.fold_left (scan_token parameters) remanent tk_l 
+      in 
+        (remanent, next i))
+        (remanent,ast_origin) l)
 
 let scan_declarations parameters =
-  List.fold_left (fun remanent a -> scan_agent_sig parameters remanent a)
+  List.fold_left (fun remanent a -> scan_agent_sig None parameters remanent a)
 
 let scan_observables _scan_mixt _parameters remanent _variable =
   (*TODO*)
@@ -469,7 +480,7 @@ let scan_perts scan_mixt parameters =
         (fun remanent m ->
           match m with
           | Ast.APPLY (_, (r, _)) ->
-            scan_mixture parameters
+            scan_mixture None parameters
               (scan_mixt parameters remanent r.Ckappa_sig.lhs)
               r.Ckappa_sig.rhs
           | Ast.CFLOWMIX (_, (m, _)) | Ast.SPECIES_OF (_, _, (m, _)) ->
@@ -479,7 +490,7 @@ let scan_perts scan_mixt parameters =
             remanent)
         remanent m)
 
-let scan_rules scan_mixt parameters a b =
+let scan_rules ast_origin scan_mixt parameters a b =
   let _ =
     if Remanent_parameters.get_trace parameters then (
       let () =
@@ -493,14 +504,16 @@ let scan_rules scan_mixt parameters a b =
       ()
     )
   in
-  List.fold_left
-    (fun remanent (_, _, guard, (rule, _)) ->
-      scan_guard parameters
-        (scan_mixture parameters
-           (scan_mixt parameters remanent rule.Ckappa_sig.lhs)
+  fst (List.fold_left
+    (fun (remanent,i) (_, _, guard, (rule, _)) ->
+     let remanent = 
+       scan_guard parameters
+        (scan_mixture i parameters
+           (scan_mixt i parameters remanent rule.Ckappa_sig.lhs)
            rule.Ckappa_sig.rhs)
-        guard)
-    a b
+        guard in 
+        remanent, next i )
+    (a,ast_origin) b)
 
 let reverse_agents_annotation parameters (error, remanent) =
   let agents_annotation = remanent.Cckappa_sig.agents_annotation in
@@ -521,33 +534,39 @@ let scan_compil_incremental parameters error compil remanent =
     Remanent_parameters.set_trace parameters
       (local_trace || Remanent_parameters.get_trace parameters)
   in
+  let remanent = error, remanent in 
   let also_explore_tested_agents =
     Remanent_parameters.lexical_analysis_of_tested_only_patterns parameters
   in
-  let remanent = error, remanent in
-  let scan_tested_mixture =
+ let scan_tested_mixture =
     if also_explore_tested_agents then
       scan_mixture
     else
-      fun _parameters remanent _mixture ->
+      fun _start _parameters remanent _mixture ->
     remanent
   in
   let remanent =
     scan_declarations parameters remanent
       (compil.Ast.signatures : Ckappa_sig.agent_sig list)
   in
-  let remanent = scan_initial_states parameters remanent compil.Ast.init in
+  (*let next_init, next_rule = 
+    match new_elts  with 
+      | None -> None, None 
+      | Some elt -> Some (Public_data.From_init elt.Diff.next_init), 
+                    Some (Public_data.From_rule elt.Diff.next_rule) 
+  in*) 
+  let remanent = scan_initial_states (Some (Public_data.From_init (snd remanent).Cckappa_sig.ninits))  parameters remanent compil.Ast.init in
   let remanent =
     scan_observables scan_tested_mixture parameters remanent
       compil.Ast.observables
   in
   let remanent =
-    scan_perts scan_tested_mixture parameters remanent compil.Ast.perturbations
+    scan_perts (scan_tested_mixture None) parameters remanent compil.Ast.perturbations
   in
-  let error, remanent =
-    scan_rules scan_tested_mixture parameters remanent compil.Ast.rules
+  let remanent =
+    scan_rules (Some (Public_data.From_rule (Ckappa_sig.rule_id_of_int (snd remanent).Cckappa_sig.nrules))) scan_tested_mixture parameters remanent compil.Ast.rules
   in
-  let remanent = reverse_agents_annotation parameters (error, remanent) in
+  let remanent = reverse_agents_annotation parameters remanent in
   remanent
 
 let scan_compil parameters error compil =

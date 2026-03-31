@@ -210,7 +210,7 @@ functor
 
     let get_dead_agents state =
       let state, agents = get_dead_agents state in
-      state, Public_data.json_of_dead_agents agents
+      state, Public_data.json_of_dead_agents Ckappa_sig.rule_id_to_json JsonUtil.of_int agents
 
     let get_conditionally_dead_rules state =
       let state, rules = get_conditionally_dead_rules state in
@@ -218,7 +218,7 @@ functor
 
     let get_conditionally_dead_agents state =
       let state, agents = get_conditionally_dead_agents state in
-      state, Public_data.conditionally_dead_agents_to_json agents
+      state, Public_data.conditionally_dead_agents_to_json Ckappa_sig.rule_id_to_json JsonUtil.of_int agents
 
     let get_working_set_elements state =
       let rules = get_working_set_elements state in

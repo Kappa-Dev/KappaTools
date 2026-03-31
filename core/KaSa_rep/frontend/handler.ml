@@ -14,6 +14,7 @@
 
 let local_trace = false
 let nrules _parameter _error handler = handler.Cckappa_sig.nrules
+let ninit _parameter _error handler = handler.Cckappa_sig.ninits 
 let nvars _parameter _error handler = handler.Cckappa_sig.nvars
 let nagents _parameter _error handler = handler.Cckappa_sig.nagents
 let get_nsites handler = handler.Cckappa_sig.nsites

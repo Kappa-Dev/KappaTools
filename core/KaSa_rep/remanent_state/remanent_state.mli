@@ -30,7 +30,7 @@ type internal_scc_decomposition =
 type quark_map = Quark_type.quarks
 type rule_id = int
 type var_id = int
-type dead_agents = Public_data.agent_kind list
+type dead_agents = (Ckappa_sig.c_rule_id, int) Public_data.agent_kind list
 
 val info_to_rule :
   string
@@ -42,7 +42,7 @@ val info_to_rule :
   Public_data.rule
 
 val info_to_agent :
-  string * Loc.t list * Ckappa_sig.c_agent_name -> Public_data.agent_kind
+  string * (Loc.t * (Ckappa_sig.c_rule_id, int) Public_data.ast_origin option) list * Ckappa_sig.c_agent_name -> (Ckappa_sig.c_rule_id, int) Public_data.agent_kind
 
 type separating_transitions = Public_data.separating_transitions
 
@@ -405,10 +405,10 @@ val set_dead_agents :
 
 val get_conditionally_dead_agents :
   ('global, 'static, 'compile) state ->
-  Public_data.agent_deadness_conditions option
+  (Ckappa_sig.c_rule_id, int) Public_data.agent_deadness_conditions option
 
 val set_conditionally_dead_agents :
-  Public_data.agent_deadness_conditions ->
+  (Ckappa_sig.c_rule_id, int) Public_data.agent_deadness_conditions ->
   ('global, 'static, 'compile) state ->
   ('global, 'static, 'compile) state
 

@@ -67,8 +67,8 @@ let info_to_rule (s1, loc, direction, s2, _guard, id) =
     Public_data.rule_hidden = false;
   }
 
-type dead_agents = Public_data.dead_agents
-type agent_deadness_conditions = Public_data.agent_deadness_conditions
+type dead_agents = (Ckappa_sig.c_rule_id, int) Public_data.dead_agents
+type agent_deadness_conditions = (Ckappa_sig.c_rule_id, int) Public_data.agent_deadness_conditions
 type separating_transitions = Public_data.separating_transitions
 
 (******************************************************************************)

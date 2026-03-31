@@ -219,13 +219,17 @@ class new_client ~is_running ~post (mailbox : mailbox) :
       let request = `List [ `String "DEAD_AGENTS" ] in
       self#message request
       >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
-              Public_data.json_to_dead_agents x |> Result_util.ok |> Lwt.return)
+              (Public_data.json_to_dead_agents 
+              (fun a -> JsonUtil.to_int a) 
+              (fun a -> JsonUtil.to_int a)) x |> Result_util.ok |> Lwt.return)
 
     method get_conditionally_dead_agents =
       let request = `List [ `String "CONDITIONALLY_DEAD_AGENTS" ] in
       self#message request
       >>= Api_common.result_bind_with_lwt ~ok:(fun x ->
-              Public_data.conditionally_dead_agents_of_json x
+              (Public_data.conditionally_dead_agents_of_json 
+               (fun a -> JsonUtil.to_int a) 
+              (fun a -> JsonUtil.to_int a)) x
               |> Result_util.ok |> Lwt.return)
 
     method get_non_weakly_reversible_transitions =

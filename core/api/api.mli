@@ -151,13 +151,12 @@ class type manager_static_analysis = object
 
   method get_dead_rules : Public_data.dead_rules result Lwt.t
 
-  method get_conditionally_dead_rules :
-    Public_data.rule_deadness_conditions result Lwt.t
+  method get_conditionally_dead_rules : Public_data.rule_deadness_conditions result Lwt.t
 
-  method get_dead_agents : Public_data.dead_agents result Lwt.t
+  method get_dead_agents : (int,int) Public_data.dead_agents result Lwt.t
 
   method get_conditionally_dead_agents :
-    Public_data.agent_deadness_conditions result Lwt.t
+    (int, int) Public_data.agent_deadness_conditions result Lwt.t
 
   method get_non_weakly_reversible_transitions :
     Public_data.separating_transitions result Lwt.t

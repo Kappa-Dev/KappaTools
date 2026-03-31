@@ -889,13 +889,31 @@ let working_set_elements_to_json json =
 (* dead agents *)
 (***************)
 
-type agent_kind = {
+type ('rule_id, 'init_id) ast_origin = 
+   | From_rule of 'rule_id 
+   | From_init of 'init_id 
+
+let from_rule = "from_rule"
+let from_init = "from_init"  
+
+let json_to_ast_origin json_to_rule_id json_to_init_id = function 
+  | `Assoc [s, id] when s = from_rule -> From_rule (json_to_rule_id id)
+  | `Assoc [s, id] when s = from_init -> From_init (json_to_init_id id)
+  | x -> raise (Yojson.Basic.Util.Type_error ("agent kind", x))
+
+let ast_origin_to_json rule_id_to_json init_id_to_json a = 
+  match a with 
+  | From_rule r -> `Assoc [from_rule, rule_id_to_json r]
+  | From_init i -> `Assoc [from_init, init_id_to_json i]
+  
+type ('rule_id,'init_id) agent_kind = {
   agent_id: int;
   agent_ast: string;
-  agent_position: Loc.t list;
+  agent_position: (Loc.t * (('rule_id,  'init_id) ast_origin) option) list;
 }
 
-let json_to_agent_kind = function
+
+let json_to_agent_kind json_to_rule_id json_to_init_id = function
   | `Assoc l as x when List.length l = 3 ->
     (try
        {
@@ -904,13 +922,17 @@ let json_to_agent_kind = function
          agent_position =
            JsonUtil.to_list
              ~error_msg:(JsonUtil.exn_msg_cant_import_from_json "locality list")
+             (JsonUtil.to_pair 
              (fun json ->
                snd
                  (Loc.annoted_of_yojson
                     (JsonUtil.to_unit
                        ~error_msg:
                          (JsonUtil.exn_msg_cant_import_from_json "locality"))
-                    json))
+                    json)) 
+               (JsonUtil.to_option 
+                    (json_to_ast_origin json_to_rule_id json_to_init_id)
+                    ))
              (List.assoc position_list l);
        }
      with Not_found ->
@@ -919,27 +941,30 @@ let json_to_agent_kind = function
             (JsonUtil.exn_msg_cant_import_from_json "agent kind", x)))
   | x -> raise (Yojson.Basic.Util.Type_error ("agent kind", x))
 
-let agent_kind_to_json agent_kind =
+let agent_kind_to_json rule_id_to_json init_id_to_json agent_kind =
   `Assoc
     [
       agent_id, JsonUtil.of_int agent_kind.agent_id;
       ast, JsonUtil.of_string agent_kind.agent_ast;
       ( position_list,
         JsonUtil.of_list
-          (fun a -> Loc.yojson_of_annoted JsonUtil.of_unit ((), a))
+          (JsonUtil.of_pair   
+            (fun a -> Loc.yojson_of_annoted JsonUtil.of_unit ((), a))
+            (JsonUtil.of_option (ast_origin_to_json rule_id_to_json init_id_to_json)))
           agent_kind.agent_position );
     ]
 
-type dead_agents = agent_kind list
-type agent_deadness_conditions = (agent_kind * string formula) list
+type ('rule_id,'init_id) dead_agents = ('rule_id,'init_id) agent_kind list
+type ('rule_id,'init_id) agent_deadness_conditions = (('rule_id,'init_id) agent_kind * string formula) list
 (* contains the agents that are dead only for certain values of the boolean predicates *)
 
-let json_of_dead_agents json =
-  `Assoc [ dead_agents, JsonUtil.of_list agent_kind_to_json json ]
+let json_of_dead_agents rule_id_to_json init_id_to_json json =
+  `Assoc [ dead_agents, JsonUtil.of_list (agent_kind_to_json rule_id_to_json init_id_to_json) json ]
 
-let json_to_dead_agents = function
+let json_to_dead_agents json_to_rule_id json_to_init_id= function
   | `Assoc [ (s, json) ] as x when s = dead_agents ->
-    (try JsonUtil.to_list json_to_agent_kind json
+    (try JsonUtil.to_list 
+           (json_to_agent_kind json_to_rule_id json_to_init_id) json
      with Not_found ->
        raise
          (Yojson.Basic.Util.Type_error
@@ -949,21 +974,21 @@ let json_to_dead_agents = function
       (Yojson.Basic.Util.Type_error
          (JsonUtil.exn_msg_cant_import_from_json dead_agents, x))
 
-let conditionally_dead_agents_to_json json =
+let conditionally_dead_agents_to_json json_to_rule_id json_to_init_id json =
   `Assoc
     [
       ( conditionally_dead_agents,
         JsonUtil.of_list
-          (JsonUtil.of_pair agent_kind_to_json
+          (JsonUtil.of_pair (agent_kind_to_json json_to_rule_id json_to_init_id) 
              (Logical_formulae.formula_to_json JsonUtil.of_string))
           json );
     ]
 
-let conditionally_dead_agents_of_json = function
+let conditionally_dead_agents_of_json json_to_rule_id json_init_id = function
   | `Assoc [ (s, json) ] as x when s = conditionally_dead_agents ->
     (try
        JsonUtil.to_list
-         (JsonUtil.to_pair json_to_agent_kind
+         (JsonUtil.to_pair (json_to_agent_kind json_to_rule_id json_init_id)
             (Logical_formulae.formula_of_json
                (JsonUtil.to_string ~error_msg:"wrong condition for dead agents")))
          json
@@ -1212,8 +1237,10 @@ let rename_pos_agent_kind rename agent_kind =
   {
     agent_kind with
     agent_position =
-      Loc.rename_pos_list Loc.rename_loc rename agent_kind.agent_position;
-  }
+      Loc.rename_pos_list 
+        (Loc.rename_pos_pair 
+          Loc.rename_loc (fun _ a -> a)) rename agent_kind.agent_position;
+  }       
 
 let rename_pos_var rename var =
   { var with var_position = Loc.rename_loc rename var.var_position }
@@ -1279,3 +1306,5 @@ let rename_pos_separating_transitions rename (l : separating_transitions) =
   Loc.rename_pos_list
     (Loc.rename_pos_pair rename_pos_rule (fun _ a -> a))
     rename l
+
+

@@ -167,24 +167,40 @@ type working_set_elements = element_in_working_set list
 val working_set_elements_of_json : Yojson.Basic.t -> working_set_elements
 val working_set_elements_to_json : working_set_elements -> Yojson.Basic.t
 
-type agent_kind = {
+type ('rule_id, 'init_id) ast_origin = 
+   | From_rule of 'rule_id 
+   | From_init of 'init_id 
+
+
+type ('rule_id,'init_id) agent_kind = {
   agent_id: int;
   agent_ast: string;
-  agent_position: Loc.t list;
+  agent_position: (Loc.t * ('rule_id, 'init_id) ast_origin option) list;
 }
 
-type dead_agents = agent_kind list
-type agent_deadness_conditions = (agent_kind * string formula) list
+type ('rule_id,'init_id) dead_agents = ('rule_id,'init_id) agent_kind list
+type ('rule_id,'init_id) agent_deadness_conditions = (('rule_id,'init_id) agent_kind * string formula) list
 (* contains the agents that are dead only for certain values of the boolean predicates *)
 
-val json_to_dead_agents : Yojson.Basic.t -> dead_agents
-val json_of_dead_agents : dead_agents -> Yojson.Basic.t
+val json_to_dead_agents : 
+   (Yojson.Basic.t -> 'rule_id) ->
+   (Yojson.Basic.t -> 'init_id) ->
+   Yojson.Basic.t -> ('rule_id,'init_id) dead_agents
+
+val json_of_dead_agents : 
+  ('rule_id -> Yojson.Basic.t) -> 
+  ('init_id -> Yojson.Basic.t) -> 
+  ('rule_id,'init_id)  dead_agents -> Yojson.Basic.t
 
 val conditionally_dead_agents_of_json :
-  Yojson.Basic.t -> agent_deadness_conditions
+  (Yojson.Basic.t -> 'rule_id) -> 
+  (Yojson.Basic.t -> 'init_id) -> 
+  Yojson.Basic.t -> ('rule_id,'init_id) agent_deadness_conditions
 
 val conditionally_dead_agents_to_json :
-  agent_deadness_conditions -> Yojson.Basic.t
+  ( 'rule_id-> Yojson.Basic.t) -> 
+  ( 'init_id-> Yojson.Basic.t) -> 
+  ('rule_id,'init_id) agent_deadness_conditions -> Yojson.Basic.t
 
 type separating_transitions = (rule * (string * string) list) list
 
@@ -255,13 +271,14 @@ val rename_pos_lemma : 'a Loc.rename_pos -> 'a lemma Loc.rename_pos
 val rename_pos_influence_map : influence_map Loc.rename_pos
 val rename_pos_contact_map : contact_map Loc.rename_pos
 val rename_pos_dead_rules : dead_rules Loc.rename_pos
-val rename_pos_dead_agents : dead_agents Loc.rename_pos
+val rename_pos_dead_agents : ('rule_id,'init_id) dead_agents Loc.rename_pos
 
 val rename_pos_rule_deadness_conditions :
   rule_deadness_conditions Loc.rename_pos
 
 val rename_pos_agent_deadness_conditions :
-  agent_deadness_conditions Loc.rename_pos
+  ('rule_id,'init_id) agent_deadness_conditions Loc.rename_pos
 
 val rename_pos_poly_constraint_list :
   'a Loc.rename_pos -> 'a poly_constraint_list Loc.rename_pos
+
