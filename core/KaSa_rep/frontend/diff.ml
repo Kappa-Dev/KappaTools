@@ -458,7 +458,7 @@ let extract index_list list =
     match index_list, list with
     | [], _ -> List.rev acc
     | h :: t, a :: b when h = i -> aux t (i + 1) b (a :: acc)
-    | _ :: t, _ :: b -> aux t (i + 1) b acc
+    | h :: t, _ :: b -> aux (h :: t) (i + 1) b acc
     | _, [] -> assert false
   in
   aux index_list 0 (*List.rev*) list []
