@@ -47,7 +47,7 @@ function createWindow() {
 
   mainWindow.once('ready-to-show', () => {
     // TODO: put this back conditionnally
-    // mainWindow.show()
+    mainWindow.show()
   })
 }
 
