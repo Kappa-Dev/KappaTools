@@ -1,190 +1,109 @@
-<img
-src="https://rawgithub.com/Kappa-Dev/KaSim/master/man/img/KaSim-Logo.svg"
-alt="KaSim logo" title="Stochastic Kappa Simulator" align="right" height="90"/>
-# KappaTools
+# Incremental KaSa
 
-[![Build Status](https://github.com/Kappa-Dev/KappaTools/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Kappa-Dev/KappaTools/actions/workflows/ci.yml?query=branch%3Amaster)
-[![Join the chat at https://gitter.im/Kappa-Dev/KaSim](https://badges.gitter.im/Kappa-Dev/KaSim.svg)](https://gitter.im/Kappa-Dev/KaSim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+The KaSa tool is a static analyzer for Kappa models. This branch implements an incremental version of KaSa, where the analysis' result is updated incrementally for each change in the model, instead of recomputing it from scratch.
 
-KaSim is a stochastic simulator for rule-based models written in Kappa. KaSa is
-a static analyser for Kappa models.
-
-Kappy is a python library to launch and analyse runs and outputs of
-Kappa models.
-
-
-## Quick startup
-
-If you are new to Kappa, the easiest way to start experimenting with it is using the webapp.
-
-<p align="center">
-<img alt="Editor screenshot with contact map" src="./dev/screenshots/editor1.png" width="45%">
-<img alt= "Plot screenshot" src="./dev/screenshots/plot.png" width="45%">
-</p>
-<p align="center">
-<img alt="Editor screenshot with contact map 2" src="./dev/screenshots/editor2.png" width="45%">
-<img alt="Stories screenshot" src="./dev/screenshots/story.png" width="45%">
-</p>
-
-
-It's available [directly in your browser](https://tools.kappalanguage.org/try/?model=https%3A//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/abc.ka),
-or for more performance as a downloadable [electron app](https://tools.kappalanguage.org/nightly-builds/), available for MacOS, Windows and Linux.
-
-Kappa tools are also available as Command-Line Interface programs, which you can either build following the [instructions below](#core-tools),
-or find the binaries included with the [electron app](https://tools.kappalanguage.org/nightly-builds/) in subdir `resources/bin`.
-
-If you would like to use python to interact with the Kappa tools, the `kappy` lib is where to look. Here's an example of its usage with `ipython`
-
-```python
-In [2]: import kappy
-
-In [3]: model_text = "%agent: A(x)\nA(x[.]), A(x[.]) <-> A(x[1]), A(x[1]) @ 1e-2,1\n%plot: |A(x[.])|\n%init: 100 A()"
-
-In [4]: kappa_client = kappy.KappaStd()
-
-In [5]: kappa_client.add_model_string(model_text)
-Out[5]: [...]
-
-In [6]: kappa_client.project_parse()
-Out[6]: [...]
-
-In [7]: kappa_client.simulation_start(kappy.SimulationParameter(.1,"[T] > 10"))
-Out[7]: {'simulation_artifact_simulation_seed': 297327779}
-
-In [8]: kappa_client.wait_for_simulation_stop()
-Out[8]: [...]
-
-In [9]: kappa_client.simulation_plot()
-Out[9]:
-  [6.7, 48.0],
-[...]
-  [0.4, 60.0],
-  [0.3, 50.0],
-  [0.2, 64.0],
-  [0.1, 62.0],
-  [0.0, 100.0]]}
-```
-
-See the [install instructions](#kappy) to start using kappy.
-
-
-## User manual
-See [documentation page on kappalanguage.org](https://kappalanguage.org/documentation).
-
-Kappy [API
-documentation is online](https://kasim.readthedocs.io/en/latest/kappy.html).
-
-The latex sources of the "older" reference manual (and KaSa one) are
-available in the `man/` directory. To compile the manuel, in addition of
-a decent LaTeX distribution you need
-[gnuplot](http://www.gnuplot.info/) and
-[graphviz](http://www.graphviz.org/) to generate images (make sure
-that `dot` is in the PATH of your OS). To generate the pdf of the
-manual type
-
-`make doc`
-
+The [online webapp](https://tools.kappalanguage.org/try/?model=https%3A//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/abc.ka) unfortunately does not support the incremental KaSa yet, therefore to try the it, the app needs to be built locally.
 ## Installation
 
-### Core tools
+### Prerequisites
+- Install [opam](https://opam.ocaml.org/doc/Install.html) (the OCaml package manager). Run `opam init` to initialize it.
+- For the benchmarks: `python3` with the libraries `pandas` and `matplotlib`
+### Build
+- Download the code from GitHub and navigate to the root directory of the project.
+- Install the dependencies by `opam install . --update-invariant --deps-only`
+- Build the project with `dune build`
+- Build the CLI: `make all`
+- Build the electron app:
+	- **on Linux**: `make Kappapp`
+	- **on Windows**: `make KappappWin`
+	- **on MacOS**: `make Kappapp.app`
+## Kappapp: A GUI for KaSa
 
-[Released versions](https://github.com/Kappa-Dev/KaSim/releases) come with
-binaries for MacOS, Windows and Debian derivatives (as Ubuntu). [Nightly
-builds](https://tools.kappalanguage.org/nightly-builds/) of the master branch
-are built for these platforms by the continuous integration tools.
+After having built the electron app, you can launch it with `./build/Kappapp/kappapp`.
+A window should open with a text editor on the left side and the analysis' result on the right half of the application.
 
-If you want or need your own build,
- - Install [opam](https://opam.ocaml.org/doc/Install.html) (the OCaml
-   package manager) and initialize it (by issuing `opam init`)
- - In the source directory, install all the dependencies by `opam install 
-   --deps-only .`
- - `dune build`
+### Text editor for the Kappa files
+The Kappa model consists of one or more files, that can be opened or created by pressing the "File" button. 
+The files can be modified in the in-app text editor.
+The currently open file represents the *current chapter* of rules and initial states that can be incrementally modified.
+Each element in the editor has a checkbox that can be clicked on to disable or enable the element.
+The static analysis result is updated accordingly.
 
-You can be more fine grained if you only need the command-line tools
-(and therefore could install less dependencies) by doing `opam install
---deps-only kappa-binaries` followed by `make all`
+### Visualization of the analysis result
 
-If nothing worked for you so far. Well, you're pretty much on your
-own... Kappa tools depend upon the OCaml native compiler version
-4.05.0 or above as well as _dune_, _findlib_, _Lwt_ (>= 2.6.0), _Re_,
-_Fmt_, _Logs_ and _Yojson_ libraries. Find any way to install them and
-you'll be only a `make all` away from getting Kappa binaries...
+1. **The contact map**: It shows the agents that are defined in the model with all their sites and all possible bonds between sites. If the accuracy "high" is chosen, the contact map is refined by removing all agents and bonds that are unreachable according to the reachability analysis.
+2. **The rule influences**: For each rule, it shows which other rules it influences and which ones may be influenced by it. A rules is influenced by a second rule if the latter can create a biomolecular species that matches the left-hand side of the former rule. As before, the accuracy "high" means that unreachable rules are removed from the output.
+3. **The constraints derived from the reachability analysis**: The reachability analysis computes some relationships between sites of the models. For example, it prints for each site all the possible states it can be in ("Non-relational properties") and it computes the relationship between sites of an agent ("Relational properties") and between sites of two bound agents ("Connected agents"). 
+4. **Unbounded polymer formation**: The last tab informs the user if it is possible that chains of arbitrary length can be formed by the current model.
+5. **Dead rules/dead agents**: If some rules or agents are unreachable, they are underlined in the text editor and the UI warns that a dead rule or dead agent was detected.
 
-### Kappy
+### Example model
 
-You should be able to `pip install kappy`.
+To test the GUI, open the file `examples/incremental_analysis/simple_example.ka` with the button `File -> Open`.
 
-- Under MacOS and linux (and if you're not using a python version so
-  cutting edge that we haven't notice its release yet), _wheels_ that
-  contain the core binaries should be available.
-- For other platforms/python versions, you need to get kappa agents by
-  yourself thanks to the *opam* package manager by `opam install
-  kappa-binaries kappa-agents` (or use an externaly hosted REST API)
-- In order to develop in kappy and run all its tests, you need to
-  follow the "get your own build section" above as well as install
-  _requests_ (and _future_).
+This model contains four agent types: A, B, C and D. The initial state contains the agents D and B. The agent A can be created by the rule `'create.A.if.D'`, if an agent D is present. The contact map shows the four types of agents. If the "high accuracy" contact map is chosen, we see that the agent C can never be formed. To solve this, we can add the initial state `%init: 100 C(c{u})`. If we do that, the analysis is updated incrementally and the warning "dead agent" disappears.
 
-## Usage
+By disabling the checkboxes in front of the rules or initial states, we can see how the result of the analysis changes when some rules are removed.
+For example, when disabling the rule `'bind.A_A'`, the model cannot form any unbounded polymers anymore.
+And when disabling the first initial state of the agent D, the agents D and A become unreachable.
 
-### KaSim
+## KaSaIncremental: the Interactive CLI for KaSa
 
-In order to run a simulation for 100 time units printing observables values
-every 0.5 time unit, type
+The CLI can be lauched with an example model by:
+```
+./bin/KaSaIncremental --current-chapter examples/incremental_analysis/simple_example.ka --do-restart-fixpoint-iterations
+```
+The analysis prints the constraints that were calculated by the reachability analysis. For example, it says that C cannot occur in the model. This can be fixed by adding the inital state `%init: 100 C(c{u})` in the file `examples/incremental_analysis/simple_example.ka` and updating the analysis. 
 
-`bin/KaSim kappa_file_1 ... kappa_file_n -l 100 -p 0.5 -o data_file`
-
-This will produce a data file of 200 point containing the
-trajectory that was produced during the simulation.
-
-Type:
-
-`bin/KaSim --help`
-
-for a complete list of options.
-
-### Kappy
-
-Do:
-
-```python
-import kappy
-client = kappy.KappaStd()
+The analysis can be updated by typing 
+```
+update file examples/incremental_analysis/simple_example.ka
+```
+in the interactive agent. After this, the analysis says "all agents may occur in the model".
+Rules can be disabled by their label, for example:
+```
+disable 'create.A.if.D'
+```
+Subsequently, they can be enabled again:
+```
+enable 'create.A.if.D'
 ```
 
-to get a kappa client that uses a kappa agent installed locally. Add a
-string argument specifing the `path/to/KaSimAgent` to use a specific agent.
+The command `help` prints more information about available commands.
+## Benchmarks
 
-A minimal example of usage is:
+The Table 1 and Fig. 4 in the in the tool paper `Incremental Reachability Analysis for the Rule-Based Modeling Language Kappa` were generated, respectively, by the scripts `script_disable_and_add_rules` and `script_compare_working_set_size`.
+### Table 1: compare the incremental and non-incremental runtimes
 
-```python
-model = "\
-%agent: A(x[x.A]) \
-%var: n_0 100 \
-%var: k_on 1e-2 \
-'rule' A(x[.]), A(x[.]) <-> A(x[1]), A(x[1]) @ k_on, 1 \
-%plot: |A(x[.])| \
-%init: n_0 A()"
-client.add_model_string(model)
-client.project_parse()
-sim_params = kappy.SimulationParameter(pause_condition="[T] > 100",plot_period=1)
-client.simulation_start(sim_params)
-client.wait_for_simulation_stop()
-results = client.simulation_plot()
-client.simulation_delete()
-# Rerun with some overwritten values for algebraic variables
-client.project_parse(k_on=5e-2,n_0=500)
-client.simulation_start(sim_params)
-client.wait_for_simulation_stop()
-results' = client.simulation_plot()
-client.shutdown()
+Run the whole analysis with:
 ```
+./examples/benchmarks/incremental-KaSa/script_disable_and_add_rules
+```
+This computes the runtimes of the non-incremental analysis, of the incremental analysis, of disabling some rules and of adding a rule, for 6 large Kappa models. The default timeout is of 50 minutes and each test is repeated 10 times. The number of rules that are added to the current chapter is 10.
+These three values can be modified with the options `-t <timeout>`, `-r <reps>` and `-s <current_chapter_size>`, respectively. See also the help message (`-h`).
 
-## Tests
+To run a small subset of the analysis, that only takes a few seconds to run, there is an option `-d`:
+```
+./examples/benchmarks/incremental-KaSa/script_disable_and_add_rules -d
+```
+This version runs the analysis with smaller models and only 2 repetitions.
 
-Launch the core/integration tests by `make check`.
+The output of the script is a latex table with the mean runtimes in the file `examples/benchmarks/incremental-KaSa/output/experiments_output.tex`. The same runtimes are available as a csv file: `examples/benchmarks/incremental-KaSa/output/experiments_output.csv`.
 
-Regenerate the reference files if you've changed something in the
-outputs by `make build-tests`
+### Fig. 4: compare the analysis overhead for different sizes of the current chapter
 
-Launch python tests by `nosetests` (after having followed the "Get
-your own build" section).
+Run the whole analysis with:
+```
+./examples/benchmarks/incremental-KaSa/script_compare_working_set_size
+```
+This computes the runtimes of the incremental analysis for the working set sizes of 0, 10, 20, 30, 40, 50 and 60. 
+As before, the default timeout is of 50min and the number of repetitions is 10.
+These values can be modified with the options `-t <timeout>` and `-r <reps>`. See also the help message (`-h`).
+
+To run a small subset of the analysis, that only takes a few seconds to run, there is an option `-d`:
+```
+./examples/benchmarks/incremental-KaSa/script_compare_working_set_size -d
+```
+This version runs the analysis with smaller models, only 2 repetitions and smaller current chapters.
+
+The output of the script is a latex and a csv table with the mean runtimes in the files `examples/benchmarks/incremental-KaSa/output/experiments_output_compare_ws.tex` or `.csv`. The runtimes are also shown in a plot: `examples/benchmarks/incremental-KaSa/output/experiments_output_compare_ws_plot.png`.
