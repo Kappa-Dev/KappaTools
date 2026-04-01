@@ -1,25 +1,17 @@
-\documentclass{article}
-\usepackage{booktabs}
-\usepackage[margin=1in,landscape]{geometry}
-\begin{document}
-\begin{table}[ht]
 \centering
 \small
-\begin{tabular}{l c c c c}
+\begin{tabular}{l c c c c c}
 \toprule
-\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{1}{c}{\textbf{non-incremental}} & \multicolumn{2}{c}{\textbf{incremental}} \\
+\textbf{Model} & \textbf{Nr. of rules} & \multicolumn{1}{c}{\textbf{non-incremental}} & \multicolumn{3}{c}{\textbf{incremental}} \\
 \cmidrule(lr){3-3}
-\cmidrule(lr){4-5}
-& & \bfseries\shortstack{analysis} & \bfseries\shortstack{initial\\analysis} & \bfseries\shortstack{projection}\\
+\cmidrule(lr){4-6}
+& & \bfseries\shortstack{analysis} & \bfseries\shortstack{initial\\analysis} & \bfseries\shortstack{disable\\rules} & \bfseries\shortstack{add\\a rule}\\
 \midrule
-\texttt{korkut\_20170113} & 3915 & 24.7 & 26.1 & 0.352 \\
-\texttt{korkut\_20170206} & 5749 & 196 & 467 & 0.88 \\
-\texttt{tgf\_20180419} & 291 & 2.1 & 4.41 & 0.0332 \\
-\texttt{tgf\_v19} & 96 & 0.715 & 1.52 & 0.0844 \\
-\texttt{wnt\_20151228} & 355 & 6.1 & 5 & 0.398 \\
-\texttt{wnt\_20170322} & 1469 & 27.5 & 32 & 0.154 \\
+\texttt{wnt\_20170322} & 1469 & 26.6 & 31.4 & 0.152 &  \\
+\texttt{tgf\_20180419} & 291 & 2.1 & 4.37 & 0.0336 &  \\
+\texttt{wnt\_20151228} & 355 & 5.91 & 4.99 & 0.416 &  \\
+\texttt{korkut\_20170113} & 3915 & 24.7 & 26.3 & 0.357 &  \\
+\texttt{korkut\_20170206} & 5749 & 194 & 471 & 0.87 &  \\
+\texttt{tgf\_v19} & 96 & 0.718 & 1.46 & 0.0988 &  \\
 \bottomrule
 \end{tabular}
-\caption{Timing table}
-\end{table}
-\end{document}
