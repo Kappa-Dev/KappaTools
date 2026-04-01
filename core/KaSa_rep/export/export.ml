@@ -2418,14 +2418,14 @@ functor
     let add_rule _rule state = state
     let add_init _init state = state
 
-    let parse_token show_title ~patch:state' ~current:state =
+    let parse_token show_title ~diff ~patch:state' ~current:state =
       let state', refined_compil' = get_refined_compil state' in
       let parameters = get_parameters state in
       let errors = get_errors state in
       let () = show_title state in
       let state, handler = get_handler state in
       let errors, handler =
-        List_tokens.scan_incremental_compil parameters errors refined_compil'
+        List_tokens.scan_incremental_compil ~diff parameters errors refined_compil'
           handler
       in
       ( Remanent_state.set_errors errors
@@ -2484,7 +2484,7 @@ functor
       in
       let state = set_errors errors state in
       let state, _state' =
-        parse_token
+        parse_token ~diff 
           (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
           ~patch:state' ~current:state
       in
