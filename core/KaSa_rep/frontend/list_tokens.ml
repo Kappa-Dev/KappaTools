@@ -465,18 +465,7 @@ let scan_initial_states ast_origin diff parameters remanent l =
                   | Some (a::b) when a=j -> 
                       Some b, true
                   | Some _ -> l, false 
-        in           
-       let () =
-       match i with Some (Public_data.From_init i) -> 
-        let () = Loggers.fprintf
-          (Remanent_parameters.get_logger parameters)
-          "Scan init %i" i  in 
-          let () =
-        Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in  ()
-          | None | Some (Public_data.From_rule _) -> () 
-      in
-       
+        in                  
       let remanent, i' = 
         if b then 
           let remanent = scan_guard parameters remanent guard in
@@ -517,32 +506,9 @@ let scan_perts scan_mixt parameters =
         remanent m)
 
 let scan_rules ast_origin diff scan_mixt parameters a b =
-    let _ =
-    if Remanent_parameters.get_trace parameters then (
-      let () =
-        Loggers.fprintf
-          (Remanent_parameters.get_logger parameters)
-          "Scan rules!"
-      in
-      let () =
-        Loggers.print_newline (Remanent_parameters.get_logger parameters)
-      in
-      ()
-    )
-  in
   let (a,_,_,_) = 
     List.fold_left
        (fun (remanent, i, j, l) (_, _, guard, (rule, _)) ->
-      let () =
-       match i with Some (Public_data.From_rule i) -> 
-        let () = Loggers.fprintf
-          (Remanent_parameters.get_logger parameters)
-          "Scan rule %i" (Ckappa_sig.int_of_rule_id i)  in 
-          let () =
-        Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in  ()
-          | None | Some (Public_data.From_init _ ) -> () 
-      in
       let l', b = 
           match l with Some [] -> Some [], false 
                   | None -> None, true 
@@ -600,9 +566,6 @@ let scan_compil_incremental parameters error ?diff compil remanent =
     | None -> None, None 
     | Some diff -> Some (diff.Diff.diff_init.Diff.new_elt), Some (diff.Diff.diff_rules.Diff.new_elt)
   in 
-  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-      "START WITH INIT COUNTER: %i " (snd remanent).Cckappa_sig.ninits in 
-  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
   let remanent =
     scan_initial_states 
       (Some (Public_data.From_init (snd remanent).Cckappa_sig.ninits)) diff_init  
@@ -616,9 +579,6 @@ let scan_compil_incremental parameters error ?diff compil remanent =
     scan_perts (scan_tested_mixture None) parameters remanent
       compil.Ast.perturbations
   in
-  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-      "START WITH RULE COUNTER: %i " (snd remanent).Cckappa_sig.nrules in 
-  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
   let remanent =
     scan_rules
       (Some
