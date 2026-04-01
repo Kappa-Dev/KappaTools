@@ -126,7 +126,13 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     in
     error, dynamic
 
-  let main ?patch parameters log_info error mvbdu_handler compil kappa_handler =
+  let main ?do_not_restart_fixpoint_computation ?patch parameters log_info error mvbdu_handler compil kappa_handler =
+     let do_increment = 
+      match do_not_restart_fixpoint_computation with 
+      | None | Some false -> true
+      | Some true -> false 
+    in 
+
     let domain_event, global_event, init_event, analysis_event, new_elts =
       match patch with
       | None ->
@@ -186,6 +192,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     let error, dynamic =
       close_event parameters error global_event None dynamic
     in
+    if do_increment then 
     let error, dynamic = add_event parameters error init_event None dynamic in
     let error, dynamic, _ =
       List.fold_left
@@ -288,6 +295,10 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
         (Domain.get_global_dynamic_information dynamic)
     in
     error, log_info, (global_static, static), dynamic
+else 
+    let error,() = 
+            Exception.warn parameters error __POS__ ~message:"Iterations have not been restarted" Exit () in 
+    error, log_info, (global_static, static), dynamic
 
   let update_main ?do_not_restart_fixpoint_computation 
       parameters log_info error mvbdu_handler compil kappa_handler
@@ -297,11 +308,6 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
           static_information,
           dynamic_information )
         Remanent_state.state) =
-    let do_increment = 
-      match do_not_restart_fixpoint_computation with 
-      | None | Some false -> true
-      | Some true -> false 
-    in 
     let patch =
       match Remanent_state.get_reachability_result state with
       | None -> None
@@ -309,15 +315,9 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     in
     match patch with 
     | None -> main ?patch parameters log_info error mvbdu_handler compil kappa_handler
-    | Some (static, dynamic,_ ) -> 
-       if do_increment then 
-          main ?patch parameters log_info error mvbdu_handler compil kappa_handler
-       else 
-          let log = Remanent_parameters.get_logger parameters in 
-          let error,() = 
-            Exception.warn parameters error __POS__ ~message:"Iterations have not been restarted" Exit () in 
-          let error, dynamic = print (snd static) dynamic error log in
-          error, log_info, static, dynamic
+  | Some _ -> 
+          main ?do_not_restart_fixpoint_computation  ?patch parameters log_info error mvbdu_handler compil kappa_handler
+      
   let main parameters log_info error mvbdu_handler compil kappa_handler =
     main parameters log_info error mvbdu_handler compil kappa_handler
 
