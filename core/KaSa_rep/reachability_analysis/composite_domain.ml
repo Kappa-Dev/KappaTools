@@ -119,6 +119,8 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
   let get_parameter static = lift Analyzer_headers.get_parameter static
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
+let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static 
+
   let get_wake_up_relation static =
     lift Analyzer_headers.get_wake_up_relation static
 
@@ -588,7 +590,16 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     lift_zeroary Domain.stabilize static dynamic error
 
   let export static dynamic error kasa_state =
+    let parameters = get_parameter static in
+    let compil = get_compil static in
+    let handler = get_kappa_handler static in 
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "EXPORT (COMPOSITE DOMAIN)" in 
+    let error = Print_cckappa.print_compil parameters error handler compil in 
+  
+    
     lift_unary Domain.export static dynamic error kasa_state
+
+
 
   let print static dynamic error loggers =
     let dead_rules =

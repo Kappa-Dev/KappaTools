@@ -734,6 +734,9 @@ module Domain = struct
   let filter static error info =
     let parameters = get_parameter static in
     let compil = get_compil static in
+    let handler = get_kappa_handler static in 
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "FILTER" in 
+    let error = Print_cckappa.print_compil parameters error handler compil in 
     let p error (_, origin) =
       match origin with
       | None -> error, true
@@ -754,8 +757,12 @@ module Domain = struct
       (error, []) (List.rev info)
 
   let export static dynamic error kasa_state =
-    let parameters = get_parameter static in
+     let parameters = get_parameter static in
     let compil = get_compil static in
+    let handler = get_kappa_handler static in 
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "EXPORT (AGENTS DOMAIN)" in 
+    let error = Print_cckappa.print_compil parameters error handler compil in 
+   
     let error, dynamic, array =
       get_seen_agent_without_working_set_vars parameters error static dynamic
     in

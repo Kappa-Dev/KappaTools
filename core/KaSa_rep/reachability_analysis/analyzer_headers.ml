@@ -386,9 +386,16 @@ let initialize_global_information ?patch parameters log_info error mvbdu_handler
     Common_static.compute_working_set_mvbdu ?patch_compute_working_set_mvbdu
       parameters error mvbdu_handler compilation nsites
   in
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "INITIALIZE GLOBAL INFORMATION"  in 
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
+  let error = Print_cckappa.print_compil parameters error kappa_handler compilation in 
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "INITIALIZE GLOBAL INFORMATION DONE"  in 
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
   let init_global_static =
     {
-      global_compilation_result = { cc_code = compilation; kappa_handler };
+      global_compilation_result = 
+          { cc_code = compilation; 
+            kappa_handler };
       global_parameter = parameters;
       global_common_views = init_common;
       global_wake_up_relation = wake_up;
@@ -400,6 +407,11 @@ let initialize_global_information ?patch parameters log_info error mvbdu_handler
   let error, mvbdu_handler, static =
     scan_rule ?patch_rule init_global_static error mvbdu_handler
   in
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "INITIALIZE GLOBAL INFORMATION"  in 
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
+  let error = Print_cckappa.print_compil parameters error static.global_compilation_result.kappa_handler static.global_compilation_result.cc_code in 
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "INITIALIZE GLOBAL INFORMATION DONE"  in 
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
   error, static, { mvbdu_handler; log_info }
 
 (* TO DO *)

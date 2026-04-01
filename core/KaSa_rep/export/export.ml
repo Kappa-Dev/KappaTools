@@ -605,16 +605,23 @@ functor
       let bdu_handler = Remanent_state.get_bdu_handler state in
       let log_info = Remanent_state.get_log_info state in
       let parameters = Remanent_state.get_parameters state in
-      let error = Remanent_state.get_errors state in
+    (* let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "EXPORT.UPDATE_REACHABILITY_RESULT" in *)
+     let error = Remanent_state.get_errors state in
+    (* let error = Print_cckappa.print_compil parameters error handler c_compil in *)
       let error, log_info, (global, static), dynamic =
         Reachability.update_main ?do_not_restart_fixpoint_computation parameters log_info error bdu_handler c_compil
           handler new_indexs state
       in
       let bdu_handler = Reachability.get_bdu_handler dynamic in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
+      let error, () = 
+        Exception.warn parameters error __POS__ Exit () in 
+
       let error, dynamic, state =
         Reachability.export global static dynamic error state
       in
+       let error, () = 
+        Exception.warn parameters error __POS__ Exit () in 
       let state = Remanent_state.set_errors error state in
       let state = Remanent_state.set_log_info log_info state in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
@@ -2418,14 +2425,14 @@ functor
     let add_rule _rule state = state
     let add_init _init state = state
 
-    let parse_token show_title ~patch:state' ~current:state =
+    let parse_token show_title ~diff ~patch:state' ~current:state =
       let state', refined_compil' = get_refined_compil state' in
       let parameters = get_parameters state in
       let errors = get_errors state in
       let () = show_title state in
       let state, handler = get_handler state in
       let errors, handler =
-        List_tokens.scan_incremental_compil parameters errors refined_compil'
+        List_tokens.scan_incremental_compil parameters errors ~diff refined_compil'
           handler
       in
       ( Remanent_state.set_errors errors
@@ -2484,7 +2491,7 @@ functor
       in
       let state = set_errors errors state in
       let state, _state' =
-        parse_token
+        parse_token ~diff 
           (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
           ~patch:state' ~current:state
       in
