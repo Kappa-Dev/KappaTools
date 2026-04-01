@@ -492,11 +492,16 @@ let get_new_indexs parameters errors handler c_compil =
 
 let fuse parameters errors handler c_compil handler' c_compil' =
   let n = Handler.nrules parameters errors handler in
-  let n' = Handler.ninit parameters errors handler in
+  let n' = Handler.ninit parameters errors handler in 
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "FUSE WITH %i %i" n n' in 
+  let () =Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
   let errors, (rules, nrules_pred) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters errors
       (fun parameters errors i rule' (rules, _) ->
         let id = Ckappa_sig.int_of_rule_id i + n in
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "ADD RULE WITH ID %i " id in 
+        let () =Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
+  
         let errors, rules =
           Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set parameters errors
             (Ckappa_sig.rule_id_of_int id)
@@ -510,6 +515,9 @@ let fuse parameters errors handler c_compil handler' c_compil' =
   let errors, init =
     Int_storage.Nearly_inf_Imperatif.fold parameters errors
       (fun parameters errors i init' inits ->
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "ADD INIT WITH ID %i " (i + n') in 
+        let () =Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
+  
         Int_storage.Nearly_inf_Imperatif.set parameters errors (i + n') init'
           inits)
       c_compil'.Cckappa_sig.init c_compil.Cckappa_sig.init

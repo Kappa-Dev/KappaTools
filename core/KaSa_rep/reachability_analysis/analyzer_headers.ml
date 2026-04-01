@@ -284,23 +284,28 @@ let get_guard_mvbdus static = static.global_guard_mvbdus
 let get_restriction_mvbdu static = static.global_restriction_mvbdu
 let get_working_set_mvbdu static = static.global_working_set_mvbdu
 
-let get_working_set_guard_parameters static =
-  let compilation = get_cc_code static in
-  let kappa_handler = get_kappa_handler static in
-  let nsites = Handler.get_nsites kappa_handler in
-  let guards =
-    Ckappa_sig.Ws_index_map_and_set.Map.fold
-      (fun _ (guard_p, _) guards ->
-        Ckappa_sig.mvbdu_var_of_guard guard_p nsites :: guards)
-      compilation.working_set_valuations []
-  in
-  List.rev guards
-
 let get_nr_guard_parameters static =
   Handler.get_nr_guard_parameters (get_kappa_handler static)
 
-let get_nsites static = Handler.get_nsites (get_kappa_handler static)
+ let get_nsites static = Handler.get_nsites (get_kappa_handler static)
 
+let get_working_set_guard_parameters ?full static =
+  let compilation = get_cc_code static in
+  let nsites = get_nsites static in
+  match full with 
+   | None | Some false ->   
+      Ckappa_sig.Ws_index_map_and_set.Map.fold
+      (fun _ (guard_p, _) guards ->
+        Ckappa_sig.mvbdu_var_of_guard guard_p nsites :: guards)
+      compilation.working_set_valuations []
+   | Some true -> 
+      let n = get_nr_guard_parameters static in   
+      let rec aux k acc = 
+        if k=n then acc 
+        else  aux (Ckappa_sig.next_guard_p_name k) (Ckappa_sig.mvbdu_var_of_guard k nsites :: acc)
+      in aux Ckappa_sig.dummy_guard_parameter []
+
+     
 let set_cc_compil cc_code static dynamic error =
   let bdu_handler = get_mvbdu_handler dynamic in
   let parameters = get_parameter static in

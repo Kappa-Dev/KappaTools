@@ -555,12 +555,9 @@ let scan_compil_incremental parameters error compil remanent =
     scan_declarations parameters remanent
       (compil.Ast.signatures : Ckappa_sig.agent_sig list)
   in
-  (*let next_init, next_rule =
-      match new_elts  with
-        | None -> None, None
-        | Some elt -> Some (Public_data.From_init elt.Diff.next_init),
-                      Some (Public_data.From_rule elt.Diff.next_rule)
-    in*)
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+      "START WITH INIT COUNTER: %i " (snd remanent).Cckappa_sig.ninits in 
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
   let remanent =
     scan_initial_states
       (Some (Public_data.From_init (snd remanent).Cckappa_sig.ninits))
@@ -574,6 +571,9 @@ let scan_compil_incremental parameters error compil remanent =
     scan_perts (scan_tested_mixture None) parameters remanent
       compil.Ast.perturbations
   in
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+      "START WITH RULE COUNTER: %i " (snd remanent).Cckappa_sig.nrules in 
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
   let remanent =
     scan_rules
       (Some

@@ -704,7 +704,7 @@ let working_set_id_of_rule_id parameters error rule_id compilation =
       rule_id compilation.rules
   with
   | error, None ->
-    Exception.warn parameters error __POS__ ~message:"rule_id does not exist"
+    Exception.warn parameters error __POS__ ~message:(Format.sprintf "rule_id %s does not exist" (Ckappa_sig.string_of_rule_id rule_id))
       Exit None
   | error, Some rule_info -> error, rule_info.e_rule_working_set_id
 
@@ -714,7 +714,7 @@ let working_set_id_of_init_id parameters error rule_id compilation =
       compilation.init
   with
   | error, None ->
-    Exception.warn parameters error __POS__ ~message:"init_id does not exist"
+    Exception.warn parameters error __POS__ ~message:(Format.sprintf "init_id %s does not exist" (string_of_int rule_id))
       Exit None
   | error, Some rule_info -> error, rule_info.e_init_working_set_id
 
