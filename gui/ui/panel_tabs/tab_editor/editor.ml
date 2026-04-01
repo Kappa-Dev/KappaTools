@@ -30,6 +30,18 @@ let toggle_button =
         Html.a_class [ "btn"; "btn-default"; "pull-right" ];
       ]
     [ Html.cdata "toggle" ]
+  
+let restart_analysis_button_id = "restart_analysis_button"
+
+let restart_analysis_button =
+  Html.a
+    ~a:
+      [
+        Html.a_id restart_analysis_button_id;
+        Html.Unsafe.string_attrib "role" "button";
+        Html.a_class [ "btn"; "btn-default"; "pull-right" ];
+      ]
+    [ Html.cdata "restart KaSa" ]
 
 let panel_heading_group_id = "panel_heading_group"
 
@@ -42,7 +54,7 @@ let panel_heading =
         ]
       Editor_menu_file.content
   in
-  let buttons = menu_editor_file_content :: [ toggle_button ] in
+  let buttons = menu_editor_file_content :: [ restart_analysis_button; toggle_button ] in
   [%html
     {|<div class="row">
              <div id="|}
@@ -329,6 +341,18 @@ let onload () : unit =
     := Dom.handler (fun _ ->
            let editor_full = React.S.value editor_full in
            let () = set_editor_full (not editor_full) in
+           Js._true)
+  in
+  let restart_analysis_button_dom : Dom_html.linkElement Js.t =
+    Js.Unsafe.coerce
+      (Js.Opt.get
+         (Ui_common.document##getElementById (Js.string restart_analysis_button_id))
+         (fun () -> assert false))
+  in
+  let () =
+    restart_analysis_button_dom##.onclick
+    := Dom.handler (fun _ ->
+           let _ = State_project.sync true () in
            Js._true)
   in
   let () =

@@ -276,8 +276,8 @@ class virtual new_client ~is_running ~post mailbox =
             [ (fun b -> Yojson.Basic.write_string b "FileCatalog") ])
 
     method secret_project_parse
-        : (Ast.parsing_compil * string option) Api.lwt_result =
-      Lwt.return
+        : bool -> (Ast.parsing_compil * string option) Api.lwt_result =
+      fun _ -> Lwt.return
         (Api_common.err_result_of_string
            "low level project_parse mustn't be used")
 
@@ -485,7 +485,7 @@ class virtual new_client ~is_running ~post mailbox =
         (Api_common.err_result_of_string
            "low level simulation_load mustn't be used")
 
-    method project_parse ~patternSharing overwrites =
+    method project_parse ~patternSharing overwrites force =
       self#message Nothing (fun b ->
           JsonUtil.write_sequence b
             [
@@ -496,6 +496,7 @@ class virtual new_client ~is_running ~post mailbox =
                   (JsonUtil.write_compact_pair Yojson.Basic.write_string
                      Nbr.write_t)
                   b overwrites);
+              (fun b -> Yojson.Basic.write_bool b force);
             ])
 
     method simulation_continue pause =

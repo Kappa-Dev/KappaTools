@@ -16,7 +16,7 @@ let create_file ?(text = Lwt.return (Js.string "")) (file_id : string) : unit =
           State_file.create_file ~filename:file_id ~content
           >>= (* get new contact map *)
           fun r ->
-          State_project.sync () >>= fun r' ->
+          State_project.sync true () >>= fun r' ->
           Lwt.return (Api_common.result_combine [ r; r' ]) )
       >>= fun _ -> Lwt.return_unit)
 
@@ -30,7 +30,7 @@ let set_file (file_id : string) : unit =
   Common.async __LOC__ (fun () ->
       State_error.wrap ~append:true __LOC__
         ( State_file.select_file file_id None >>= fun r ->
-          State_project.sync () >>= fun r' ->
+          State_project.sync true () >>= fun r' ->
           Lwt.return (Api_common.result_combine [ r; r' ]) )
       (* get new contact map *)
       >>= fun _ -> Lwt.return_unit)
@@ -39,7 +39,7 @@ let close_file () : unit =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__
         ( State_file.remove_file () >>= fun r ->
-          State_project.sync () >>= fun r' ->
+          State_project.sync true () >>= fun r' ->
           Lwt.return (Api_common.result_combine [ r; r' ]) )
       (* get new contact map *)
       >>= fun _ -> Lwt.return_unit)
@@ -48,7 +48,7 @@ let set_file_compile rank (compile : bool) : unit =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__
         ( State_file.set_compile rank compile >>= fun r ->
-          State_project.sync () >>= fun r' ->
+          State_project.sync true () >>= fun r' ->
           Lwt.return (Api_common.result_combine [ r; r' ]) )
       (* get new contact map *)
       >>= fun _ -> Lwt.return_unit)
@@ -57,7 +57,7 @@ let order_files (filenames : string list) : unit =
   Common.async __LOC__ (fun () ->
       State_error.wrap __LOC__
         ( State_file.order_files filenames >>= fun r ->
-          State_project.sync () >>= fun r' ->
+          State_project.sync false () >>= fun r' ->
           Lwt.return (Api_common.result_combine [ r; r' ]) )
       (* get new contact map *)
       >>= fun _ -> Lwt.return_unit)

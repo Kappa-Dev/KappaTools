@@ -28,7 +28,7 @@ class type virtual manager_model = object
   method virtual is_running : bool
 
   method secret_project_parse :
-    (Ast.parsing_compil * string option) result Lwt.t
+    bool -> (Ast.parsing_compil * string option) result Lwt.t
   (*the string is Some filename if the returned parsing_compil represents only the current chapter*)
 
   method project_overwrite : string -> Ast.parsing_compil -> unit result Lwt.t
@@ -209,6 +209,7 @@ class type concrete_manager = object
   method project_parse :
     patternSharing:Pattern.sharing_level ->
     (string * Nbr.t) list ->
+    bool ->
     unit result Lwt.t
 
   method get_influence_map_node_at :

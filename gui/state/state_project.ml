@@ -212,7 +212,7 @@ let set_show_non_weakly_reversible_transitions
 
 let update_state project project_catalog default_parameters project_parameters =
   project.project_manager#project_parse
-    ~patternSharing:Pattern.Compatible_patterns []
+    ~patternSharing:Pattern.Compatible_patterns [] false
   >>= fun (out : unit Api.result) ->
   set_state
     {
@@ -311,12 +311,12 @@ let model : model React.signal =
       })
     state
 
-let sync () : unit Api.lwt_result =
+let sync force () : unit Api.lwt_result =
   match (React.S.value state).project_current with
   | None -> Lwt.return (Result_util.ok ())
   | Some current ->
     current.project_manager#project_parse
-      ~patternSharing:Pattern.Compatible_patterns []
+      ~patternSharing:Pattern.Compatible_patterns [] force
     >>= fun out ->
     let st = React.S.value state in
     let () = set_state { st with project_version = succ st.project_version } in
@@ -376,7 +376,7 @@ let remove_project project_id =
         }
     in
     let () = current.project_manager#terminate in
-    sync () >>= fun out'' ->
+    sync true () >>= fun out'' ->
     Lwt.return (Api_common.result_combine [ out'; out'' ])
   with Not_found ->
     Lwt.return

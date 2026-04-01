@@ -128,7 +128,7 @@ let catalog catalog =
       | Some id -> { position; id } :: acc)
     catalog.index []
 
-let parse yield catalog =
+let parse yield catalog ~force =
   let parse_one_file x filenames compile all_rules_in_ws err =
     let file = Hashtbl.find catalog.elements x in
     let lexbuf = Lexing.from_string file.content in
@@ -188,18 +188,22 @@ let parse yield catalog =
       Lwt.return (Result_util.ok (compile, None))
     | _, err -> handle_error err
   in
-  match !(catalog.ast), !(catalog.current_ws) with
-  | Current compile, _ -> Lwt.return (Result_util.ok (compile, None))
-  | Patched, Some current ->
-    (match Mods.DynArray.get catalog.index current with
-    | None ->
-      let () = catalog.ast := Empty in
-      parse_all_files ()
-    | Some x ->
-      parse_one_file x [] Ast.empty_compil true [] >>= ( function
-      | compile, [] -> Lwt.return (Result_util.ok (compile, Some x))
-      | _, err -> handle_error err ))
-  | Empty, _ | _, None -> parse_all_files ()
+  if force then 
+    let () = catalog.ast := Empty in
+    parse_all_files () 
+  else
+    match !(catalog.ast), !(catalog.current_ws) with
+    | Current compile, _ -> Lwt.return (Result_util.ok (compile, None))
+    | Patched, Some current ->
+      (match Mods.DynArray.get catalog.index current with
+      | None ->
+        let () = catalog.ast := Empty in
+        parse_all_files ()
+      | Some x ->
+        parse_one_file x [] Ast.empty_compil true [] >>= ( function
+        | compile, [] -> Lwt.return (Result_util.ok (compile, Some x))
+        | _, err -> handle_error err ))
+    | Empty, _ | _, None -> parse_all_files ()
 
 let overwrite filename ast catalog =
   let content = Format.asprintf "%a" Ast.print_parsing_compil_kappa ast in

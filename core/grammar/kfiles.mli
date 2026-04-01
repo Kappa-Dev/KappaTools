@@ -37,6 +37,7 @@ val catalog : catalog -> catalog_item list
 val parse :
   (unit -> unit Lwt.t) ->
   catalog ->
+  force:bool ->
   (Ast.parsing_compil * string option, Result_util.message list) Result_util.t
   Lwt.t
 

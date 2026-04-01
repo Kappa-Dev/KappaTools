@@ -171,13 +171,14 @@ object
   method project_parse :
     patternSharing:Kappa_terms.Pattern.sharing_level ->
     (string * Nbr.t) list ->
+    bool ->
     (unit, Result_util.message list) Result_util.t Lwt.t
 
   method secret_get_pos_of_rules_and_vars :
     Public_data.pos_of_rules_and_vars Api.lwt_result
 
   method secret_project_parse :
-    (Ast.parsing_compil * string option) Api.lwt_result
+    bool -> (Ast.parsing_compil * string option) Api.lwt_result
 
   method secret_simulation_load :
     Kappa_terms.Pattern.sharing_level ->

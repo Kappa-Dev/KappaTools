@@ -115,7 +115,7 @@ class t exec_command message_delimiter =
 
     val mutable kasa_locator = []
 
-    method project_parse ~patternSharing overwrites =
+    method project_parse ~patternSharing overwrites force =
       let process_kasa_locator init_kasa load =
         let locators =
           init_kasa >>= fun result ->
@@ -135,7 +135,7 @@ class t exec_command message_delimiter =
         in
         load >>= Api_common.result_bind_with_lwt ~ok:(fun () -> locators)
       in
-      self#secret_project_parse
+      self#secret_project_parse force
       >>= Api_common.result_bind_with_lwt ~ok:(fun (out, patch_file) ->
               (* load the sim so that kasa can run on it *)
               let load =

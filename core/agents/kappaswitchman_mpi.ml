@@ -335,7 +335,11 @@ let on_message exec_command message_delimiter =
                                  Yojson.Basic.read_string Nbr.read_t))
                            st b
                        in
-                       manager#project_parse ~patternSharing overwrites
+                       let force =
+                         JsonUtil.read_next_item
+                           Yojson.Basic.read_bool st b
+                       in
+                       manager#project_parse ~patternSharing overwrites force
                        >>= fun out -> Lwt.return (B (Nothing, msg_id, out))
                      | "SimulationContinue" ->
                        let simulation_parameter =

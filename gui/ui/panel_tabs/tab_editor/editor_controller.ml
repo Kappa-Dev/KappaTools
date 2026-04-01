@@ -18,7 +18,7 @@ let set_content ~(filename : string) ~(filecontent : string) : unit =
     (Api_common.result_bind_with_lwt ~ok:(fun (_, current_filename) ->
          if filename = current_filename then
            State_file.set_content filecontent >>= fun r ->
-           State_project.sync () >>= fun r' ->
+           State_project.sync false () >>= fun r' ->
            Lwt.return (Api_common.result_combine [ r; r' ])
          else (
            let msg =

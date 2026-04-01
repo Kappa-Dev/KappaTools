@@ -45,7 +45,7 @@ val remove_project : string -> unit Api.lwt_result
 val init : string list -> unit Lwt.t
 (* run on application init *)
 
-val sync : unit -> unit Api.lwt_result
+val sync : bool -> unit -> unit Api.lwt_result
 (* to sync state of application with runtime *)
 
 val sync_no_compilation : unit -> unit Api.lwt_result

@@ -85,6 +85,7 @@ class type concrete_manager_without_kasim = object
       unit Api.lwt_result) ->
     patternSharing:Pattern.sharing_level ->
     (string * Nbr.t) list ->
+    bool ->
     unit Api.lwt_result
 end
 
@@ -153,7 +154,7 @@ class virtual manager_without_kasim () : concrete_manager_without_kasim =
     val mutable kasa_locator = []
 
     method private project_parse_without_kasim ~simulation_load ~patternSharing
-        overwrites =
+        overwrites force =
       let process_kasa_locator init_kasa load =
         let locators =
           init_kasa
@@ -173,7 +174,7 @@ class virtual manager_without_kasim () : concrete_manager_without_kasim =
         in
         load >>= Api_common.result_bind_with_lwt ~ok:(fun () -> locators)
       in
-      self#secret_project_parse
+      self#secret_project_parse force
       >>= Api_common.result_bind_with_lwt
             ~ok:(fun ((parsing_compil : Ast.parsing_compil), patch_file) ->
               (* load the sim so that kasa can run on it *)
@@ -241,14 +242,14 @@ class runtime_kasim_as_web_worker () : Api.concrete_manager =
       without_kasim#is_computing || self#sim_is_computing
       || self#story_is_computing
 
-    method project_parse ~patternSharing overwrites =
+    method project_parse ~patternSharing overwrites force =
       let simulation_load (patternSharing : Pattern.sharing_level)
           (parsing_compil : Ast.parsing_compil)
           (overwrites : (string * Nbr.t) list) =
         self#secret_simulation_load patternSharing parsing_compil overwrites
       in
       without_kasim#project_parse_without_kasim ~simulation_load ~patternSharing
-        overwrites
+        overwrites force
   end
 
 (* TODO: deprecate this? *)
@@ -281,10 +282,10 @@ class runtime_kasim_embedded_in_main_thread () : Api.concrete_manager =
     method is_computing =
       without_kasim#is_computing || self#is_computing || self#story_is_computing
 
-    method project_parse ~patternSharing overwrites =
+    method project_parse ~patternSharing overwrites force =
       let simulation_load patternSharing parsing_compil overwrites =
         self#secret_simulation_load patternSharing parsing_compil overwrites
       in
       without_kasim#project_parse_without_kasim ~simulation_load ~patternSharing
-        overwrites
+        overwrites force
   end

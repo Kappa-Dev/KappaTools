@@ -106,7 +106,10 @@ let on_message yield post =
                        let out = Kfiles.file_delete ~id catalog in
                        Lwt.return (B (Nothing, msg_id, lift_answer out))
                      | "ProjectParse" ->
-                       Lwt.bind (Kfiles.parse yield catalog) (fun out ->
+                       let force =
+                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
+                       in
+                       Lwt.bind (Kfiles.parse yield catalog ~force) (fun out ->
                            Lwt.return (B (Ast, msg_id, out)))
                      | "ProjectOverwrite" ->
                        let id =
