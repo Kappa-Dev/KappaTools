@@ -93,7 +93,7 @@ echo "Using a timeout of $TIMEOUT."
 echo "Using $NR_RULES rules in the working set."
 echo "Performing $REPS repetitions for each experiment."
 
-OPTIONS="--reset-all --compute-reachability-analysis --enable-every-domain --print-efficiency"
+OPTIONS="--reset-all --compute-reachability-analysis --enable-every-domain --print-efficiency --do-restart-fixpoint-iterations"
 # models
 MODELS_DIRECTORY="${SCRIPT_DIR}/models/"
 

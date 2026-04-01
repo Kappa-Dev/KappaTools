@@ -85,7 +85,7 @@ def main(inp_path, out_path):
     lines.append(r"& & \bfseries\shortstack{analysis} & \bfseries\shortstack{initial\\analysis} & \bfseries\shortstack{disable\\rules} & \bfseries\shortstack{add\\a rule}\\")
     lines.append(r"\midrule")
 
-    for model in sorted(data.keys(), key=lambda k: model_nr_rules.get(k, "")):# sort by number of rules in the model
+    for model in sorted(data.keys(), key=lambda k: int(model_nr_rules.get(k, "0"))):# sort by number of rules in the model
         row_elems = []
         row_elems.append(r"\texttt{" + latex_escape(model) + "}")
         row_elems.append(latex_escape(model_nr_rules.get(model, "")))
