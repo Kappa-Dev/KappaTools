@@ -70,10 +70,10 @@ functor
     (******************************************************************)
     (*operations of module signatures*)
 
-    let init ?compil ?files ~called_from () =
+    let init ?compil ?files ?(is_a_patch=false) ~called_from () =
       match compil with
       | Some compil ->
-        let parameters = Remanent_parameters.get_parameters ~called_from () in
+        let parameters = Remanent_parameters.get_parameters ~called_from ~is_a_patch () in
         let state =
           Remanent_state.create_state parameters (Remanent_state.Compil compil)
         in
@@ -85,9 +85,9 @@ functor
           let errors = Exception.empty_exceptions_caught_and_uncaught in
           let errors, parameters, files =
             match files with
-            | None -> Get_option.get_option errors
+            | None -> Get_option.get_option ~is_a_patch errors
             | Some x ->
-              let a, b, _ = Get_option.get_option errors in
+              let a, b, _ = Get_option.get_option ~is_a_patch errors in
               a, b, x
           in
           let log = Remanent_parameters.get_logger parameters in
@@ -287,6 +287,7 @@ functor
       let parameters = get_parameters state in
       let syntax_version = Remanent_parameters.get_syntax_version parameters in
       let removed_rules = Remanent_parameters.get_rules_to_remove parameters in
+      let is_a_patch = Remanent_parameters.get_is_a_patch parameters in
       let current_chapter =
         Remanent_parameters.get_current_chapter parameters
       in
@@ -300,6 +301,11 @@ functor
         | Remanent_state.Files files ->
           let () = show_title state in
           (try
+            if is_a_patch then 
+              ( errors,
+               Cli_init.get_ast_from_list_of_files ~current_chapter:files ~rules_in_ws:[]
+                 ~removed_rules:[] syntax_version [])
+            else
              ( errors,
                Cli_init.get_ast_from_list_of_files ~current_chapter ~rules_in_ws
                  ~removed_rules syntax_version files )
@@ -2438,7 +2444,7 @@ functor
         | Some false | None -> false
       in
       let errors = get_errors state in
-      let state' = init ~called_from ?compil ?files () in
+      let state' = init ~called_from ?compil ?files ~is_a_patch:true () in
       let state' = set_errors errors state' in
       let state', _ = get_compilation state' in
       let state' =

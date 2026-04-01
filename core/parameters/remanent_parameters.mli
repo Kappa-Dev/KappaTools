@@ -20,6 +20,7 @@ val ext_format : Remanent_parameters_sig.graph_format -> string
 
 val get_parameters :
   ?html_mode:bool ->
+  ?is_a_patch:bool ->
   called_from:Remanent_parameters_sig.called_from ->
   unit ->
   Remanent_parameters_sig.parameters
@@ -335,10 +336,7 @@ val update_call_stack :
 
 val get_print_efficiency : Remanent_parameters_sig.parameters -> bool
 
-val set_print_efficiency :
-  Remanent_parameters_sig.parameters ->
-  bool ->
-  Remanent_parameters_sig.parameters
+val get_is_a_patch : Remanent_parameters_sig.parameters -> bool
 
 val open_influence_map_file :
   Remanent_parameters_sig.parameters -> Remanent_parameters_sig.parameters

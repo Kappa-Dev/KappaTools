@@ -340,7 +340,7 @@ let fetch_backdoors () =
     Remanent_parameters_sig.backdoor_directory = !Config.backdoor_directory;
   }
 
-let get_parameters ?(html_mode = true) ~called_from () =
+let get_parameters ?(html_mode = true) ?(is_a_patch=false) ~called_from () =
   let channel, channel_err, channel_backdoor, html_mode, command =
     match called_from with
     | Remanent_parameters_sig.Server ->
@@ -479,6 +479,7 @@ let get_parameters ?(html_mode = true) ~called_from () =
       | Some channel -> Loggers.open_logger_from_channel channel);
     Remanent_parameters_sig.compression_status = Loggers.dummy_txt_logger;
     Remanent_parameters_sig.print_efficiency = !Config.print_efficiency;
+    Remanent_parameters_sig.is_a_patch = is_a_patch;
     Remanent_parameters_sig.profiler =
       (match channel with
       | None -> Loggers.dummy_txt_logger
@@ -1438,11 +1439,11 @@ let get_compression_status_logger parameter =
 
 let get_kasa_state = compose get_kasa_state_1 get_marshalisable
 
-let set_print_efficiency parameter bool =
-  { parameter with Remanent_parameters_sig.print_efficiency = bool }
-
 let get_print_efficiency parameter =
   parameter.Remanent_parameters_sig.print_efficiency
+
+let get_is_a_patch parameter =
+  parameter.Remanent_parameters_sig.is_a_patch
 
 let set_logger parameter logger =
   { parameter with Remanent_parameters_sig.logger }
