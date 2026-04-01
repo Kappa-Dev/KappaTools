@@ -725,7 +725,7 @@ let rule_is_enabled_in_current_working_set parameters error rule_id compilation
     error, true (* rules that are not in the working set are always enabled *)
   | error, Some ws_id ->
     (match
-       Ckappa_sig.Ws_index_map_and_set.Map.find_option parameters error ws_id
+       Ckappa_sig.Ws_index_map_and_set.Map.find_option_without_logs parameters error ws_id
          compilation.working_set_valuations
      with
     | error, None -> error, false (*permanently disabled*)
@@ -738,7 +738,7 @@ let rule_is_permanently_disabled_in_current_working_set parameters error rule_id
     error, false (* rules that are not in the working set are always enabled *)
   | error, Some ws_id ->
     (match
-       Ckappa_sig.Ws_index_map_and_set.Map.find_option parameters error ws_id
+       Ckappa_sig.Ws_index_map_and_set.Map.find_option_without_logs parameters error ws_id
          compilation.working_set_valuations
      with
     | error, None -> error, true
@@ -751,7 +751,7 @@ let init_is_enabled_in_current_working_set parameters error init_id compilation
     error, true (* inits that are not in the working set are always enabled *)
   | error, Some ws_id ->
     (match
-       Ckappa_sig.Ws_index_map_and_set.Map.find_option parameters error ws_id
+       Ckappa_sig.Ws_index_map_and_set.Map.find_option_without_logs parameters error ws_id
          compilation.working_set_valuations
      with
     | error, None -> error, false (*permanently disabled*)
@@ -764,7 +764,7 @@ let init_is_permanently_disabled_in_current_working_set parameters error rule_id
     error, false (* inits that are not in the working set are always enabled *)
   | error, Some ws_id ->
     (match
-       Ckappa_sig.Ws_index_map_and_set.Map.find_option parameters error ws_id
+       Ckappa_sig.Ws_index_map_and_set.Map.find_option_without_logs parameters error ws_id
          compilation.working_set_valuations
      with
     | error, None -> error, true
