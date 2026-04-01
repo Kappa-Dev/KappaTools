@@ -197,19 +197,24 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     let error, dynamic, _ =
       List.fold_left
         (fun (error, dynamic, i) chemical_species ->
-          let error, dynamic =
-            add_event parameters error (StoryProfiling.Initial_state i) None
-              dynamic
-          in
-          let error, dynamic, () =
-            Domain.add_initial_state static dynamic error chemical_species
+           let error, b = 
+              Cckappa_sig.init_is_permanently_disabled_in_current_working_set 
+            parameters error i compil in 
+          let error, dynamic = 
+            if b then error, dynamic else 
+              let error, dynamic =
+                add_event parameters error (StoryProfiling.Initial_state i) None
+                dynamic
+              in
+              let error, dynamic, () =
+                Domain.add_initial_state static dynamic error chemical_species
           in
           let error, dynamic =
             close_event parameters error (StoryProfiling.Initial_state i) None
               dynamic
-          in
+          in error, dynamic  in 
           error, dynamic, i + 1)
-        (error, dynamic, 1) init
+        (error, dynamic, 0) init
     in
     let error, dynamic = close_event parameters error init_event None dynamic in
     let log = Remanent_parameters.get_logger parameters in
@@ -222,7 +227,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
         match next_opt with
         | None -> error, static, dynamic
         | Some rule_id ->
-          let error =
+           let error =
             if
               local_trace
               || Remanent_parameters.get_dump_reachability_analysis_iteration
@@ -242,11 +247,17 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
             ) else
               error
           in
+          let error, b = 
+            Cckappa_sig.rule_is_permanently_disabled_in_current_working_set
+            parameters error rule_id compil in 
+          if b then error, static, dynamic 
+          else 
+        
           let error, dynamic, is_enabled =
             Domain.is_enabled static dynamic error rule_id
           in
-          (match is_enabled with
-          | None ->
+          (match b,is_enabled with
+          | false, _ | _, None ->
             let _ =
               if
                 local_trace
@@ -263,7 +274,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
               )
             in
             aux error dynamic
-          | Some precondition ->
+          | true, Some precondition ->
             let _ =
               if
                 local_trace
