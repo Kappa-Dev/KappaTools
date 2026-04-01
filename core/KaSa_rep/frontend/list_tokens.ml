@@ -455,11 +455,31 @@ let next i =
   | Some (Public_data.From_rule i) ->
     Some (Public_data.From_rule (Ckappa_sig.next_rule_id i))
 
-let scan_initial_states ast_origin parameters remanent l =
-  fst
-    (List.fold_left
-       (fun (remanent, i) (_, (guard, (alg, _pos), init_t)) ->
-         let remanent = scan_guard parameters remanent guard in
+let scan_initial_states ast_origin diff parameters remanent l =
+  let (a,_,_,_) = 
+    List.fold_left
+       (fun (remanent, i,j,l) (_, (guard, (alg, _pos), init_t)) ->
+        let l', b = 
+          match l with Some [] -> Some [], false 
+                  | None -> None, true 
+                  | Some (a::b) when a=j -> 
+                      Some b, true
+                  | Some _ -> l, false 
+        in           
+       let () =
+       match i with Some (Public_data.From_init i) -> 
+        let () = Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "Scan init %i" i  in 
+          let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    in  ()
+          | None | Some (Public_data.From_rule _) -> () 
+      in
+       
+      let remanent, i' = 
+        if b then 
+          let remanent = scan_guard parameters remanent guard in
          let remanent = scan_alg parameters remanent alg in
          let remanent =
            match init_t with
@@ -467,9 +487,11 @@ let scan_initial_states ast_origin parameters remanent l =
              scan_mixture i parameters remanent mixture
            | Ast.INIT_TOK tk_l ->
              List.fold_left (scan_token parameters) remanent tk_l
-         in
-         remanent, next i)
-       (remanent, ast_origin) l)
+         in remanent, next i 
+        else remanent, i  in 
+        remanent, i', j+1,l' )
+       (remanent, ast_origin, 0, diff) l
+    in a 
 
 let scan_declarations parameters =
   List.fold_left (fun remanent a -> scan_agent_sig None parameters remanent a)
@@ -494,8 +516,8 @@ let scan_perts scan_mixt parameters =
             remanent)
         remanent m)
 
-let scan_rules ast_origin scan_mixt parameters a b =
-  let _ =
+let scan_rules ast_origin diff scan_mixt parameters a b =
+    let _ =
     if Remanent_parameters.get_trace parameters then (
       let () =
         Loggers.fprintf
@@ -508,18 +530,36 @@ let scan_rules ast_origin scan_mixt parameters a b =
       ()
     )
   in
-  fst
-    (List.fold_left
-       (fun (remanent, i) (_, _, guard, (rule, _)) ->
-         let remanent =
+  let (a,_,_,_) = 
+    List.fold_left
+       (fun (remanent, i, j, l) (_, _, guard, (rule, _)) ->
+      let () =
+       match i with Some (Public_data.From_rule i) -> 
+        let () = Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "Scan rule %i" (Ckappa_sig.int_of_rule_id i)  in 
+          let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    in  ()
+          | None | Some (Public_data.From_init _ ) -> () 
+      in
+      let l', b = 
+          match l with Some [] -> Some [], false 
+                  | None -> None, true 
+                  | Some (a::b) when a=j -> 
+                      Some b, true
+                  | Some _ -> l, false 
+        in      
+         let remanent, i' =
+          if b then 
            scan_guard parameters
              (scan_mixture i parameters
                 (scan_mixt i parameters remanent rule.Ckappa_sig.lhs)
                 rule.Ckappa_sig.rhs)
-             guard
+             guard, next i  else remanent, i 
          in
-         remanent, next i)
-       (a, ast_origin) b)
+         remanent, i', j+1, l')
+       (a, ast_origin,0,diff) b in a 
 
 let reverse_agents_annotation parameters (error, remanent) =
   let agents_annotation = remanent.Cckappa_sig.agents_annotation in
@@ -535,7 +575,7 @@ let reverse_agents_annotation parameters (error, remanent) =
 
   error, { remanent with Cckappa_sig.agents_annotation }
 
-let scan_compil_incremental parameters error compil remanent =
+let scan_compil_incremental parameters error ?diff compil remanent =
   let parameters =
     Remanent_parameters.set_trace parameters
       (local_trace || Remanent_parameters.get_trace parameters)
@@ -555,12 +595,17 @@ let scan_compil_incremental parameters error compil remanent =
     scan_declarations parameters remanent
       (compil.Ast.signatures : Ckappa_sig.agent_sig list)
   in
+  let diff_init, diff_rules = 
+    match diff with 
+    | None -> None, None 
+    | Some diff -> Some (diff.Diff.diff_init.Diff.new_elt), Some (diff.Diff.diff_rules.Diff.new_elt)
+  in 
   let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
       "START WITH INIT COUNTER: %i " (snd remanent).Cckappa_sig.ninits in 
   let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
   let remanent =
-    scan_initial_states
-      (Some (Public_data.From_init (snd remanent).Cckappa_sig.ninits))
+    scan_initial_states 
+      (Some (Public_data.From_init (snd remanent).Cckappa_sig.ninits)) diff_init  
       parameters remanent compil.Ast.init
   in
   let remanent =
@@ -578,7 +623,7 @@ let scan_compil_incremental parameters error compil remanent =
     scan_rules
       (Some
          (Public_data.From_rule
-            (Ckappa_sig.rule_id_of_int (snd remanent).Cckappa_sig.nrules)))
+            (Ckappa_sig.rule_id_of_int (snd remanent).Cckappa_sig.nrules))) diff_rules
       scan_tested_mixture parameters remanent compil.Ast.rules
   in
   let remanent = reverse_agents_annotation parameters remanent in
@@ -588,9 +633,10 @@ let scan_compil parameters error compil =
   let error, remanent = empty_handler parameters error in
   scan_compil_incremental parameters error compil remanent
 
-let scan_incremental_compil parameters error compil old_remanent =
+let scan_incremental_compil parameters error ~diff compil old_remanent =
+  let diff = Some diff in 
   let error, remanent =
-    scan_compil_incremental parameters error compil old_remanent
+    scan_compil_incremental parameters error ?diff compil old_remanent
   in
   let () =
     if Remanent_parameters.get_trace parameters then (
