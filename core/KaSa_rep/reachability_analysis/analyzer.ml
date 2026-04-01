@@ -126,7 +126,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     in
     error, dynamic
 
-  let main ?do_not_restart_fixpoint_computation ?patch parameters log_info error mvbdu_handler compil kappa_handler =
+  let main ?patch parameters log_info error mvbdu_handler compil kappa_handler =
     let domain_event, global_event, init_event, analysis_event, new_elts =
       match patch with
       | None ->
@@ -186,17 +186,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     let error, dynamic =
       close_event parameters error global_event None dynamic
     in
-    let do_increment = 
-      match do_not_restart_fixpoint_computation with 
-      | None | Some false -> true
-      | Some true -> false 
-    in 
-     let log = Remanent_parameters.get_logger parameters in
-    let error, static, dynamic = 
-      if not do_increment then 
-        error, static, dynamic 
-    else 
-       let error, dynamic = add_event parameters error init_event None dynamic in
+    let error, dynamic = add_event parameters error init_event None dynamic in
     let error, dynamic, _ =
       List.fold_left
         (fun (error, dynamic, i) chemical_species ->
@@ -215,6 +205,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
         (error, dynamic, 1) init
     in
     let error, dynamic = close_event parameters error init_event None dynamic in
+    let log = Remanent_parameters.get_logger parameters in
     let error, dynamic =
       add_event parameters error analysis_event None dynamic
     in
@@ -286,7 +277,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
             aux error dynamic)
       in
       aux error dynamic
-    in error, static, dynamic  in 
+    in
     let error, dynamic, () = Domain.stabilize static dynamic error in
     let error, dynamic =
       close_event parameters error analysis_event None dynamic
@@ -306,6 +297,11 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
           static_information,
           dynamic_information )
         Remanent_state.state) =
+    let do_increment = 
+      match do_not_restart_fixpoint_computation with 
+      | None | Some false -> true
+      | Some true -> false 
+    in 
     let patch =
       match Remanent_state.get_reachability_result state with
       | None -> None
@@ -313,18 +309,19 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     in
     match patch with 
     | None -> main ?patch parameters log_info error mvbdu_handler compil kappa_handler
-    | Some _-> 
-         main ?patch ?do_not_restart_fixpoint_computation  parameters log_info error mvbdu_handler compil kappa_handler
-   
+    | Some (static, dynamic,_ ) -> 
+       if do_increment then 
+          main ?patch parameters log_info error mvbdu_handler compil kappa_handler
+       else 
+          let log = Remanent_parameters.get_logger parameters in 
+          let error,() = 
+            Exception.warn parameters error __POS__ ~message:"Iterations have not been restarted" Exit () in 
+          let error, dynamic = print (snd static) dynamic error log in
+          error, log_info, static, dynamic
   let main parameters log_info error mvbdu_handler compil kappa_handler =
     main parameters log_info error mvbdu_handler compil kappa_handler
 
   let export global static dynamic error kasa_state =
-   (*let parameters = Domain.get_parameters static in
-    let compil = Domain.get_static static in
-    let handler = get_kappa_handler static in 
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "EXPORT (COMPOSITE DOMAIN)" in 
-    let error = Print_cckappa.print_compil *)
     let kasa_state =
       Remanent_state.set_internal_constraint_list [] kasa_state
     in

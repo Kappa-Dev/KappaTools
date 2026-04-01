@@ -2366,11 +2366,6 @@ let translate_c_compil parameters error handler compil =
           error, map)
       c_rules handler.Cckappa_sig.rules_label_map
   in
-  let () = 
-    Loggers.fprintf (Remanent_parameters.get_logger parameters) 
-       "PREPROCESS NRULES %i NINIT %i" n_rules n_inits in 
-  let () = 
-    Loggers.print_newline (Remanent_parameters.get_logger parameters)  in 
 
   ( error,
     {
