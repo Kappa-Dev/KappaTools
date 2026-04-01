@@ -12,6 +12,8 @@ val compute_ws_values :
   (int option * (Ast.mixture, Ast.mixture, string) Ast.init_statement) list ->
   Ast.parsing_compil ->
   Ast.parsing_compil
+  * Ast.rule Ast.compil_rule list
+  * (int option * (Ast.mixture, Ast.mixture, string) Ast.init_statement) list
 
 val append_to_ast_compil :
   Ast.parsing_instruction list ->

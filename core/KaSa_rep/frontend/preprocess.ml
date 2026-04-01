@@ -2317,6 +2317,7 @@ let translate_c_compil parameters error handler compil =
       (List.rev c_signatures)
   in
   let n_rules = List.length c_rules in
+  let n_inits = List.length c_inits in
   let error, c_rules =
     Ckappa_sig.array_of_list_rule_id
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create
@@ -2363,13 +2364,14 @@ let translate_c_compil parameters error handler compil =
               error label rule_id rule_label_map
           in
           error, map)
-      c_rules Ckappa_sig.Rule_label_map_and_set.Map.empty
+      c_rules handler.Cckappa_sig.rules_label_map
   in
 
   ( error,
     {
       handler with
       Cckappa_sig.nrules = n_rules;
+      Cckappa_sig.ninits = n_inits;
       Cckappa_sig.nvars = n_vars;
       Cckappa_sig.rules_label_map = rule_label_to_rule_id_map;
     },

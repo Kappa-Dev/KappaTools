@@ -109,7 +109,13 @@ val fuse :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   Cckappa_sig.compil ->
+  Cckappa_sig.kappa_handler ->
   Cckappa_sig.compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Cckappa_sig.kappa_handler
   * Cckappa_sig.compil
+
+val update_ast :
+  Ast.parsing_compil ->
+  Ast.parsing_compil ->
+  Ast.parsing_compil * Ast.parsing_compil

@@ -45,13 +45,15 @@ let compute_ws_values ~all_rules_in_ws ~rules_in_ws rules inits compil =
       ([], working_set_values, nr_working_set_params, List.length compil.rules)
       rules
   in
-  {
-    compil with
-    rules = compil.Ast.rules @ List.rev rules_rev;
-    init = compil.Ast.init @ List.rev init_rev;
-    working_set_values;
-    nr_working_set_params;
-  }
+  ( {
+      compil with
+      rules = compil.Ast.rules @ List.rev rules_rev;
+      init = compil.Ast.init @ List.rev init_rev;
+      working_set_values;
+      nr_working_set_params;
+    },
+    List.rev rules_rev,
+    List.rev init_rev )
 
 let append_to_ast_compil rev_instr ?(all_rules_in_ws = false)
     ?(rules_in_ws = []) compil =
@@ -127,4 +129,7 @@ let append_to_ast_compil rev_instr ?(all_rules_in_ws = false)
             inits ))
       (compil, [], []) (List.rev rev_instr)
   in
-  compute_ws_values ~all_rules_in_ws ~rules_in_ws rules inits compil
+  let compil, _, _ =
+    compute_ws_values ~all_rules_in_ws ~rules_in_ws rules inits compil
+  in
+  compil

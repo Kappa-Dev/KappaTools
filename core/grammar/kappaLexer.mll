@@ -209,7 +209,7 @@ and inline_comment = parse
     try
       let () = Format.fprintf logger "Parsing %s...@." file in
       let out = KappaParser.start_rule token lexbuf {compil with rules = []; init = []} in
-	  let out = Cst.compute_ws_values ~all_rules_in_ws ~rules_in_ws out.Ast.rules out.Ast.init 
+	  let out, _, _ = Cst.compute_ws_values ~all_rules_in_ws ~rules_in_ws out.Ast.rules out.Ast.init 
 	  	{out with rules = compil.Ast.rules; init = compil.Ast.init} in
       let () = Format.fprintf logger "done@." in
       let () = close_in d in out

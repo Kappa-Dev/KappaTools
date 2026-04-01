@@ -2491,11 +2491,18 @@ functor
       let state, handler = get_handler state in
       let _state', compil = get_compilation state' in
       let compil = Diff.cut diff compil in
+      (*extracts only the new rules from the compilation *)
       let errors = get_errors state in
+      let state, old_compilation = get_compilation state in
+      let compil, updated_compilation =
+        Diff.update_ast compil old_compilation
+      in
+      let state = Remanent_state.set_compilation updated_compilation state in
+      let state = Remanent_state.set_compilation updated_compilation state in
       let errors, c_compil =
         Prepreprocess.translate_compil parameters errors compil
       in
-      let errors, _handler, cc_compil' =
+      let errors, handler', cc_compil' =
         Preprocess.translate_c_compil parameters errors handler c_compil
       in
       let _state' = Remanent_state.set_compilation compil state' in
@@ -2504,12 +2511,12 @@ functor
       let state = Remanent_state.store_patch cc_compil state in
       let errors = get_errors state in
       let errors, handler, cc_compil =
-        Diff.fuse parameters errors handler cc_compil cc_compil'
+        Diff.fuse parameters errors handler cc_compil handler' cc_compil'
       in
       let state = set_errors errors state in
+      let state = Remanent_state.set_c_compil cc_compil state in
       let state, ((_global_static, _static), _dynamic) =
-        update_reachability_result
-          ?do_not_restart_fixpoint_computation 
+        update_reachability_result ?do_not_restart_fixpoint_computation
           (compute_show_title (fun _ -> do_we_show_title) (Some "Apply patch"))
           new_indexs state
       in

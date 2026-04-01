@@ -490,37 +490,21 @@ let get_new_indexs parameters errors handler c_compil =
   in
   errors, new_indexs
 
-let fuse parameters errors handler c_compil c_compil' =
+let fuse parameters errors handler c_compil handler' c_compil' =
   let n = Handler.nrules parameters errors handler in
-  let errors, n' =
-    Int_storage.Nearly_inf_Imperatif.dimension parameters errors
-      c_compil.Cckappa_sig.init
-  in
-  let rules_label_map = handler.Cckappa_sig.rules_label_map in
-  let errors, (rules_label_map, rules, nrules_pred) =
+  let n' = Handler.ninit parameters errors handler in
+  let errors, (rules, nrules_pred) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters errors
-      (fun parameters errors i rule' (rules_label_map, rules, _) ->
+      (fun parameters errors i rule' (rules, _) ->
         let id = Ckappa_sig.int_of_rule_id i + n in
         let errors, rules =
           Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set parameters errors
             (Ckappa_sig.rule_id_of_int id)
             rule' rules
         in
-        let errors, rules_label_map =
-          match rule'.Cckappa_sig.e_rule_label with
-          | None -> errors, rules_label_map
-          | Some (label, _) ->
-            let errors, rules_label_map =
-              Ckappa_sig.Rule_label_map_and_set.Map.add_or_overwrite parameters
-                errors label
-                (Ckappa_sig.rule_id_of_int id)
-                rules_label_map
-            in
-            errors, rules_label_map
-        in
-        errors, (rules_label_map, rules, id))
+        errors, (rules, id))
       c_compil'.Cckappa_sig.rules
-      (rules_label_map, c_compil.Cckappa_sig.rules, n)
+      (c_compil.Cckappa_sig.rules, n)
   in
   let nrules = nrules_pred + 1 in
   let errors, init =
@@ -530,6 +514,26 @@ let fuse parameters errors handler c_compil c_compil' =
           inits)
       c_compil'.Cckappa_sig.init c_compil.Cckappa_sig.init
   in
+  let ninits = n' + Handler.ninit parameters errors handler' in
   ( errors,
-    { handler with Cckappa_sig.nrules; Cckappa_sig.rules_label_map },
-    { c_compil with Cckappa_sig.rules; Cckappa_sig.init } )
+    { handler' with Cckappa_sig.nrules; Cckappa_sig.ninits },
+    {
+      c_compil with
+      Cckappa_sig.rules;
+      Cckappa_sig.init;
+      Cckappa_sig.working_set_valuations =
+        c_compil'.Cckappa_sig.working_set_valuations;
+    } )
+
+let update_ast added_elements_compil old_compil =
+  let updated_compil, renamed_rules, renamed_init =
+    Cst.compute_ws_values ~all_rules_in_ws:true ~rules_in_ws:[]
+      added_elements_compil.Ast.rules added_elements_compil.Ast.init old_compil
+  in
+  ( {
+      added_elements_compil with
+      Ast.init = renamed_init;
+      Ast.rules = renamed_rules;
+      Ast.working_set_values = updated_compil.Ast.working_set_values;
+    },
+    updated_compil )
