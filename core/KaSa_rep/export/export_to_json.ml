@@ -97,7 +97,7 @@ functor
       init ?compil ~called_from:Remanent_parameters_sig.Server ()
 
     let patch ?compil ~old_file_name state =
-      patch ?compil ~called_from:Remanent_parameters_sig.Server ~old_file_name
+      patch ~do_not_restart_fixpoint_computation:false ?compil ~called_from:Remanent_parameters_sig.Server ~old_file_name
         state
 
     let get_contact_map ?(accuracy_level = Public_data.Low) state =
@@ -210,8 +210,9 @@ functor
 
     let get_dead_agents state =
       let state, agents = get_dead_agents state in
+      let of_int a = JsonUtil.of_int (Ckappa_sig.int_of_rule_id a) in
       ( state,
-        Public_data.json_of_dead_agents Ckappa_sig.rule_id_to_json
+        Public_data.json_of_dead_agents of_int
           JsonUtil.of_int agents )
 
     let get_conditionally_dead_rules state =
