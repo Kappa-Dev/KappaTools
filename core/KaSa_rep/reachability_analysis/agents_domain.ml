@@ -147,10 +147,11 @@ module Domain = struct
         { agents_liveness = seen_agent; liveness_current_working_set = None };
     }
 
-  let is_false_mvbdu parameters error dynamic mvbdu =
+  let is_false_mvbdu parameters error dynamic mvbdu restriction_bdu
+    =
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, is_false =
-      Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu
+      Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu restriction_bdu
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, is_false
@@ -596,6 +597,7 @@ module Domain = struct
 
   let is_enabled static dynamic error rule_id precondition =
     let parameters = get_parameter static in
+    let restriction_bdu = get_restriction_mvbdu static in 
     let domain_static = get_domain_static_information static in
     let error, (bot_or_not, _) =
       match
@@ -630,7 +632,7 @@ module Domain = struct
           l
       in
       let error, dynamic, is_false =
-        is_false_mvbdu parameters error dynamic state_guard_parameters
+        is_false_mvbdu parameters error dynamic state_guard_parameters restriction_bdu
       in
       if is_false then
         error, dynamic, None
@@ -651,6 +653,7 @@ module Domain = struct
 
   let maybe_reachable static dynamic error _flag pattern precondition =
     let parameters = get_parameter static in
+    let restriction_bdu = get_restriction_mvbdu static in 
     let error, dynamic, state_guard_parameters =
       get_state_of_guard_parameters parameters dynamic error precondition
     in
@@ -670,7 +673,7 @@ module Domain = struct
                   current_mvbdu true
               in
               let error, dynamic, is_false =
-                is_false_mvbdu parameters error dynamic current_mvbdu
+                is_false_mvbdu parameters error dynamic current_mvbdu restriction_bdu
               in
               if is_false then
                 raise (False (error, dynamic))
@@ -782,7 +785,7 @@ module Domain = struct
               let info = a, list, c in
               let agent = Remanent_state.info_to_agent info in
               let error, dynamic, is_false =
-                is_false_mvbdu parameters error dynamic mvbdu
+                is_false_mvbdu parameters error dynamic mvbdu restriction_bdu 
               in
               if is_false then
                 ( error,
@@ -882,7 +885,7 @@ module Domain = struct
                   __POS__ Exit
               in
               let error, dynamic, is_false =
-                is_false_mvbdu parameters error dynamic mvbdu
+                is_false_mvbdu parameters error dynamic mvbdu restriction_bdu
               in
               let error, dynamic =
                 if is_false then (

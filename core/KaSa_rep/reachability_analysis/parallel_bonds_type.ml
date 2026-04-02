@@ -233,7 +233,7 @@ let compute_mvbdus_and_parallel_constraints parameters bdu_handler error mvbdu
   in
   let error, bdu_handler, parallel_is_false =
     Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
-      parallel_bond_mvbdu
+      parallel_bond_mvbdu restriction_bdu
   in
   let error, bdu_handler, non_parallel_is_true =
     Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
@@ -241,7 +241,7 @@ let compute_mvbdus_and_parallel_constraints parameters bdu_handler error mvbdu
   in
   let error, bdu_handler, non_parallel_is_false =
     Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
-      non_parallel_bond_mvbdu
+      non_parallel_bond_mvbdu restriction_bdu
   in
   let depends_on_parameters =
     not

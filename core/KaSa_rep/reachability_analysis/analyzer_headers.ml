@@ -376,7 +376,7 @@ let initialize_global_information ?patch parameters log_info error mvbdu_handler
   let nr_guard_parameters = Handler.get_nr_guard_parameters kappa_handler in
   let error, mvbdu_handler, restriction_mvbdu =
     Common_static.compute_restriction_mvbdu ?patch_compute_restriction_mvbdu
-      parameters error mvbdu_handler nr_guard_parameters nsites
+      parameters error mvbdu_handler nr_guard_parameters nsites compilation 
   in
   let error, mvbdu_handler, guard_mvbdus =
     Common_static.collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters
