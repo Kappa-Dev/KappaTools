@@ -504,7 +504,7 @@ let fuse parameters errors handler c_compil handler' c_compil' =
         in
         errors, (rules, id))
       c_compil'.Cckappa_sig.rules
-      (c_compil.Cckappa_sig.rules, n)
+      (c_compil.Cckappa_sig.rules, n - 1)
   in
   let nrules = nrules_pred + 1 in
   let errors, init =
