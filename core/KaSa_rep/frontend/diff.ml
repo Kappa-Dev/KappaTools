@@ -170,7 +170,7 @@ let summarize_init_state_from_ast parameters error id
       | None -> false
       | Some id ->
       match Mods.IntMap.find_option id compil.Ast.working_set_values with
-      | None -> false 
+      | None -> true 
       | Some None -> true
       | Some (Some _) -> false
 
@@ -181,7 +181,7 @@ let summarize_from_ast parameters error compil =
       (fun (error, id, summary) rule ->
         let (ws_id, _, _, _) = rule in
         if is_permanently_disabled compil ws_id then
-          error, id, summary
+          error, id + 1, summary
         else
         let error, summary =
           summarize_rule_from_ast parameters error id rule summary
@@ -196,7 +196,7 @@ let summarize_from_ast parameters error compil =
              int option * (Ast.mixture, Ast.mixture, string) Ast.init_statement) ->
         let ws_id, (a, b, init) = init_statement in
         if is_permanently_disabled compil ws_id then
-          error, id, summary
+          error, id + 1, summary
         else
         match init with
         | Ast.INIT_TOK _ -> error, id + 1, summary
