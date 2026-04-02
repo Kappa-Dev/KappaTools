@@ -461,7 +461,7 @@ let extract index_list list =
     | h :: t, _ :: b -> aux (h :: t) (i + 1) b acc
     | _, [] -> assert false
   in
-  aux index_list 0 (*List.rev*) list []
+  aux (List.sort compare index_list) 0 list []
 
 let cut diff (ast : Ast.parsing_compil) =
   let rules = extract diff.diff_rules.new_elt ast.Ast.rules in
