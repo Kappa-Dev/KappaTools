@@ -11,6 +11,7 @@
 # or in output/experiments_output_compare_ws_plot.png (plot)
 
 DEBUG=false
+VERBOSE=false
 INSTALL_DEPS=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -35,13 +36,14 @@ Options:
   -t <timeout>   Set timeout value (default: $TIMEOUT)
   -r <int>       Set how many reps to do for each experiment (default: $REPS)
   -i             Install dependencies before building and running
-  -d             Set DEBUG to true (it runs the analysis with less reps, smaller models and more verbose output)
+  -d             Set DEBUG to true (it runs the analysis with less reps and smaller models)
+  -v             Get more verbose output
   -h             Show this help message and exit
 EOF
 }
 
 # parse arguments
-while getopts ":t:r:idh" opt; do
+while getopts ":t:r:idvh" opt; do
     case "$opt" in
         t)
             TIMEOUT="$OPTARG"
@@ -54,6 +56,9 @@ while getopts ":t:r:idh" opt; do
             ;;
         d)
             DEBUG=true
+            ;;
+        v)
+            VERBOSE=true
             ;;
         h)
             print_help
@@ -134,7 +139,7 @@ if $INSTALL_DEPS; then
     opam install . --update-invariant
 fi
 
-if ! $DEBUG; then
+if ! $VERBOSE; then
     echo
     # Build Kappa
     echo "Building the project:"
@@ -180,13 +185,13 @@ for MODEL in "${MODELS[@]}"; do
         for (( i=1; i<=REPS; i++ ))
         do
             # INCREMENTAL ANALYSIS
-            if $DEBUG; then
+            if $VERBOSE; then
                 echo "⚡️ Starting incremental analysis:"
             fi
 
             echo "q" > "$INPUT_INCREMENTAL_TMP"
             
-            if $DEBUG; then
+            if $VERBOSE; then
                 echo "INCREMENTAL COMMANDS:"
                 cat "$INPUT_INCREMENTAL_TMP"
             fi
@@ -210,7 +215,7 @@ for MODEL in "${MODELS[@]}"; do
                 --rules-in-working-set "$random_rules"
                 )
             fi
-            if $DEBUG; then
+            if $VERBOSE; then
                 printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
                 printf '\n'
             fi
