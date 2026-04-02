@@ -1,5 +1,6 @@
-./KaSaIncremental essai.ka essai2.ka --do-restart-fixpoint-iterations 
+Command line:
+% ./KaSaIncremental essai.ka essai2.ka --do-restart-fixpoint-iterations --print-efficiency 
 
-update file essai_diff.ka as essai.ka 
+On prompt:
+> update file essai_diff.ka as essai.ka 
 
-s
