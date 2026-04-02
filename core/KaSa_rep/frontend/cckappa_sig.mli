@@ -208,7 +208,7 @@ type compil = {
   rules: enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
   (*rules (possibly named)*)
   working_set_valuations:
-    (Ckappa_sig.c_guard_parameter * bool) Ckappa_sig.Ws_index_map_and_set.Map.t;
+    (Ckappa_sig.c_guard_parameter * bool option) Ckappa_sig.Ws_index_map_and_set.Map.t;
   (*maps working_set rules and inital states to their boolean parameter and a boolean that tells us if they are enabled or not*)
   observables:
     (mixture, string) Alg_expr.e Loc.annoted Int_storage.Nearly_inf_Imperatif.t;
@@ -319,6 +319,13 @@ val build_address :
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
   site_address
+
+val is_ws_permanently_disabled: 
+ Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Ckappa_sig.c_working_set_index -> 
+  compil ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * bool
 
 val rule_is_enabled_in_current_working_set :
   Remanent_parameters_sig.parameters ->

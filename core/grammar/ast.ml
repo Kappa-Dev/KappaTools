@@ -205,7 +205,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   volumes: (string * float * string) list;
   guard_param_values: bool Mods.StringMap.t;
       (** The guard parameters that have a defined value (true or false).*)
-  working_set_values: bool Mods.IntMap.t;
+  working_set_values: bool option Mods.IntMap.t;
       (** Maps each rule in the working set to true if it is enabled or false if it is disabled. And None if it is permanently disabled. *)
   nr_working_set_params: int;
       (** Number of rules that are currently in the working set. *)
@@ -1065,9 +1065,10 @@ let print_working_set_prefix id working_set_values =
   string_of_int id ^ ". "
   ^
   match Mods.IntMap.find_option id working_set_values with
-  | None -> "[PERMANENTLY DISABLED] "
-  | Some true -> "[ENABLED] "
-  | Some false -> "[DISABLED] "
+  | None -> "[FAIL]"
+  | Some None -> "[PERMANENTLY DISABLED] "
+  | Some Some true -> "[ENABLED] "
+  | Some Some false -> "[DISABLED] "
 
 let print_init c f = function
   | ws_id, (g, (n, _), INIT_MIX (m, _)) ->
@@ -1799,7 +1800,7 @@ let compil_to_json c =
              (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
       ( "working_set_values",
-        Mods.IntMap.to_json JsonUtil.of_int JsonUtil.of_bool
+        Mods.IntMap.to_json JsonUtil.of_int (JsonUtil.of_option JsonUtil.of_bool)
           c.working_set_values );
       "nr_working_set_params", JsonUtil.of_int c.nr_working_set_params;
       ( "guard_param_values",
@@ -1925,10 +1926,10 @@ let compil_of_json = function
                 ~error_msg:
                   (JsonUtil.exn_msg_cant_import_from_json
                      "AST working_set_values sig"))
-             (JsonUtil.to_bool
+             (JsonUtil.to_option (JsonUtil.to_bool
                 ~error_msg:
                   (JsonUtil.exn_msg_cant_import_from_json
-                     "AST working_set_values boolean value"))
+                     "AST working_set_values boolean value")))
              (List.assoc "working_set_values" l);
          nr_working_set_params =
            JsonUtil.to_int

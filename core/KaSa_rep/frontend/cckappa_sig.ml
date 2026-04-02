@@ -215,7 +215,7 @@ type compil = {
   rules: enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
   (*rules (possibly named)*)
   working_set_valuations:
-    (Ckappa_sig.c_guard_parameter * bool) Ckappa_sig.Ws_index_map_and_set.Map.t;
+    (Ckappa_sig.c_guard_parameter * (bool option)) Ckappa_sig.Ws_index_map_and_set.Map.t;
   (*maps working_set rules and inital states to their boolean parameter and a boolean that tells us if they are enabled or not*)
   observables:
     (mixture, string) Alg_expr.e Loc.annoted Int_storage.Nearly_inf_Imperatif.t;
@@ -728,8 +728,11 @@ let rule_is_enabled_in_current_working_set parameters error rule_id compilation
        Ckappa_sig.Ws_index_map_and_set.Map.find_option_without_logs parameters error ws_id
          compilation.working_set_valuations
      with
-    | error, None -> error, false (*permanently disabled*)
-    | error, Some (_, bool) -> error, bool)
+    | error, None -> 
+      Exception.warn parameters error __POS__ Exit false (*permanently disabled*)
+    | error, Some (_, None) -> error, false
+
+    | error, Some (_, Some bool) -> error, bool)
 
 let rule_is_permanently_disabled_in_current_working_set parameters error rule_id
     compilation =
@@ -744,6 +747,16 @@ let rule_is_permanently_disabled_in_current_working_set parameters error rule_id
     | error, None -> error, true
     | error, Some _ -> error, false)
 
+let is_ws_permanently_disabled parameters error ws_id compilation
+    =
+    match
+       Ckappa_sig.Ws_index_map_and_set.Map.find_option_without_logs parameters error ws_id compilation.working_set_valuations
+     with
+    | error, None -> 
+      Exception.warn parameters error __POS__ Exit true (*should not exist*)
+    | error, Some (_, None) -> error, true (*permanently disabled*)
+    | error, Some (_, Some _) -> error, false
+
 let init_is_enabled_in_current_working_set parameters error init_id compilation
     =
   match working_set_id_of_init_id parameters error init_id compilation with
@@ -754,8 +767,9 @@ let init_is_enabled_in_current_working_set parameters error init_id compilation
        Ckappa_sig.Ws_index_map_and_set.Map.find_option_without_logs parameters error ws_id
          compilation.working_set_valuations
      with
-    | error, None -> error, false (*permanently disabled*)
-    | error, Some (_, bool) -> error, bool)
+    | error, None -> Exception.warn parameters error __POS__ Exit false (*should not exist*)
+    | error, Some (_, None) -> error, false (*permanently disabled*)
+    | error, Some (_, Some bool) -> error, bool)
 
 let init_is_permanently_disabled_in_current_working_set parameters error rule_id
     compilation =

@@ -185,7 +185,7 @@ type ('agent, 'agent_sig, 'pattern, 'mixture, 'id, 'rule) compil = {
   volumes: (string * float * string) list;
   guard_param_values: bool Mods.StringMap.t;
       (** The guard parameters that have a defined value (true or false).*)
-  working_set_values: bool Mods.IntMap.t;
+  working_set_values: bool option Mods.IntMap.t;
       (** Maps each rule in the working set to true if it is enabled or false if it is disabled. And None if it is permanently disabled. *)
   nr_working_set_params: int;
       (** Number of rules that are currently in the working set. *)

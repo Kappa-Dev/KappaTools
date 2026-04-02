@@ -14,13 +14,13 @@ let compute_ws_values ~all_rules_in_ws ~rules_in_ws rules inits compil =
         | None ->
           if all_rules_in_ws then
             ( (Some k, (guard, alg, init_t)) :: inits,
-              Mods.IntMap.add k true ws_values,
+              Mods.IntMap.add k (Some true) ws_values,
               k + 1 )
           else
             (ws_index, (guard, alg, init_t)) :: inits, ws_values, k
         | Some _ ->
           ( (Some k, (guard, alg, init_t)) :: inits,
-            Mods.IntMap.add k true ws_values,
+            Mods.IntMap.add k (Some true) ws_values,
             k + 1 ))
       ([], compil.Ast.working_set_values, compil.nr_working_set_params)
       inits
@@ -32,14 +32,14 @@ let compute_ws_values ~all_rules_in_ws ~rules_in_ws rules inits compil =
         | None ->
           if all_rules_in_ws || List.exists (( = ) i) rules_in_ws then
             ( (Some k, label, guard, rule) :: rules,
-              Mods.IntMap.add k true ws_values,
+              Mods.IntMap.add k (Some true) ws_values,
               k + 1,
               i + 1 )
           else
             (ws_index, label, guard, rule) :: rules, ws_values, k, i + 1
         | Some _ ->
           ( (Some k, label, guard, rule) :: rules,
-            Mods.IntMap.add k true ws_values,
+            Mods.IntMap.add k (Some true) ws_values,
             k + 1,
             i + 1 ))
       ([], working_set_values, nr_working_set_params, List.length compil.rules)

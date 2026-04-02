@@ -2141,9 +2141,9 @@ functor
         working_set_indexes permanently_disable =
       let bool =
         if permanently_disable then
-          false
+          Some false
         else
-          bool
+          Some bool
       in
       let parameters = get_parameters state in
       let state, compilation = get_compilation state in
@@ -2183,14 +2183,14 @@ functor
             else (
               let working_set_values =
                 if permanently_disable then
-                  Mods.IntMap.remove guard_int working_set_values
+                  Mods.IntMap.add guard_int None working_set_values
                 else
                   Mods.IntMap.add guard_int bool working_set_values
               in
               let error, (guard_id, _) =
                 Ckappa_sig.Ws_index_map_and_set.Map.find_default parameters
                   error
-                  (Ckappa_sig.guard_parameter_of_int (-1), false)
+                  (Ckappa_sig.guard_parameter_of_int (-1), Some false)
                   working_set_index working_set_valuations
               in
               let error, working_set_valuations =

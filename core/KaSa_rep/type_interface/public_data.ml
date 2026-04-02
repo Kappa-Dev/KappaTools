@@ -379,7 +379,7 @@ type rule = {
 type element_in_working_set = {
   rule_ws_id: int;
   rule_ws_position: Loc.t;
-  rule_ws_enabled: bool;
+  rule_ws_enabled: bool option;
 }
 
 let direction_to_json d =
@@ -439,7 +439,7 @@ let ws_element_to_json rule =
       rule_id, JsonUtil.of_int rule.rule_ws_id;
       ( position,
         Loc.yojson_of_annoted JsonUtil.of_unit ((), rule.rule_ws_position) );
-      rule_enabled, JsonUtil.of_bool rule.rule_ws_enabled;
+      rule_enabled, (JsonUtil.of_option JsonUtil.of_bool) rule.rule_ws_enabled;
     ]
 
 let json_to_ws_element = function
@@ -454,7 +454,7 @@ let json_to_ws_element = function
                    ~error_msg:
                      (JsonUtil.exn_msg_cant_import_from_json "locality"))
                 (List.assoc position l));
-         rule_ws_enabled = JsonUtil.to_bool (List.assoc rule_enabled l);
+         rule_ws_enabled = (JsonUtil.to_option (fun a -> JsonUtil.to_bool a)) (List.assoc rule_enabled l);
        }
      with Not_found ->
        raise
