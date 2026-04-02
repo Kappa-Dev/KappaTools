@@ -29,6 +29,8 @@ The currently open file represents the *current chapter* of rules and initial st
 Each element in the editor has a checkbox that can be clicked on to disable or enable the element.
 The static analysis result is updated accordingly.
 
+If needed, the button "restart KaSa" can be used to restart the whole analysis from scratch.
+
 ### Visualization of the analysis result
 
 1. **The contact map**: It shows the agents that are defined in the model with all their sites and all possible bonds between sites. If the accuracy "high" is chosen, the contact map is refined by removing all agents and bonds that are unreachable according to the reachability analysis.
