@@ -88,7 +88,7 @@ let main () =
       state
   in
   let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
-  let print_result parameters state print_analysis start_time =
+  let print_result parameters state print_analysis =
     let state, _ = Export_to_KaSa.get_reachability_analysis state in
     let state =
       if print_analysis then
@@ -98,12 +98,14 @@ let main () =
     in
     let error = Export_to_KaSa.get_errors state in
     let () = Exception.print parameters error in
-    let () = KaSaUtil.print_efficiency parameters state start_time in
     state
   in
-  let state = print_result parameters state false initial_start_time in
+  let state = print_result parameters state false  in
   let log = Remanent_parameters.get_logger parameters in
-  let rec loop state =
+  let rec loop_time state start_time =
+    Loggers.fprintf log "This computation step took ";
+    KaSaUtil.print_only_timing parameters start_time;
+    Loggers.print_newline log; 
     Loggers.fprintf log "> ";
     Loggers.flush_logger log;
     let state =
@@ -115,7 +117,7 @@ let main () =
       | "quit" | "q" -> ()
       | "help" | "h" ->
         Loggers.fprintf log "%s" help_message;
-        loop state
+        loop state 
       | "print rules" | "p rules" ->
         let state, compilation = Export_to_KaSa.get_compilation state in
         let () =
@@ -131,13 +133,11 @@ let main () =
         let () = Exception.print parameters error in
         loop state
       | "print result" | "p result" | "p" ->
-        let start_time = Sys.time () in
-        let state = print_result parameters state true start_time in
+        let state = print_result parameters state true in
         loop state
       | input
         when String.length input > 12 && String.sub input 0 12 = "update file "
         ->
-        let start_time = Sys.time () in
         let l = String.split_on_char ' ' input in
         let do_not_restart_fixpoint_computation =
           match !Config.do_restart_fixpoint_iterations with
@@ -168,10 +168,9 @@ let main () =
             in
             Export_to_KaSa.set_errors error state
         in
-        let state = print_result parameters state false start_time in
+        let state = print_result parameters state false  in
         loop state
       | input ->
-        let start_time = Sys.time () in
         let success, state =
           match parse_input input with
           | Enable (false, i) ->
@@ -208,7 +207,7 @@ let main () =
         in
         let state =
           if success then
-            print_result parameters state true start_time
+            print_result parameters state true 
           else (
             let error = Export_to_KaSa.get_errors state in
             let () = Exception.print parameters error in
@@ -217,7 +216,7 @@ let main () =
         in
         loop state
     with End_of_file -> ()
-  in
-  loop state
+  and loop state = loop_time state (Sys.time ()) 
+in loop_time state initial_start_time
 
 let () = main ()

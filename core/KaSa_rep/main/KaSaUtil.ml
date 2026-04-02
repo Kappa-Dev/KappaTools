@@ -1,4 +1,28 @@
 module KaSaUtil (Export_to_KaSa : Export_to_KaSa.Type) = struct
+  let print_only_timing parameters start_time = 
+      if Remanent_parameters.get_print_efficiency parameters then 
+      let end_time = Sys.time () in
+      let cpu_time = end_time -. start_time in
+        let () =
+      if cpu_time <= 1. then
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "%0.6f s." cpu_time
+      else if cpu_time <= 10. then
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "%.6f s." cpu_time
+      else if cpu_time <= 1000. then
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "%3.3f s." cpu_time
+      else
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "%3.3g s." cpu_time
+    in
+    ()
+
   let print_efficiency parameters state start_time =
     if Remanent_parameters.get_print_efficiency parameters then (
       let end_time = Sys.time () in
