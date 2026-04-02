@@ -366,6 +366,16 @@ module Domain = struct
               parameters error (nagents_int - 1) (fun _ error _ ->
                 error, mvbdu_false)
         in
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "INIT ITER" in  
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
+        let error = 
+          Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.iter 
+            parameters error
+            ( fun _ error i _ -> 
+                Loggers.fprintf (Remanent_parameters.get_logger parameters) "%i" 
+                (Ckappa_sig.int_of_agent_name i); Loggers.print_newline (Remanent_parameters.get_logger parameters); 
+                error) init_seen_agents_array
+            in 
         let init_global_dynamic_information =
           {
             agents_liveness = init_seen_agents_array;
@@ -379,19 +389,50 @@ module Domain = struct
         let next_agent =
           Ckappa_sig.int_of_agent_name new_elts.Diff.next_agent
         in
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "UPDATE ITER %i" next_agent in  
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
+      
         let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
         let error, bdu_handler, mvbdu_false =
           Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
         in
+         let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "BEFORE"  in  
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
+      
+         let error = 
+          Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.iter 
+            parameters error
+            ( fun _ error i _ -> 
+                Loggers.fprintf (Remanent_parameters.get_logger parameters) "%i" 
+                (Ckappa_sig.int_of_agent_name i); Loggers.print_newline (Remanent_parameters.get_logger parameters); 
+                error) local.agents_liveness 
+            in 
         let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
         let error, init_dead_agent_array =
           Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.expand_and_copy
             parameters error local.agents_liveness (nagents_int - 1)
         in
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "AFTER"  in  
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
+      
+         let error = 
+          Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.iter 
+            parameters error
+            ( fun _ error i _ -> 
+                Loggers.fprintf (Remanent_parameters.get_logger parameters) "%i" 
+                (Ckappa_sig.int_of_agent_name i); Loggers.print_newline (Remanent_parameters.get_logger parameters); 
+                error) init_dead_agent_array 
+            in 
         let rec aux (k : int) (error, array) =
           if k < next_agent then
             error, array
           else
+            let () = 
+              Loggers.fprintf 
+                (Remanent_parameters.get_logger parameters) 
+                "INIT AGENT %i" k 
+          in 
+            let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)  in 
             aux (k - 1)
               (Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set
                  parameters error
