@@ -257,7 +257,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
             Domain.is_enabled static dynamic error rule_id
           in
           (match b,is_enabled with
-          | false, _ | _, None ->
+          | true, _ | _, None ->
             let _ =
               if
                 local_trace
@@ -274,7 +274,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
               )
             in
             aux error dynamic
-          | true, Some precondition ->
+          | false, Some precondition ->
             let _ =
               if
                 local_trace
