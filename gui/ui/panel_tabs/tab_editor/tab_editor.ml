@@ -134,7 +134,7 @@ let init_dead_agents () =
                                ^ Html_utility.string_of_agent agent
                              in
                              List.fold_left
-                               (fun acc (range,_) ->
+                               (fun acc (range, _) ->
                                  {
                                    Result_util.severity = Logs.Warning;
                                    Result_util.range = Some range;

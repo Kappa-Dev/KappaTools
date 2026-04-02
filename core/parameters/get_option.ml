@@ -423,7 +423,6 @@ let options =
         "dump debugging information",
         [ debug, 3 ],
         Hidden );
-      
       ( "--unsafe-mode",
         Bool Config.unsafe,
         "exceptions are gathered at the end of the computation, instead of \
@@ -435,7 +434,7 @@ let options =
         "prompt CPU time and various datas",
         [ debug, 5 ],
         Expert );
-          ( "--do-restart-fixpoint-iterations",
+      ( "--do-restart-fixpoint-iterations",
         Bool Config.do_restart_fixpoint_iterations,
         "if false -> do not restart itterations in incremental analysis",
         [],
@@ -523,7 +522,7 @@ let get_option ?(is_a_patch = false) error =
   let title = Version.version_kasa_full_name in
   let () = SuperargTk.parse ~title options FileNames.input in
   let parameters =
-    Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.KaSa ~is_a_patch
-      ()
+    Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.KaSa
+      ~is_a_patch ()
   in
   error, parameters, !FileNames.input

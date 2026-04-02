@@ -148,8 +148,10 @@ class virtual new_client ~post mailbox : Api.manager_model =
     method secret_project_parse force =
       self#message Ast (fun b ->
           JsonUtil.write_sequence b
-            [ (fun b -> Yojson.Basic.write_string b "ProjectParse");
-              (fun b -> Yojson.Basic.write_bool b force) ])
+            [
+              (fun b -> Yojson.Basic.write_string b "ProjectParse");
+              (fun b -> Yojson.Basic.write_bool b force);
+            ])
 
     method project_overwrite file_id ast =
       self#message Nothing (fun b ->

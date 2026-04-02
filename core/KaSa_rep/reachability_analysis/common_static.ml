@@ -1172,7 +1172,8 @@ let scan_rule_set ?patch parameter error kappa_handler compil store_result =
 
 let compute_restriction_mvbdu ?patch_compute_restriction_mvbdu parameters error
     mvbdu_handler nr_guard_parameters nsites compilation =
-  let starting_mvbdu, starting =  match patch_compute_restriction_mvbdu with
+  let starting_mvbdu, starting =
+    match patch_compute_restriction_mvbdu with
     | Some (_, mvbdu, i) -> Some mvbdu, Some i
     | None -> None, None
   in
@@ -1194,25 +1195,30 @@ let compute_restriction_mvbdu ?patch_compute_restriction_mvbdu parameters error
   let error, ws_list =
     Ckappa_sig.Ws_index_map_and_set.Map.fold
       (fun ws (guard, _) (error, pair_list) ->
-        let error, b = Cckappa_sig.is_ws_permanently_disabled parameters error ws compilation in
-          error, if b then  (( Ckappa_sig.mvbdu_var_of_guard guard nsites,
-            ( (Some Ckappa_sig.dummy_state_index_false, Some Ckappa_sig.dummy_state_index_false )))::pair_list)
-            else pair_list)
-      compilation.Cckappa_sig.working_set_valuations 
-      (error,[])
+        let error, b =
+          Cckappa_sig.is_ws_permanently_disabled parameters error ws compilation
+        in
+        ( error,
+          if b then
+            ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
+              ( Some Ckappa_sig.dummy_state_index_false,
+                Some Ckappa_sig.dummy_state_index_false ) )
+            :: pair_list
+          else
+            pair_list ))
+      compilation.Cckappa_sig.working_set_valuations (error, [])
   in
-  let error, mvbdu_handler, mvbdu_ws = 
-   Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters mvbdu_handler
-      error (List.rev ws_list)
-  in 
-  let error, mvbdu_handler, mvbdu = 
-  match starting_mvbdu with
-  | None -> 
-    error, mvbdu_handler, mvbdu
-  | Some a ->
-    Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error a mvbdu
-  in 
-  Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error mvbdu_ws mvbdu 
+  let error, mvbdu_handler, mvbdu_ws =
+    Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters mvbdu_handler error
+      (List.rev ws_list)
+  in
+  let error, mvbdu_handler, mvbdu =
+    match starting_mvbdu with
+    | None -> error, mvbdu_handler, mvbdu
+    | Some a ->
+      Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error a mvbdu
+  in
+  Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error mvbdu_ws mvbdu
 
 let collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters error
     mvbdu_handler compilation bdu_restriction nsites =
@@ -1241,53 +1247,53 @@ let collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters error
 
 let compute_working_set_mvbdu ?patch_compute_working_set_mvbdu parameters error
     mvbdu_handler compilation nsites =
-  let _ = patch_compute_working_set_mvbdu in 
-    (*let starting_mvbdu, starting_g, starting_s =
-    match patch_compute_working_set_mvbdu with
-    | Some (diff, mvbdu) ->
-      Some mvbdu, diff.Diff.next_nr_predicates, diff.Diff.next_nsites
-    | None ->
-      None, Ckappa_sig.guard_parameter_of_int 0, Ckappa_sig.site_name_of_int 0
-  in
-  let error =
-    if
-      Ckappa_sig.compare_site_name
-        Ckappa_sig.hack_to_separate_sites_id_from_guard_id nsites
-      < 0
-      && not (nsites = starting_s)
-    then (
-      let error, () =
-        Exception.warn parameters error __POS__
-          ~message:
-            "Number of sites capacity has been exceeded in incremental analysis"
-          Exit ()
-      in
-      error
-    ) else
-      error
-  in*)
-  (*let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "WS MAP" in 
-  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)in
-  let () = 
-    Ckappa_sig.Ws_index_map_and_set.Map.iter 
-      (fun i (_,j)  -> 
-        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s %s" 
-        (Ckappa_sig.string_of_working_set_index i) 
-        (if j then "TRUE" else "FALSE") in 
-        let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)in ())  
-    compilation.Cckappa_sig.working_set_valuations 
-  in *)
+  let _ = patch_compute_working_set_mvbdu in
+  (*let starting_mvbdu, starting_g, starting_s =
+      match patch_compute_working_set_mvbdu with
+      | Some (diff, mvbdu) ->
+        Some mvbdu, diff.Diff.next_nr_predicates, diff.Diff.next_nsites
+      | None ->
+        None, Ckappa_sig.guard_parameter_of_int 0, Ckappa_sig.site_name_of_int 0
+    in
+    let error =
+      if
+        Ckappa_sig.compare_site_name
+          Ckappa_sig.hack_to_separate_sites_id_from_guard_id nsites
+        < 0
+        && not (nsites = starting_s)
+      then (
+        let error, () =
+          Exception.warn parameters error __POS__
+            ~message:
+              "Number of sites capacity has been exceeded in incremental analysis"
+            Exit ()
+        in
+        error
+      ) else
+        error
+    in*)
+  (*let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "WS MAP" in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)in
+    let () =
+      Ckappa_sig.Ws_index_map_and_set.Map.iter
+        (fun i (_,j)  ->
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s %s"
+          (Ckappa_sig.string_of_working_set_index i)
+          (if j then "TRUE" else "FALSE") in
+          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)in ())
+      compilation.Cckappa_sig.working_set_valuations
+    in *)
   let pair_list =
     Ckappa_sig.Ws_index_map_and_set.Map.fold
       (fun _ (guard, bool) pair_list ->
-       (* if Ckappa_sig.compare_guard_parameter guard starting_g < 0 then
-          pair_list
-        else*)
-          ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
-            match bool with
-            | None | Some false -> Ckappa_sig.dummy_state_index_false
-            | Some true -> Ckappa_sig.dummy_state_index_true )
-          :: pair_list)
+        (* if Ckappa_sig.compare_guard_parameter guard starting_g < 0 then
+             pair_list
+           else*)
+        ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
+          match bool with
+          | None | Some false -> Ckappa_sig.dummy_state_index_false
+          | Some true -> Ckappa_sig.dummy_state_index_true )
+        :: pair_list)
       compilation.Cckappa_sig.working_set_valuations []
   in
   let error, mvbdu_handler, mvbdu =
@@ -1295,9 +1301,10 @@ let compute_working_set_mvbdu ?patch_compute_working_set_mvbdu parameters error
       error (List.rev pair_list)
   in
   (*match starting_mvbdu with
-  | None ->*) error, mvbdu_handler, mvbdu
-  (*| Some a ->
-    Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error a mvbdu*)
+    | None ->*)
+  error, mvbdu_handler, mvbdu
+(*| Some a ->
+  Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error a mvbdu*)
 
 (******************************************************************)
 (******************************************************************)

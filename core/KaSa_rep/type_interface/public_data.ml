@@ -454,7 +454,9 @@ let json_to_ws_element = function
                    ~error_msg:
                      (JsonUtil.exn_msg_cant_import_from_json "locality"))
                 (List.assoc position l));
-         rule_ws_enabled = (JsonUtil.to_option (fun a -> JsonUtil.to_bool a)) (List.assoc rule_enabled l);
+         rule_ws_enabled =
+           (JsonUtil.to_option (fun a -> JsonUtil.to_bool a))
+             (List.assoc rule_enabled l);
        }
      with Not_found ->
        raise

@@ -126,12 +126,13 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     in
     error, dynamic
 
-  let main ?do_not_restart_fixpoint_computation ?patch parameters log_info error mvbdu_handler compil kappa_handler =
-     let do_increment = 
-      match do_not_restart_fixpoint_computation with 
+  let main ?do_not_restart_fixpoint_computation ?patch parameters log_info error
+      mvbdu_handler compil kappa_handler =
+    let do_increment =
+      match do_not_restart_fixpoint_computation with
       | None | Some false -> true
-      | Some true -> false 
-    in 
+      | Some true -> false
+    in
 
     let domain_event, global_event, init_event, analysis_event, new_elts =
       match patch with
@@ -192,128 +193,142 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     let error, dynamic =
       close_event parameters error global_event None dynamic
     in
-    if do_increment then 
-    let error, dynamic = add_event parameters error init_event None dynamic in
-    let error, dynamic, _ =
-      List.fold_left
-        (fun (error, dynamic, i) chemical_species ->
-           let error, b = 
-              Cckappa_sig.init_is_permanently_disabled_in_current_working_set 
-            parameters error i compil in 
-          let error, dynamic = 
-            if b then error, dynamic else 
-              let error, dynamic =
-                add_event parameters error (StoryProfiling.Initial_state i) None
-                dynamic
-              in
-              let error, dynamic, () =
-                Domain.add_initial_state static dynamic error chemical_species
-          in
-          let error, dynamic =
-            close_event parameters error (StoryProfiling.Initial_state i) None
-              dynamic
-          in error, dynamic  in 
-          error, dynamic, i + 1)
-        (error, dynamic, 0) init
-    in
-    let error, dynamic = close_event parameters error init_event None dynamic in
-    let log = Remanent_parameters.get_logger parameters in
-    let error, dynamic =
-      add_event parameters error analysis_event None dynamic
-    in
-    let error, static, dynamic =
-      let rec aux error dynamic =
-        let error, dynamic, next_opt = Domain.next_rule static dynamic error in
-        match next_opt with
-        | None -> error, static, dynamic
-        | Some rule_id ->
-           let error =
-            if
-              local_trace
-              || Remanent_parameters.get_dump_reachability_analysis_iteration
-                   parameters
-              || Remanent_parameters.get_trace parameters
-            then (
-              let error, rule_id_string =
-                try Handler.string_of_rule parameters error compil rule_id
-                with _ ->
-                  Exception.warn parameters error __POS__ Exit
-                    (Ckappa_sig.string_of_rule_id rule_id)
-              in
-              let () = Loggers.print_newline log in
-              let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in
-              let () = Loggers.print_newline log in
-              error
-            ) else
-              error
-          in
-          let error, b = 
-            Cckappa_sig.rule_is_permanently_disabled_in_current_working_set
-            parameters error rule_id compil in 
-          if b then error, static, dynamic 
-          else 
-        
-          let error, dynamic, is_enabled =
-            Domain.is_enabled static dynamic error rule_id
-          in
-          (match b,is_enabled with
-          | true, _ | _, None ->
-            let _ =
-              if
-                local_trace
-                || Remanent_parameters.get_dump_reachability_analysis_iteration
-                     parameters
-                || Remanent_parameters.get_trace parameters
-              then (
-                let () =
-                  Loggers.fprintf log
-                    "\t\tthe precondition is not satisfied yet"
+    if do_increment then (
+      let error, dynamic = add_event parameters error init_event None dynamic in
+      let error, dynamic, _ =
+        List.fold_left
+          (fun (error, dynamic, i) chemical_species ->
+            let error, b =
+              Cckappa_sig.init_is_permanently_disabled_in_current_working_set
+                parameters error i compil
+            in
+            let error, dynamic =
+              if b then
+                error, dynamic
+              else (
+                let error, dynamic =
+                  add_event parameters error (StoryProfiling.Initial_state i)
+                    None dynamic
                 in
-                let () = Loggers.print_newline log in
-                ()
+                let error, dynamic, () =
+                  Domain.add_initial_state static dynamic error chemical_species
+                in
+                let error, dynamic =
+                  close_event parameters error (StoryProfiling.Initial_state i)
+                    None dynamic
+                in
+                error, dynamic
               )
             in
-            aux error dynamic
-          | false, Some precondition ->
-            let _ =
-              if
-                local_trace
-                || Remanent_parameters.get_dump_reachability_analysis_iteration
-                     parameters
-                || Remanent_parameters.get_trace parameters
-              then (
-                let () =
-                  Loggers.fprintf log "\t\tthe precondition is satisfied"
-                in
-                let () = Loggers.print_newline log in
-                ()
-              )
-            in
-            let error, dynamic, () =
-              Domain.apply_rule static dynamic error rule_id precondition
-            in
-            aux error dynamic)
+            error, dynamic, i + 1)
+          (error, dynamic, 0) init
       in
-      aux error dynamic
-    in
-    let error, dynamic, () = Domain.stabilize static dynamic error in
-    let error, dynamic =
-      close_event parameters error analysis_event None dynamic
-    in
-    let error, dynamic = print static dynamic error log in
-    let log_info =
-      Analyzer_headers.get_log_info
-        (Domain.get_global_dynamic_information dynamic)
-    in
-    error, log_info, (global_static, static), dynamic
-else 
-    let error,() = 
-            Exception.warn parameters error __POS__ ~message:"Iterations have not been restarted" Exit () in 
-    error, log_info, (global_static, static), dynamic
+      let error, dynamic =
+        close_event parameters error init_event None dynamic
+      in
+      let log = Remanent_parameters.get_logger parameters in
+      let error, dynamic =
+        add_event parameters error analysis_event None dynamic
+      in
+      let error, static, dynamic =
+        let rec aux error dynamic =
+          let error, dynamic, next_opt =
+            Domain.next_rule static dynamic error
+          in
+          match next_opt with
+          | None -> error, static, dynamic
+          | Some rule_id ->
+            let error =
+              if
+                local_trace
+                || Remanent_parameters.get_dump_reachability_analysis_iteration
+                     parameters
+                || Remanent_parameters.get_trace parameters
+              then (
+                let error, rule_id_string =
+                  try Handler.string_of_rule parameters error compil rule_id
+                  with _ ->
+                    Exception.warn parameters error __POS__ Exit
+                      (Ckappa_sig.string_of_rule_id rule_id)
+                in
+                let () = Loggers.print_newline log in
+                let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in
+                let () = Loggers.print_newline log in
+                error
+              ) else
+                error
+            in
+            let error, b =
+              Cckappa_sig.rule_is_permanently_disabled_in_current_working_set
+                parameters error rule_id compil
+            in
+            if b then
+              error, static, dynamic
+            else (
+              let error, dynamic, is_enabled =
+                Domain.is_enabled static dynamic error rule_id
+              in
+              match b, is_enabled with
+              | true, _ | _, None ->
+                let _ =
+                  if
+                    local_trace
+                    || Remanent_parameters
+                       .get_dump_reachability_analysis_iteration parameters
+                    || Remanent_parameters.get_trace parameters
+                  then (
+                    let () =
+                      Loggers.fprintf log
+                        "\t\tthe precondition is not satisfied yet"
+                    in
+                    let () = Loggers.print_newline log in
+                    ()
+                  )
+                in
+                aux error dynamic
+              | false, Some precondition ->
+                let _ =
+                  if
+                    local_trace
+                    || Remanent_parameters
+                       .get_dump_reachability_analysis_iteration parameters
+                    || Remanent_parameters.get_trace parameters
+                  then (
+                    let () =
+                      Loggers.fprintf log "\t\tthe precondition is satisfied"
+                    in
+                    let () = Loggers.print_newline log in
+                    ()
+                  )
+                in
+                let error, dynamic, () =
+                  Domain.apply_rule static dynamic error rule_id precondition
+                in
+                aux error dynamic
+            )
+        in
+        aux error dynamic
+      in
+      let error, dynamic, () = Domain.stabilize static dynamic error in
+      let error, dynamic =
+        close_event parameters error analysis_event None dynamic
+      in
+      let error, dynamic = print static dynamic error log in
+      let log_info =
+        Analyzer_headers.get_log_info
+          (Domain.get_global_dynamic_information dynamic)
+      in
+      error, log_info, (global_static, static), dynamic
+    ) else (
+      let error, () =
+        Exception.warn parameters error __POS__
+          ~message:"Iterations have not been restarted" Exit ()
+      in
+      error, log_info, (global_static, static), dynamic
+    )
 
-  let update_main ?do_not_restart_fixpoint_computation 
-      parameters log_info error mvbdu_handler compil kappa_handler
-      new_indexs
+  let update_main ?do_not_restart_fixpoint_computation parameters log_info error
+      mvbdu_handler compil kappa_handler new_indexs
       (state :
         ( Analyzer_headers.global_static_information,
           static_information,
@@ -324,11 +339,13 @@ else
       | None -> None
       | Some (static, dynamic) -> Some (static, dynamic, new_indexs)
     in
-    match patch with 
-    | None -> main ?patch parameters log_info error mvbdu_handler compil kappa_handler
-  | Some _ -> 
-          main ?do_not_restart_fixpoint_computation  ?patch parameters log_info error mvbdu_handler compil kappa_handler
-      
+    match patch with
+    | None ->
+      main ?patch parameters log_info error mvbdu_handler compil kappa_handler
+    | Some _ ->
+      main ?do_not_restart_fixpoint_computation ?patch parameters log_info error
+        mvbdu_handler compil kappa_handler
+
   let main parameters log_info error mvbdu_handler compil kappa_handler =
     main parameters log_info error mvbdu_handler compil kappa_handler
 
@@ -353,7 +370,12 @@ else
       | Some l ->
         Remanent_state.set_internal_constraint_list (List.rev l) kasa_state
     in
-    let kasa_state = Remanent_state.set_bdu_handler (Analyzer_headers.get_mvbdu_handler (Domain.get_global_dynamic_information dynamic)) kasa_state in 
+    let kasa_state =
+      Remanent_state.set_bdu_handler
+        (Analyzer_headers.get_mvbdu_handler
+           (Domain.get_global_dynamic_information dynamic))
+        kasa_state
+    in
     error, dynamic, kasa_state
 
   let maybe_reachable static dynamic error flag pattern =

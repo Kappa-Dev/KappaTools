@@ -287,25 +287,29 @@ let get_working_set_mvbdu static = static.global_working_set_mvbdu
 let get_nr_guard_parameters static =
   Handler.get_nr_guard_parameters (get_kappa_handler static)
 
- let get_nsites static = Handler.get_nsites (get_kappa_handler static)
+let get_nsites static = Handler.get_nsites (get_kappa_handler static)
 
 let get_working_set_guard_parameters ?full static =
   let compilation = get_cc_code static in
   let nsites = get_nsites static in
-  match full with 
-   | None | Some false ->   
-      Ckappa_sig.Ws_index_map_and_set.Map.fold
+  match full with
+  | None | Some false ->
+    Ckappa_sig.Ws_index_map_and_set.Map.fold
       (fun _ (guard_p, _) guards ->
         Ckappa_sig.mvbdu_var_of_guard guard_p nsites :: guards)
       compilation.working_set_valuations []
-   | Some true -> 
-      let n = get_nr_guard_parameters static in   
-      let rec aux k acc = 
-        if k=n then acc 
-        else  aux (Ckappa_sig.next_guard_p_name k) (Ckappa_sig.mvbdu_var_of_guard k nsites :: acc)
-      in aux Ckappa_sig.dummy_guard_parameter []
+  | Some true ->
+    let n = get_nr_guard_parameters static in
+    let rec aux k acc =
+      if k = n then
+        acc
+      else
+        aux
+          (Ckappa_sig.next_guard_p_name k)
+          (Ckappa_sig.mvbdu_var_of_guard k nsites :: acc)
+    in
+    aux Ckappa_sig.dummy_guard_parameter []
 
-     
 let set_cc_compil cc_code static dynamic error =
   let bdu_handler = get_mvbdu_handler dynamic in
   let parameters = get_parameter static in
@@ -376,7 +380,7 @@ let initialize_global_information ?patch parameters log_info error mvbdu_handler
   let nr_guard_parameters = Handler.get_nr_guard_parameters kappa_handler in
   let error, mvbdu_handler, restriction_mvbdu =
     Common_static.compute_restriction_mvbdu ?patch_compute_restriction_mvbdu
-      parameters error mvbdu_handler nr_guard_parameters nsites compilation 
+      parameters error mvbdu_handler nr_guard_parameters nsites compilation
   in
   let error, mvbdu_handler, guard_mvbdus =
     Common_static.collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters

@@ -277,9 +277,10 @@ class virtual new_client ~is_running ~post mailbox =
 
     method secret_project_parse
         : bool -> (Ast.parsing_compil * string option) Api.lwt_result =
-      fun _ -> Lwt.return
-        (Api_common.err_result_of_string
-           "low level project_parse mustn't be used")
+      fun _ ->
+        Lwt.return
+          (Api_common.err_result_of_string
+             "low level project_parse mustn't be used")
 
     method secret_get_pos_of_rules_and_vars
         : Public_data.pos_of_rules_and_vars Api.lwt_result =

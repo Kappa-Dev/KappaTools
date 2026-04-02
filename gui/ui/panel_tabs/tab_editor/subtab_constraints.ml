@@ -109,7 +109,8 @@ let content () =
       [ Html.div [] ]
   in
   let add_agents
-      (conditionally_dead_agents : (int,int) Public_data.agent_deadness_conditions) =
+      (conditionally_dead_agents :
+        (int, int) Public_data.agent_deadness_conditions) =
     if List.length conditionally_dead_agents > 0 then
       print_panel "Conditions for agent deadness"
         print_conditionally_dead_agents conditionally_dead_agents

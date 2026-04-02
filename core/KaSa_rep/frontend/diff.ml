@@ -492,7 +492,7 @@ let get_new_indexs parameters errors handler c_compil =
 
 let fuse parameters errors handler c_compil handler' c_compil' =
   let n = Handler.nrules parameters errors handler in
-  let n' = Handler.ninit parameters errors handler in 
+  let n' = Handler.ninit parameters errors handler in
   let errors, (rules, nrules_pred) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters errors
       (fun parameters errors i rule' (rules, _) ->
@@ -509,7 +509,7 @@ let fuse parameters errors handler c_compil handler' c_compil' =
   let nrules = nrules_pred + 1 in
   let errors, init =
     Int_storage.Nearly_inf_Imperatif.fold parameters errors
-      (fun parameters errors i init' inits ->  
+      (fun parameters errors i init' inits ->
         Int_storage.Nearly_inf_Imperatif.set parameters errors (i + n') init'
           inits)
       c_compil'.Cckappa_sig.init c_compil.Cckappa_sig.init

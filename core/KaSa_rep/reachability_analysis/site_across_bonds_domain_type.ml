@@ -507,7 +507,8 @@ let print_site_across_bonds_domain ?verbose:(_verbose = true) ?(sparse = false)
           restriction_bdu
       in
       let error, bdu_handler, is_false =
-        Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu restriction_bdu 
+        Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu
+          restriction_bdu
       in
       if is_true || is_false then
         error, bdu_handler

@@ -30,7 +30,7 @@ let toggle_button =
         Html.a_class [ "btn"; "btn-default"; "pull-right" ];
       ]
     [ Html.cdata "toggle" ]
-  
+
 let restart_analysis_button_id = "restart_analysis_button"
 
 let restart_analysis_button =
@@ -54,7 +54,9 @@ let panel_heading =
         ]
       Editor_menu_file.content
   in
-  let buttons = menu_editor_file_content :: [ restart_analysis_button; toggle_button ] in
+  let buttons =
+    menu_editor_file_content :: [ restart_analysis_button; toggle_button ]
+  in
   [%html
     {|<div class="row">
              <div id="|}
@@ -346,7 +348,8 @@ let onload () : unit =
   let restart_analysis_button_dom : Dom_html.linkElement Js.t =
     Js.Unsafe.coerce
       (Js.Opt.get
-         (Ui_common.document##getElementById (Js.string restart_analysis_button_id))
+         (Ui_common.document##getElementById
+            (Js.string restart_analysis_button_id))
          (fun () -> assert false))
   in
   let () =

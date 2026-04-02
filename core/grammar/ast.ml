@@ -1067,8 +1067,8 @@ let print_working_set_prefix id working_set_values =
   match Mods.IntMap.find_option id working_set_values with
   | None -> "[FAIL]"
   | Some None -> "[PERMANENTLY DISABLED] "
-  | Some Some true -> "[ENABLED] "
-  | Some Some false -> "[DISABLED] "
+  | Some (Some true) -> "[ENABLED] "
+  | Some (Some false) -> "[DISABLED] "
 
 let print_init c f = function
   | ws_id, (g, (n, _), INIT_MIX (m, _)) ->
@@ -1800,7 +1800,8 @@ let compil_to_json c =
              (JsonUtil.of_list (Loc.string_annoted_to_json ~filenames)))
           c.configurations );
       ( "working_set_values",
-        Mods.IntMap.to_json JsonUtil.of_int (JsonUtil.of_option JsonUtil.of_bool)
+        Mods.IntMap.to_json JsonUtil.of_int
+          (JsonUtil.of_option JsonUtil.of_bool)
           c.working_set_values );
       "nr_working_set_params", JsonUtil.of_int c.nr_working_set_params;
       ( "guard_param_values",
@@ -1926,10 +1927,11 @@ let compil_of_json = function
                 ~error_msg:
                   (JsonUtil.exn_msg_cant_import_from_json
                      "AST working_set_values sig"))
-             (JsonUtil.to_option (JsonUtil.to_bool
-                ~error_msg:
-                  (JsonUtil.exn_msg_cant_import_from_json
-                     "AST working_set_values boolean value")))
+             (JsonUtil.to_option
+                (JsonUtil.to_bool
+                   ~error_msg:
+                     (JsonUtil.exn_msg_cant_import_from_json
+                        "AST working_set_values boolean value")))
              (List.assoc "working_set_values" l);
          nr_working_set_params =
            JsonUtil.to_int

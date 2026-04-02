@@ -188,10 +188,10 @@ let parse yield catalog ~force =
       Lwt.return (Result_util.ok (compile, None))
     | _, err -> handle_error err
   in
-  if force then 
+  if force then (
     let () = catalog.ast := Empty in
-    parse_all_files () 
-  else
+    parse_all_files ()
+  ) else (
     match !(catalog.ast), !(catalog.current_ws) with
     | Current compile, _ -> Lwt.return (Result_util.ok (compile, None))
     | Patched, Some current ->
@@ -204,6 +204,7 @@ let parse yield catalog ~force =
         | compile, [] -> Lwt.return (Result_util.ok (compile, Some x))
         | _, err -> handle_error err ))
     | Empty, _ | _, None -> parse_all_files ()
+  )
 
 let overwrite filename ast catalog =
   let content = Format.asprintf "%a" Ast.print_parsing_compil_kappa ast in

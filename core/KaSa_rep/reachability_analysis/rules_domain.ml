@@ -131,7 +131,8 @@ module Domain = struct
   let is_false_mvbdu parameters error dynamic mvbdu restriction_mvbdu =
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, is_false =
-      Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu restriction_mvbdu
+      Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu
+        restriction_mvbdu
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, is_false
@@ -263,7 +264,7 @@ module Domain = struct
   let is_enabled static dynamic error (rule_id : Ckappa_sig.c_rule_id)
       precondition =
     let parameters = get_parameter static in
-    let restriction_bdu = get_restriction_mvbdu static in 
+    let restriction_bdu = get_restriction_mvbdu static in
     let bool_array = get_dead_rule dynamic in
     let error, mvbdu =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameters error
@@ -427,10 +428,9 @@ module Domain = struct
               else
                 rule
             in
-            let restriction_bdu =
-              get_restriction_mvbdu static in 
+            let restriction_bdu = get_restriction_mvbdu static in
             let error, dynamic, is_false =
-              is_false_mvbdu parameters error dynamic mvbdu restriction_bdu 
+              is_false_mvbdu parameters error dynamic mvbdu restriction_bdu
             in
             if is_false then
               ( error,
@@ -461,7 +461,7 @@ module Domain = struct
 
   let print_dead_rule static dynamic error =
     let parameters = get_parameter static in
-    let restriction_bdu = get_restriction_mvbdu static in 
+    let restriction_bdu = get_restriction_mvbdu static in
     let error, dynamic, result =
       get_dead_rule_without_working_set_vars parameters error static dynamic
     in
@@ -532,7 +532,7 @@ module Domain = struct
                   __POS__ Exit
               in
               let error, dynamic, is_false =
-                is_false_mvbdu parameters error dynamic mvbdu restriction_bdu 
+                is_false_mvbdu parameters error dynamic mvbdu restriction_bdu
               in
               let error, dynamic =
                 if is_false then (
@@ -598,7 +598,7 @@ module Domain = struct
     error, dynamic, ()
 
   let get_dead_rules static dynamic parameters error r_id =
-    let restriction_bdu = get_restriction_mvbdu static in 
+    let restriction_bdu = get_restriction_mvbdu static in
     let error, dynamic, dead_rules =
       get_dead_rule_without_working_set_vars parameters error static dynamic
     in

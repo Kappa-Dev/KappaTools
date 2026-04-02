@@ -335,7 +335,6 @@ val update_call_stack :
   Remanent_parameters_sig.parameters
 
 val get_print_efficiency : Remanent_parameters_sig.parameters -> bool
-
 val get_is_a_patch : Remanent_parameters_sig.parameters -> bool
 
 val open_influence_map_file :

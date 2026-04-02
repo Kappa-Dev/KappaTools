@@ -70,10 +70,12 @@ functor
     (******************************************************************)
     (*operations of module signatures*)
 
-    let init ?compil ?files ?(is_a_patch=false) ~called_from () =
+    let init ?compil ?files ?(is_a_patch = false) ~called_from () =
       match compil with
       | Some compil ->
-        let parameters = Remanent_parameters.get_parameters ~called_from ~is_a_patch () in
+        let parameters =
+          Remanent_parameters.get_parameters ~called_from ~is_a_patch ()
+        in
         let state =
           Remanent_state.create_state parameters (Remanent_state.Compil compil)
         in
@@ -301,14 +303,14 @@ functor
         | Remanent_state.Files files ->
           let () = show_title state in
           (try
-            if is_a_patch then 
-              ( errors,
-               Cli_init.get_ast_from_list_of_files ~current_chapter:files ~rules_in_ws:[]
-                 ~removed_rules:[] syntax_version [])
-            else
-             ( errors,
-               Cli_init.get_ast_from_list_of_files ~current_chapter ~rules_in_ws
-                 ~removed_rules syntax_version files )
+             if is_a_patch then
+               ( errors,
+                 Cli_init.get_ast_from_list_of_files ~current_chapter:files
+                   ~rules_in_ws:[] ~removed_rules:[] syntax_version [] )
+             else
+               ( errors,
+                 Cli_init.get_ast_from_list_of_files ~current_chapter
+                   ~rules_in_ws ~removed_rules syntax_version files )
            with exn ->
              let errors, () = Exception.warn parameters errors __POS__ exn () in
              errors, Ast.empty_compil)
@@ -598,7 +600,8 @@ functor
       in
       state, ((global, static), dynamic)
 
-    let update_reachability_result ?do_not_restart_fixpoint_computation show_title new_indexs state =
+    let update_reachability_result ?do_not_restart_fixpoint_computation
+        show_title new_indexs state =
       let state, c_compil = get_c_compilation state in
       let state, handler = get_handler state in
       let () = show_title state in
@@ -607,8 +610,8 @@ functor
       let parameters = Remanent_state.get_parameters state in
       let error = Remanent_state.get_errors state in
       let error, log_info, (global, static), dynamic =
-        Reachability.update_main ?do_not_restart_fixpoint_computation parameters log_info error bdu_handler c_compil
-          handler new_indexs state
+        Reachability.update_main ?do_not_restart_fixpoint_computation parameters
+          log_info error bdu_handler c_compil handler new_indexs state
       in
       let bdu_handler = Reachability.get_bdu_handler dynamic in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
@@ -2324,17 +2327,18 @@ functor
         | Some r -> r.Cckappa_sig.e_rule_working_set_id
       in
       let () =
-        if Remanent_parameters.get_trace parameters then
-          let () = 
-          Loggers.fprintf
-            (Remanent_parameters.get_logger parameters)
-            "WS OF RULE -> rid:%i Wid:%i"
-            (Ckappa_sig.int_of_rule_id i)
-            (match id_opt with
-            | None -> -1
-            | Some a -> Ckappa_sig.int_of_working_set_index a)
-        in Loggers.print_newline  (Remanent_parameters.get_logger parameters)
-        else
+        if Remanent_parameters.get_trace parameters then (
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameters)
+              "WS OF RULE -> rid:%i Wid:%i"
+              (Ckappa_sig.int_of_rule_id i)
+              (match id_opt with
+              | None -> -1
+              | Some a -> Ckappa_sig.int_of_working_set_index a)
+          in
+          Loggers.print_newline (Remanent_parameters.get_logger parameters)
+        ) else
           ()
       in
       let state = set_errors errors state in
@@ -2427,15 +2431,15 @@ functor
       let () = show_title state in
       let state, handler = get_handler state in
       let errors, handler =
-        List_tokens.scan_incremental_compil ~diff parameters errors refined_compil'
-          handler
+        List_tokens.scan_incremental_compil ~diff parameters errors
+          refined_compil' handler
       in
       ( Remanent_state.set_errors errors
           (Remanent_state.set_handler handler state),
         state' )
 
-    let patch ?debug ?do_not_restart_fixpoint_computation ?do_we_show_title ~called_from ?compil ?patch_file_name
-        ~old_file_name state =
+    let patch ?debug ?do_not_restart_fixpoint_computation ?do_we_show_title
+        ~called_from ?compil ?patch_file_name ~old_file_name state =
       let parameters = get_parameters state in
       let log = Remanent_parameters.get_logger parameters in
       let state, summary_ast = summarize_from_ast state in
@@ -2487,7 +2491,7 @@ functor
       let state = set_errors errors state in
       (* TODO is this parse_token still necessary now that I added the List_token.scan_incremental_compil later? I am not 100% sure what it does so I am afraid of removing it. *)
       let state, _state' =
-        parse_token ~diff 
+        parse_token ~diff
           (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
           ~patch:state' ~current:state
       in
@@ -2505,8 +2509,9 @@ functor
       let errors, c_compil =
         Prepreprocess.translate_compil parameters errors compil
       in
-      let errors, handler' = 
-        List_tokens.scan_incremental_compil parameters errors c_compil handler in
+      let errors, handler' =
+        List_tokens.scan_incremental_compil parameters errors c_compil handler
+      in
       let errors, handler', cc_compil' =
         Preprocess.translate_c_compil parameters errors handler' c_compil
       in
@@ -2520,7 +2525,7 @@ functor
       in
       let state = set_errors errors state in
       let state = Remanent_state.set_c_compil cc_compil state in
-      let state = Remanent_state.set_handler handler state in 
+      let state = Remanent_state.set_handler handler state in
       let state, ((_global_static, _static), _dynamic) =
         update_reachability_result ?do_not_restart_fixpoint_computation
           (compute_show_title (fun _ -> do_we_show_title) (Some "Apply patch"))

@@ -151,5 +151,4 @@ let backdoor_directory = ref ""
 let current_chapter = ref ([] : string list)
 let rules_in_working_set = ref ([] : int list)
 let rules_to_remove = ref ([] : int list)
-
-let do_restart_fixpoint_iterations = ref false 
+let do_restart_fixpoint_iterations = ref false

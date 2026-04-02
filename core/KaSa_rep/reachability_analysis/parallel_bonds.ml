@@ -685,8 +685,8 @@ module Domain = struct
   (*************************************************************)
   (* if a parallel bound occurs on the lhs, check that this is possible *)
 
-  let common_scan parameters error bdu_handler restriction_bdu tuples_of_interest store_value
-      list guard_mvbdu =
+  let common_scan parameters error bdu_handler restriction_bdu
+      tuples_of_interest store_value list guard_mvbdu =
     let rec scan list error bdu_handler precondition_guard_mvbdu =
       match list with
       | [] -> error, true, bdu_handler, precondition_guard_mvbdu
@@ -715,7 +715,7 @@ module Domain = struct
         in
         let error, bdu_handler, is_false =
           Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
-            mvbdu_inter_parallel_or_not restriction_bdu 
+            mvbdu_inter_parallel_or_not restriction_bdu
         in
         if is_false then
           error, false, bdu_handler, precondition_guard_mvbdu
@@ -768,12 +768,11 @@ module Domain = struct
     in
     let store_value = get_value dynamic in
     let bdu_handler = get_mvbdu_handler dynamic in
-     let restriction_bdu = get_restriction_mvbdu static in
+    let restriction_bdu = get_restriction_mvbdu static in
     let error, bool, bdu_handler, precondition_guard_mvbdu =
       common_scan parameters error bdu_handler restriction_bdu
-      tuples_of_interest store_value
-        list guard_bdu 
-  in 
+        tuples_of_interest store_value list guard_bdu
+    in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     if bool then (
       let error, dynamic, precondition =
@@ -790,7 +789,7 @@ module Domain = struct
     (* non parallel bonds in a pattern can be maps to parallel ones through morphisms *)
     (* thus when the flag is Morphisms with ignore non parallel bonds *)
     let parameters = get_parameter static in
-    let restriction_bdu = get_restriction_mvbdu static in 
+    let restriction_bdu = get_restriction_mvbdu static in
     let tuples_of_interest = get_tuples_of_interest static in
     let error, parallel_map =
       Parallel_bonds_static.collect_double_bonds_in_pattern parameters error
@@ -820,8 +819,8 @@ module Domain = struct
       Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
     in
     let error, bool, bdu_handler, precondition_guard_mvbdu =
-      common_scan parameters error bdu_handler restriction_bdu tuples_of_interest store_value
-        list mvbdu_true
+      common_scan parameters error bdu_handler restriction_bdu
+        tuples_of_interest store_value list mvbdu_true
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     if bool then (
@@ -852,14 +851,14 @@ module Domain = struct
          map
 
   let can_only_be_parallel_bond parameters error static dynamic mvbdu =
-    let restriction_bdu = get_restriction_mvbdu static in 
+    let restriction_bdu = get_restriction_mvbdu static in
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, can_be_non_parallel =
       add_first_variable_to_mvbdu parameters bdu_handler error false mvbdu
     in
     let error, bdu_handler, is_false =
       Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
-        can_be_non_parallel restriction_bdu 
+        can_be_non_parallel restriction_bdu
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, is_false
@@ -1139,8 +1138,8 @@ module Domain = struct
                                                       dynamic,
                                                       is_parallel_bond ) =
                                                   can_only_be_parallel_bond
-                                                    parameters error static dynamic
-                                                    mvbdu
+                                                    parameters error static
+                                                    dynamic mvbdu
                                                 in
                                                 if is_parallel_bond then
                                                   error, true, dynamic

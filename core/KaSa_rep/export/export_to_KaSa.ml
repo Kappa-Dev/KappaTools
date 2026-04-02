@@ -158,7 +158,7 @@ module type Type = sig
     (Ast.mixture, Ast.mixture, string) Ast.init_statement -> state -> state
 
   val patch :
-    ?do_not_restart_fixpoint_computation:bool -> 
+    ?do_not_restart_fixpoint_computation:bool ->
     ?debug:bool ->
     ?do_we_show_title:bool ->
     patch_file_name:string ->
@@ -199,7 +199,8 @@ functor
     let add_rule = add_rule
     let add_init = add_init
 
-    let patch ?do_not_restart_fixpoint_computation ?debug ?do_we_show_title ~patch_file_name =
-      patch ?do_not_restart_fixpoint_computation ?debug ?do_we_show_title ?compil:None ~patch_file_name
-        ~called_from:Remanent_parameters_sig.KaSa
+    let patch ?do_not_restart_fixpoint_computation ?debug ?do_we_show_title
+        ~patch_file_name =
+      patch ?do_not_restart_fixpoint_computation ?debug ?do_we_show_title
+        ?compil:None ~patch_file_name ~called_from:Remanent_parameters_sig.KaSa
   end

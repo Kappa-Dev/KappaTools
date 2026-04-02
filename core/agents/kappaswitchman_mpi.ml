@@ -336,8 +336,7 @@ let on_message exec_command message_delimiter =
                            st b
                        in
                        let force =
-                         JsonUtil.read_next_item
-                           Yojson.Basic.read_bool st b
+                         JsonUtil.read_next_item Yojson.Basic.read_bool st b
                        in
                        manager#project_parse ~patternSharing overwrites force
                        >>= fun out -> Lwt.return (B (Nothing, msg_id, out))
