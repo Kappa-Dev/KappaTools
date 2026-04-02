@@ -589,7 +589,7 @@ functor
       in
       let bdu_handler = Reachability.get_bdu_handler dynamic in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
-      let error, dynamic, state =
+      let error, state =
         Reachability.export global static dynamic error state
       in
       let state = Remanent_state.set_errors error state in
@@ -615,7 +615,7 @@ functor
       in
       let bdu_handler = Reachability.get_bdu_handler dynamic in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
-      let error, dynamic, state =
+      let error, state =
         Reachability.export global static dynamic error state
       in
       let state = Remanent_state.set_errors error state in
@@ -2246,13 +2246,8 @@ functor
           | None -> assert false
           | Some global -> global
         in
-        let error, dynamic, state =
+        let error, state =
           Reachability.export global static dynamic error state
-        in
-        let state =
-          Remanent_state.set_reachability_result
-            ((global, static), dynamic)
-            state
         in
         let state = Remanent_state.reset_reachability_memoized_values state in
         Remanent_state.set_errors error state
@@ -2526,7 +2521,7 @@ functor
       let state = set_errors errors state in
       let state = Remanent_state.set_c_compil cc_compil state in
       let state = Remanent_state.set_handler handler state in
-      let state, ((_global_static, _static), _dynamic) =
+      let state, _ =
         update_reachability_result ?do_not_restart_fixpoint_computation
           (compute_show_title (fun _ -> do_we_show_title) (Some "Apply patch"))
           new_indexs state

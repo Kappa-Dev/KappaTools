@@ -56,7 +56,6 @@ module type Analyzer = sig
     Exception.exceptions_caught_and_uncaught ->
     ('static, 'dynamic) Analyzer_headers.kasa_state ->
     Exception.exceptions_caught_and_uncaught
-    * dynamic_information
     * ('static, 'dynamic) Analyzer_headers.kasa_state
 
   val print :
@@ -376,7 +375,7 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
            (Domain.get_global_dynamic_information dynamic))
         kasa_state
     in
-    error, dynamic, kasa_state
+    error, (*dynamic,*) kasa_state
 
   let maybe_reachable static dynamic error flag pattern =
     let error, dynamic, precondition =

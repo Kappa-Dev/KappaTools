@@ -56,7 +56,6 @@ module type Analyzer = sig
     Exception.exceptions_caught_and_uncaught ->
     ('static, 'dynamic) Analyzer_headers.kasa_state ->
     Exception.exceptions_caught_and_uncaught
-    * dynamic_information
     * ('static, 'dynamic) Analyzer_headers.kasa_state
 
   val print :
