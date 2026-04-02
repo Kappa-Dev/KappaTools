@@ -103,7 +103,7 @@ let main () =
   let state = print_result parameters state false  in
   let log = Remanent_parameters.get_logger parameters in
   let rec loop_time state start_time =
-    Loggers.fprintf log "This computation step took ";
+    Loggers.fprintf log "execution took ";
     KaSaUtil.print_only_timing parameters start_time;
     Loggers.print_newline log; 
     Loggers.fprintf log "> ";
