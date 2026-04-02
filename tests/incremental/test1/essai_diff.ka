@@ -1,0 +1,7 @@
+%agent: A(x) 
+%agent: B(x) 
+%agent: C(x) 
+
+%init: 10 B() 
+  'r2' A(),. -> .,B() @2 
+  'r5' A(),. -> .,D() @2 

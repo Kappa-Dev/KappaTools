@@ -1,0 +1,5 @@
+./KaSaIncremental essai.ka essai2.ka --do-restart-fixpoint-iterations 
+
+update file essai_diff.ka as essai.ka 
+
+s
