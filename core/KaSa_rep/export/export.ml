@@ -2325,6 +2325,7 @@ functor
       in
       let () =
         if Remanent_parameters.get_trace parameters then
+          let () = 
           Loggers.fprintf
             (Remanent_parameters.get_logger parameters)
             "WS OF RULE -> rid:%i Wid:%i"
@@ -2332,6 +2333,7 @@ functor
             (match id_opt with
             | None -> -1
             | Some a -> Ckappa_sig.int_of_working_set_index a)
+        in Loggers.print_newline  (Remanent_parameters.get_logger parameters)
         else
           ()
       in
