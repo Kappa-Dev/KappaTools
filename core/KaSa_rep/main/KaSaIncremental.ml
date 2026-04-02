@@ -18,12 +18,9 @@ let help_message =
    one.\n\
   \    update file foo.ka as foo'.ka\n\
   \        Replace the content of the current verion of the file foo'.ka with \
-   the content of the file foo.ka\n\
-  \    add <rule>\n\
-  \        (Not implemented yet TODO) Adds a rule to the working set.\n"
+   the content of the file foo.ka\n"
 
 type parsed_instruction =
-  | Add of string
   | Enable_index of bool * int list
   | Enable of bool * string
   | Parsing_error of string
@@ -52,18 +49,13 @@ let parse_input s =
                  ^ ". Please put a label inside of quotation marks, e.g. \
                     'label'.")
               | Some i -> Enable_index (bool, i :: l))
-            | Add _ | Enable _ | Parsing_error _ -> e)
+            | Enable _ | Parsing_error _ -> e)
           (Enable_index (bool, []))
           (if String.contains s ',' then
              String.split_on_char ',' s
            else
              String.split_on_char ' ' s)
-  in
-  (* ---- ADD ---- *)
-  if String.starts_with ~prefix:"add" s then (
-    let s = String.trim (String.sub s 3 (String.length s - 3)) in
-    Add s
-  ) else if (* ---- ENABLE ---- *) String.starts_with ~prefix:"enable" s then (
+  in if (* ---- ENABLE ---- *) String.starts_with ~prefix:"enable" s then (
     let s = String.trim (String.sub s 6 (String.length s - 6)) in
     parse_enable_label s true
   ) else if (* ---- DISABLE ---- *)
@@ -182,9 +174,6 @@ let main () =
         let start_time = Sys.time () in
         let success, state =
           match parse_input input with
-          | Add _ ->
-            print_endline "TODO adding a rule was not implemented yet";
-            false, state
           | Enable (false, i) ->
             let () =
               Loggers.fprintf log "Disabling rule with label '%s'...\n" i
