@@ -18,7 +18,7 @@ val scan_compil :
 val scan_incremental_compil :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  diff:Diff.diff -> 
+  ?diff:Diff.diff -> 
   ( Ckappa_sig.agent,
     Ckappa_sig.agent_sig,
     Ckappa_sig.mixture,

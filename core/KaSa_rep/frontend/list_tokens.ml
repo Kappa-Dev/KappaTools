@@ -593,8 +593,7 @@ let scan_compil parameters error compil =
   let error, remanent = empty_handler parameters error in
   scan_compil_incremental parameters error compil remanent
 
-let scan_incremental_compil parameters error ~diff compil old_remanent =
-  let diff = Some diff in 
+let scan_incremental_compil parameters error ?diff compil old_remanent =
   let error, remanent =
     scan_compil_incremental parameters error ?diff compil old_remanent
   in

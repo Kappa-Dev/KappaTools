@@ -2485,6 +2485,7 @@ functor
         Diff.get_new_indexs parameters errors handler cc_compil
       in
       let state = set_errors errors state in
+      (* TODO is this parse_token still necessary now that I added the List_token.scan_incremental_compil later? I am not 100% sure what it does so I am afraid of removing it. *)
       let state, _state' =
         parse_token ~diff 
           (compute_show_title (fun _ -> do_we_show_title) (Some "Parse patch"))
@@ -2504,8 +2505,10 @@ functor
       let errors, c_compil =
         Prepreprocess.translate_compil parameters errors compil
       in
+      let errors, handler' = 
+        List_tokens.scan_incremental_compil parameters errors c_compil handler in
       let errors, handler', cc_compil' =
-        Preprocess.translate_c_compil parameters errors handler c_compil
+        Preprocess.translate_c_compil parameters errors handler' c_compil
       in
       let _state' = Remanent_state.set_compilation compil state' in
       let state = Remanent_state.set_errors errors state in
