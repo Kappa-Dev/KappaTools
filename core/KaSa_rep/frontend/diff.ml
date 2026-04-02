@@ -494,8 +494,6 @@ let get_new_indexs parameters errors handler c_compil =
   let next_nr_predicates = Handler.get_nr_guard_parameters handler in
   let dual = handler.Cckappa_sig.dual in
   let next_agent = Handler.nagents parameters errors handler in
-  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "NEXT AGENT %i" (Ckappa_sig.int_of_agent_name next_agent) in 
-  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
   let new_indexs =
     {
       next_rule = Ckappa_sig.rule_id_of_int n;
