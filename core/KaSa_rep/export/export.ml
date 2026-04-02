@@ -2515,6 +2515,7 @@ functor
       in
       let state = set_errors errors state in
       let state = Remanent_state.set_c_compil cc_compil state in
+      let state = Remanent_state.set_handler handler state in 
       let state, ((_global_static, _static), _dynamic) =
         update_reachability_result ?do_not_restart_fixpoint_computation
           (compute_show_title (fun _ -> do_we_show_title) (Some "Apply patch"))
