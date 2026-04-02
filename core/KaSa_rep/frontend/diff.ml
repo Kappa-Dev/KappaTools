@@ -165,11 +165,24 @@ let summarize_init_state_from_ast parameters error id
     (fun summary_init_state_map x -> { x with summary_init_state_map })
     parameters error id init_state summary
 
+    let is_permanently_disabled compil ws_id =
+      match ws_id with
+      | None -> false
+      | Some id ->
+      match Mods.IntMap.find_option id compil.Ast.working_set_values with
+      | None -> false 
+      | Some None -> true
+      | Some (Some _) -> false
+
 let summarize_from_ast parameters error compil =
   let error, summary = error, Mods.StringMap.empty in
   let error, _, summary =
     List.fold_left
       (fun (error, id, summary) rule ->
+        let (ws_id, _, _, _) = rule in
+        if is_permanently_disabled compil ws_id then
+          error, id, summary
+        else
         let error, summary =
           summarize_rule_from_ast parameters error id rule summary
         in
@@ -181,7 +194,10 @@ let summarize_from_ast parameters error compil =
       (fun (error, id, summary)
            (init_statement :
              int option * (Ast.mixture, Ast.mixture, string) Ast.init_statement) ->
-        let _, (a, b, init) = init_statement in
+        let ws_id, (a, b, init) = init_statement in
+        if is_permanently_disabled compil ws_id then
+          error, id, summary
+        else
         match init with
         | Ast.INIT_TOK _ -> error, id + 1, summary
         | Ast.INIT_MIX _ ->
