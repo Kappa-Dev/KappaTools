@@ -353,6 +353,7 @@ else
       | Some l ->
         Remanent_state.set_internal_constraint_list (List.rev l) kasa_state
     in
+    let kasa_state = Remanent_state.set_bdu_handler (Analyzer_headers.get_mvbdu_handler (Domain.get_global_dynamic_information dynamic)) kasa_state in 
     error, dynamic, kasa_state
 
   let maybe_reachable static dynamic error flag pattern =
