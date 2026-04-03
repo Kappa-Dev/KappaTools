@@ -207,18 +207,18 @@ let add_checkbox_to_working_set_elements rules codemirror =
               let () = build_warning range in
               visited_lines
             ) else (
-              match rule.Public_data.rule_ws_enabled with 
+              match rule.Public_data.rule_ws_enabled with
               | None -> visited_lines
               | Some enabled ->
-              let () =
-                Codemirror.setGutterMarker ~line ~cm:codemirror
-                  ~dom:
-                    (build_checkbox
-                       (string_of_int rule.Public_data.rule_ws_id)
-                       enabled)
-                  ~gutter_id:working_set_gutter
-              in
-              line :: visited_lines
+                let () =
+                  Codemirror.setGutterMarker ~line ~cm:codemirror
+                    ~dom:
+                      (build_checkbox
+                         (string_of_int rule.Public_data.rule_ws_id)
+                         enabled)
+                    ~gutter_id:working_set_gutter
+                in
+                line :: visited_lines
             )
           ) else
             visited_lines

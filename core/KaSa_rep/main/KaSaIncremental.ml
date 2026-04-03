@@ -55,7 +55,8 @@ let parse_input s =
              String.split_on_char ',' s
            else
              String.split_on_char ' ' s)
-  in if (* ---- ENABLE ---- *) String.starts_with ~prefix:"enable" s then (
+  in
+  if (* ---- ENABLE ---- *) String.starts_with ~prefix:"enable" s then (
     let s = String.trim (String.sub s 6 (String.length s - 6)) in
     parse_enable_label s true
   ) else if (* ---- DISABLE ---- *)
@@ -66,7 +67,6 @@ let parse_input s =
     Parsing_error ("Unknown command: " ^ s)
 
 let main () =
-  let initial_start_time = Sys.time () in
   let errors = Exception.empty_exceptions_caught_and_uncaught in
   let _, parameters, _ = Get_option.get_option errors in
   let module A =
@@ -80,13 +80,6 @@ let main () =
     (module Export_to_KaSa.Export (A) : Export_to_KaSa.Type)
   in
   let module Export_to_KaSa = (val export_to_kasa : Export_to_KaSa.Type) in
-  let state = Export_to_KaSa.init () in
-  let state =
-    if Remanent_parameters.get_compute_symmetries parameters then
-      fst (Export_to_KaSa.get_env state)
-    else
-      state
-  in
   let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
   let print_result parameters state print_analysis =
     let state, _ = Export_to_KaSa.get_reachability_analysis state in
@@ -100,42 +93,75 @@ let main () =
     let () = Exception.print parameters error in
     state
   in
-  let state = print_result parameters state false  in
   let log = Remanent_parameters.get_logger parameters in
-  let rec loop_time state start_time =
-    Loggers.fprintf log "execution took ";
-    KaSaUtil.print_only_timing parameters start_time;
-    Loggers.print_newline log; 
-    Loggers.fprintf log "> ";
-    Loggers.flush_logger log;
+  let rec loop ?command state start_time =
+    let () =
+      match start_time with
+      | None -> ()
+      | Some start_time ->
+        let () = Loggers.fprintf log "execution took " in
+        let () = KaSaUtil.print_only_timing parameters start_time in
+        Loggers.print_newline log
+    in
     let state =
-      Export_to_KaSa.set_errors Exception.empty_exceptions_caught_and_uncaught
-        state
+      match state with
+      | None -> None
+      | Some state ->
+        Some
+          (Export_to_KaSa.set_errors
+             Exception.empty_exceptions_caught_and_uncaught state)
+    in
+    let s =
+      match command with
+      | Some s -> s
+      | None ->
+        let () = Loggers.fprintf log "> " in
+        let () = Loggers.flush_logger log in
+        String.trim (read_line ())
+    in
+    let state =
+      match state with
+      | None -> None
+      | Some state ->
+        Some
+          (Export_to_KaSa.set_errors
+             Exception.empty_exceptions_caught_and_uncaught state)
     in
     try
-      match String.trim (read_line ()) with
-      | "quit" | "q" -> ()
-      | "help" | "h" ->
-        Loggers.fprintf log "%s" help_message;
-        loop state 
-      | "print rules" | "p rules" ->
+      let start_time = Some (Sys.time ()) in
+      match s, state with
+      | ("quit" | "q"), _ -> ()
+      | ("help" | "h"), _ ->
+        let () = Loggers.fprintf log "%s" help_message in
+        loop state None
+      | "restart", _ | _, None ->
+        let state = Export_to_KaSa.init () in
+        let state =
+          if Remanent_parameters.get_compute_symmetries parameters then
+            fst (Export_to_KaSa.get_env state)
+          else
+            state
+        in
+        let state = print_result parameters state false in
+        loop (Some state) start_time
+      | ("print rules" | "p rules"), Some state ->
         let state, compilation = Export_to_KaSa.get_compilation state in
         let () =
           Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
         in
         let error = Export_to_KaSa.get_errors state in
         let () = Exception.print parameters error in
-        loop state
-      | "print working set" | "print ws" | "p ws" ->
+        loop (Some state) None
+      | ("print working set" | "print ws" | "p ws"), Some state ->
         let state, compilation = Export_to_KaSa.get_compilation state in
         let () = Loggers.fprintf log "%a" Ast.print_working_set compilation in
         let error = Export_to_KaSa.get_errors state in
         let () = Exception.print parameters error in
-        loop state
-      | "print result" | "p result" | "p" ->
+        loop (Some state) None
+      | ("print result" | "p result" | "p"), Some state ->
         let state = print_result parameters state true in
-        loop state
-      | input
+        loop (Some state) start_time
+      | input, Some state
         when String.length input > 12 && String.sub input 0 12 = "update file "
         ->
         let l = String.split_on_char ' ' input in
@@ -168,9 +194,9 @@ let main () =
             in
             Export_to_KaSa.set_errors error state
         in
-        let state = print_result parameters state false  in
-        loop state
-      | input ->
+        let state = print_result parameters state false in
+        loop (Some state) start_time
+      | input, Some state ->
         let success, state =
           match parse_input input with
           | Enable (false, i) ->
@@ -207,16 +233,16 @@ let main () =
         in
         let state =
           if success then
-            print_result parameters state true 
+            print_result parameters state true
           else (
             let error = Export_to_KaSa.get_errors state in
             let () = Exception.print parameters error in
             state
           )
         in
-        loop state
+        loop (Some state) start_time
     with End_of_file -> ()
-  and loop state = loop_time state (Sys.time ()) 
-in loop_time state initial_start_time
+  in
+  loop ~command:"restart" None None
 
 let () = main ()

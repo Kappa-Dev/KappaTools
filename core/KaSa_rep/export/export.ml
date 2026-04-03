@@ -614,8 +614,7 @@ functor
           log_info error bdu_handler c_compil handler new_indexs state
       in
       let error, dynamic, static =
-          Reachability.enable_or_disable_rule static dynamic error
-            c_compil
+        Reachability.enable_or_disable_rule static dynamic error c_compil
       in
       let bdu_handler = Reachability.get_bdu_handler dynamic in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
@@ -2383,9 +2382,10 @@ functor
       in
       let error = get_errors state in
       let error, state, _ =
-        toggle_working_set_boolean_parameters_in_compilation error false state
-          l true
-    in set_errors error state
+        toggle_working_set_boolean_parameters_in_compilation error false state l
+          true
+      in
+      set_errors error state
 
     let permanently_disable_init_c_id_list list state =
       let state, l =
@@ -2399,9 +2399,10 @@ functor
       in
       let error = get_errors state in
       let error, state, _ =
-        toggle_working_set_boolean_parameters_in_compilation error false state
-          l true
-    in set_errors error state
+        toggle_working_set_boolean_parameters_in_compilation error false state l
+          true
+      in
+      set_errors error state
 
     (* Incremental analysis *)
     let summarize_from_ast state =

@@ -10,9 +10,9 @@
 # The output is in output/experiments_output_compare_ws.tex (table)
 # or in output/experiments_output_compare_ws_plot.png (plot)
 
-DEBUG=false
-VERBOSE=false
-INSTALL_DEPS=false
+DEBUG=true
+VERBOSE=true
+INSTALL_DEPS=true
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${SCRIPT_DIR}/../../.."
