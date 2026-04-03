@@ -139,7 +139,7 @@ if $INSTALL_DEPS; then
 fi
 
 # Build Kappa
-if ! $VERBOSE; then
+if ! $DEBUG; then
     echo
     echo "Building the project:"
     make all

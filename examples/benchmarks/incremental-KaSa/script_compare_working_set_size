@@ -85,8 +85,8 @@ STEP=10
 
 if $DEBUG; then
     MIN_NR_RULES=0
-    MAX_NR_RULES=4
-    STEP=1
+    MAX_NR_RULES=10
+    STEP=2
     TIMEOUT=3m
     REPS=2
 fi
@@ -127,7 +127,7 @@ OUTPUT_DIR="${SCRIPT_DIR}/output/"
 PROFILING_FILE="${KAPPA_OUTPUT_DIR}profiling.html"
 
 if $DEBUG ; then
-    MODELS=("egfr_net" "tgf_v19")
+    MODELS=("egfr_net" "tgf_20180419" "wnt_20151228")
 fi
 
 AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
@@ -139,7 +139,7 @@ if $INSTALL_DEPS; then
     opam install . --update-invariant
 fi
 
-if ! $VERBOSE; then
+if ! $DEBUG; then
     echo
     # Build Kappa
     echo "Building the project:"
@@ -253,8 +253,10 @@ cmd=(python3
     "${SCRIPT_DIR}/latex_table_compare_ws.py" 
     "$OUTPUT_MEAN_RUNTIMES" "$OUTPUT_LATEX_RUNTIMES"
     )
-printf '%q ' "${cmd[@]}"
-printf '\n'
+if $VERBOSE; then
+    printf '%q ' "${cmd[@]}"
+    printf '\n'
+fi
 { ${cmd[@]}; }
 
 echo "📊 The latex table of the runtimes can be found in: $OUTPUT_LATEX_RUNTIMES"
