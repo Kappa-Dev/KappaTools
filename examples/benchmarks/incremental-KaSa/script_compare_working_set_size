@@ -240,7 +240,9 @@ for MODEL in "${MODELS[@]}"; do
     done
 done
 
-python3 -m venv ./temp_python_install
+if [ ! -d "temp_python_install" ]; then
+  python3 -m venv temp_python_install
+fi
 source ./temp_python_install/bin/activate
 pip3 install pandas -q
 pip3 install matplotlib -q
@@ -269,10 +271,11 @@ echo "📊 The latex table of the runtimes can be found in: $OUTPUT_LATEX_RUNTIM
 cmd=(python3 
     "${SCRIPT_DIR}/plot.py" "${OUTPUT_DIR}experiments_output_mean.csv" "${OUTPUT_DIR}runtimes"
     )
-printf '%q ' "${cmd[@]}"
-printf '\n'
+if $VERBOSE; then
+    printf '%q ' "${cmd[@]}"
+    printf '\n'
+fi
 { ${cmd[@]}; }
 echo "📈 The png plot of the runtimes can be found in: ${OUTPUT_DIR}runtimes.png"
 
 deactivate
-rm -rf ./temp_python_install
