@@ -77,7 +77,7 @@ let content () =
 let init_dead_rules () =
   React.S.l1
     (fun model ->
-      State_error.wrap ~append:true "tab_editor_dead_rule"
+      State_error.wrap ~append:false "tab_editor_dead_rule"
         (State_project.eval_with_project ~label:__LOC__
            (fun (manager : Api.concrete_manager) ->
              if
@@ -116,7 +116,7 @@ let init_dead_rules () =
 let init_dead_agents () =
   React.S.l1
     (fun model ->
-      State_error.wrap ~append:true "tab_editor_dead_agent"
+      State_error.wrap ~append:false "tab_editor_dead_agent"
         (State_project.eval_with_project ~label:__LOC__
            (fun (manager : Api.concrete_manager) ->
              if
@@ -154,7 +154,7 @@ let init_dead_agents () =
 let init_non_weakly_reversible_transitions () =
   React.S.l1
     (fun model ->
-      State_error.wrap ~append:true "tab_editor_dead_rule"
+      State_error.wrap ~append:false "tab_editor_dead_rule"
         (State_project.eval_with_project ~label:__LOC__
            (fun (manager : Api.concrete_manager) ->
              if
