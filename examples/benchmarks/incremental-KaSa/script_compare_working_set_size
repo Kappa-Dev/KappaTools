@@ -240,6 +240,11 @@ for MODEL in "${MODELS[@]}"; do
     done
 done
 
+python3 -m venv ./temp_python_install
+source ./temp_python_install/bin/activate
+pip3 install pandas -q
+pip3 install matplotlib -q
+
 python3 examples/benchmarks/incremental-KaSa/mean_of_reps.py "${OUTPUT_DIR}experiments_output.csv" "${OUTPUT_DIR}experiments_output_mean.csv"
 
 OUTPUT_MEAN_RUNTIMES="${OUTPUT_DIR}experiments_output_mean.csv"
@@ -268,3 +273,6 @@ printf '%q ' "${cmd[@]}"
 printf '\n'
 { ${cmd[@]}; }
 echo "📈 The png plot of the runtimes can be found in: ${OUTPUT_DIR}runtimes.png"
+
+deactivate
+rm -rf ./temp_python_install

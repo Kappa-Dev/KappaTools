@@ -347,6 +347,10 @@ for MODEL in "${MODELS[@]}"; do
     echo "Results of the incremental analysis: $STDOUT_OUTPUT_FILE_INCREMENTAL"
 done
 
+python3 -m venv ./temp_python_install
+source ./temp_python_install/bin/activate
+pip3 install pandas -q
+
 # compute the mean runtime of the multiple repetitions
 python3 examples/benchmarks/incremental-KaSa/mean_of_reps.py "${OUTPUT_DIR}experiments_output.csv" "${OUTPUT_DIR}experiments_output_mean.csv"
 
@@ -371,3 +375,5 @@ fi
 
 echo "📊 The latex table of the runtimes can be found in: $OUTPUT_LATEX_RUNTIMES"
 
+deactivate
+rm -rf ./temp_python_install
