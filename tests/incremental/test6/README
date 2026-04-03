@@ -1,0 +1,3 @@
+./KaSaIncremental --current-chapter a_before.ka --do-restart-fixpoint-iterations
+
+update file a_after.ka as a_before.ka
