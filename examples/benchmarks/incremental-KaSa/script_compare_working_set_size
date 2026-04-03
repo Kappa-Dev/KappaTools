@@ -205,7 +205,7 @@ for MODEL in "${MODELS[@]}"; do
                 $OPTIONS
                 )
             else 
-                random_rules=$(shuf -i "0-$NR_RULES_MODEL" -n $NR_RULES | paste -sd,)
+                random_rules=$(shuf -i "0-$NR_RULES_MODEL" -n $NR_RULES | paste -s -d ',')
                 cmd=(
                 timeout "$TIMEOUT"
                 "$KASA_INC_BINARY"

@@ -229,7 +229,7 @@ for MODEL in "${MODELS[@]}"; do
         fi
         
         # choose 10 random rules to be added to the working set
-        random_rules=$(shuf -i 0-$NR_RULES_MODEL -n "$NR_RULES" | paste -sd,)
+        random_rules=$(shuf -i 0-$NR_RULES_MODEL -n "$NR_RULES" | paste -s -d ',')
 
         if $VERBOSE; then 
             echo "Random list of rules that are in the working set: $random_rules"
