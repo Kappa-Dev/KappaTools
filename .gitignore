@@ -87,6 +87,7 @@ tests/integration/*/*/output/data_2.csv
 dist/
 *.egg-info
 .idea
+temp_python_install/
 
 # eclipse
 .project
