@@ -1,0 +1,7 @@
+Command line:
+./KaSaIncremental --current-chapter simple_example.ka --do-restart-fixpoint-iterations 
+
+On prompt:
+disable 0
+enable 0
+disable 1
