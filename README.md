@@ -7,7 +7,7 @@ The [online webapp](https://tools.kappalanguage.org/try/?model=https%3A//raw.git
 
 ### Prerequisites
 - Install [opam](https://opam.ocaml.org/doc/Install.html) (the OCaml package manager). Run `opam init` to initialize it.
-- For the benchmarks: `python3` with the libraries `pandas` and `matplotlib`
+- For the benchmarks: `python3` and `python3-venv`
 ### Build
 - Download the code from GitHub and navigate to the root directory of the project.
 - Install the dependencies by `opam install . --update-invariant --deps-only`
@@ -75,6 +75,9 @@ The command `help` prints more information about available commands.
 ## Benchmarks
 
 The Table 1 and Fig. 4 in the in the tool paper `Incremental Reachability Analysis for the Rule-Based Modeling Language Kappa` were generated, respectively, by the scripts `script_disable_and_add_rules` and `script_compare_working_set_size`.
+
+These scripts are written in bash, therefore they will unfortunately not work on Windows.
+
 ### Table 1: compare the incremental and non-incremental runtimes
 
 Run the whole analysis with:
