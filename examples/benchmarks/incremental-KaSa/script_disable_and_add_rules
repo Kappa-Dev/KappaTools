@@ -126,7 +126,7 @@ OUTPUT_DIR="${SCRIPT_DIR}/output/"
 PROFILING_FILE="${KAPPA_OUTPUT_DIR}profiling.html"
 
 if $DEBUG ; then
-    MODELS=("egfr_net" "tgf_v19")
+    MODELS=("egfr_net" "tgf_20180419" "wnt_20151228")
 fi
 
 AVAILABLE_MODELS=$(printf "%s, " "${MODELS[@]}")
@@ -363,8 +363,10 @@ cmd=(python3
     "${SCRIPT_DIR}/latex_table_of_runtimes.py" 
     "$OUTPUT_MEAN_RUNTIMES" "$OUTPUT_LATEX_RUNTIMES"
     )
-printf '%q ' "${cmd[@]}"
-printf '\n'
+if $VERBOSE; then
+    printf '%q ' "${cmd[@]}"
+    printf '\n'
+fi
 { ${cmd[@]}; }
 
 echo "📊 The latex table of the runtimes can be found in: $OUTPUT_LATEX_RUNTIMES"
