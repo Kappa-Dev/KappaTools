@@ -217,6 +217,7 @@ val print_ast_rule : Format.formatter -> rule -> unit
 
 val print_rule_content :
   bidirectional:bool -> Format.formatter -> rule_content -> unit
+val print_agent_sig : Format.formatter -> agent_sig -> unit
 
 val print_parsing_compil_kappa : Format.formatter -> parsing_compil -> unit
 val print_working_set : Format.formatter -> parsing_compil -> unit
@@ -316,3 +317,7 @@ val diff_pos_init_statement :
   'mixture Loc.diff_pos ->
   'id Loc.diff_pos ->
   ('pattern, 'mixture, 'id) init_statement Loc.diff_pos
+
+val diff_pos_agent_sig : 
+  agent_sig -> agent_sig -> (Loc.t * Loc.t) list ->
+  (Loc.t * Loc.t) list

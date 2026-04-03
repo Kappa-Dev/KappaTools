@@ -17,8 +17,8 @@
 
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
 
-let date = "<2015.01.23"
-let version = "4.01"
+let date = "<2016.04.03"
+let version = "4.01 (incremental)"
 let output_directory = ref "output"
 let output_cm_directory = ref "output"
 let output_im_directory = ref "output"

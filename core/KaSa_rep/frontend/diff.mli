@@ -1,5 +1,5 @@
-type ('rule, 'init) summary_file
-type ('rule, 'init) summary
+type ('rule, 'init, 'agent_sig) summary_file
+type ('rule, 'init, 'agent_sig) summary
 
 type diff_elt = {
   new_elt: int list;
@@ -7,7 +7,7 @@ type diff_elt = {
   pos_renaming: (Loc.t * Loc.t) list;
 }
 
-type diff = { diff_rules: diff_elt; diff_init: diff_elt }
+type diff = { diff_rules: diff_elt; diff_init: diff_elt ; diff_agent_sig: diff_elt }
 
 type new_indexs = {
   next_rule: Ckappa_sig.c_rule_id;
@@ -31,7 +31,8 @@ val summarize_from_ast :
   Ast.parsing_compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * ( Ast.rule Ast.compil_rule,
-      (Ast.mixture, Ast.mixture, string) Ast.init_statement )
+      (Ast.mixture, Ast.mixture, string) Ast.init_statement, 
+      Ast.agent_sig)
     summary
 
 val summarize_from_ckappa :
@@ -39,25 +40,25 @@ val summarize_from_ckappa :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * (Ckappa_sig.enriched_rule, Ckappa_sig.enriched_init) summary
+  * (Ckappa_sig.enriched_rule, Ckappa_sig.enriched_init, (Ckappa_sig.agent_sig Loc.annoted)) summary
 
 val summarize_from_cckappa :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init) summary
+  * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init, Cckappa_sig.agent_sig) summary
 
 val dump_summary :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  ('a, 'b) summary ->
+  ('a, 'b, 'c) summary ->
   unit
 
 val is_new_rule :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  ('a, 'b) summary ->
+  ('a, 'b, 'c) summary ->
   filename:string ->
   rule:string ->
   Exception_without_parameter.exceptions_caught_and_uncaught * bool
@@ -65,19 +66,28 @@ val is_new_rule :
 val is_new_init_state :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  ('a, 'b) summary ->
+  ('a, 'b, 'c) summary ->
   filename:string ->
   init_state:string ->
+  Exception_without_parameter.exceptions_caught_and_uncaught * bool
+
+val is_new_agent_sig :
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('a, 'b, 'c) summary ->
+  filename:string ->
+  agent_sig:string ->
   Exception_without_parameter.exceptions_caught_and_uncaught * bool
 
 val diff :
   'rule Loc.diff_pos ->
   'init Loc.diff_pos ->
+  'agent_sig Loc.diff_pos -> 
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
-  before:('rule, 'init) summary ->
+  before:('rule, 'init, 'agent_sig) summary ->
   filename:string ->
-  after:('rule, 'init) summary_file ->
+  after:('rule, 'init, 'agent_sig) summary_file ->
   Exception_without_parameter.exceptions_caught_and_uncaught * diff
 
 val dump_diff :
@@ -90,9 +100,9 @@ val get_file :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   filename:string ->
-  ('rule, 'init) summary ->
+  ('rule, 'init, 'agent_sig) summary ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * ('rule, 'init) summary_file
+  * ('rule, 'init, 'agent_sig) summary_file
 
 val renaming_of_diff : diff -> Loc.t -> Loc.t option
 val cut : diff -> Ast.parsing_compil -> Ast.parsing_compil

@@ -1165,6 +1165,8 @@ let print_perturbation f ((alarm, cond, modif, rep), _) =
          Format.fprintf f "repeat @[%a@]" print_ast_bool_expr r))
     rep
 
+   let print_agent_sig = print_ast_agent ~print_counter:print_counter_sig 
+    
 let print_parsing_compil_kappa f c =
   Format.fprintf f
     "@[<v>%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,@,%a@,@,%a@,%a@,%a@,%a@,@]@."
@@ -2561,6 +2563,9 @@ let diff_pos_parametric_agent diff_pos_counter (a : 'a parametric_agent) a' l =
 
 let diff_pos_agent (a : agent) a' l =
   diff_pos_parametric_agent diff_pos_counter a a' l
+
+let diff_pos_agent_sig (a : agent_sig) a' l = 
+  diff_pos_parametric_agent Counters_info.diff_pos_counter_sig a a' l 
 
 let diff_pos_mixture (m : mixture) m' l =
   Loc.diff_pos_list (Loc.diff_pos_list diff_pos_agent) m m' l

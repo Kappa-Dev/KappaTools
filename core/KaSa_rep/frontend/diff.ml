@@ -1,11 +1,12 @@
-type ('rule, 'init) summary_file = {
+type ('rule, 'init, 'agent_sig) summary_file = {
   summary_rule_map: (int * 'rule) Mods.StringMap.t;
   summary_init_state_map: (int * 'init) Mods.StringMap.t;
+  summary_agent_sig_map: (int * 'agent_sig) Mods.StringMap.t 
       (* summary_rule_set: Mods.StringSet.t ;
          summary_init_state_set: Mods.StringSet.t ;*)
 }
 
-type ('a, 'b) summary = ('a, 'b) summary_file Mods.StringMap.t
+type ('a, 'b, 'c) summary = ('a, 'b, 'c) summary_file Mods.StringMap.t
 
 type diff_elt = {
   new_elt: int list;
@@ -13,7 +14,7 @@ type diff_elt = {
   pos_renaming: (Loc.t * Loc.t) list;
 }
 
-type diff = { diff_rules: diff_elt; diff_init: diff_elt }
+type diff = { diff_rules: diff_elt; diff_init: diff_elt ; diff_agent_sig: diff_elt }
 
 type new_indexs = {
   next_rule: Ckappa_sig.c_rule_id;
@@ -43,6 +44,7 @@ let empty_summary_file =
   {
     summary_rule_map = Mods.StringMap.empty;
     summary_init_state_map = Mods.StringMap.empty;
+    summary_agent_sig_map = Mods.StringMap.empty; 
   }
 
 let get_file _parameters errors ~filename summary =
@@ -61,6 +63,17 @@ let dump_summary parameters _error summary =
     Mods.StringMap.iter
       (fun s i ->
         let () = Loggers.fprintf logger "         FILE: %s" s in
+        let () = Loggers.print_newline logger in
+           let () = Loggers.fprintf logger "             Agent_sig:" in
+        let () = Loggers.print_newline logger in
+        let () =
+          Mods.StringMap.iter
+            (fun s (i, _) ->
+              let () = Loggers.fprintf logger "                %s -> %i" s i in
+              let () = Loggers.print_newline logger in
+              ())
+            i.summary_agent_sig_map
+        in
         let () = Loggers.print_newline logger in
         let () = Loggers.fprintf logger "             Rules:" in
         let () = Loggers.print_newline logger in
@@ -105,7 +118,31 @@ let summarize_gen get_file_name get_string get_map set_map parameters error id
   let summary_file = set_map map summary_file in
   error, Mods.StringMap.add file_name summary_file summary
 
-let summarize_rule_from_ast parameters error id
+let summarize_agent_sig_from_ast parameters error id
+    (agent: Ast.agent_sig) summary =
+  let get_file_name agent =
+    let loc = 
+      match agent with 
+    | Ast.Absent loc 
+    | Ast.Present ((_,loc),_,_) -> loc 
+    in 
+    let filename = loc.Loc.file in
+    filename
+  in
+  let get_string _parameters error agent =
+    let b = Buffer.create 1 in
+    let fmt = Format.formatter_of_buffer b in
+    let () = Ast.print_agent_sig fmt agent in
+    let () = Format.pp_print_flush fmt () in
+    let string = Buffer.contents b in
+    error, string
+  in
+  summarize_gen get_file_name get_string
+    (fun x -> x.summary_agent_sig_map)
+    (fun summary_agent_sig_map x -> { x with summary_agent_sig_map })
+    parameters error id agent summary
+
+  let summarize_rule_from_ast parameters error id
     (rule : Ast.rule Ast.compil_rule) summary =
   let get_file_name (_, _, _, (_, loc)) =
     let filename = loc.Loc.file in
@@ -209,6 +246,18 @@ let summarize_from_ast parameters error compil =
             error, id + 1, summary
         ))
       (error, 0, summary) compil.Ast.init
+  in
+   let error, _, summary =
+    List.fold_left
+      (fun (error, id, summary)
+           agent_sig ->
+            let error, summary =
+              summarize_agent_sig_from_ast parameters error id agent_sig
+                summary
+            in
+            error, id + 1, summary
+        )
+      (error, 0, summary) compil.Ast.signatures
   in
   error, summary
 
@@ -365,11 +414,16 @@ let diff_gen diff_pos get_id get_obj get_map parameters errors ~before ~after =
   in
   errors, { new_elt = created_list; removed_elt = removed_list; pos_renaming }
 
-let diff diff_pos_rule diff_init parameters errors ~before ~filename ~after =
+let diff diff_pos_rule diff_init diff_pos_agent_sig parameters errors ~before ~filename ~after =
   let before =
     match Mods.StringMap.find_option filename before with
     | None -> empty_summary_file
     | Some x -> x
+  in
+  let errors, diff_agent_sig = 
+   diff_gen diff_pos_agent_sig fst snd
+      (fun x -> x.summary_agent_sig_map)
+      parameters errors ~before ~after
   in
   let errors, diff_rules =
     diff_gen diff_pos_rule fst snd
@@ -381,7 +435,7 @@ let diff diff_pos_rule diff_init parameters errors ~before ~filename ~after =
       (fun x -> x.summary_init_state_map)
       parameters errors ~before ~after
   in
-  errors, { diff_rules; diff_init }
+  errors, { diff_rules; diff_init ; diff_agent_sig}
 
 let is_new_gen get _parameters error summary ~filename string =
   match Mods.StringMap.find_option filename summary with
@@ -401,6 +455,11 @@ let is_new_init_state parameters errors summary ~filename ~init_state =
   is_new_gen
     (fun x -> x.summary_init_state_map)
     parameters errors summary ~filename init_state
+
+let is_new_agent_sig parameters errors summary ~filename ~agent_sig = 
+   is_new_gen
+    (fun x -> x.summary_agent_sig_map)
+    parameters errors summary ~filename agent_sig 
 
 let dump_diff parameters errors (diff : diff) =
   let logger = Remanent_parameters.get_logger parameters in

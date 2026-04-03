@@ -2451,7 +2451,8 @@ functor
         ~called_from ?compil ?patch_file_name ~old_file_name state =
       let parameters = get_parameters state in
       let log = Remanent_parameters.get_logger parameters in
-      let state, summary_ast = summarize_from_ast state in
+      let state, summary_ast = summarize_from_ast state in 
+      (* Former summary could be stored in remanent state *)
       let files = Option.map (fun x -> [ x ]) patch_file_name in
       let do_we_show_title =
         match do_we_show_title with
@@ -2477,6 +2478,7 @@ functor
           (Ast.diff_pos_parsing_compil_rule Ast.diff_pos_rule)
           (Ast.diff_pos_init_statement Ast.diff_pos_mixture Ast.diff_pos_mixture
              Loc.diff_pos_flat)
+          Ast.diff_pos_agent_sig
           parameters errors ~filename:old_file_name ~before:summary_ast
           ~after:summary_file
       in

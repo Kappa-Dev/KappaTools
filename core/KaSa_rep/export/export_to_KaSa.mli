@@ -139,7 +139,8 @@ module type Type = sig
     state ->
     state
     * ( Ast.rule Ast.compil_rule,
-        (Ast.mixture, Ast.mixture, string) Ast.init_statement )
+        (Ast.mixture, Ast.mixture, string) Ast.init_statement, 
+        Ast.agent_sig)
       Diff.summary
 
   (*val summarize_from_ckappa: state -> state *
@@ -147,7 +148,7 @@ module type Type = sig
 
   (*val summarize_from_cckappa: state -> state * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init)  Diff.summary *)
 
-  val dump_summary : ('a, 'b) Diff.summary -> state -> state
+  val dump_summary : ('a, 'b, 'c) Diff.summary -> state -> state
   val rename_pos : state Loc.rename_pos
   val add_rule : Ast.rule Ast.compil_rule -> state -> state
 

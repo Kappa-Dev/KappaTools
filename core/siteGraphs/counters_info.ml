@@ -295,3 +295,22 @@ let rename_pos_counter_sig rename counter_sig =
     counter_sig_visible =
       rename_pos_origin rename counter_sig.counter_sig_visible;
   }
+
+  let diff_pos_conversion_info c c' = 
+      Loc.diff_pos_annoted Loc.diff_pos_flat c.from_sig_name c'.from_sig_name 
+  
+  let diff_pos_origin origin origin' l = 
+    match origin, origin' with 
+    | From_original_ast, From_original_ast -> l 
+    | From_clte_elimination c, From_clte_elimination c' ->
+      diff_pos_conversion_info c c' l 
+    | From_original_ast, From_clte_elimination _ 
+    | From_clte_elimination _, From_original_ast -> assert false 
+
+
+
+let diff_pos_counter_sig a b l = 
+  diff_pos_origin a.counter_sig_visible b.counter_sig_visible
+  (Loc.diff_pos_opt Loc.diff_pos_flat a.counter_sig_min b.counter_sig_min
+   (Loc.diff_pos_opt Loc.diff_pos_flat a.counter_sig_max b.counter_sig_max 
+      (Loc.diff_pos_flat a.counter_sig_name b.counter_sig_name l)))
