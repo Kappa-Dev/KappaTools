@@ -53,7 +53,7 @@ let get_file _parameters errors ~filename summary =
   | Some x -> errors, x
 
 let renaming_of_diff diff =
-  Loc.fun_of_list (diff.diff_rules.pos_renaming @ diff.diff_init.pos_renaming)
+  Loc.fun_of_list (List.flatten [diff.diff_rules.pos_renaming;diff.diff_init.pos_renaming;diff.diff_agent_sig.pos_renaming])
 
 let dump_summary parameters _error summary =
   let logger = Remanent_parameters.get_logger parameters in
@@ -261,6 +261,28 @@ let summarize_from_ast parameters error compil =
   in
   error, summary
 
+let summarize_agent_sig_from_ckappa parameters error id
+    (agent_sig : Ckappa_sig.agent_sig Loc.annoted) summary =
+  let get_file_name (agent_sig : Ckappa_sig.agent_sig Loc.annoted) =
+    let loc = snd agent_sig in
+    let filename = loc.Loc.file in
+    filename
+  in
+  let get_string _parameters error (rule : Ckappa_sig.agent_sig Loc.annoted) =
+    let b = Buffer.create 1 in
+    let fmt = Format.formatter_of_buffer b in
+    let logger = Loggers.open_logger_from_formatter fmt in
+    let parameters = Remanent_parameters.set_logger parameters logger in
+    let error = Print_ckappa.print_agent_sig parameters error (fst rule) in
+    let string = Buffer.contents b in
+    error, string
+  in
+  summarize_gen get_file_name get_string
+    (fun x -> x.summary_agent_sig_map)
+    (fun summary_agent_sig_map x -> { x with summary_agent_sig_map })
+    parameters error id agent_sig summary
+
+
 let summarize_rule_from_ckappa parameters error id
     (rule : Ckappa_sig.enriched_rule) summary =
   let get_file_name (rule : Ckappa_sig.enriched_rule) =
@@ -306,6 +328,15 @@ let summarize_init_state_from_ckappa parameters error id
 
 let summarize_from_ckappa parameters error (compil : Ckappa_sig.c_compil) =
   let error, summary = error, Mods.StringMap.empty in
+ let error, summary =
+    Int_storage.Nearly_inf_Imperatif.fold parameters error
+      (fun parameters error id rule summary ->
+        let error, summary =
+          summarize_agent_sig_from_ckappa parameters error id rule summary
+        in
+        error, summary)
+      compil.Ckappa_sig.c_signatures summary
+  in
   let error, summary =
     Int_storage.Nearly_inf_Imperatif.fold parameters error
       (fun parameters error id rule summary ->
@@ -570,6 +601,7 @@ let get_new_indexs parameters errors handler c_compil =
 let fuse parameters errors handler c_compil handler' c_compil' =
   let n = Handler.nrules parameters errors handler in
   let n' = Handler.ninit parameters errors handler in
+  let errors, n'' = Int_storage.Nearly_inf_Imperatif.dimension parameters errors c_compil'.Cckappa_sig.signatures in 
   let errors, (rules, nrules_pred) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters errors
       (fun parameters errors i rule' (rules, _) ->
@@ -592,12 +624,25 @@ let fuse parameters errors handler c_compil handler' c_compil' =
       c_compil'.Cckappa_sig.init c_compil.Cckappa_sig.init
   in
   let ninits = n' + Handler.ninit parameters errors handler' in
+  let errors, (signatures, _n_sig_pred) =
+    Int_storage.Nearly_inf_Imperatif.fold parameters errors
+      (fun parameters errors i init' (inits,_) ->
+        let id = i + n'' in
+        let errors, inits = Int_storage.Nearly_inf_Imperatif.set parameters errors (i + n'') init'
+          inits in 
+       errors,(inits, id) )
+      c_compil'.Cckappa_sig.signatures
+      (c_compil.Cckappa_sig.signatures,n''-1)
+  in
+  (*let ninits = n'' + Handler.ninit parameters errors handler' in*)
+
   ( errors,
     { handler' with Cckappa_sig.nrules; Cckappa_sig.ninits },
     {
       c_compil with
       Cckappa_sig.rules;
       Cckappa_sig.init;
+      Cckappa_sig.signatures;
       Cckappa_sig.working_set_valuations =
         c_compil'.Cckappa_sig.working_set_valuations;
     } )
@@ -607,10 +652,12 @@ let update_ast added_elements_compil old_compil =
     Cst.compute_ws_values ~all_rules_in_ws:true ~rules_in_ws:[]
       added_elements_compil.Ast.rules added_elements_compil.Ast.init old_compil
   in
+  let renamed_signatures = old_compil.Ast.signatures @ added_elements_compil.Ast.signatures in 
   ( {
       added_elements_compil with
       Ast.init = renamed_init;
       Ast.rules = renamed_rules;
+      Ast.signatures = renamed_signatures; 
       Ast.working_set_values = updated_compil.Ast.working_set_values;
     },
     updated_compil )

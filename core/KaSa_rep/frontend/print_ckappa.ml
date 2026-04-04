@@ -224,6 +224,93 @@ let print_counter parameter error counter =
   in
   error
 
+(*Format.fprintf f "%s{%a%a}%a"
+    (fst c.Counters_info.counter_sig_name)
+    (Pp.option ~with_space:false print_counter_min)
+    c.Counters_info.counter_sig_min
+    (Pp.option ~with_space:false print_counter_max)
+    c.Counters_info.counter_sig_max
+    (print_counter_default c.counter_sig_min)
+    c.Counters_info.counter_sig_default
+
+    Format.fprintf f "%s{%a%a}%a"
+    (fst c.Counters_info.counter_sig_name)
+    (Pp.option ~with_space:false print_counter_min)
+    c.Counters_info.counter_sig_min
+    (Pp.option ~with_space:false print_counter_max)
+    c.Counters_info.counter_sig_max
+    (print_counter_default c.counter_sig_min)
+    c.Counters_info.counter_sig_default*)
+
+
+ let string_of_min a = 
+  match a with 
+  | None -> "" 
+  | Some None -> "-oo"
+  | Some Some i -> Format.sprintf "%d" i    
+
+   let string_of_max a = 
+  match a with 
+  | None -> "" 
+  | Some None -> "+oo"
+  | Some Some i -> Format.sprintf "%d" i    
+
+
+  let print_counter_sig parameter error (counter:Ckappa_sig.counter_sig) =
+    let () = Loggers.fprintf
+      (Remanent_parameters.get_logger parameter)
+      "%s(%s,%s)%i" counter.Ckappa_sig.counter_sig_name (string_of_min counter.Ckappa_sig.counter_sig_min) (string_of_max counter.Ckappa_sig.counter_sig_max) counter.Ckappa_sig.counter_sig_default 
+  in error 
+  
+  (*let _ =
+    match counter.Ckappa_sig.counter_test with
+    | Some (Ckappa_sig.CEQ n) ->
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameter)
+        "%s%s%i%s"
+        (Remanent_parameters.get_open_counterceq parameter)
+        (Remanent_parameters.get_counterceq_symbol parameter)
+        n
+        (Remanent_parameters.get_close_counterceq parameter)
+    | Some (Ckappa_sig.CGTE n) ->
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameter)
+        "%s%s%i%s"
+        (Remanent_parameters.get_open_countercgte parameter)
+        (Remanent_parameters.get_countercgte_symbol parameter)
+        n
+        (Remanent_parameters.get_close_countercgte parameter)
+    | Some (Ckappa_sig.CVAR s) ->
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameter)
+        "%s%s%s%s"
+        (Remanent_parameters.get_open_countercvar parameter)
+        (Remanent_parameters.get_countercvar_symbol parameter)
+        s
+        (Remanent_parameters.get_close_countercvar parameter)
+    | Some Ckappa_sig.UNKNOWN | None -> ()
+  in
+  let () =
+    match counter.Ckappa_sig.counter_delta with
+    | Some 0 | None -> ()
+    | Some n when n > 0 ->
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameter)
+        "%s%s%i%s"
+        (Remanent_parameters.get_open_counterdelta parameter)
+        (Remanent_parameters.get_counterdeltaplus_symbol parameter)
+        n
+        (Remanent_parameters.get_close_counterdelta parameter)
+    | Some n (*when n<0*) ->
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameter)
+        "%s%s%i%s"
+        (Remanent_parameters.get_open_counterdelta parameter)
+        (Remanent_parameters.get_counterdeltaminus_symbol parameter)
+        (-n)
+        (Remanent_parameters.get_close_countercvar parameter)
+  in
+  error*)
 let print_interface parameter error interface =
   let rec aux error bool interface =
     match interface with
@@ -245,6 +332,27 @@ let print_interface parameter error interface =
   in
   aux error false interface
 
+  let print_interface_sig parameter error interface =
+  let rec aux error bool interface =
+    match interface with
+    | Ckappa_sig.EMPTY_INTF -> error
+    | Ckappa_sig.COUNTER_SEP (counter, interface) ->
+      let _ =
+        Misc_sa.print_comma parameter bool
+          (Remanent_parameters.get_site_sep_comma_symbol parameter)
+      in
+      let error = print_counter_sig parameter error counter in
+      aux error true interface
+    | Ckappa_sig.PORT_SEP (port, interface) ->
+      let _ =
+        Misc_sa.print_comma parameter bool
+          (Remanent_parameters.get_site_sep_comma_symbol parameter)
+      in
+      let error = print_port parameter error port in
+      aux error true interface
+  in
+  aux error false interface
+
 let print_agent parameter error agent =
   let () =
     Loggers.fprintf
@@ -253,6 +361,22 @@ let print_agent parameter error agent =
       (Remanent_parameters.get_agent_open_symbol parameter)
   in
   let error = print_interface parameter error agent.Ckappa_sig.ag_intf in
+  let _ =
+    Loggers.fprintf
+      (Remanent_parameters.get_logger parameter)
+      "%s"
+      (Remanent_parameters.get_agent_close_symbol parameter)
+  in
+  error
+
+let print_agent_sig parameter error agent =
+  let () =
+    Loggers.fprintf
+      (Remanent_parameters.get_logger parameter)
+      "%s%s" agent.Ckappa_sig.agent_name
+      (Remanent_parameters.get_agent_open_symbol parameter)
+  in
+  let error = print_interface_sig parameter error agent.Ckappa_sig.ag_intf in
   let _ =
     Loggers.fprintf
       (Remanent_parameters.get_logger parameter)
