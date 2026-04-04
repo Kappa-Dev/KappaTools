@@ -99,7 +99,7 @@ let main () =
       match start_time with
       | None -> ()
       | Some start_time ->
-        let () = Loggers.fprintf log "execution took " in
+        let () = if Remanent_parameters.get_print_efficiency parameters then ( Loggers.fprintf log "execution took " ) in
         let () = KaSaUtil.print_only_timing parameters start_time in
         Loggers.print_newline log
     in
