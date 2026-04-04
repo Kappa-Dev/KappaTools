@@ -1,15 +1,20 @@
-# Incremental KaSa
+# Incremental Kasa: Static Analysis of Kappa Models at Edit Time
 
-The KaSa tool is a static analyzer for Kappa models. This branch implements an incremental version of KaSa, where the analysis' result is updated incrementally for each change in the model, instead of recomputing it from scratch.
+The KaSa tool is a static analyzer for Kappa models. This branch implements an incremental version of KaSa, where the analysis result is updated incrementally for each change in the model, instead of recomputing it from scratch.
 
-The [online webapp](https://tools.kappalanguage.org/try/?model=https%3A//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/abc.ka) unfortunately does not support the incremental KaSa yet, therefore to try the it, the app needs to be built locally.
+The [online webapp](https://tools.kappalanguage.org/try/?model=https%3A//raw.githubusercontent.com/Kappa-Dev/KappaTools/master/examples/abc.ka) unfortunately does not support the incremental KaSa yet, therefore to try it, the app needs to be built locally.
 ## Installation
 
 ### Prerequisites
-- Install [opam](https://opam.ocaml.org/doc/Install.html) (the OCaml package manager). Run `opam init` to initialize it.
-- For the benchmarks: `python3` and `python3-venv`
+- Install [opam](https://opam.ocaml.org/doc/Install.html) (the OCaml package manager). Run `opam init` to initialize it. It works best with ocaml version 4.14.2.
+- For the benchmarks: install the latest version of `python3` and `python3-venv` (I tested it with python 3.10.12)
 ### Build
-- Download the code from GitHub and navigate to the root directory of the project.
+- Download the code from GitHub and navigate to the root directory of the project:
+```bash
+git clone https://github.com/Kappa-Dev/KappaTools.git
+cd KappaTools
+git checkout incremental-KaSa
+```
 - Install the dependencies by `opam install . --update-invariant --deps-only`
 - Build the project with `dune build`
 - Build the CLI: `make all`
@@ -20,13 +25,13 @@ The [online webapp](https://tools.kappalanguage.org/try/?model=https%3A//raw.git
 ## Kappapp: A GUI for KaSa
 
 After having built the electron app, you can launch it with `./build/Kappapp/kappapp`.
-A window should open with a text editor on the left side and the analysis' result on the right half of the application.
+A window should open with a text editor on the left side and the analysis result on the right half of the application.
 
 ### Text editor for the Kappa files
-The Kappa model consists of one or more files, that can be opened or created by pressing the "File" button. 
+The Kappa model consists of one or more files, that can be imported or created by pressing the "File" button. 
 The files can be modified in the in-app text editor.
 The currently open file represents the *current chapter* of rules and initial states that can be incrementally modified.
-Each element in the editor has a checkbox that can be clicked on to disable or enable the element.
+Each rule and initial state in the editor has a checkbox that can be clicked on to disable or enable the corresponding element.
 The static analysis result is updated accordingly.
 
 If needed, the button "restart KaSa" can be used to restart the whole analysis from scratch.
@@ -35,8 +40,8 @@ If needed, the button "restart KaSa" can be used to restart the whole analysis f
 
 1. **The contact map**: It shows the agents that are defined in the model with all their sites and all possible bonds between sites. If the accuracy "high" is chosen, the contact map is refined by removing all agents and bonds that are unreachable according to the reachability analysis.
 2. **The rule influences**: For each rule, it shows which other rules it influences and which ones may be influenced by it. A rules is influenced by a second rule if the latter can create a biomolecular species that matches the left-hand side of the former rule. As before, the accuracy "high" means that unreachable rules are removed from the output.
-3. **The constraints derived from the reachability analysis**: The reachability analysis computes some relationships between sites of the models. For example, it prints for each site all the possible states it can be in ("Non-relational properties") and it computes the relationship between sites of an agent ("Relational properties") and between sites of two bound agents ("Connected agents"). 
-4. **Unbounded polymer formation**: The last tab informs the user if it is possible that chains of arbitrary length can be formed by the current model.
+3. **The constraints derived from the reachability analysis**: The reachability analysis computes some relationships between sites of the proteins. For example, it prints for each site all the possible states it can be in ("Non-relational properties") and it computes the relationship between sites of an agent ("Relational properties") and between sites of two bound agents ("Connected agents"). 
+4. **Unbounded polymer formation**: The last tab informs the user if it is possible that chains of arbitrary length can be formed by the model.
 5. **Dead rules/dead agents**: If some rules or agents are unreachable, they are underlined in the text editor and the UI warns that a dead rule or dead agent was detected.
 
 ### Example model
@@ -51,13 +56,15 @@ And when disabling the first initial state of the agent D, the agents D and A be
 
 ## KaSaIncremental: the Interactive CLI for KaSa
 
-The CLI can be lauched with an example model by:
+Note: for windows, use the command `.\_build\install\default\bin\KaSaIncremental.exe` instead of `./bin/KaSaIncremental`.
+
+The CLI can be lauched with an example model by running:
 ```
 ./bin/KaSaIncremental --current-chapter examples/incremental_analysis/simple_example.ka --do-restart-fixpoint-iterations
 ```
 The analysis prints the constraints that were calculated by the reachability analysis. For example, it says that C cannot occur in the model. This can be fixed by adding the inital state `%init: 100 C(c{u})` in the file `examples/incremental_analysis/simple_example.ka` and updating the analysis. 
 
-The analysis can be updated by typing 
+The analysis can be updated by typing:
 ```
 update file examples/incremental_analysis/simple_example.ka
 ```

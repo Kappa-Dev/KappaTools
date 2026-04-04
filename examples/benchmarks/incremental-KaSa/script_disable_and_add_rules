@@ -2,7 +2,7 @@
 
 ## BENCHMARKS for the incremental implementation of KaSa, for the Tool paper at CMSB2026
 
-# pre-requisites: python3 with the library "pandas"
+# pre-requisites: python3 and python3-venv
 
 # It analyzer 6 large Kappa models in 4 different ways:
 # 1) non-incremental analysis
@@ -199,7 +199,6 @@ for MODEL in "${MODELS[@]}"; do
             "$EXAMPLE_MODEL"
             -syntax "$SYNTAX"
             $OPTIONS
-
             )
         if $VERBOSE; then
             printf '%q ' "${cmd[@]}"
