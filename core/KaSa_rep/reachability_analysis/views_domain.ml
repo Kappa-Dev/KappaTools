@@ -399,7 +399,6 @@ module Domain = struct
         (StoryProfiling.Domain_initialization domain_name) None log_info
     in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
-
     let error, init_global_static, init_global_dynamic, start =
       match patch with
       | None ->
@@ -444,8 +443,18 @@ module Domain = struct
         in
         error, init_global_static, init_global_dynamic, None
       | Some (static', local, new_elts) ->
+        let covering_class = 
+          static'.domain_static_information_covering_class 
+        in 
+        let compil = Analyzer_headers.get_cc_code static in
+        let handler_kappa = Analyzer_headers.get_kappa_handler static in   
+        let error, domain_static_information_covering_class = 
+            Covering_classes_main.scan_predicate_covering_classes 
+            ~covering_class parameters error handler_kappa compil
+        in
+
         ( error,
-          { static' with global_static_information = static },
+          { static' with global_static_information = static ; domain_static_information_covering_class},
           { global = dynamic; local },
           Some new_elts.Diff.next_rule )
     in
