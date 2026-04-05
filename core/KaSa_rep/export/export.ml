@@ -2440,7 +2440,7 @@ functor
       let () = show_title state in
       let state, handler = get_handler state in
       let errors, handler =
-        List_tokens.scan_incremental_compil ~diff parameters errors
+        List_tokens.scan_incremental_compil ~do_not_declare:true ~diff parameters errors
           refined_compil' handler
       in
       ( Remanent_state.set_errors errors
@@ -2462,7 +2462,7 @@ functor
       let errors = get_errors state in
       let state' = init ~called_from ?compil ?files ~is_a_patch:true () in
       let state' = set_errors errors state' in
-      let state', _ = get_compilation state' in
+      let state', _ = get_compilation state' in     
       let state' =
         rename_pos
           (fun loc -> Some { loc with Loc.file = old_file_name })
@@ -2479,10 +2479,19 @@ functor
           (Ast.diff_pos_init_statement Ast.diff_pos_mixture Ast.diff_pos_mixture
              Loc.diff_pos_flat)
           Ast.diff_pos_agent_sig
+          (Ast.fold_pos_parsing_compil_rule Ast.fold_pos_rule)
+          (Ast.fold_pos_init_statement Ast.fold_pos_mixture Ast.fold_pos_mixture
+             Loc.fold_pos_flat)
+          Ast.fold_pos_agent_sig
           parameters errors ~filename:old_file_name ~before:summary_ast
           ~after:summary_file
       in
+      let state, kappa_handler = get_handler state in 
+      let errors, kappa_handler = 
+        Cckappa_sig.remove_pos_kappa_handler_with_errors parameters errors (Diff.remove_of_diff diff) kappa_handler 
+      in      
       let state = set_errors errors state in
+      let state = Remanent_state.set_handler kappa_handler state in 
       let state = rename_pos (Diff.renaming_of_diff diff) state in
       let state =
         permanently_disable_rule_c_id_list
@@ -2508,25 +2517,23 @@ functor
       in
       let state, handler = get_handler state in
       let _state', compil = get_compilation state' in
-      let compil = Diff.cut diff compil in
+      let compil_new_elt = Diff.cut diff compil in
       (*extracts only the new rules from the compilation *)
       let errors = get_errors state in
       let state, old_compilation = get_compilation state in
-      let compil, updated_compilation =
-        Diff.update_ast compil old_compilation
+      let compil_new_elt, updated_compilation =
+        Diff.update_ast compil_new_elt old_compilation
       in
       let state = Remanent_state.set_compilation updated_compilation state in
-      let state = Remanent_state.set_compilation updated_compilation state in
-      let errors, c_compil =
-        Prepreprocess.translate_compil parameters errors compil
+      let errors, c_compil_new_elt =
+        Prepreprocess.translate_compil parameters errors compil_new_elt
       in
       let errors, handler' =
-        List_tokens.scan_incremental_compil parameters errors c_compil handler
+        List_tokens.scan_incremental_compil ~do_not_declare:false parameters errors c_compil_new_elt handler
       in
       let errors, handler', cc_compil' =
-        Preprocess.translate_c_compil parameters errors handler' c_compil
+        Preprocess.translate_c_compil parameters errors handler' c_compil_new_elt
       in
-      let _state' = Remanent_state.set_compilation compil state' in
       let state = Remanent_state.set_errors errors state in
       let state, cc_compil = get_c_compilation state in
       let state = Remanent_state.store_patch cc_compil state in
@@ -2571,7 +2578,7 @@ functor
               let () = Loggers.fprintf log "AST (NEW RULES)" in
               let () = Loggers.print_newline log in
 
-              let () = Ast.print_parsing_compil_kappa fmt compil in
+              let () = Ast.print_parsing_compil_kappa fmt compil_new_elt in
               ()
           in
           let () = Loggers.fprintf log "CCKAPPA" in
@@ -2579,7 +2586,7 @@ functor
           let errors =
             Print_cckappa.print_compil parameters errors handler cc_compil
           in
-          set_errors errors state
+                    set_errors errors state
         ) else
           state
       in

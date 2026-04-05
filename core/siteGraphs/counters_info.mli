@@ -26,6 +26,9 @@ val rename_pos_counter_sig :
 
 val diff_pos_counter_sig : 
   counter_sig Loc.diff_pos
+
+val fold_pos_counter_sig : 
+  (counter_sig,'a) Loc.fold_pos
   
 type t = counter_sig option array array
 

@@ -314,3 +314,19 @@ let diff_pos_counter_sig a b l =
   (Loc.diff_pos_opt Loc.diff_pos_flat a.counter_sig_min b.counter_sig_min
    (Loc.diff_pos_opt Loc.diff_pos_flat a.counter_sig_max b.counter_sig_max 
       (Loc.diff_pos_flat a.counter_sig_name b.counter_sig_name l)))
+
+let fold_pos_conversion_info f c = 
+      Loc.fold_pos_annoted Loc.fold_pos_flat f c.from_sig_name 
+  
+let fold_pos_origin f origin l = 
+    match origin with 
+    | From_original_ast -> l 
+    | From_clte_elimination c ->
+      fold_pos_conversion_info f c l 
+
+
+let fold_pos_counter_sig f a l = 
+  fold_pos_origin f a.counter_sig_visible 
+  (Loc.fold_pos_opt Loc.fold_pos_flat f a.counter_sig_min 
+   (Loc.fold_pos_opt Loc.fold_pos_flat f a.counter_sig_max 
+      (Loc.fold_pos_flat f a.counter_sig_name  l)))

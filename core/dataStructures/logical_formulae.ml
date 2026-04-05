@@ -224,3 +224,14 @@ let rec diff_pos diff_atom (a : 'a formula) a' l =
   | ( (P _ | NOT _ | IMPLY _ | OR _ | AND _ | True | False),
       (P _ | NOT _ | IMPLY _ | OR _ | AND _ | True | False) ) ->
     failwith (invalid_arg "diff_pos")
+
+let rec fold_pos fold_atom f (a : 'a formula) l =
+  match a with
+  | P a -> fold_atom f a l
+  | NOT a -> fold_pos fold_atom f a l
+  | IMPLY (a1, a2) 
+  | OR (a1, a2) 
+  | AND (a1, a2) -> 
+    fold_pos fold_atom f a2 (fold_pos fold_atom f a1 l)
+  | False | True -> l
+  

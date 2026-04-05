@@ -89,10 +89,11 @@ let init_agent_declaration parameters error handler agent_id agent_string =
   in
   error, { handler with Cckappa_sig.agents_annotation }
 
-let add_agent_declaration parameters error handler agent_id pos_opt =
-  match pos_opt with
-  | None -> error, handler
-  | Some pos ->
+let add_agent_declaration ~do_not_declare  parameters error handler agent_id pos_opt =
+  match do_not_declare, pos_opt with
+ | true, Some _ 
+  | _, None -> error, handler
+  | _, Some pos ->
     let error, info_opt =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameters
         error agent_id handler.Cckappa_sig.agents_annotation
@@ -109,7 +110,7 @@ let add_agent_declaration parameters error handler agent_id pos_opt =
     in
     error, { handler with Cckappa_sig.agents_annotation }
 
-let declare_agent parameters error handler agent_string pos =
+let declare_agent ~do_not_declare parameters error handler agent_string pos =
   let agents_dic = handler.Cckappa_sig.agents_dic in
   let error, (bool, output) =
     Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error
@@ -157,7 +158,7 @@ let declare_agent parameters error handler agent_string pos =
         error, (handler, k)
   in
   let error, handler =
-    add_agent_declaration parameters error handler agent_name pos
+    add_agent_declaration ~do_not_declare parameters error handler agent_name pos
   in
   error, (handler, agent_name)
 
@@ -326,9 +327,9 @@ let declare_dual parameter error handler ag site state ag' site' state' =
   in
   error, { handler with Cckappa_sig.dual }
 
-let scan_agent ast_origin ~get_counter_name parameters (error, handler) agent =
+let scan_agent ~do_not_declare ast_origin ~get_counter_name parameters (error, handler) agent =
   let error, (handler, ag_id) =
-    declare_agent parameters error handler agent.Ckappa_sig.agent_name
+    declare_agent ~do_not_declare parameters error handler agent.Ckappa_sig.agent_name
       (Some (agent.Ckappa_sig.agent_name_pos, ast_origin))
   in
   let rec aux error interface handler =
@@ -367,7 +368,7 @@ let scan_agent ast_origin ~get_counter_name parameters (error, handler) agent =
         | Ckappa_sig.LNK_VALUE (_, agent', site', _, _)
         | Ckappa_sig.LNK_TYPE ((agent', _), (site', _)) ->
           let error, (handler, ag_id') =
-            declare_agent parameters error handler agent' None
+            declare_agent ~do_not_declare parameters error handler agent' None
           in
           let error, (handler, _, _site_id) =
             declare_site_with_binding_states parameters (error, handler) ag_id
@@ -412,16 +413,16 @@ let get_counter_name_sig c = c.Ckappa_sig.counter_sig_name
 let scan_agent_sig = scan_agent ~get_counter_name:get_counter_name_sig
 let scan_agent = scan_agent ~get_counter_name
 
-let rec scan_mixture ast_origin parameters remanent mixture =
+let rec scan_mixture ~do_not_declare ast_origin parameters remanent mixture =
   match mixture with
   | Ckappa_sig.EMPTY_MIX -> remanent
   | Ckappa_sig.SKIP mixture ->
-    scan_mixture ast_origin parameters remanent mixture
+    scan_mixture ~do_not_declare ast_origin parameters remanent mixture
   | Ckappa_sig.COMMA (agent, mixture)
   | Ckappa_sig.DOT (_, agent, mixture)
   | Ckappa_sig.PLUS (_, agent, mixture) ->
-    let remanent = scan_agent ast_origin parameters remanent agent in
-    scan_mixture ast_origin parameters remanent mixture
+    let remanent = scan_agent ~do_not_declare ast_origin parameters remanent agent in
+    scan_mixture ~do_not_declare ast_origin parameters remanent mixture
 
 let scan_token parameters remanent _alg =
   (*TO DO*)
@@ -454,8 +455,8 @@ let next i =
   | Some (Public_data.From_init i) -> Some (Public_data.From_init (i + 1))
   | Some (Public_data.From_rule i) ->
     Some (Public_data.From_rule (Ckappa_sig.next_rule_id i))
-
-let scan_initial_states ast_origin diff parameters remanent l =
+ 
+let scan_initial_states ~do_not_declare ast_origin diff parameters remanent l =
   let a, _, _, _ =
     List.fold_left
       (fun (remanent, i, j, l) (_, (guard, (alg, _pos), init_t)) ->
@@ -473,7 +474,7 @@ let scan_initial_states ast_origin diff parameters remanent l =
             let remanent =
               match init_t with
               | Ast.INIT_MIX (mixture, _pos') ->
-                scan_mixture i parameters remanent mixture
+                scan_mixture ~do_not_declare i parameters remanent mixture
               | Ast.INIT_TOK tk_l ->
                 List.fold_left (scan_token parameters) remanent tk_l
             in
@@ -487,30 +488,30 @@ let scan_initial_states ast_origin diff parameters remanent l =
   in
   a
 
-let scan_declarations parameters =
-  List.fold_left (fun remanent a -> scan_agent_sig None parameters remanent a)
+let scan_declarations ~do_not_declare parameters =
+  List.fold_left (fun remanent a -> scan_agent_sig ~do_not_declare None parameters remanent a)
 
 let scan_observables _scan_mixt _parameters remanent _variable =
   (*TODO*)
   remanent
 
-let scan_perts scan_mixt parameters =
+let scan_perts ~do_not_declare scan_mixt parameters =
   List.fold_left (fun remanent ((_, _, m, _), _) ->
       List.fold_left
         (fun remanent m ->
           match m with
           | Ast.APPLY (_, (r, _)) ->
-            scan_mixture None parameters
-              (scan_mixt parameters remanent r.Ckappa_sig.lhs)
+            scan_mixture ~do_not_declare None parameters
+              (scan_mixt ~do_not_declare parameters remanent r.Ckappa_sig.lhs)
               r.Ckappa_sig.rhs
           | Ast.CFLOWMIX (_, (m, _)) | Ast.SPECIES_OF (_, _, (m, _)) ->
-            scan_mixt parameters remanent m
+            scan_mixt ~do_not_declare parameters remanent m
           | Ast.UPDATE _ | Ast.STOP _ | Ast.SNAPSHOT _ | Ast.PLOTENTRY
           | Ast.PRINT _ | Ast.CFLOWLABEL _ | Ast.DINOFF _ | Ast.DIN _ ->
             remanent)
         remanent m)
 
-let scan_rules ast_origin diff scan_mixt parameters a b =
+let scan_rules ~do_not_declare ast_origin diff scan_mixt parameters a b =
   let a, _, _, _ =
     List.fold_left
       (fun (remanent, i, j, l) (_, _, guard, (rule, _)) ->
@@ -524,8 +525,8 @@ let scan_rules ast_origin diff scan_mixt parameters a b =
         let remanent, i' =
           if b then
             ( scan_guard parameters
-                (scan_mixture i parameters
-                   (scan_mixt i parameters remanent rule.Ckappa_sig.lhs)
+                (scan_mixture ~do_not_declare i parameters
+                   (scan_mixt ~do_not_declare i parameters remanent rule.Ckappa_sig.lhs)
                    rule.Ckappa_sig.rhs)
                 guard,
               next i )
@@ -551,8 +552,8 @@ let reverse_agents_annotation parameters (error, remanent) =
 
   error, { remanent with Cckappa_sig.agents_annotation }
 
-let scan_compil_incremental parameters error ?diff compil remanent =
-  let parameters =
+let scan_compil_incremental ~do_not_declare parameters error ?diff compil remanent =
+ let parameters =
     Remanent_parameters.set_trace parameters
       (local_trace || Remanent_parameters.get_trace parameters)
   in
@@ -562,13 +563,13 @@ let scan_compil_incremental parameters error ?diff compil remanent =
   in
   let scan_tested_mixture =
     if also_explore_tested_agents then
-      scan_mixture
+      scan_mixture 
     else
-      fun _start _parameters remanent _mixture ->
-    remanent
+      fun  ~do_not_declare _start _parameters remanent _mixture -> 
+        let _ = do_not_declare in remanent 
   in
   let remanent =
-    scan_declarations parameters remanent
+    scan_declarations ~do_not_declare parameters remanent
       (compil.Ast.signatures : Ckappa_sig.agent_sig list)
   in
   let diff_init, diff_rules =
@@ -579,7 +580,7 @@ let scan_compil_incremental parameters error ?diff compil remanent =
         Some diff.Diff.diff_rules.Diff.new_elt )
   in
   let remanent =
-    scan_initial_states
+    scan_initial_states ~do_not_declare
       (Some (Public_data.From_init (snd remanent).Cckappa_sig.ninits)) diff_init
       parameters remanent compil.Ast.init
   in
@@ -588,11 +589,11 @@ let scan_compil_incremental parameters error ?diff compil remanent =
       compil.Ast.observables
   in
   let remanent =
-    scan_perts (scan_tested_mixture None) parameters remanent
+    scan_perts ~do_not_declare (scan_tested_mixture None) parameters remanent
       compil.Ast.perturbations
   in
   let remanent =
-    scan_rules
+    scan_rules ~do_not_declare
       (Some
          (Public_data.From_rule
             (Ckappa_sig.rule_id_of_int (snd remanent).Cckappa_sig.nrules)))
@@ -602,12 +603,13 @@ let scan_compil_incremental parameters error ?diff compil remanent =
   remanent
 
 let scan_compil parameters error compil =
+  let do_not_declare = false in 
   let error, remanent = empty_handler parameters error in
-  scan_compil_incremental parameters error compil remanent
+  scan_compil_incremental ~do_not_declare parameters error compil remanent
 
-let scan_incremental_compil parameters error ?diff compil old_remanent =
+let scan_incremental_compil ~do_not_declare parameters error ?diff compil old_remanent =
   let error, remanent =
-    scan_compil_incremental parameters error ?diff compil old_remanent
+    scan_compil_incremental ~do_not_declare parameters error ?diff compil old_remanent
   in
   let () =
     if Remanent_parameters.get_trace parameters then (

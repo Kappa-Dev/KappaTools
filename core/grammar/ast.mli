@@ -230,13 +230,11 @@ val read_parsing_compil : Yojson.lexer_state -> Lexing.lexbuf -> parsing_compil
 val working_set_index_to_string : int -> string
 
 val rename_pos_perturbation :
-  ((Loc.t -> Loc.t option) -> 'pattern -> 'pattern) ->
-  ((Loc.t -> Loc.t option) -> 'mixture -> 'mixture) ->
-  ((Loc.t -> Loc.t option) -> 'id -> 'id) ->
-  ((Loc.t -> Loc.t option) -> 'rule -> 'rule) ->
-  (Loc.t -> Loc.t option) ->
-  ('pattern, 'mixture, 'id, 'rule) perturbation ->
-  ('pattern, 'mixture, 'id, 'rule) perturbation
+  'pattern Loc.rename_pos -> 
+  'mixture Loc.rename_pos -> 
+  'id Loc.rename_pos -> 
+  'rule Loc.rename_pos -> 
+  ('pattern, 'mixture, 'id, 'rule) perturbation Loc.rename_pos 
 
 val rename_pos_perturbation_with_errors :
   ('parameters ->
@@ -303,11 +301,8 @@ val rename_pos_compil :
 val diff_pos_rule : rule Loc.diff_pos
 
 val diff_pos_parsing_compil_rule :
-  ('rule -> 'rule -> (Loc.t * Loc.t) list -> (Loc.t * Loc.t) list) ->
-  'rule compil_rule ->
-  'rule compil_rule ->
-  (Loc.t * Loc.t) list ->
-  (Loc.t * Loc.t) list
+  'rule Loc.diff_pos -> 
+  'rule compil_rule Loc.diff_pos 
 
 val diff_pos_mixture : mixture Loc.diff_pos
 val diff_pos_id : string Loc.diff_pos
@@ -318,6 +313,21 @@ val diff_pos_init_statement :
   'id Loc.diff_pos ->
   ('pattern, 'mixture, 'id) init_statement Loc.diff_pos
 
-val diff_pos_agent_sig : 
-  agent_sig -> agent_sig -> (Loc.t * Loc.t) list ->
-  (Loc.t * Loc.t) list
+val diff_pos_agent_sig : agent_sig Loc.diff_pos
+
+
+val fold_pos_rule : (rule,'a) Loc.fold_pos
+
+val fold_pos_parsing_compil_rule :
+  ('rule,'a) Loc.fold_pos -> ('rule compil_rule,'a) Loc.fold_pos 
+  
+val fold_pos_id: (string,'a) Loc.fold_pos           
+val fold_pos_agent_sig : 
+  (agent_sig,'a) Loc.fold_pos 
+val fold_pos_mixture :
+  (mixture,'a) Loc.fold_pos 
+val fold_pos_init_statement: 
+  ('pattern,'a) Loc.fold_pos -> 
+  ('mixture,'a) Loc.fold_pos -> 
+  ('id,'a) Loc.fold_pos -> 
+  (('pattern, 'mixture, 'id) init_statement,'a) Loc.fold_pos

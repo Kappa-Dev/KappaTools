@@ -157,19 +157,18 @@ val rule_of_json :
   filenames:string array -> Yojson.Basic.t -> string guard option * rule
 
 val rename_pos_link :
-  ((Loc.t -> Loc.t option) -> 'a -> 'a) ->
-  ((Loc.t -> Loc.t option) -> 'b -> 'b) ->
-  (Loc.t -> Loc.t option) ->
-  ('a, 'b) link ->
-  ('a, 'b) link
+  'a Loc.rename_pos -> 'b Loc.rename_pos -> ('a,'b) link Loc.rename_pos 
 
 val rename_pos_guard :
-  ((Loc.t -> Loc.t option) -> 'a -> 'a) ->
-  (Loc.t -> Loc.t option) ->
-  'a guard ->
-  'a guard
+  'a Loc.rename_pos -> 'a guard Loc.rename_pos 
 
 val diff_pos_link :
   'a Loc.diff_pos -> 'b Loc.diff_pos -> ('a, 'b) link Loc.diff_pos
 
 val diff_pos_guard : 'a Loc.diff_pos -> 'a guard Loc.diff_pos
+
+val fold_pos_link :
+  ('a,'c) Loc.fold_pos -> ('b,'c) Loc.fold_pos -> (('a, 'b) link,'c) Loc.fold_pos
+
+val fold_pos_guard : ('a,'b) Loc.fold_pos -> ('a guard,'b) Loc.fold_pos
+

@@ -899,3 +899,48 @@ and diff_pos_annoted_e diff_pos_mix diff_pos_id e e' l =
 
 and diff_pos_annoted_bool diff_pos_mix diff_pos_id b b' l =
   Loc.diff_pos_annoted (diff_pos_bool diff_pos_mix diff_pos_id) b b' l
+
+let rec fold_pos_e fold_pos_mix fold_pos_id f e l =
+  match e with
+  | Alg_expr.BIN_ALG_OP (_, e1, e2) ->
+    fold_pos_annoted_e fold_pos_mix fold_pos_id f e2 
+      (fold_pos_annoted_e fold_pos_mix fold_pos_id f e1 l)
+  | Alg_expr.UN_ALG_OP (_, e) ->
+    fold_pos_annoted_e fold_pos_mix fold_pos_id f e l
+  | Alg_expr.ALG_VAR id -> fold_pos_id f id l
+  | Alg_expr.STATE_ALG_OP a -> Loc.fold_pos_flat f a l
+  | Alg_expr.KAPPA_INSTANCE i -> fold_pos_mix f i l
+  | Alg_expr.TOKEN_ID i -> fold_pos_id f i l
+  | Alg_expr.DIFF_KAPPA_INSTANCE dk ->
+    Loc.fold_pos_pair
+      (Loc.fold_pos_annoted (fold_pos_e fold_pos_mix fold_pos_id))
+      fold_pos_mix f dk l
+  | Alg_expr.DIFF_TOKEN dk->
+    Loc.fold_pos_pair
+      (Loc.fold_pos_annoted (fold_pos_e fold_pos_mix fold_pos_id))
+      fold_pos_id f dk l
+  | Alg_expr.IF (a, b, c) ->
+    let l = fold_pos_annoted_bool fold_pos_mix fold_pos_id f a l in
+    let l = fold_pos_annoted_e fold_pos_mix fold_pos_id f b l in
+    let l = fold_pos_annoted_e fold_pos_mix fold_pos_id f c l in
+    l
+  | Alg_expr.CONST _ -> l
+  
+
+and fold_pos_bool fold_pos_mix fold_pos_id f e l =
+  match e with
+  | Alg_expr.BIN_BOOL_OP (_, e1, e2) ->
+    fold_pos_annoted_bool fold_pos_mix fold_pos_id f e2 
+      (fold_pos_annoted_bool fold_pos_mix fold_pos_id f e1 l)
+  | Alg_expr.UN_BOOL_OP (_, e) ->
+    fold_pos_annoted_bool fold_pos_mix fold_pos_id f e l
+  | Alg_expr.COMPARE_OP (_, e1, e2) ->
+    fold_pos_annoted_e fold_pos_mix fold_pos_id f e2 
+      (fold_pos_annoted_e fold_pos_mix fold_pos_id f e1 l)
+  | Alg_expr.TRUE | Alg_expr.FALSE-> l
+
+and fold_pos_annoted_e fold_pos_mix fold_pos_id f e l =
+  Loc.fold_pos_annoted (fold_pos_e fold_pos_mix fold_pos_id) f e l
+
+and fold_pos_annoted_bool fold_pos_mix fold_pos_id f b l =
+  Loc.fold_pos_annoted (fold_pos_bool fold_pos_mix fold_pos_id) f b l

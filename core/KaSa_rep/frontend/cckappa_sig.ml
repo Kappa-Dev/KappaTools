@@ -791,6 +791,21 @@ let init_is_permanently_disabled_in_current_working_set parameters error rule_id
     | error, None -> error, true
     | error, Some _ -> error, false)
 
+let remove_pos_kappa_handler_with_errors parameters error p kappa_handler = 
+    let error, agents_annotation =
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold 
+    parameters error 
+      (fun parameters error key (a, b) m ->
+        let data = 
+          ( 
+          ( a,
+            List.filter (fun (a,_) -> not (p a)) b))
+        in 
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set 
+          parameters error key data m)
+      kappa_handler.agents_annotation kappa_handler.agents_annotation
+  in
+  error, { kappa_handler with agents_annotation }
 let rename_pos_kappa_handler_with_errors parameters error rename kappa_handler =
   let error, agents_annotation =
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.rename_pos
@@ -799,12 +814,7 @@ let rename_pos_kappa_handler_with_errors parameters error rename kappa_handler =
           ( a,
             List.rev_map
               (Loc.rename_pos_pair Loc.rename_loc (fun _ a -> a) rename)
-              (List.rev
-                 (b
-                   : (Loc.t
-                     * (Ckappa_sig.c_rule_id, delta) Public_data.ast_origin
-                       option)
-                     list)) ) ))
+              (List.rev b)) ))
       parameters error rename kappa_handler.agents_annotation
   in
   error, { kappa_handler with agents_annotation }

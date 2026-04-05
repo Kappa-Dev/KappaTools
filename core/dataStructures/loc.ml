@@ -207,9 +207,11 @@ let string_option_annoted_of_json ~filenames =
     (JsonUtil.to_option (JsonUtil.to_string ?error_msg:None))
 
 type 'a rename_pos = (t -> t option) -> 'a -> 'a
-
+type 'a remove_pos = (t -> bool) -> 'a -> 'a
 type ('parameters, 'errors, 'a) rename_pos_with_errors =
   'parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a
+type ('parameters, 'errors, 'a) remove_pos_with_errors =
+  'parameters -> 'errors -> (t -> bool) -> 'a -> 'errors * 'a
 
 let rename_loc rename pos =
   match rename pos with
@@ -267,6 +269,7 @@ let rename_pos_pair_with_errors rename_pos1 rename_pos2 parameters errors rename
 type 'a diff_pos = 'a -> 'a -> (t * t) list -> (t * t) list
 
 let diff_pos_empty = []
+let remove_pos_empty = []
 
 let diff_pos loc loc' l =
   if loc == loc' || loc = loc' then
@@ -300,6 +303,41 @@ module LocMap = Map.Make (struct
   let compare = compare
 end)
 
+module LocSet = Set.Make (struct
+  type t_above = t
+
+  type t = t_above
+  (** type t = t *)
+
+  let compare = compare
+end)
+
 let fun_of_list l =
   let m = List.fold_left (fun m (a, b) -> LocMap.add a b m) LocMap.empty l in
   fun elt -> LocMap.find_opt elt m
+
+
+let set_of_list l =
+  let m = List.fold_left (fun m a -> LocSet.add a m) LocSet.empty l in
+  fun elt -> LocSet.mem elt m
+
+
+type ('a,'b) fold_pos = (t -> 'b -> 'b) -> 'a -> 'b -> 'b  
+
+let fold_pos f (t:t) a = f t a 
+
+let fold_pos_annoted fold_pos' f (a,t) acc
+= fold_pos' f a (fold_pos f t acc)
+
+let fold_pos_flat _ _ a = a 
+let fold_pos_opt fold_pos f a acc = 
+match a with 
+| None -> acc 
+| Some b -> fold_pos f b acc 
+let fold_pos_list fold_pos f t a = 
+  List.fold_left 
+    (fun a elt -> fold_pos f elt a) 
+    a t 
+
+let fold_pos_pair fold_posa fold_posb f (a,b) acc = 
+  fold_posb f b (fold_posa f a acc)

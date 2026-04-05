@@ -5,6 +5,7 @@ type diff_elt = {
   new_elt: int list;
   removed_elt: int list;
   pos_renaming: (Loc.t * Loc.t) list;
+  pos_removing: Loc.t list ;
 }
 
 type diff = { diff_rules: diff_elt; diff_init: diff_elt ; diff_agent_sig: diff_elt }
@@ -83,6 +84,9 @@ val diff :
   'rule Loc.diff_pos ->
   'init Loc.diff_pos ->
   'agent_sig Loc.diff_pos -> 
+   ('rule,Loc.t list) Loc.fold_pos ->
+  ('init,Loc.t list) Loc.fold_pos ->
+  ('agent_sig,Loc.t list) Loc.fold_pos -> 
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   before:('rule, 'init, 'agent_sig) summary ->
@@ -105,6 +109,7 @@ val get_file :
   * ('rule, 'init, 'agent_sig) summary_file
 
 val renaming_of_diff : diff -> Loc.t -> Loc.t option
+val remove_of_diff : diff -> Loc.t -> bool 
 val cut : diff -> Ast.parsing_compil -> Ast.parsing_compil
 
 val get_new_indexs :

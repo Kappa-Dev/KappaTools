@@ -2500,7 +2500,8 @@ let rename_pos_parsing_compil =
     (fun _ a -> a)
     rename_pos_rule
 
-let diff_pos_counter_test = Loc.diff_pos_flat
+
+ let diff_pos_counter_test = Loc.diff_pos_flat
 
 let diff_pos_counter (c : counter) c' l =
   let l =
@@ -2678,4 +2679,175 @@ let diff_pos_init_statement diff_pos_pattern diff_pos_mixture diff_pos_id
       e e' l
   in
   let l = diff_pos_init_t diff_pos_mixture diff_pos_id init_t init_t' l in
+  l
+
+
+let fold_pos_counter_test = Loc.fold_pos_flat
+
+let fold_pos_counter f (c : counter) l =
+  let l =
+    Loc.fold_pos_annoted Loc.fold_pos_flat f c.counter_name l
+  in
+  let l =
+    Loc.fold_pos_opt
+      (Loc.fold_pos_annoted fold_pos_counter_test)
+      f c.counter_test  l
+  in
+  let l =
+    Loc.fold_pos_annoted Loc.fold_pos_flat f c.counter_delta  l
+  in
+  l
+
+let fold_pos_internal f (a : internal)  l =
+  Loc.fold_pos_list (Loc.fold_pos_annoted Loc.fold_pos_flat) f a l
+
+let fold_pos_port f (a : port) l =
+  let l = Loc.fold_pos_annoted Loc.fold_pos_flat f a.port_name l in
+  let l = fold_pos_internal f a.port_int l in
+  let l =
+    Loc.fold_pos_opt
+      (Loc.fold_pos_annoted Loc.fold_pos_flat)
+      f a.port_int_mod  l
+  in
+  let l =
+    Loc.fold_pos_list
+      (Loc.fold_pos_annoted
+         (LKappa.fold_pos_link
+            (Loc.fold_pos_annoted Loc.fold_pos_flat)
+            Loc.fold_pos_flat))
+      f a.port_link  l
+  in
+  let l =
+    Loc.fold_pos_opt
+      (Loc.fold_pos_opt (Loc.fold_pos_annoted Loc.fold_pos_flat))
+      f a.port_link_mod  l
+  in
+  l
+
+let fold_pos_site fold_pos f (a : 'counter site)  l =
+  match a with
+  | Port p -> fold_pos_port f p  l
+  | Counter c -> fold_pos f c l
+ 
+let fold_pos_agent_mod f   = Loc.fold_pos_flat f 
+
+let fold_pos_parametric_agent fold_pos_counter f (a : 'a parametric_agent) l =
+  match a with
+  | Present (a, b, c) ->
+    let l = Loc.fold_pos_annoted Loc.fold_pos_flat f a l in
+    let l = Loc.fold_pos_list (fold_pos_site fold_pos_counter) f b l in
+    let l = fold_pos_agent_mod f c l in
+    l
+  | Absent pos-> Loc.fold_pos f pos l
+ 
+let fold_pos_agent f (a : agent)  =
+  fold_pos_parametric_agent fold_pos_counter f a 
+
+let fold_pos_agent_sig f (a : agent_sig) = 
+  fold_pos_parametric_agent Counters_info.fold_pos_counter_sig f a 
+
+let fold_pos_mixture f (m : mixture) =
+  Loc.fold_pos_list (Loc.fold_pos_list fold_pos_agent) f m 
+
+let fold_pos_edit_notation f (e : edit_notation) l =
+  let l = fold_pos_mixture f e.mix l in
+  let l =
+    Loc.fold_pos_list
+      (Loc.fold_pos_pair
+         (Loc.fold_pos_annoted
+            (Alg_expr_extra.fold_pos_e fold_pos_mixture Loc.fold_pos_flat))
+         (Loc.fold_pos_annoted Loc.fold_pos_flat))
+      f e.delta_token l
+  in
+  l
+
+let fold_pos_arrow_notation f (e : arrow_notation) l =
+  let l = fold_pos_mixture f e.lhs l in
+  let l =
+    Loc.fold_pos_list
+      (Loc.fold_pos_pair
+         (Loc.fold_pos_annoted
+            (Alg_expr_extra.fold_pos_e fold_pos_mixture Loc.fold_pos_flat))
+         (Loc.fold_pos_annoted Loc.fold_pos_flat))
+      f e.rm_token  l
+  in
+  let l = fold_pos_mixture f e.rhs l in
+  let l =
+    Loc.fold_pos_list
+      (Loc.fold_pos_pair
+         (Loc.fold_pos_annoted
+            (Alg_expr_extra.fold_pos_e fold_pos_mixture Loc.fold_pos_flat))
+         (Loc.fold_pos_annoted Loc.fold_pos_flat))
+      f e.add_token l
+  in
+  l
+
+let fold_pos_rule_content f (r : rule_content)l =
+  match r with
+  | Edit e -> fold_pos_edit_notation f e l
+  | Arrow e -> fold_pos_arrow_notation f e l
+ 
+let fold_pos_rule f (rule : rule) l =
+  let l = fold_pos_rule_content f rule.rewrite l in
+  let l =
+    Loc.fold_pos_annoted
+      (Alg_expr_extra.fold_pos_e fold_pos_mixture (fun _ _ l -> l))
+      f rule.k_def  l
+  in
+  let l =
+    Loc.fold_pos_opt
+      (Loc.fold_pos_pair
+         (Loc.fold_pos_annoted
+            (Alg_expr_extra.fold_pos_e fold_pos_mixture Loc.fold_pos_flat))
+         (Loc.fold_pos_opt
+            (Loc.fold_pos_annoted
+               (Alg_expr_extra.fold_pos_e fold_pos_mixture Loc.fold_pos_flat))))
+      f rule.k_un l
+  in
+  let l =
+    Loc.fold_pos_opt
+      (Loc.fold_pos_annoted
+         (Alg_expr_extra.fold_pos_e fold_pos_mixture (fun _ _ l -> l)))
+      f rule.k_op  l
+  in
+  let l =
+    Loc.fold_pos_opt
+      (Loc.fold_pos_pair
+         (Loc.fold_pos_annoted
+            (Alg_expr_extra.fold_pos_e fold_pos_mixture Loc.fold_pos_flat))
+         (Loc.fold_pos_opt
+            (Loc.fold_pos_annoted
+               (Alg_expr_extra.fold_pos_e fold_pos_mixture Loc.fold_pos_flat))))
+      f rule.k_op_un  l
+  in
+  l
+
+let fold_pos_id _ _ l = l
+
+let fold_pos_parsing_compil_rule fold_pos_rule f (r : 'a compil_rule) l =
+  let _, b, c, d = r in
+  let l = Loc.fold_pos_opt (Loc.fold_pos_annoted Loc.fold_pos_flat) f b l in
+  let l = Loc.fold_pos_opt (LKappa.fold_pos_guard Loc.fold_pos_flat) f c  l in
+  let l = Loc.fold_pos_annoted fold_pos_rule f d l in
+  l
+
+let fold_pos_init_t fold_pos_mixture fold_pos_id f init_t l =
+  match init_t with
+  | INIT_MIX mix ->
+    Loc.fold_pos_annoted fold_pos_mixture f mix l
+  | INIT_TOK tok ->
+    Loc.fold_pos_list (Loc.fold_pos_annoted fold_pos_id) f tok l
+ 
+let fold_pos_init_statement fold_pos_pattern fold_pos_mixture fold_pos_id
+    f (init : ('a, 'b, 'c) init_statement)  l =
+  let g_opt, e, init_t = init in
+  let l =
+    Loc.fold_pos_opt (LKappa.fold_pos_guard Loc.fold_pos_flat) f g_opt l
+  in
+  let l =
+    Loc.fold_pos_annoted
+      (Alg_expr_extra.fold_pos_e fold_pos_pattern Loc.fold_pos_flat)
+      f e l
+  in
+  let l = fold_pos_init_t fold_pos_mixture fold_pos_id f init_t l in
   l
