@@ -89,10 +89,10 @@ let init_agent_declaration parameters error handler agent_id agent_string =
   in
   error, { handler with Cckappa_sig.agents_annotation }
 
-let add_agent_declaration ~do_not_declare  parameters error handler agent_id pos_opt =
+let add_agent_declaration ~do_not_declare parameters error handler agent_id
+    pos_opt =
   match do_not_declare, pos_opt with
- | true, Some _ 
-  | _, None -> error, handler
+  | true, Some _ | _, None -> error, handler
   | _, Some pos ->
     let error, info_opt =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameters
@@ -158,7 +158,8 @@ let declare_agent ~do_not_declare parameters error handler agent_string pos =
         error, (handler, k)
   in
   let error, handler =
-    add_agent_declaration ~do_not_declare parameters error handler agent_name pos
+    add_agent_declaration ~do_not_declare parameters error handler agent_name
+      pos
   in
   error, (handler, agent_name)
 
@@ -327,9 +328,11 @@ let declare_dual parameter error handler ag site state ag' site' state' =
   in
   error, { handler with Cckappa_sig.dual }
 
-let scan_agent ~do_not_declare ast_origin ~get_counter_name parameters (error, handler) agent =
+let scan_agent ~do_not_declare ast_origin ~get_counter_name parameters
+    (error, handler) agent =
   let error, (handler, ag_id) =
-    declare_agent ~do_not_declare parameters error handler agent.Ckappa_sig.agent_name
+    declare_agent ~do_not_declare parameters error handler
+      agent.Ckappa_sig.agent_name
       (Some (agent.Ckappa_sig.agent_name_pos, ast_origin))
   in
   let rec aux error interface handler =
@@ -421,7 +424,9 @@ let rec scan_mixture ~do_not_declare ast_origin parameters remanent mixture =
   | Ckappa_sig.COMMA (agent, mixture)
   | Ckappa_sig.DOT (_, agent, mixture)
   | Ckappa_sig.PLUS (_, agent, mixture) ->
-    let remanent = scan_agent ~do_not_declare ast_origin parameters remanent agent in
+    let remanent =
+      scan_agent ~do_not_declare ast_origin parameters remanent agent
+    in
     scan_mixture ~do_not_declare ast_origin parameters remanent mixture
 
 let scan_token parameters remanent _alg =
@@ -455,7 +460,7 @@ let next i =
   | Some (Public_data.From_init i) -> Some (Public_data.From_init (i + 1))
   | Some (Public_data.From_rule i) ->
     Some (Public_data.From_rule (Ckappa_sig.next_rule_id i))
- 
+
 let scan_initial_states ~do_not_declare ast_origin diff parameters remanent l =
   let a, _, _, _ =
     List.fold_left
@@ -489,7 +494,8 @@ let scan_initial_states ~do_not_declare ast_origin diff parameters remanent l =
   a
 
 let scan_declarations ~do_not_declare parameters =
-  List.fold_left (fun remanent a -> scan_agent_sig ~do_not_declare None parameters remanent a)
+  List.fold_left (fun remanent a ->
+      scan_agent_sig ~do_not_declare None parameters remanent a)
 
 let scan_observables _scan_mixt _parameters remanent _variable =
   (*TODO*)
@@ -526,7 +532,8 @@ let scan_rules ~do_not_declare ast_origin diff scan_mixt parameters a b =
           if b then
             ( scan_guard parameters
                 (scan_mixture ~do_not_declare i parameters
-                   (scan_mixt ~do_not_declare i parameters remanent rule.Ckappa_sig.lhs)
+                   (scan_mixt ~do_not_declare i parameters remanent
+                      rule.Ckappa_sig.lhs)
                    rule.Ckappa_sig.rhs)
                 guard,
               next i )
@@ -552,8 +559,9 @@ let reverse_agents_annotation parameters (error, remanent) =
 
   error, { remanent with Cckappa_sig.agents_annotation }
 
-let scan_compil_incremental ~do_not_declare parameters error ?diff compil remanent =
- let parameters =
+let scan_compil_incremental ~do_not_declare parameters error ?diff compil
+    remanent =
+  let parameters =
     Remanent_parameters.set_trace parameters
       (local_trace || Remanent_parameters.get_trace parameters)
   in
@@ -563,10 +571,11 @@ let scan_compil_incremental ~do_not_declare parameters error ?diff compil remane
   in
   let scan_tested_mixture =
     if also_explore_tested_agents then
-      scan_mixture 
+      scan_mixture
     else
-      fun  ~do_not_declare _start _parameters remanent _mixture -> 
-        let _ = do_not_declare in remanent 
+      fun ~do_not_declare _start _parameters remanent _mixture ->
+    let _ = do_not_declare in
+    remanent
   in
   let remanent =
     scan_declarations ~do_not_declare parameters remanent
@@ -603,13 +612,15 @@ let scan_compil_incremental ~do_not_declare parameters error ?diff compil remane
   remanent
 
 let scan_compil parameters error compil =
-  let do_not_declare = false in 
+  let do_not_declare = false in
   let error, remanent = empty_handler parameters error in
   scan_compil_incremental ~do_not_declare parameters error compil remanent
 
-let scan_incremental_compil ~do_not_declare parameters error ?diff compil old_remanent =
+let scan_incremental_compil ~do_not_declare parameters error ?diff compil
+    old_remanent =
   let error, remanent =
-    scan_compil_incremental ~do_not_declare parameters error ?diff compil old_remanent
+    scan_compil_incremental ~do_not_declare parameters error ?diff compil
+      old_remanent
   in
   let () =
     if Remanent_parameters.get_trace parameters then (

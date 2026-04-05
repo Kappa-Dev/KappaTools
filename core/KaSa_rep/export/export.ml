@@ -2440,18 +2440,18 @@ functor
       let () = show_title state in
       let state, handler = get_handler state in
       let errors, handler =
-        List_tokens.scan_incremental_compil ~do_not_declare:true ~diff parameters errors
-          refined_compil' handler
+        List_tokens.scan_incremental_compil ~do_not_declare:true ~diff
+          parameters errors refined_compil' handler
       in
       ( Remanent_state.set_errors errors
           (Remanent_state.set_handler handler state),
         state' )
 
     let patch ?debug ?do_not_restart_fixpoint_computation ?do_we_show_title
-        ~called_from ?compil ?patch_file_name ~old_file_name state =
+        ~called_from ?compil ?patch_file_name ~old_file_name ~summary state =
       let parameters = get_parameters state in
       let log = Remanent_parameters.get_logger parameters in
-      let state, summary_ast = summarize_from_ast state in 
+      let state, summary_ast = state, summary in
       (* Former summary could be stored in remanent state *)
       let files = Option.map (fun x -> [ x ]) patch_file_name in
       let do_we_show_title =
@@ -2462,7 +2462,7 @@ functor
       let errors = get_errors state in
       let state' = init ~called_from ?compil ?files ~is_a_patch:true () in
       let state' = set_errors errors state' in
-      let state', _ = get_compilation state' in     
+      let state', _ = get_compilation state' in
       let state' =
         rename_pos
           (fun loc -> Some { loc with Loc.file = old_file_name })
@@ -2473,6 +2473,9 @@ functor
       let errors, summary_file =
         Diff.get_file ~filename:old_file_name parameters errors summary_ast'
       in
+      let summary =
+        Diff.update_file ~filename:old_file_name summary_file summary_ast
+      in
       let errors, diff =
         Diff.diff
           (Ast.diff_pos_parsing_compil_rule Ast.diff_pos_rule)
@@ -2482,16 +2485,16 @@ functor
           (Ast.fold_pos_parsing_compil_rule Ast.fold_pos_rule)
           (Ast.fold_pos_init_statement Ast.fold_pos_mixture Ast.fold_pos_mixture
              Loc.fold_pos_flat)
-          Ast.fold_pos_agent_sig
-          parameters errors ~filename:old_file_name ~before:summary_ast
-          ~after:summary_file
+          Ast.fold_pos_agent_sig parameters errors ~filename:old_file_name
+          ~before:summary_ast ~after:summary_file
       in
-      let state, kappa_handler = get_handler state in 
-      let errors, kappa_handler = 
-        Cckappa_sig.remove_pos_kappa_handler_with_errors parameters errors (Diff.remove_of_diff diff) kappa_handler 
-      in      
+      let state, kappa_handler = get_handler state in
+      let errors, kappa_handler =
+        Cckappa_sig.remove_pos_kappa_handler_with_errors parameters errors
+          (Diff.remove_of_diff diff) kappa_handler
+      in
       let state = set_errors errors state in
-      let state = Remanent_state.set_handler kappa_handler state in 
+      let state = Remanent_state.set_handler kappa_handler state in
       let state = rename_pos (Diff.renaming_of_diff diff) state in
       let state =
         permanently_disable_rule_c_id_list
@@ -2529,10 +2532,12 @@ functor
         Prepreprocess.translate_compil parameters errors compil_new_elt
       in
       let errors, handler' =
-        List_tokens.scan_incremental_compil ~do_not_declare:false parameters errors c_compil_new_elt handler
+        List_tokens.scan_incremental_compil ~do_not_declare:false parameters
+          errors c_compil_new_elt handler
       in
       let errors, handler', cc_compil' =
-        Preprocess.translate_c_compil parameters errors handler' c_compil_new_elt
+        Preprocess.translate_c_compil parameters errors handler'
+          c_compil_new_elt
       in
       let state = Remanent_state.set_errors errors state in
       let state, cc_compil = get_c_compilation state in
@@ -2586,9 +2591,13 @@ functor
           let errors =
             Print_cckappa.print_compil parameters errors handler cc_compil
           in
-                    set_errors errors state
+          let () = Loggers.fprintf log "KAPPA HANDLER" in
+          let () = Loggers.print_newline log in
+          let errors = Print_handler.print_handler parameters errors handler in
+
+          set_errors errors state
         ) else
           state
       in
-      state
+      summary, state
   end

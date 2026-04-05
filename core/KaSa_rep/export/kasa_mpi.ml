@@ -25,6 +25,8 @@ let gState =
   let compil = Ast.empty_compil in
   ref (init ~compil ())
 
+let gSummary = ref Diff.empty_summary
+
 let send_exception post ?id e =
   let head =
     match id with
@@ -85,9 +87,11 @@ let on_message post text =
     (try
        let old_file_name = JsonUtil.to_string file_name in
        let compil = Ast.compil_of_json compil in
-       let state = patch ~compil ~old_file_name !gState in
+       let summary = !gSummary in
+       let summary, state = patch ~compil ~old_file_name ~summary !gState in
        let state, ast = get_compilation state in
        let () = gState := state in
+       let () = gSummary := summary in
        send_response post id (Ast.compil_to_json ast)
      with e -> send_exception post ~id e)
   | Some (id, `List [ `String "CONTACT_MAP"; acc ]) ->

@@ -217,8 +217,8 @@ val print_ast_rule : Format.formatter -> rule -> unit
 
 val print_rule_content :
   bidirectional:bool -> Format.formatter -> rule_content -> unit
-val print_agent_sig : Format.formatter -> agent_sig -> unit
 
+val print_agent_sig : Format.formatter -> agent_sig -> unit
 val print_parsing_compil_kappa : Format.formatter -> parsing_compil -> unit
 val print_working_set : Format.formatter -> parsing_compil -> unit
 val to_erased_mixture : mixture -> mixture
@@ -230,11 +230,11 @@ val read_parsing_compil : Yojson.lexer_state -> Lexing.lexbuf -> parsing_compil
 val working_set_index_to_string : int -> string
 
 val rename_pos_perturbation :
-  'pattern Loc.rename_pos -> 
-  'mixture Loc.rename_pos -> 
-  'id Loc.rename_pos -> 
-  'rule Loc.rename_pos -> 
-  ('pattern, 'mixture, 'id, 'rule) perturbation Loc.rename_pos 
+  'pattern Loc.rename_pos ->
+  'mixture Loc.rename_pos ->
+  'id Loc.rename_pos ->
+  'rule Loc.rename_pos ->
+  ('pattern, 'mixture, 'id, 'rule) perturbation Loc.rename_pos
 
 val rename_pos_perturbation_with_errors :
   ('parameters ->
@@ -301,8 +301,7 @@ val rename_pos_compil :
 val diff_pos_rule : rule Loc.diff_pos
 
 val diff_pos_parsing_compil_rule :
-  'rule Loc.diff_pos -> 
-  'rule compil_rule Loc.diff_pos 
+  'rule Loc.diff_pos -> 'rule compil_rule Loc.diff_pos
 
 val diff_pos_mixture : mixture Loc.diff_pos
 val diff_pos_id : string Loc.diff_pos
@@ -314,20 +313,17 @@ val diff_pos_init_statement :
   ('pattern, 'mixture, 'id) init_statement Loc.diff_pos
 
 val diff_pos_agent_sig : agent_sig Loc.diff_pos
-
-
-val fold_pos_rule : (rule,'a) Loc.fold_pos
+val fold_pos_rule : (rule, 'a) Loc.fold_pos
 
 val fold_pos_parsing_compil_rule :
-  ('rule,'a) Loc.fold_pos -> ('rule compil_rule,'a) Loc.fold_pos 
-  
-val fold_pos_id: (string,'a) Loc.fold_pos           
-val fold_pos_agent_sig : 
-  (agent_sig,'a) Loc.fold_pos 
-val fold_pos_mixture :
-  (mixture,'a) Loc.fold_pos 
-val fold_pos_init_statement: 
-  ('pattern,'a) Loc.fold_pos -> 
-  ('mixture,'a) Loc.fold_pos -> 
-  ('id,'a) Loc.fold_pos -> 
-  (('pattern, 'mixture, 'id) init_statement,'a) Loc.fold_pos
+  ('rule, 'a) Loc.fold_pos -> ('rule compil_rule, 'a) Loc.fold_pos
+
+val fold_pos_id : (string, 'a) Loc.fold_pos
+val fold_pos_agent_sig : (agent_sig, 'a) Loc.fold_pos
+val fold_pos_mixture : (mixture, 'a) Loc.fold_pos
+
+val fold_pos_init_statement :
+  ('pattern, 'a) Loc.fold_pos ->
+  ('mixture, 'a) Loc.fold_pos ->
+  ('id, 'a) Loc.fold_pos ->
+  (('pattern, 'mixture, 'id) init_statement, 'a) Loc.fold_pos

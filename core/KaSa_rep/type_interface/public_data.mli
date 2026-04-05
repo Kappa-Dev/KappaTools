@@ -86,7 +86,7 @@ type rule = {
 type element_in_working_set = {
   rule_ws_id: int;
   rule_ws_position: Loc.t;
-  rule_ws_enabled: bool option ;
+  rule_ws_enabled: bool option;
 }
 
 type var = {

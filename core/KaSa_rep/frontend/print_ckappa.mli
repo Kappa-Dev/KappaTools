@@ -1,6 +1,6 @@
 val local_trace : bool
 
-val print_agent_sig:
+val print_agent_sig :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.agent_sig ->

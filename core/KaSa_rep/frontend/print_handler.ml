@@ -179,18 +179,23 @@ let print_handler parameters error handler =
     Remanent_parameters.update_prefix parameters "agents info:"
   in
   let () =
-    Loggers.fprintf log "%s \n"
-      (Remanent_parameters.get_prefix parameters)
+    Loggers.fprintf log "%s \n" (Remanent_parameters.get_prefix parameters)
   in
-  let error = 
-    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.print parameters_info error 
-    (fun _parameters _error (a,l) -> 
-      let () = Loggers.fprintf log "%s -> %i" a (List.length l) in 
-      let () = List.iter (fun (elt,_) -> Loggers.fprintf log "%s" (Loc.to_string elt)) l in 
-      let () = Loggers.print_newline log in 
-      error)
-  handler.Cckappa_sig.agents_annotation
-  in error
+  let error =
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.print parameters_info
+      error
+      (fun _parameters _error (a, l) ->
+        let () = Loggers.fprintf log "%s -> %i" a (List.length l) in
+        let () =
+          List.iter
+            (fun (elt, _) -> Loggers.fprintf log "%s" (Loc.to_string elt))
+            l
+        in
+        let () = Loggers.print_newline log in
+        error)
+      handler.Cckappa_sig.agents_annotation
+  in
+  error
 
 let dot_of_contact_map ?loggers parameters
     (error : Exception.exceptions_caught_and_uncaught) handler =

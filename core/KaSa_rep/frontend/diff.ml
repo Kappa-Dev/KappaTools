@@ -1,21 +1,27 @@
 type ('rule, 'init, 'agent_sig) summary_file = {
   summary_rule_map: (int * 'rule) Mods.StringMap.t;
   summary_init_state_map: (int * 'init) Mods.StringMap.t;
-  summary_agent_sig_map: (int * 'agent_sig) Mods.StringMap.t 
+  summary_agent_sig_map: (int * 'agent_sig) Mods.StringMap.t;
       (* summary_rule_set: Mods.StringSet.t ;
          summary_init_state_set: Mods.StringSet.t ;*)
 }
 
 type ('a, 'b, 'c) summary = ('a, 'b, 'c) summary_file Mods.StringMap.t
 
+let empty_summary = Mods.StringMap.empty
+
 type diff_elt = {
   new_elt: int list;
   removed_elt: int list;
   pos_renaming: (Loc.t * Loc.t) list;
-  pos_removing: Loc.t list ;
+  pos_removing: Loc.t list;
 }
 
-type diff = { diff_rules: diff_elt; diff_init: diff_elt ; diff_agent_sig: diff_elt }
+type diff = {
+  diff_rules: diff_elt;
+  diff_init: diff_elt;
+  diff_agent_sig: diff_elt;
+}
 
 type new_indexs = {
   next_rule: Ckappa_sig.c_rule_id;
@@ -45,7 +51,7 @@ let empty_summary_file =
   {
     summary_rule_map = Mods.StringMap.empty;
     summary_init_state_map = Mods.StringMap.empty;
-    summary_agent_sig_map = Mods.StringMap.empty; 
+    summary_agent_sig_map = Mods.StringMap.empty;
   }
 
 let get_file _parameters errors ~filename summary =
@@ -54,10 +60,22 @@ let get_file _parameters errors ~filename summary =
   | Some x -> errors, x
 
 let renaming_of_diff diff =
-  Loc.fun_of_list (List.flatten [diff.diff_rules.pos_renaming;diff.diff_init.pos_renaming;diff.diff_agent_sig.pos_renaming])
+  Loc.fun_of_list
+    (List.flatten
+       [
+         diff.diff_rules.pos_renaming;
+         diff.diff_init.pos_renaming;
+         diff.diff_agent_sig.pos_renaming;
+       ])
 
-let remove_of_diff diff = 
-  Loc.set_of_list (List.flatten [diff.diff_rules.pos_removing;diff.diff_init.pos_removing;diff.diff_agent_sig.pos_removing])
+let remove_of_diff diff =
+  Loc.set_of_list
+    (List.flatten
+       [
+         diff.diff_rules.pos_removing;
+         diff.diff_init.pos_removing;
+         diff.diff_agent_sig.pos_removing;
+       ])
 
 let dump_summary parameters _error summary =
   let logger = Remanent_parameters.get_logger parameters in
@@ -68,7 +86,7 @@ let dump_summary parameters _error summary =
       (fun s i ->
         let () = Loggers.fprintf logger "         FILE: %s" s in
         let () = Loggers.print_newline logger in
-           let () = Loggers.fprintf logger "             Agent_sig:" in
+        let () = Loggers.fprintf logger "             Agent_sig:" in
         let () = Loggers.print_newline logger in
         let () =
           Mods.StringMap.iter
@@ -107,6 +125,9 @@ let dump_summary parameters _error summary =
   in
   ()
 
+let update_file ~filename summary_file summary =
+  Mods.StringMap.add filename summary_file summary
+
 let summarize_gen get_file_name get_string get_map set_map parameters error id
     elt summary =
   let _ = parameters in
@@ -122,14 +143,13 @@ let summarize_gen get_file_name get_string get_map set_map parameters error id
   let summary_file = set_map map summary_file in
   error, Mods.StringMap.add file_name summary_file summary
 
-let summarize_agent_sig_from_ast parameters error id
-    (agent: Ast.agent_sig) summary =
+let summarize_agent_sig_from_ast parameters error id (agent : Ast.agent_sig)
+    summary =
   let get_file_name agent =
-    let loc = 
-      match agent with 
-    | Ast.Absent loc 
-    | Ast.Present ((_,loc),_,_) -> loc 
-    in 
+    let loc =
+      match agent with
+      | Ast.Absent loc | Ast.Present ((_, loc), _, _) -> loc
+    in
     let filename = loc.Loc.file in
     filename
   in
@@ -146,7 +166,7 @@ let summarize_agent_sig_from_ast parameters error id
     (fun summary_agent_sig_map x -> { x with summary_agent_sig_map })
     parameters error id agent summary
 
-  let summarize_rule_from_ast parameters error id
+let summarize_rule_from_ast parameters error id
     (rule : Ast.rule Ast.compil_rule) summary =
   let get_file_name (_, _, _, (_, loc)) =
     let filename = loc.Loc.file in
@@ -251,16 +271,13 @@ let summarize_from_ast parameters error compil =
         ))
       (error, 0, summary) compil.Ast.init
   in
-   let error, _, summary =
+  let error, _, summary =
     List.fold_left
-      (fun (error, id, summary)
-           agent_sig ->
-            let error, summary =
-              summarize_agent_sig_from_ast parameters error id agent_sig
-                summary
-            in
-            error, id + 1, summary
-        )
+      (fun (error, id, summary) agent_sig ->
+        let error, summary =
+          summarize_agent_sig_from_ast parameters error id agent_sig summary
+        in
+        error, id + 1, summary)
       (error, 0, summary) compil.Ast.signatures
   in
   error, summary
@@ -285,7 +302,6 @@ let summarize_agent_sig_from_ckappa parameters error id
     (fun x -> x.summary_agent_sig_map)
     (fun summary_agent_sig_map x -> { x with summary_agent_sig_map })
     parameters error id agent_sig summary
-
 
 let summarize_rule_from_ckappa parameters error id
     (rule : Ckappa_sig.enriched_rule) summary =
@@ -332,7 +348,7 @@ let summarize_init_state_from_ckappa parameters error id
 
 let summarize_from_ckappa parameters error (compil : Ckappa_sig.c_compil) =
   let error, summary = error, Mods.StringMap.empty in
- let error, summary =
+  let error, summary =
     Int_storage.Nearly_inf_Imperatif.fold parameters error
       (fun parameters error id rule summary ->
         let error, summary =
@@ -430,38 +446,50 @@ let summarize_from_cckappa parameters error (compil : Cckappa_sig.compil) =
   in
   error, summary
 
-let diff_gen diff_pos scan_pos get_id get_obj get_map parameters errors ~before ~after =
+let diff_gen diff_pos scan_pos get_id get_obj get_map parameters errors ~before
+    ~after =
   let map_before = get_map before in
   let map_after = get_map after in
   let errors, (removed_list, created_list, pos_renaming, pos_removing) =
     Mods.StringMap.monadic_fold2 parameters errors
-      (fun _parameters errors _ elt elt' (removed_list, added_list, pos_diff, pos_removing) ->
+      (fun _parameters errors _ elt elt'
+           (removed_list, added_list, pos_diff, pos_removing) ->
         ( errors,
           ( removed_list,
             added_list,
-            diff_pos (get_obj elt) (get_obj elt') pos_diff, 
+            diff_pos (get_obj elt) (get_obj elt') pos_diff,
             pos_removing ) ))
-      (fun _parameters errors _ elt (removed_list, added_list, pos_diff, pos_deleted) ->
-        errors, (get_id elt :: removed_list, added_list, pos_diff, 
-        scan_pos (fun a b -> a::b) (get_obj elt) pos_deleted))
-      (fun _parameters errors _ elt (removed_list, added_list, pos_diff, pos_removing) ->
+      (fun _parameters errors _ elt
+           (removed_list, added_list, pos_diff, pos_deleted) ->
+        ( errors,
+          ( get_id elt :: removed_list,
+            added_list,
+            pos_diff,
+            scan_pos (fun a b -> a :: b) (get_obj elt) pos_deleted ) ))
+      (fun _parameters errors _ elt
+           (removed_list, added_list, pos_diff, pos_removing) ->
         errors, (removed_list, get_id elt :: added_list, pos_diff, pos_removing))
       map_before map_after
       ([], [], Loc.diff_pos_empty, Loc.remove_pos_empty)
   in
-  errors, { new_elt = created_list; removed_elt = removed_list; pos_renaming ; pos_removing}
+  ( errors,
+    {
+      new_elt = created_list;
+      removed_elt = removed_list;
+      pos_renaming;
+      pos_removing;
+    } )
 
-let diff 
-  diff_pos_rule diff_pos_init diff_pos_agent_sig 
-  scan_pos_rule scan_pos_init scan_pos_agent_sig  
-  parameters errors ~before ~filename ~after =
+let diff diff_pos_rule diff_pos_init diff_pos_agent_sig scan_pos_rule
+    scan_pos_init scan_pos_agent_sig parameters errors ~before ~filename ~after
+    =
   let before =
     match Mods.StringMap.find_option filename before with
     | None -> empty_summary_file
     | Some x -> x
   in
-  let errors, diff_agent_sig = 
-   diff_gen diff_pos_agent_sig scan_pos_agent_sig fst snd
+  let errors, diff_agent_sig =
+    diff_gen diff_pos_agent_sig scan_pos_agent_sig fst snd
       (fun x -> x.summary_agent_sig_map)
       parameters errors ~before ~after
   in
@@ -475,7 +503,7 @@ let diff
       (fun x -> x.summary_init_state_map)
       parameters errors ~before ~after
   in
-  errors, { diff_rules; diff_init ; diff_agent_sig}
+  errors, { diff_rules; diff_init; diff_agent_sig }
 
 let is_new_gen get _parameters error summary ~filename string =
   match Mods.StringMap.find_option filename summary with
@@ -496,10 +524,10 @@ let is_new_init_state parameters errors summary ~filename ~init_state =
     (fun x -> x.summary_init_state_map)
     parameters errors summary ~filename init_state
 
-let is_new_agent_sig parameters errors summary ~filename ~agent_sig = 
-   is_new_gen
+let is_new_agent_sig parameters errors summary ~filename ~agent_sig =
+  is_new_gen
     (fun x -> x.summary_agent_sig_map)
-    parameters errors summary ~filename agent_sig 
+    parameters errors summary ~filename agent_sig
 
 let dump_diff parameters errors (diff : diff) =
   let logger = Remanent_parameters.get_logger parameters in
@@ -507,7 +535,7 @@ let dump_diff parameters errors (diff : diff) =
   let () = Loggers.print_newline logger in
   let () = Loggers.fprintf logger "         REMOVED: " in
   let () = Loggers.print_newline logger in
-   let () = Loggers.fprintf logger "             DECL:" in
+  let () = Loggers.fprintf logger "             DECL:" in
   let () = Loggers.print_newline logger in
   let () =
     List.iter
@@ -518,7 +546,7 @@ let dump_diff parameters errors (diff : diff) =
       diff.diff_agent_sig.removed_elt
   in
   let () = Loggers.print_newline logger in
-   let () = Loggers.fprintf logger "             Init:" in
+  let () = Loggers.fprintf logger "             Init:" in
   let () = Loggers.print_newline logger in
   let () =
     List.iter
@@ -543,7 +571,7 @@ let dump_diff parameters errors (diff : diff) =
   let () = Loggers.print_newline logger in
   let () = Loggers.fprintf logger "         NEW: " in
   let () = Loggers.print_newline logger in
-   let () = Loggers.fprintf logger "             Decl" in
+  let () = Loggers.fprintf logger "             Decl" in
   let () = Loggers.print_newline logger in
   let () =
     List.iter
@@ -565,7 +593,7 @@ let dump_diff parameters errors (diff : diff) =
       diff.diff_init.new_elt
   in
   let () = Loggers.print_newline logger in
-    let () = Loggers.fprintf logger "             Rules:" in
+  let () = Loggers.fprintf logger "             Rules:" in
   let () = Loggers.print_newline logger in
   let () =
     List.iter
@@ -605,8 +633,8 @@ let extract index_list list =
 let cut diff (ast : Ast.parsing_compil) =
   let rules = extract diff.diff_rules.new_elt ast.Ast.rules in
   let init = extract diff.diff_init.new_elt ast.Ast.init in
-  let signatures = extract diff.diff_agent_sig.new_elt ast.Ast.signatures in 
-  { ast with Ast.init; Ast.rules ; Ast.signatures}
+  let signatures = extract diff.diff_agent_sig.new_elt ast.Ast.signatures in
+  { ast with Ast.init; Ast.rules; Ast.signatures }
 
 let get_new_indexs parameters errors handler c_compil =
   let n = Handler.nrules parameters errors handler in
@@ -633,7 +661,10 @@ let get_new_indexs parameters errors handler c_compil =
 let fuse parameters errors handler c_compil handler' c_compil' =
   let n = Handler.nrules parameters errors handler in
   let n' = Handler.ninit parameters errors handler in
-  let errors, n'' = Int_storage.Nearly_inf_Imperatif.dimension parameters errors c_compil'.Cckappa_sig.signatures in 
+  let errors, n'' =
+    Int_storage.Nearly_inf_Imperatif.dimension parameters errors
+      c_compil'.Cckappa_sig.signatures
+  in
   let errors, (rules, nrules_pred) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters errors
       (fun parameters errors i rule' (rules, _) ->
@@ -658,13 +689,15 @@ let fuse parameters errors handler c_compil handler' c_compil' =
   let ninits = n' + Handler.ninit parameters errors handler' in
   let errors, (signatures, _n_sig_pred) =
     Int_storage.Nearly_inf_Imperatif.fold parameters errors
-      (fun parameters errors i init' (inits,_) ->
+      (fun parameters errors i init' (inits, _) ->
         let id = i + n'' in
-        let errors, inits = Int_storage.Nearly_inf_Imperatif.set parameters errors (i + n'') init'
-          inits in 
-       errors,(inits, id) )
+        let errors, inits =
+          Int_storage.Nearly_inf_Imperatif.set parameters errors (i + n'') init'
+            inits
+        in
+        errors, (inits, id))
       c_compil'.Cckappa_sig.signatures
-      (c_compil.Cckappa_sig.signatures,n''-1)
+      (c_compil.Cckappa_sig.signatures, n'' - 1)
   in
   ( errors,
     { handler' with Cckappa_sig.nrules; Cckappa_sig.ninits },
@@ -682,12 +715,14 @@ let update_ast added_elements_compil old_compil =
     Cst.compute_ws_values ~all_rules_in_ws:true ~rules_in_ws:[]
       added_elements_compil.Ast.rules added_elements_compil.Ast.init old_compil
   in
-  let renamed_signatures = (*old_compil.Ast.signatures @*) added_elements_compil.Ast.signatures in 
+  let renamed_signatures =
+    (*old_compil.Ast.signatures @*) added_elements_compil.Ast.signatures
+  in
   ( {
       added_elements_compil with
       Ast.init = renamed_init;
       Ast.rules = renamed_rules;
-      Ast.signatures = renamed_signatures; 
+      Ast.signatures = renamed_signatures;
       Ast.working_set_values = updated_compil.Ast.working_set_values;
     },
     updated_compil )

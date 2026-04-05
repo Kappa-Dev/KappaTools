@@ -99,17 +99,21 @@ let main () =
       match start_time with
       | None -> ()
       | Some start_time ->
-        let () = if Remanent_parameters.get_print_efficiency parameters then ( Loggers.fprintf log "execution took " ) in
+        let () =
+          if Remanent_parameters.get_print_efficiency parameters then
+            Loggers.fprintf log "execution took "
+        in
         let () = KaSaUtil.print_only_timing parameters start_time in
         Loggers.print_newline log
     in
     let state =
       match state with
       | None -> None
-      | Some state ->
+      | Some (summary, state) ->
         Some
-          (Export_to_KaSa.set_errors
-             Exception.empty_exceptions_caught_and_uncaught state)
+          ( summary,
+            Export_to_KaSa.set_errors
+              Exception.empty_exceptions_caught_and_uncaught state )
     in
     let s =
       match command with
@@ -122,10 +126,11 @@ let main () =
     let state =
       match state with
       | None -> None
-      | Some state ->
+      | Some (summary, state) ->
         Some
-          (Export_to_KaSa.set_errors
-             Exception.empty_exceptions_caught_and_uncaught state)
+          ( summary,
+            Export_to_KaSa.set_errors
+              Exception.empty_exceptions_caught_and_uncaught state )
     in
     try
       let start_time = Some (Sys.time ()) in
@@ -143,25 +148,26 @@ let main () =
             state
         in
         let state = print_result parameters state false in
-        loop (Some state) start_time
-      | ("print rules" | "p rules"), Some state ->
+        let state, summary = Export_to_KaSa.summarize_from_ast state in
+        loop (Some (summary, state)) start_time
+      | ("print rules" | "p rules"), Some (summary, state) ->
         let state, compilation = Export_to_KaSa.get_compilation state in
         let () =
           Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
         in
         let error = Export_to_KaSa.get_errors state in
         let () = Exception.print parameters error in
-        loop (Some state) None
-      | ("print working set" | "print ws" | "p ws"), Some state ->
+        loop (Some (summary, state)) None
+      | ("print working set" | "print ws" | "p ws"), Some (summary, state) ->
         let state, compilation = Export_to_KaSa.get_compilation state in
         let () = Loggers.fprintf log "%a" Ast.print_working_set compilation in
         let error = Export_to_KaSa.get_errors state in
         let () = Exception.print parameters error in
-        loop (Some state) None
-      | ("print result" | "p result" | "p"), Some state ->
+        loop (Some (summary, state)) None
+      | ("print result" | "p result" | "p"), Some (summary, state) ->
         let state = print_result parameters state true in
-        loop (Some state) start_time
-      | input, Some state
+        loop (Some (summary, state)) start_time
+      | input, Some (summary, state)
         when String.length input > 12 && String.sub input 0 12 = "update file "
         ->
         let l = String.split_on_char ' ' input in
@@ -170,21 +176,15 @@ let main () =
           | true -> Some false
           | false -> Some true
         in
-        let state =
+        let summary, state =
           match l with
           | [ "update"; "file"; patch_file_name ] ->
             let old_file_name = patch_file_name in
-            let state =
-              Export_to_KaSa.patch ?do_not_restart_fixpoint_computation
-                ~patch_file_name ~old_file_name state
-            in
-            state
+            Export_to_KaSa.patch ?do_not_restart_fixpoint_computation
+              ~patch_file_name ~old_file_name ~summary state
           | [ "update"; "file"; patch_file_name; "as"; old_file_name ] ->
-            let state =
-              Export_to_KaSa.patch ?do_not_restart_fixpoint_computation
-                ~patch_file_name ~old_file_name state
-            in
-            state
+            Export_to_KaSa.patch ?do_not_restart_fixpoint_computation
+              ~patch_file_name ~old_file_name ~summary state
           | _ ->
             let error = Export_to_KaSa.get_errors state in
             let error, () =
@@ -192,11 +192,11 @@ let main () =
                 ~message:("Parsing error: " ^ input)
                 Exit ()
             in
-            Export_to_KaSa.set_errors error state
+            summary, Export_to_KaSa.set_errors error state
         in
         let state = print_result parameters state false in
-        loop (Some state) start_time
-      | input, Some state ->
+        loop (Some (summary, state)) start_time
+      | input, Some (summary, state) ->
         let success, state =
           match parse_input input with
           | Enable (false, i) ->
@@ -240,7 +240,7 @@ let main () =
             state
           )
         in
-        loop (Some state) start_time
+        loop (Some (summary, state)) start_time
     with End_of_file -> ()
   in
   loop ~command:"restart" None None

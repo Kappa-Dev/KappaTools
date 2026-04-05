@@ -372,7 +372,7 @@ val working_set_id_of_init_id :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Ckappa_sig.c_working_set_index option
 
-val remove_pos_kappa_handler_with_errors : 
+val remove_pos_kappa_handler_with_errors :
   ( Remanent_parameters_sig.parameters,
     Exception_without_parameter.exceptions_caught_and_uncaught,
     kappa_handler )

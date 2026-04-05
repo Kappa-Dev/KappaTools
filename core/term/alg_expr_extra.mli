@@ -96,9 +96,11 @@ val diff_pos_bool :
   ('mix, 'id) Alg_expr.bool Loc.diff_pos
 
 val fold_pos_e :
-  ('mix,'a) Loc.fold_pos -> ('id,'a) Loc.fold_pos -> (('mix, 'id) Alg_expr.e,'a) Loc.fold_pos
+  ('mix, 'a) Loc.fold_pos ->
+  ('id, 'a) Loc.fold_pos ->
+  (('mix, 'id) Alg_expr.e, 'a) Loc.fold_pos
 
 val fold_pos_bool :
-  ('mix,'a) Loc.fold_pos ->
-  ('id,'a) Loc.fold_pos ->
-  (('mix, 'id) Alg_expr.bool,'a) Loc.fold_pos
+  ('mix, 'a) Loc.fold_pos ->
+  ('id, 'a) Loc.fold_pos ->
+  (('mix, 'id) Alg_expr.bool, 'a) Loc.fold_pos

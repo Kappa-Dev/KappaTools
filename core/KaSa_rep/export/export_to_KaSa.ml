@@ -142,8 +142,8 @@ module type Type = sig
     state ->
     state
     * ( Ast.rule Ast.compil_rule,
-        (Ast.mixture, Ast.mixture, string) Ast.init_statement, 
-        Ast.agent_sig)
+        (Ast.mixture, Ast.mixture, string) Ast.init_statement,
+        Ast.agent_sig )
       Diff.summary
 
   (*val summarize_from_ckappa: state -> state *
@@ -164,8 +164,17 @@ module type Type = sig
     ?do_we_show_title:bool ->
     patch_file_name:string ->
     old_file_name:string ->
+    summary:
+      ( Ast.rule Ast.compil_rule,
+        (Ast.mixture, Ast.mixture, string) Ast.init_statement,
+        Ast.agent_sig )
+      Diff.summary ->
     state ->
-    state
+    ( Ast.rule Ast.compil_rule,
+      (Ast.mixture, Ast.mixture, string) Ast.init_statement,
+      Ast.agent_sig )
+    Diff.summary
+    * state
 end
 
 module Export =

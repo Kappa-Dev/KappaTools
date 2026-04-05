@@ -17,7 +17,19 @@ module type Type = sig
   val init : ?compil:Ast.parsing_compil -> unit -> state
 
   val patch :
-    ?compil:Ast.parsing_compil -> old_file_name:string -> state -> state
+    ?compil:Ast.parsing_compil ->
+    old_file_name:string ->
+    summary:
+      ( Ast.rule Ast.compil_rule,
+        (Ast.mixture, Ast.mixture, string) Ast.init_statement,
+        Ast.agent_sig )
+      Diff.summary ->
+    state ->
+    ( Ast.rule Ast.compil_rule,
+      (Ast.mixture, Ast.mixture, string) Ast.init_statement,
+      Ast.agent_sig )
+    Diff.summary
+    * state
 
   val get_compilation : state -> state * Ast.parsing_compil
 

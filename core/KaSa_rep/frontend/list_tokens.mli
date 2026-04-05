@@ -16,7 +16,7 @@ val scan_compil :
   * Cckappa_sig.kappa_handler
 
 val scan_incremental_compil :
-  do_not_declare: bool -> 
+  do_not_declare:bool ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   ?diff:Diff.diff ->

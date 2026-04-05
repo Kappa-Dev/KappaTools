@@ -903,7 +903,7 @@ and diff_pos_annoted_bool diff_pos_mix diff_pos_id b b' l =
 let rec fold_pos_e fold_pos_mix fold_pos_id f e l =
   match e with
   | Alg_expr.BIN_ALG_OP (_, e1, e2) ->
-    fold_pos_annoted_e fold_pos_mix fold_pos_id f e2 
+    fold_pos_annoted_e fold_pos_mix fold_pos_id f e2
       (fold_pos_annoted_e fold_pos_mix fold_pos_id f e1 l)
   | Alg_expr.UN_ALG_OP (_, e) ->
     fold_pos_annoted_e fold_pos_mix fold_pos_id f e l
@@ -915,7 +915,7 @@ let rec fold_pos_e fold_pos_mix fold_pos_id f e l =
     Loc.fold_pos_pair
       (Loc.fold_pos_annoted (fold_pos_e fold_pos_mix fold_pos_id))
       fold_pos_mix f dk l
-  | Alg_expr.DIFF_TOKEN dk->
+  | Alg_expr.DIFF_TOKEN dk ->
     Loc.fold_pos_pair
       (Loc.fold_pos_annoted (fold_pos_e fold_pos_mix fold_pos_id))
       fold_pos_id f dk l
@@ -925,19 +925,18 @@ let rec fold_pos_e fold_pos_mix fold_pos_id f e l =
     let l = fold_pos_annoted_e fold_pos_mix fold_pos_id f c l in
     l
   | Alg_expr.CONST _ -> l
-  
 
 and fold_pos_bool fold_pos_mix fold_pos_id f e l =
   match e with
   | Alg_expr.BIN_BOOL_OP (_, e1, e2) ->
-    fold_pos_annoted_bool fold_pos_mix fold_pos_id f e2 
+    fold_pos_annoted_bool fold_pos_mix fold_pos_id f e2
       (fold_pos_annoted_bool fold_pos_mix fold_pos_id f e1 l)
   | Alg_expr.UN_BOOL_OP (_, e) ->
     fold_pos_annoted_bool fold_pos_mix fold_pos_id f e l
   | Alg_expr.COMPARE_OP (_, e1, e2) ->
-    fold_pos_annoted_e fold_pos_mix fold_pos_id f e2 
+    fold_pos_annoted_e fold_pos_mix fold_pos_id f e2
       (fold_pos_annoted_e fold_pos_mix fold_pos_id f e1 l)
-  | Alg_expr.TRUE | Alg_expr.FALSE-> l
+  | Alg_expr.TRUE | Alg_expr.FALSE -> l
 
 and fold_pos_annoted_e fold_pos_mix fold_pos_id f e l =
   Loc.fold_pos_annoted (fold_pos_e fold_pos_mix fold_pos_id) f e l

@@ -208,8 +208,10 @@ let string_option_annoted_of_json ~filenames =
 
 type 'a rename_pos = (t -> t option) -> 'a -> 'a
 type 'a remove_pos = (t -> bool) -> 'a -> 'a
+
 type ('parameters, 'errors, 'a) rename_pos_with_errors =
   'parameters -> 'errors -> (t -> t option) -> 'a -> 'errors * 'a
+
 type ('parameters, 'errors, 'a) remove_pos_with_errors =
   'parameters -> 'errors -> (t -> bool) -> 'a -> 'errors * 'a
 
@@ -316,28 +318,23 @@ let fun_of_list l =
   let m = List.fold_left (fun m (a, b) -> LocMap.add a b m) LocMap.empty l in
   fun elt -> LocMap.find_opt elt m
 
-
 let set_of_list l =
   let m = List.fold_left (fun m a -> LocSet.add a m) LocSet.empty l in
   fun elt -> LocSet.mem elt m
 
+type ('a, 'b) fold_pos = (t -> 'b -> 'b) -> 'a -> 'b -> 'b
 
-type ('a,'b) fold_pos = (t -> 'b -> 'b) -> 'a -> 'b -> 'b  
+let fold_pos f (t : t) a = f t a
+let fold_pos_annoted fold_pos' f (a, t) acc = fold_pos' f a (fold_pos f t acc)
+let fold_pos_flat _ _ a = a
 
-let fold_pos f (t:t) a = f t a 
+let fold_pos_opt fold_pos f a acc =
+  match a with
+  | None -> acc
+  | Some b -> fold_pos f b acc
 
-let fold_pos_annoted fold_pos' f (a,t) acc
-= fold_pos' f a (fold_pos f t acc)
+let fold_pos_list fold_pos f t a =
+  List.fold_left (fun a elt -> fold_pos f elt a) a t
 
-let fold_pos_flat _ _ a = a 
-let fold_pos_opt fold_pos f a acc = 
-match a with 
-| None -> acc 
-| Some b -> fold_pos f b acc 
-let fold_pos_list fold_pos f t a = 
-  List.fold_left 
-    (fun a elt -> fold_pos f elt a) 
-    a t 
-
-let fold_pos_pair fold_posa fold_posb f (a,b) acc = 
+let fold_pos_pair fold_posa fold_posb f (a, b) acc =
   fold_posb f b (fold_posa f a acc)

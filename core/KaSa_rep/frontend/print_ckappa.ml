@@ -242,27 +242,30 @@ let print_counter parameter error counter =
     (print_counter_default c.counter_sig_min)
     c.Counters_info.counter_sig_default*)
 
-
- let string_of_min a = 
-  match a with 
-  | None -> "" 
+let string_of_min a =
+  match a with
+  | None -> ""
   | Some None -> "-oo"
-  | Some Some i -> Format.sprintf "%d" i    
+  | Some (Some i) -> Format.sprintf "%d" i
 
-   let string_of_max a = 
-  match a with 
-  | None -> "" 
+let string_of_max a =
+  match a with
+  | None -> ""
   | Some None -> "+oo"
-  | Some Some i -> Format.sprintf "%d" i    
+  | Some (Some i) -> Format.sprintf "%d" i
 
-
-  let print_counter_sig parameter error (counter:Ckappa_sig.counter_sig) =
-    let () = Loggers.fprintf
+let print_counter_sig parameter error (counter : Ckappa_sig.counter_sig) =
+  let () =
+    Loggers.fprintf
       (Remanent_parameters.get_logger parameter)
-      "%s(%s,%s)%i" counter.Ckappa_sig.counter_sig_name (string_of_min counter.Ckappa_sig.counter_sig_min) (string_of_max counter.Ckappa_sig.counter_sig_max) counter.Ckappa_sig.counter_sig_default 
-  in error 
-  
-  (*let _ =
+      "%s(%s,%s)%i" counter.Ckappa_sig.counter_sig_name
+      (string_of_min counter.Ckappa_sig.counter_sig_min)
+      (string_of_max counter.Ckappa_sig.counter_sig_max)
+      counter.Ckappa_sig.counter_sig_default
+  in
+  error
+
+(*let _ =
     match counter.Ckappa_sig.counter_test with
     | Some (Ckappa_sig.CEQ n) ->
       Loggers.fprintf
@@ -332,7 +335,7 @@ let print_interface parameter error interface =
   in
   aux error false interface
 
-  let print_interface_sig parameter error interface =
+let print_interface_sig parameter error interface =
   let rec aux error bool interface =
     match interface with
     | Ckappa_sig.EMPTY_INTF -> error

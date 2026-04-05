@@ -913,8 +913,8 @@ let diff_pos_guard diff_pos (a : 'a guard) a' l =
 let fold_pos_link fold_pos fold_pos' f (lnk : ('a, 'b) link) l =
   match lnk with
   | ANY_FREE | LNK_FREE | LNK_ANY | LNK_SOME -> l
-  | LNK_VALUE (_, a) -> fold_pos' f a  l
+  | LNK_VALUE (_, a) -> fold_pos' f a l
   | LNK_TYPE (a, b) -> fold_pos f b (fold_pos f a l)
- 
+
 let fold_pos_guard fold_pos f (a : 'a guard) l =
   Logical_formulae.fold_pos (Loc.fold_pos_annoted fold_pos) f a l

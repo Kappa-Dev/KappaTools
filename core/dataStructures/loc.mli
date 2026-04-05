@@ -135,14 +135,17 @@ val diff_pos_opt : 'a diff_pos -> 'a option diff_pos
 val diff_pos_list : 'a diff_pos -> 'a list diff_pos
 val diff_pos_pair : 'a diff_pos -> 'b diff_pos -> ('a * 'b) diff_pos
 val diff_pos_empty : (t * t) list
-val remove_pos_empty: t list 
+val remove_pos_empty : t list
 val fun_of_list : (t * t) list -> t -> t option
-val set_of_list : t list -> t -> bool 
+val set_of_list : t list -> t -> bool
 
-type ('a,'b) fold_pos = (t -> 'b -> 'b) -> 'a -> 'b -> 'b  
-val fold_pos : (t,'a) fold_pos
-val fold_pos_annoted : ('a,'b) fold_pos -> ('a annoted, 'b) fold_pos
-val fold_pos_flat : ('a,'b) fold_pos
-val fold_pos_opt : ('a,'b) fold_pos -> ('a option,'b) fold_pos
-val fold_pos_list : ('a,'b) fold_pos -> ('a list,'b) fold_pos
-val fold_pos_pair : ('a,'b) fold_pos -> ('c,'b) fold_pos -> ('a * 'c, 'b) fold_pos
+type ('a, 'b) fold_pos = (t -> 'b -> 'b) -> 'a -> 'b -> 'b
+
+val fold_pos : (t, 'a) fold_pos
+val fold_pos_annoted : ('a, 'b) fold_pos -> ('a annoted, 'b) fold_pos
+val fold_pos_flat : ('a, 'b) fold_pos
+val fold_pos_opt : ('a, 'b) fold_pos -> ('a option, 'b) fold_pos
+val fold_pos_list : ('a, 'b) fold_pos -> ('a list, 'b) fold_pos
+
+val fold_pos_pair :
+  ('a, 'b) fold_pos -> ('c, 'b) fold_pos -> ('a * 'c, 'b) fold_pos

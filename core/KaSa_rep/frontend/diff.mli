@@ -1,14 +1,26 @@
 type ('rule, 'init, 'agent_sig) summary_file
 type ('rule, 'init, 'agent_sig) summary
 
+val empty_summary : ('rule, 'init, 'agent_sig) summary
+
+val update_file :
+  filename:string ->
+  ('rule, 'init, 'agent_sig) summary_file ->
+  ('rule, 'init, 'agent_sig) summary ->
+  ('rule, 'init, 'agent_sig) summary
+
 type diff_elt = {
   new_elt: int list;
   removed_elt: int list;
   pos_renaming: (Loc.t * Loc.t) list;
-  pos_removing: Loc.t list ;
+  pos_removing: Loc.t list;
 }
 
-type diff = { diff_rules: diff_elt; diff_init: diff_elt ; diff_agent_sig: diff_elt }
+type diff = {
+  diff_rules: diff_elt;
+  diff_init: diff_elt;
+  diff_agent_sig: diff_elt;
+}
 
 type new_indexs = {
   next_rule: Ckappa_sig.c_rule_id;
@@ -32,8 +44,8 @@ val summarize_from_ast :
   Ast.parsing_compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * ( Ast.rule Ast.compil_rule,
-      (Ast.mixture, Ast.mixture, string) Ast.init_statement, 
-      Ast.agent_sig)
+      (Ast.mixture, Ast.mixture, string) Ast.init_statement,
+      Ast.agent_sig )
     summary
 
 val summarize_from_ckappa :
@@ -41,14 +53,20 @@ val summarize_from_ckappa :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * (Ckappa_sig.enriched_rule, Ckappa_sig.enriched_init, (Ckappa_sig.agent_sig Loc.annoted)) summary
+  * ( Ckappa_sig.enriched_rule,
+      Ckappa_sig.enriched_init,
+      Ckappa_sig.agent_sig Loc.annoted )
+    summary
 
 val summarize_from_cckappa :
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.compil ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * (Cckappa_sig.enriched_rule, Cckappa_sig.enriched_init, Cckappa_sig.agent_sig) summary
+  * ( Cckappa_sig.enriched_rule,
+      Cckappa_sig.enriched_init,
+      Cckappa_sig.agent_sig )
+    summary
 
 val dump_summary :
   Remanent_parameters_sig.parameters ->
@@ -83,10 +101,10 @@ val is_new_agent_sig :
 val diff :
   'rule Loc.diff_pos ->
   'init Loc.diff_pos ->
-  'agent_sig Loc.diff_pos -> 
-   ('rule,Loc.t list) Loc.fold_pos ->
-  ('init,Loc.t list) Loc.fold_pos ->
-  ('agent_sig,Loc.t list) Loc.fold_pos -> 
+  'agent_sig Loc.diff_pos ->
+  ('rule, Loc.t list) Loc.fold_pos ->
+  ('init, Loc.t list) Loc.fold_pos ->
+  ('agent_sig, Loc.t list) Loc.fold_pos ->
   Remanent_parameters_sig.parameters ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   before:('rule, 'init, 'agent_sig) summary ->
@@ -109,7 +127,7 @@ val get_file :
   * ('rule, 'init, 'agent_sig) summary_file
 
 val renaming_of_diff : diff -> Loc.t -> Loc.t option
-val remove_of_diff : diff -> Loc.t -> bool 
+val remove_of_diff : diff -> Loc.t -> bool
 val cut : diff -> Ast.parsing_compil -> Ast.parsing_compil
 
 val get_new_indexs :
