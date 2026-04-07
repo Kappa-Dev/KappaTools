@@ -228,7 +228,7 @@ for MODEL in "${MODELS[@]}"; do
         fi
         
         # choose 10 random rules to be added to the working set
-        random_rules=$(shuf -i 0-$NR_RULES_MODEL -n "$NR_RULES" | paste -s -d ',')
+        random_rules=$(paste -s -d ',' <(shuf -i 0-$NR_RULES_MODEL -n "$NR_RULES"))
 
         if $VERBOSE; then 
             echo "Random list of rules that are in the working set: $random_rules"
@@ -269,7 +269,7 @@ for MODEL in "${MODELS[@]}"; do
             printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
             printf '\n'
         fi
-        { cat "$INPUT_INCREMENTAL_TMP" | ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_DECREMENTAL"
+        { cat "$INPUT_INCREMENTAL_TMP"| ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_DECREMENTAL"
         EXIT_STATUS=$?
 
         # Check if the program was killed by timeout
@@ -318,10 +318,10 @@ for MODEL in "${MODELS[@]}"; do
         --remove-rules "$last_element"
         )
         if $VERBOSE; then
-            printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
+            printf '%q ' cat "$INPUT_INCREMENTAL_TMP"'|' "${cmd[@]}"
             printf '\n'
         fi
-        { cat "$INPUT_INCREMENTAL_TMP" | ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_INCREMENTAL"
+        { cat "$INPUT_INCREMENTAL_TMP"| ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_INCREMENTAL"
         EXIT_STATUS=$?
 
         # Check if the program was killed by timeout
