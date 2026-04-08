@@ -32,6 +32,10 @@
  raise
           (ExceptionDefn.Malformed_Decl
              ("The mod component is not consistent (lhs/rhs compilation).",e))
+  let fail_mixture_error_mod_compilation e _  = 
+ raise
+          (ExceptionDefn.Malformed_Decl
+             ("The mod component is not consistent (mixture compilation).",e))
 
 let fail_with_two_occurrences_of_a_site _ site = 
  raise
@@ -63,11 +67,16 @@ let fail_with_two_occurrences_of_a_site _ site =
        raise
           (ExceptionDefn.Malformed_Decl
              ("Internal states should not be updated in a created agent",e))
-             
+
+  let fail_with_missing_agent_in_mixture e = 
+        raise
+          (ExceptionDefn.Malformed_Decl
+             ("Missing agents are not allowed in mixtures",e))
   let rec check_list get_pos_elt check_elt e a = 
     match a with 
     | [] -> () 
-    | a::b -> let () = check_elt (get_pos_elt e a) a in check_list get_pos_elt check_elt e b 
+    | a::b -> let () = check_elt ((get_pos_elt e a):Loc.t) a in 
+              check_list get_pos_elt check_elt e b 
 
   let rec check_list2 get_pos_elt check_elt_lhs check_elt_rhs check_elt_both e a b = 
     match a,b with 
@@ -76,7 +85,13 @@ let fail_with_two_occurrences_of_a_site _ site =
     | [],l -> check_list get_pos_elt check_elt_rhs e l 
     | a::b, c::d -> let () = check_elt_both (get_pos_elt e a) a  c in 
                     check_list2 get_pos_elt check_elt_lhs check_elt_rhs check_elt_both e b d 
+  let check_gen_opt check e a = 
+    match a with 
+    | None -> ()
+    | Some a -> check e a 
 
+  let check_gen_annoted check _ (a,pos) = ((check pos a): unit)
+  
   let check_agent_name e (a,posa) (b,posb) = 
       if a=b then () 
       else fail_with_agent_name_mismatch e posa posb 
@@ -219,55 +234,122 @@ let fail_with_two_occurrences_of_a_site _ site =
   let check_rule_line  = 
       check_list2 get_pos_agent fail_missing_agent fail_missing_agent check_agent_both 
     
-  let check_rule =
+  let _get_pos_parametric_agent _ agent_sig = 
+    match agent_sig with 
+      | Ast.Absent pos -> pos 
+      | Ast.Present ((_,pos),_,_) -> pos 
+
+
+
+  let get_pos_sentence e a = 
+  match a with 
+  | Ast.RULE (_,_,(_,pos),_)  
+  | Ast.GUARD_PARAM ((_,pos),_) 
+  | Ast.TOKENSIG (_,pos)  
+  | Ast.PLOT (_,pos) 
+  | Ast.PERT (_,pos) -> pos    
+  | Ast.SIG _ 
+  | Ast.CONFIG _ 
+  | Ast.VOLSIG _ 
+  | Ast.INIT _ 
+  | Ast.OBS _ | Ast.DECLARE _ 
+  | Ast.CONFLICT _ 
+  | Ast.SEQUENTIAL_BOND _ -> e 
+
+  let check_rule_hs =
       check_list2 get_pos_rule_line fail_missing_rule_line fail_missing_rule_line  check_rule_line   
 
-  let get_pos_sentence e _a = e (* TO DO *)
-  let check_sentence _e sentence = 
-    match sentence with 
-     | Ast.RULE (_, _, (rule,pos), _) -> 
-          let () = match rule.Ast.rewrite with 
-          | Ast.Edit _ -> () (* TO DO *)
-          | Ast.Arrow rule  -> check_rule pos rule.Ast.lhs rule.Ast.rhs 
-          in () 
-     | SIG _|TOKENSIG _ |VOLSIG _ 
-     | INIT _ 
-     | DECLARE _ 
-    | OBS _ 
-    | PLOT _ 
-    | PERT _ 
-    | CONFIG _ 
-    |GUARD_PARAM _ 
-    | CONFLICT _ 
-    | SEQUENTIAL_BOND _ -> () (* TO DO *)
-     (*| LABEL annoted EQUAL annoted alg_expr
-    { let (v,_,_) = $5 in add (Ast.DECLARE (($1,rhs_pos 1),v)) }
-  | rule { let guard,rule = $1 in add (Ast.RULE (None, guard, rule, false)) }
-  | WORKING_SET annoted OP_BRA annoted working_set CL_BRA annoted {}
-  | SIGNATURE annoted agent_sig { let (a,_,_) = $3 in add (Ast.SIG a) }
-  | SIGNATURE annoted error
-    { raise
-        (ExceptionDefn.Syntax_Error (add_pos 3 "Malformed agent signature")) }
-  | TOKEN annoted ID annoted { add (Ast.TOKENSIG ($3,rhs_pos 3)) }
-  | PLOT annoted alg_expr { let (v,_,_) = $3 in add (Ast.PLOT v) }
-  | PLOT annoted error
-    { raise (ExceptionDefn.Syntax_Error
-               (add_pos 3
-                  "Malformed plot instruction, \
-an algebraic expression is expected")) }
-  | LET annoted variable_declaration
-    { let (i,v,_,_) = $3 in add (Ast.DECLARE (i,v)) }
-  | OBS annoted variable_declaration { let (i,v,_,_) = $3 in add (Ast.OBS (i,v)) }
-  | INIT annoted init_with_guard
-    { let (guard,alg,init) = $3 in add (Ast.INIT ((guard,alg,init),false)) }
-  | PERT perturbation_declaration { add (Ast.PERT ($2, rhs_pos 2)) }
-  | CONFIG annoted STRING annoted value_list
-    { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }
-  | GUARD_PARAM annoted ID annoted boolean annoted { add (Ast.GUARD_PARAM (($3,rhs_pos 3), $5)) }
-  | CONFLICT annoted ID annoted ID annoted ID annoted { add (Ast.CONFLICT (($3,rhs_pos 3), ($5,rhs_pos 5), ($7,rhs_pos 7))) }
-  | SEQUENTIAL_BOND annoted ID annoted ID annoted ID annoted { add (Ast.SEQUENTIAL_BOND (($3,rhs_pos 3), ($5,rhs_pos 5), ($7,rhs_pos 7))) }
-  ;*)
-   (* TO DO *)
+  let check_rule _e (rule,pos) =
+     let () = 
+     match rule.Ast.rewrite with 
+        | Ast.Edit _ -> () (* TO DO *)
+        | Ast.Arrow rule  -> check_rule_hs pos rule.Ast.lhs rule.Ast.rhs 
+    in () 
+
+
+  let check_mixture  = check_list (fun e _ -> e) (check_list (fun e _ -> e) (fun e ag -> match ag with Ast.Absent pos -> fail_with_missing_agent_in_mixture pos
+             | Ast.Present(a,b,Ast.NoMod) -> check_agent_rhs e (a,b)
+             | Ast.Present(_,_,(Ast.Create | Ast.Erase)) -> 
+             fail_mixture_error_mod_compilation e ag ))
+
+
+let check_expr e a =
+      Alg_expr.fold_on_mixture 
+        (fun () (a:Ast.mixture) -> check_mixture e a) 
+        () a 
+ let check_bexpr e a = 
+    Alg_expr.fold_bool_on_mixture  (fun () (a:Ast.mixture) -> check_mixture e a) () a 
+  
+  let check_print_expr e a = 
+    match a with 
+    | Primitives.Str_pexpr _ -> () 
+    | Primitives.Alg_pexpr expr -> check_expr e expr
+
+  let check_modif_expr e a = 
+    match a with 
+    | Ast.APPLY (expr, rule) -> 
+      let () = check_expr e expr in 
+      check_rule e rule 
+    | Ast.UPDATE (_,expr) -> check_expr e expr   
+    | Ast.CFLOWMIX (_, mixture) -> 
+        check_gen_annoted check_mixture e mixture 
+    | Ast.DINOFF l
+    | Ast.DIN (_,l) 
+    | Ast.SNAPSHOT (_,l) 
+    | Ast.STOP l -> 
+        check_list (fun e _ -> e) check_print_expr e l 
+    | Ast.PRINT(l,l') -> 
+      let () =  check_list (fun e _ -> e) check_print_expr e l in 
+       check_list (fun e _ -> e) check_print_expr e l'
+    | Ast.SPECIES_OF (_, l, mixture) -> 
+       let () =  check_list (fun e _ -> e) check_print_expr e l in 
+       check_gen_annoted check_mixture e mixture 
+    | Ast.CFLOWLABEL _ 
+    | Ast.PLOTENTRY -> ()  
+
+  let check_init _e i = 
+    match i with 
+    | Ast.INIT_MIX ((mix:Ast.mixture),pos) -> check_mixture pos mix 
+    | Ast.INIT_TOK _ -> () 
+
+
+
+
+ 
+
+
+  
+  let check_var_def e (_,a) = check_expr e a 
+  let check_pert e (_,b,expr,b') =
+    let () = check_gen_opt check_bexpr e b in
+    let () = check_list 
+              (fun e _ -> e) 
+              (check_modif_expr) 
+                  e expr in    
+    let () = check_gen_opt check_bexpr e b' in  
+    () 
+
+let check_init_statement e (_,expr,i) = 
+    let () = check_expr e expr in 
+    let () = check_init e i in 
+    () 
+
+  let check_sentence e sentence = 
+    match (sentence:Ast.parsing_instruction) with 
+     | Ast.RULE (_,_,rule,_) -> check_rule e rule 
+     | Ast.INIT (init_statement,_) -> 
+            check_init_statement e init_statement   
+     | Ast.SIG _ 
+     | Ast.TOKENSIG _  | Ast.VOLSIG _ -> ()    
+     | Ast.DECLARE var_def 
+     | Ast.OBS var_def  -> check_var_def e var_def 
+     | Ast.PLOT plot -> check_expr e plot 
+     | Ast.PERT (pert,pos) -> check_pert pos pert 
+     | Ast.CONFIG _ 
+     | Ast.GUARD_PARAM _ 
+     | Ast.CONFLICT _ 
+     | Ast.SEQUENTIAL_BOND _ -> () 
+
   let check_body = check_list get_pos_sentence check_sentence 
 %}
 
