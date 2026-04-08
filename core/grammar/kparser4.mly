@@ -42,6 +42,15 @@ let fail_with_two_occurrences_of_a_site _ site =
           (ExceptionDefn.Malformed_Decl
              ((Format.sprintf "The site %s occurs several times in the interface." (fst site),(snd site))))
 
+  let fail_with_more_than_two_occ_of_a_binding_site e i = 
+      raise
+          (ExceptionDefn.Malformed_Decl
+             (Format.sprintf "This mixture contains more than two occurrences of the binding label %i" i,e))
+
+  let fail_with_dangling_bond e i = 
+      raise
+          (ExceptionDefn.Malformed_Decl
+             (Format.sprintf "This mixture contains only one occurrence of the binding label %i" i,e)) 
 
   let fail_with_site_mismatch e _ _  = 
        raise
@@ -53,6 +62,17 @@ let fail_with_two_occurrences_of_a_site _ site =
        raise
           (ExceptionDefn.Malformed_Decl
              ((Format.sprintf "Counter should not be updated in the lhs of a rule.",e)))
+  
+   let fail_with_missing_lnk_state e   = 
+       raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "Lnk state is missing in a site.",e)))
+
+   let fail_with_several_lnk_states e   = 
+       raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "Several Lnk states in a site.",e)))
+  
   let fail_with_bad_counter_test e   = 
        raise
           (ExceptionDefn.Malformed_Decl
@@ -216,16 +236,16 @@ let fail_with_two_occurrences_of_a_site _ site =
   let check_agent_both e lhs rhs = 
     match lhs, rhs with 
     | Ast.Absent _, Ast.Absent _-> () 
-    | Ast.Absent _, Ast.Present ((b,posb),intb,Ast.Create) -> 
+    | Ast.Absent _, Ast.Present ((b,posb),intb,(Ast.Create | Ast.NoMod)) -> 
         check_agent_rhs e ((b,posb),intb)
-    | Ast.Present ((b,posb),intb,Ast.Erase) , Ast.Absent _ -> 
+    | Ast.Present ((b,posb),intb,(Ast.Erase | Ast.NoMod)) , Ast.Absent _ -> 
         check_agent_lhs e ((b,posb),intb)
     | Ast.Present ((a,posa),inta, Ast.NoMod), Ast.Present ((b,posb),intb,Ast.NoMod) -> 
       let () = check_agent_name e (a,posa) (b,posb) in 
       let () = check_interface_both e inta intb in 
       () 
     | Ast.Present (_,_,(Ast.Create | Ast.Erase | Ast.NoMod)), _ 
-    | _, Ast.Present (_,_,(Ast.Erase | Ast.NoMod)) -> 
+    | _, Ast.Present (_,_,(Ast.Erase)) -> 
       fail_lhs_rhs_error_mod_compilation e lhs rhs  
   
   let get_pos_agent e _a = e
@@ -259,18 +279,62 @@ let fail_with_two_occurrences_of_a_site _ site =
   let check_rule_hs =
       check_list2 get_pos_rule_line fail_missing_rule_line fail_missing_rule_line  check_rule_line   
 
+
+  let deal_with_port e acc port = 
+    match port.Ast.port_link with 
+    | [ (ANY_FREE | LNK_FREE | LNK_ANY | LNK_SOME | LNK_TYPE _) ,_ ] -> acc 
+    | [ LNK_VALUE (i, _),_ ] -> i::acc 
+    | [] -> 
+      fail_with_missing_lnk_state e 
+    | (_,e)::_::_ -> fail_with_several_lnk_states e 
+
+  let deal_with_site e acc site = 
+    match site with 
+      | Ast.Port a  -> deal_with_port e acc a 
+      | Ast.Counter _ ->  acc 
+
+  let deal_with_agent e acc ag = 
+    match ag with 
+    | Ast.Absent _ -> acc 
+    | Ast.Present(_,(interface:'a Ast.site list),_) ->
+        List.fold_left (deal_with_site e) acc interface 
+
+  let gather_binding_labels e a = 
+    List.fold_left 
+        (List.fold_left (deal_with_agent e))
+        [] a  
+
+  let check_binding_labels e a = 
+   let l = gather_binding_labels e a in 
+    let l = List.sort compare l in 
+    let rec aux l = 
+      match l with 
+        | [] -> ()
+        | (a:int)::b::c::_ when a=b && a=c -> 
+            fail_with_more_than_two_occ_of_a_binding_site e a 
+        | a::b::tail when a=b -> aux tail 
+        | a::_ -> fail_with_dangling_bond e a
+    in aux l 
+  
+
   let check_rule _e (rule,pos) =
      let () = 
      match rule.Ast.rewrite with 
         | Ast.Edit _ -> () (* TO DO *)
-        | Ast.Arrow rule  -> check_rule_hs pos rule.Ast.lhs rule.Ast.rhs 
+        | Ast.Arrow rule  -> 
+          let () = check_rule_hs pos rule.Ast.lhs rule.Ast.rhs in 
+          let () = check_binding_labels pos rule.Ast.lhs in 
+          let () = check_binding_labels pos rule.Ast.rhs in 
+          ()
     in () 
-
-
-  let check_mixture  = check_list (fun e _ -> e) (check_list (fun e _ -> e) (fun e ag -> match ag with Ast.Absent pos -> fail_with_missing_agent_in_mixture pos
+let check_mixture e a = 
+    let () = 
+        check_list (fun e _ -> e) (check_list (fun e _ -> e) (fun e ag -> match ag with Ast.Absent pos -> fail_with_missing_agent_in_mixture pos
              | Ast.Present(a,b,Ast.NoMod) -> check_agent_rhs e (a,b)
              | Ast.Present(_,_,(Ast.Create | Ast.Erase)) -> 
-             fail_mixture_error_mod_compilation e ag ))
+             fail_mixture_error_mod_compilation e ag )) e a 
+    in 
+    check_binding_labels e a 
 
 
 let check_expr e a =
