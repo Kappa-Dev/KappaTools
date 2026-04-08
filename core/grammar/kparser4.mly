@@ -10,6 +10,7 @@
   let add_pos e x =
     (x,
     Loc.of_pos (Parsing.symbol_start_pos ()) (Parsing.rhs_end_pos e))
+
   let rhs_pos i =
     Loc.of_pos (Parsing.rhs_start_pos i) (Parsing.rhs_end_pos i)
   let end_pos = Parsing.rhs_end_pos
@@ -19,6 +20,255 @@
   let add x = internal_memory := x :: !internal_memory
   let output () =
     let o = List.rev !internal_memory in let () = internal_memory := [] in o
+
+  let fail_lhs_rhs_mismatch e _ = 
+    raise
+          (ExceptionDefn.Malformed_Decl
+             ("Left hand side/right hand side agent mismatch",e))
+  let fail_missing_agent = fail_lhs_rhs_mismatch 
+  let fail_missing_rule_line = fail_lhs_rhs_mismatch
+   
+  let fail_lhs_rhs_error_mod_compilation e _ _ = 
+ raise
+          (ExceptionDefn.Malformed_Decl
+             ("The mod component is not consistent (lhs/rhs compilation).",e))
+
+let fail_with_two_occurrences_of_a_site _ site = 
+ raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "The site %s occurs several times in the interface." (fst site),(snd site))))
+
+
+  let fail_with_site_mismatch e _ _  = 
+       raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "Left hand side/right hand side site mismatch",e)))
+  let fail_with_agent_name_mismatch a b _ = fail_lhs_rhs_mismatch a b    
+
+  let fail_with_bad_counter_delta e   = 
+       raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "Counter should not be updated in the lhs of a rule.",e)))
+  let fail_with_bad_counter_test e   = 
+       raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "Counter should not be tested in the rhs of a rule.",e)))
+
+   let fail_with_bad_site_state_modification e   = 
+       raise
+          (ExceptionDefn.Malformed_Decl
+             ("Internal states should not be updated in the lhs of a rule.",e))
+
+   let fail_with_bad_site_state_modification_in_creation e   = 
+       raise
+          (ExceptionDefn.Malformed_Decl
+             ("Internal states should not be updated in a created agent",e))
+             
+  let rec check_list get_pos_elt check_elt e a = 
+    match a with 
+    | [] -> () 
+    | a::b -> let () = check_elt (get_pos_elt e a) a in check_list get_pos_elt check_elt e b 
+
+  let rec check_list2 get_pos_elt check_elt_lhs check_elt_rhs check_elt_both e a b = 
+    match a,b with 
+    | [],[] -> () 
+    | l,[] -> check_list get_pos_elt check_elt_lhs e l
+    | [],l -> check_list get_pos_elt check_elt_rhs e l 
+    | a::b, c::d -> let () = check_elt_both (get_pos_elt e a) a  c in 
+                    check_list2 get_pos_elt check_elt_lhs check_elt_rhs check_elt_both e b d 
+
+  let check_agent_name e (a,posa) (b,posb) = 
+      if a=b then () 
+      else fail_with_agent_name_mismatch e posa posb 
+
+  let check_counter_lhs loc a = 
+    if fst a.Ast.counter_delta = 0 
+    then () 
+    else fail_with_bad_counter_delta loc 
+  let check_counter_rhs loc a = 
+    if a.Ast.counter_test = None 
+    then () 
+    else fail_with_bad_counter_test loc 
+
+  let check_port_int _e _a = ()
+  let check_port_link _e _a = ()
+  let check_port_lhs e a = 
+    if a.Ast.port_int_mod = None && a.Ast.port_link_mod = None 
+    then 
+      begin 
+        let () = check_port_int e a.Ast.port_int in 
+        check_port_link e a.Ast.port_link 
+      end 
+    else 
+      fail_with_bad_site_state_modification e 
+   
+
+  let check_port_rhs e a = 
+    if a.Ast.port_int_mod = None && a.Ast.port_link_mod = None 
+    then 
+      begin 
+        let () = check_port_int e a.Ast.port_int in 
+        check_port_link e a.Ast.port_link 
+      end 
+    else 
+      fail_with_bad_site_state_modification_in_creation e 
+  
+  let check_port_both e sa sb = 
+      let () = check_port_lhs e sa in 
+      let () = check_port_rhs e sb in 
+      ()
+      (* TO DO *)
+      
+  
+  let sort_interface = 
+   List.sort 
+        (fun x y -> 
+        match x,y with Ast.Port a,Port b -> compare (fst a.port_name) (fst b.port_name) 
+           | Ast.Counter a,Ast.Counter b ->  compare (fst a.Ast.counter_name) (fst b.Ast.counter_name) 
+           | Ast.Port _,Ast.Counter _  -> -1 
+           | Ast.Counter _, Ast.Port _ -> 1)
+  
+
+  let check_interface_gen check_port check_counter e inta = 
+    let inta = sort_interface inta in 
+    let check_elt e a former = 
+       match a with 
+      | Ast.Port a when (Some (fst a.Ast.port_name)) =  former ->  fail_with_two_occurrences_of_a_site e a.Ast.port_name 
+      | Ast.Counter a when (Some (fst a.Ast.counter_name)) =  former ->  
+       fail_with_two_occurrences_of_a_site e a.Ast.counter_name 
+      | Ast.Port a -> 
+      let () = check_port e a in 
+      Some (fst a.Ast.port_name)  
+      | Ast.Counter a -> 
+      let () = check_counter e a 
+      in Some (fst a.Ast.counter_name)  
+    in 
+    let rec aux e inta former =   
+      match inta with 
+      | a::a' -> 
+        let former = check_elt e a former in 
+        aux e a' former 
+      | [] -> () 
+  in aux e inta None 
+  
+  let check_interface_lhs = check_interface_gen check_port_lhs check_counter_lhs
+  let check_interface_rhs = check_interface_gen check_port_rhs check_counter_rhs 
+  
+
+  let check_interface_both e inta intb = 
+    let inta = sort_interface inta in 
+    let intb = sort_interface intb in 
+    let check_elt e a b former = 
+       match a, b with 
+      | Ast.Port a, Ast.Port b ->  
+        begin 
+        if fst a.Ast.port_name = fst b.Ast.port_name then 
+           if (Some (fst a.Ast.port_name)) =  former then 
+              fail_with_two_occurrences_of_a_site e a.Ast.port_name 
+            else 
+              let () = check_port_both e a b in 
+              Some (fst (a.Ast.port_name))
+        else fail_with_site_mismatch e a.Ast.port_name b.Ast.port_name 
+        end
+      | Ast.Counter a, Ast.Counter b -> 
+        begin 
+        if fst a.Ast.counter_name = fst b.Ast.counter_name then 
+        if (Some (fst a.Ast.counter_name)) = former then 
+          fail_with_two_occurrences_of_a_site e a.Ast.counter_name
+          else 
+          let () = check_counter_lhs e a in 
+          let () = check_counter_rhs e b in 
+          Some (fst a.Ast.counter_name)
+          else fail_with_site_mismatch e a.Ast.counter_name b.Ast.counter_name
+        end 
+      | Ast.Port a, Ast.Counter b -> fail_with_site_mismatch e a.Ast.port_name b.Ast.counter_name 
+      | Ast.Counter a, Ast.Port b  -> 
+      fail_with_site_mismatch e a.Ast.counter_name b.Ast.port_name 
+  in 
+  let rec aux e (inta:Ast.counter Ast.site list) intb former =   
+      match inta, intb with 
+      | a::a',b::b' -> 
+        let former = check_elt e a b former in 
+        aux e a' b' former 
+      | [], [] -> () 
+      | _::_, [] | [],_::_-> fail_with_site_mismatch e  inta intb 
+  in aux e inta intb None 
+  
+  let check_agent_lhs e (_,intf) = 
+    check_interface_lhs e intf  
+  let check_agent_rhs e (_,intf) = 
+    check_interface_rhs e intf 
+  let check_agent_both e lhs rhs = 
+    match lhs, rhs with 
+    | Ast.Absent _, Ast.Absent _-> () 
+    | Ast.Absent _, Ast.Present ((b,posb),intb,Ast.Create) -> 
+        check_agent_rhs e ((b,posb),intb)
+    | Ast.Present ((b,posb),intb,Ast.Erase) , Ast.Absent _ -> 
+        check_agent_lhs e ((b,posb),intb)
+    | Ast.Present ((a,posa),inta, Ast.NoMod), Ast.Present ((b,posb),intb,Ast.NoMod) -> 
+      let () = check_agent_name e (a,posa) (b,posb) in 
+      let () = check_interface_both e inta intb in 
+      () 
+    | Ast.Present (_,_,(Ast.Create | Ast.Erase | Ast.NoMod)), _ 
+    | _, Ast.Present (_,_,(Ast.Erase | Ast.NoMod)) -> 
+      fail_lhs_rhs_error_mod_compilation e lhs rhs  
+  
+  let get_pos_agent e _a = e
+
+  let get_pos_rule_line e _a = e 
+  let check_rule_line  = 
+      check_list2 get_pos_agent fail_missing_agent fail_missing_agent check_agent_both 
+    
+  let check_rule =
+      check_list2 get_pos_rule_line fail_missing_rule_line fail_missing_rule_line  check_rule_line   
+
+  let get_pos_sentence e _a = e (* TO DO *)
+  let check_sentence _e sentence = 
+    match sentence with 
+     | Ast.RULE (_, _, (rule,pos), _) -> 
+          let () = match rule.Ast.rewrite with 
+          | Ast.Edit _ -> () (* TO DO *)
+          | Ast.Arrow rule  -> check_rule pos rule.Ast.lhs rule.Ast.rhs 
+          in () 
+     | SIG _|TOKENSIG _ |VOLSIG _ 
+     | INIT _ 
+     | DECLARE _ 
+    | OBS _ 
+    | PLOT _ 
+    | PERT _ 
+    | CONFIG _ 
+    |GUARD_PARAM _ 
+    | CONFLICT _ 
+    | SEQUENTIAL_BOND _ -> () (* TO DO *)
+     (*| LABEL annoted EQUAL annoted alg_expr
+    { let (v,_,_) = $5 in add (Ast.DECLARE (($1,rhs_pos 1),v)) }
+  | rule { let guard,rule = $1 in add (Ast.RULE (None, guard, rule, false)) }
+  | WORKING_SET annoted OP_BRA annoted working_set CL_BRA annoted {}
+  | SIGNATURE annoted agent_sig { let (a,_,_) = $3 in add (Ast.SIG a) }
+  | SIGNATURE annoted error
+    { raise
+        (ExceptionDefn.Syntax_Error (add_pos 3 "Malformed agent signature")) }
+  | TOKEN annoted ID annoted { add (Ast.TOKENSIG ($3,rhs_pos 3)) }
+  | PLOT annoted alg_expr { let (v,_,_) = $3 in add (Ast.PLOT v) }
+  | PLOT annoted error
+    { raise (ExceptionDefn.Syntax_Error
+               (add_pos 3
+                  "Malformed plot instruction, \
+an algebraic expression is expected")) }
+  | LET annoted variable_declaration
+    { let (i,v,_,_) = $3 in add (Ast.DECLARE (i,v)) }
+  | OBS annoted variable_declaration { let (i,v,_,_) = $3 in add (Ast.OBS (i,v)) }
+  | INIT annoted init_with_guard
+    { let (guard,alg,init) = $3 in add (Ast.INIT ((guard,alg,init),false)) }
+  | PERT perturbation_declaration { add (Ast.PERT ($2, rhs_pos 2)) }
+  | CONFIG annoted STRING annoted value_list
+    { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }
+  | GUARD_PARAM annoted ID annoted boolean annoted { add (Ast.GUARD_PARAM (($3,rhs_pos 3), $5)) }
+  | CONFLICT annoted ID annoted ID annoted ID annoted { add (Ast.CONFLICT (($3,rhs_pos 3), ($5,rhs_pos 5), ($7,rhs_pos 7))) }
+  | SEQUENTIAL_BOND annoted ID annoted ID annoted ID annoted { add (Ast.SEQUENTIAL_BOND (($3,rhs_pos 3), ($5,rhs_pos 5), ($7,rhs_pos 7))) }
+  ;*)
+   (* TO DO *)
+  let check_body = check_list get_pos_sentence check_sentence 
 %}
 
 %token EOF COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR OP_BRA CL_BRA AT SEMICOLON
@@ -489,7 +739,8 @@ rule_content:
   | rule_side arrow annoted rule_side
     { let (lhs,rm_token,_,_) = $1 in
       let (rhs,add_token,pend,an) = $4 in
-      (Ast.Arrow {Ast.lhs; Ast.rm_token; Ast.rhs; Ast.add_token},$2,pend,an) }
+       (Ast.Arrow {Ast.lhs; Ast.rm_token; Ast.rhs; Ast.add_token},$2,pend,an) 
+      }
   | rule_side arrow annoted
     { let (lhs,rm_token,_,_) = $1 in
       (Ast.Arrow {Ast.lhs; Ast.rm_token; Ast.rhs=[]; Ast.add_token=[]},$2,end_pos 2,$3) }
@@ -863,7 +1114,9 @@ model_body:
   ;
 
 model:
-  | annoted model_body { $2 }
+  | annoted model_body {let model = $2 in 
+                        let () = check_body (Loc.of_pos (Parsing.symbol_start_pos ())(end_pos 2)) model in 
+                        model}
   | error
     { raise (ExceptionDefn.Syntax_Error
                (add_pos 1 "Incorrect beginning of sentence !!!")) }
