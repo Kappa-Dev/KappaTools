@@ -92,6 +92,37 @@ let fail_with_two_occurrences_of_a_site _ site =
         raise
           (ExceptionDefn.Malformed_Decl
              ("Missing agents are not allowed in mixtures",e))
+
+  let fail_with_underspecified_binding_state_in_rhs s e = 
+        raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "The binding state of the site %s is not specified enough in the rhs" s),e))
+
+  let fail_with_underspecified_binding_state_in_lhs s e = 
+        raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "The binding state of the site %s is not specified enough in the lhs" s),e))
+
+  let fail_with_several_link_state s e = 
+      raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "Site %s has several binding states" s),e))
+
+let fail_with_underspecified_internal_state_in_rhs s e = 
+        raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "The internal state of the site %s is not specified enough in the rhs" s),e))
+
+  let fail_with_underspecified_internal_state_in_lhs s e = 
+        raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "The internal state of the site %s is not specified enough in the lhs" s),e))
+
+  let fail_with_several_internal_states s e = 
+      raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "Site %s has several internal states" s),e))
+
   let rec check_list get_pos_elt check_elt e a = 
     match a with 
     | [] -> () 
@@ -148,11 +179,70 @@ let fail_with_two_occurrences_of_a_site _ site =
     else 
       fail_with_bad_site_state_modification_in_creation e 
   
-  let check_port_both e sa sb = 
+  let syntax_version = Ast.V4 
+
+  let check_port_both e s sa sb = 
       let () = check_port_lhs e sa in 
       let () = check_port_rhs e sb in 
-      ()
-      (* TO DO *)
+      let () = match sa.Ast.port_link,sb.Ast.port_link with 
+    | [ (LKappa.LNK_ANY, _) ], [ (LKappa.LNK_ANY, _) ] 
+    | [ (LKappa.LNK_SOME, _) ], [ ((LKappa.LNK_SOME | LKappa.LNK_VALUE _) , _) ] 
+    | [ (LKappa.LNK_ANY, _) ], [ ((LKappa.LNK_FREE | LKappa.ANY_FREE | LKappa.LNK_VALUE _), _) ] 
+    | ( [ ((LKappa.LNK_SOME | LKappa.LNK_TYPE _), _) ],
+        [ ((LKappa.LNK_FREE | LKappa.ANY_FREE), _) ] ) 
+    | ( [ (LKappa.LNK_TYPE _, _) ],
+        [ (LKappa.LNK_VALUE _, _) ] )
+    | ( [ ((LKappa.LNK_FREE | LKappa.ANY_FREE), _) ],
+        [ ((LKappa.LNK_VALUE _ | LKappa.LNK_FREE | LKappa.ANY_FREE), _) ] ) 
+    | ( [ (LKappa.LNK_VALUE _, _) ],
+        [ ((LKappa.LNK_VALUE _ |LKappa.LNK_FREE | LKappa.ANY_FREE), _) ] ) -> () 
+  
+    | ( [
+          ( LKappa.LNK_TYPE ((dst_p'', _), (dst_ty'', _)),_);
+        ],
+        [ (LKappa.LNK_TYPE ((dst_p', _), (dst_ty', _)), _) ] )
+      when dst_p'' = dst_p' && dst_ty'' = dst_ty' -> () 
+    | [],[] -> ()   
+    | ( _,
+        ( [ (LKappa.LNK_ANY, pos) ]
+        | [ (LKappa.LNK_SOME, pos) ]
+        | [ (LKappa.LNK_TYPE _, pos) ] ) ) ->
+      fail_with_underspecified_binding_state_in_rhs s pos 
+
+    | [ ((LKappa.LNK_ANY | LKappa.LNK_SOME | LKappa.LNK_TYPE _ | LKappa.LNK_VALUE _), _) ], [] when syntax_version = Ast.V3 -> () 
+     | ( ([ ((LKappa.LNK_FREE | LKappa.ANY_FREE), _) ] | []),
+        ([ ((LKappa.LNK_FREE | LKappa.ANY_FREE), _) ] | []) )
+      when syntax_version = Ast.V3 -> () 
+     | [], [ (LKappa.LNK_VALUE _, _) ] when syntax_version = Ast.V3 -> () 
+    
+    | ( [
+          ( ( LKappa.LNK_VALUE _
+            | LKappa.LNK_FREE | LKappa.ANY_FREE
+            | LKappa.LNK_TYPE _
+            | LKappa.LNK_SOME | LKappa.LNK_ANY ),
+            pos );
+        ],
+        [] ) -> 
+        fail_with_underspecified_binding_state_in_rhs s pos 
+     
+    | [], [ ((LKappa.ANY_FREE | LKappa.LNK_FREE | LKappa.LNK_VALUE (_, _)), pos) ]
+      ->
+      fail_with_underspecified_binding_state_in_lhs s pos 
+
+    | _, _ :: (_, pos) :: _ 
+    | _ :: (_, pos) :: _, _ ->
+      fail_with_several_link_state s pos 
+      in 
+      match sa.Ast.port_int, sb.Ast.port_int with
+    | [], [] | [ (None, _) ], [ _ ] 
+    | [ (Some _, _) ], [ (Some _, _) ] -> () 
+    | [], [ (Some _, _) ] when syntax_version = Ast.V3 -> () 
+    | [], [ _, pos ] ->
+      fail_with_underspecified_internal_state_in_lhs s pos
+    | [ _,pos  ], ([ (None, _) ] | []) ->
+     fail_with_underspecified_internal_state_in_rhs s pos 
+    | _ :: (_, pos) :: _, _ | _, _ :: (_, pos) :: _ ->
+      fail_with_several_internal_states s pos 
       
   
   let sort_interface = 
@@ -201,7 +291,7 @@ let fail_with_two_occurrences_of_a_site _ site =
            if (Some (fst a.Ast.port_name)) =  former then 
               fail_with_two_occurrences_of_a_site e a.Ast.port_name 
             else 
-              let () = check_port_both e a b in 
+              let () = check_port_both e (fst a.Ast.port_name) a b in 
               Some (fst (a.Ast.port_name))
         else fail_with_site_mismatch e a.Ast.port_name b.Ast.port_name 
         end
