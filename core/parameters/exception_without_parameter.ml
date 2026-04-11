@@ -197,6 +197,9 @@ let rec stringlist_of_exception x stack =
     "Caught_exception(" :: stringlist_of_caught x (")" :: stack)
   | Uncaught_exception x ->
     "Uncaught_exception(" :: stringlist_of_uncaught x (")" :: stack)
+  | ExceptionDefn.Malformed_Decl (x,pos) ->  (x^Loc.to_string pos)::stack 
+  | ExceptionDefn.Syntax_Error (x,pos) -> (x^Loc.to_string pos)::stack 
+  
   | _ -> "Unknown" :: stack
 
 and stringlist_of_uncaught x stack =

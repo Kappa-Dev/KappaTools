@@ -10,7 +10,7 @@
 # The output is in output/experiments_output_compare_ws.tex (table)
 # or in output/experiments_output_compare_ws_plot.png (plot)
 
-DEBUG=true
+DEBUG=false
 VERBOSE=true
 INSTALL_DEPS=true
 

@@ -312,7 +312,8 @@ functor
                  Cli_init.get_ast_from_list_of_files ~current_chapter
                    ~rules_in_ws ~removed_rules syntax_version files )
            with exn ->
-             let errors, () = Exception.warn parameters errors __POS__ exn () in
+             let errors, () = Exception.warn parameters errors ~message:"Ill-formed model" __POS__ exn () in
+             let () = raise exn in 
              errors, Ast.empty_compil)
       in
       let state = Remanent_state.set_errors errors state in

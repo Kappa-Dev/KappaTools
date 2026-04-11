@@ -63,10 +63,10 @@ let fail_with_two_occurrences_of_a_site _ site =
           (ExceptionDefn.Malformed_Decl
              ((Format.sprintf "Counter should not be updated in the lhs of a rule.",e)))
   
-   let fail_with_missing_lnk_state e   = 
+   (*let fail_with_missing_lnk_state e   = 
        raise
           (ExceptionDefn.Malformed_Decl
-             ((Format.sprintf "Lnk state is missing in a site.",e)))
+             ((Format.sprintf "Lnk state is missing in a site.",e)))*)
 
    let fail_with_several_lnk_states e   = 
        raise
@@ -370,12 +370,10 @@ let fail_with_underspecified_internal_state_in_rhs s e =
       check_list2 get_pos_rule_line fail_missing_rule_line fail_missing_rule_line  check_rule_line   
 
 
-  let deal_with_port e acc port = 
+  let deal_with_port _e acc port = 
     match port.Ast.port_link with 
-    | [ (ANY_FREE | LNK_FREE | LNK_ANY | LNK_SOME | LNK_TYPE _) ,_ ] -> acc 
+    | [ (ANY_FREE | LNK_FREE | LNK_ANY | LNK_SOME | LNK_TYPE _) ,_ ] | [] -> acc 
     | [ LNK_VALUE (i, _),_ ] -> i::acc 
-    | [] -> 
-      fail_with_missing_lnk_state e 
     | (_,e)::_::_ -> fail_with_several_lnk_states e 
 
   let deal_with_site e acc site = 
