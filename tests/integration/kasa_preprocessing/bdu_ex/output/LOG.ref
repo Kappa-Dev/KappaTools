@@ -1,6 +1,5 @@
 Parsing bdu_ex.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -25,6 +24,9 @@ Signature:duals:0:
 Signature:duals:0:2:
 Signature:duals:0:2:1:
 Signature:duals:0:2:1:agent_type:0,site_type:2,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 10File "bdu_ex.ka", line 4, characters 8-9:File "bdu_ex.ka", line 7, characters 14-15:File "bdu_ex.ka", line 8, characters 4-5:File "bdu_ex.ka", line 8, characters 18-19:File "bdu_ex.ka", line 9, characters 4-5:File "bdu_ex.ka", line 9, characters 27-28:File "bdu_ex.ka", line 10, characters 7-8:File "bdu_ex.ka", line 10, characters 15-16:File "bdu_ex.ka", line 10, characters 26-27:File "bdu_ex.ka", line 10, characters 34-35:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

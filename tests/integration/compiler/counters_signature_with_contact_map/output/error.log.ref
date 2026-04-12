@@ -1,0 +1,2 @@
+File "sigs_contact.ka", line 4, characters 10-29:
+Counter should not be tested in the rhs of a rule.

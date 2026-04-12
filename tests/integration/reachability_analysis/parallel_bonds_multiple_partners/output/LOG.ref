@@ -1,6 +1,5 @@
 Parsing essai.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -29,6 +28,9 @@ Signature:states:0:4:
 Signature:states:0:4:state_id:0->u
 Signature:states:0:4:state_id:1->p
 Signature:duals: 
+Signature: 
+Signature:agents info:0:
+A -> 23File "essai.ka", line 1, characters 8-9:File "essai.ka", line 3, characters 9-10:File "essai.ka", line 5, characters 5-6:File "essai.ka", line 6, characters 0-1:File "essai.ka", line 6, characters 14-15:File "essai.ka", line 7, characters 0-1:File "essai.ka", line 7, characters 22-23:File "essai.ka", line 8, characters 0-1:File "essai.ka", line 8, characters 30-31:File "essai.ka", line 9, characters 0-1:File "essai.ka", line 9, characters 14-15:File "essai.ka", line 10, characters 0-1:File "essai.ka", line 10, characters 14-15:File "essai.ka", line 11, characters 0-1:File "essai.ka", line 11, characters 22-23:File "essai.ka", line 12, characters 0-1:File "essai.ka", line 12, characters 30-31:File "essai.ka", line 13, characters 0-1:File "essai.ka", line 13, characters 14-15:File "essai.ka", line 14, characters 0-1:File "essai.ka", line 14, characters 46-47:File "essai.ka", line 15, characters 0-1:File "essai.ka", line 15, characters 14-15:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

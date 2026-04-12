@@ -1,6 +1,5 @@
 Parsing example_working_set.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -28,6 +27,9 @@ Signature:duals:0:1:1:agent_type:0,site_type:1,state_id:1
 Signature:duals:0:2:
 Signature:duals:0:2:1:
 Signature:duals:0:2:1:agent_type:0,site_type:2,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 12File "example_working_set.ka", line 1, characters 8-9:File "example_working_set.ka", line 6, characters 26-27:File "example_working_set.ka", line 7, characters 18-19:File "example_working_set.ka", line 7, characters 29-30:File "example_working_set.ka", line 8, characters 12-13:File "example_working_set.ka", line 8, characters 21-22:File "example_working_set.ka", line 8, characters 32-33:File "example_working_set.ka", line 8, characters 41-42:File "example_working_set.ka", line 10, characters 12-13:File "example_working_set.ka", line 10, characters 21-22:File "example_working_set.ka", line 10, characters 32-33:File "example_working_set.ka", line 10, characters 41-42:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:variables:0:
@@ -59,7 +61,7 @@ Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min
 Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
 Compilation:rules:0:reverse:
 Compilation:rules:0:actions:creation:(agent_id_0,agent_type_0)
-Compilation:rules:1:
+(0)Compilation:rules:1:
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
 Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
@@ -72,7 +74,7 @@ Compilation:rules:1:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min
 Compilation:rules:1:reverse:
 Compilation:rules:1:reverse:agent_id_0:
 Compilation:rules:1:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
-Compilation:rules:2:
+(1)Compilation:rules:2:
 Compilation:rules:2:lhs:
 Compilation:rules:2:lhs:agent_id_0:
 Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
@@ -98,7 +100,7 @@ Compilation:rules:2:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_mi
 Compilation:rules:2:reverse:agent_id_1:
 Compilation:rules:2:reverse:agent_id_1:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
 Compilation:rules:2:actions:binding:(agent_id_0,agent_type_0)@site_type_1----(agent_id_1,agent_type_0)@site_type_1
-Compilation:rules:3:
+(2)Compilation:rules:3:
 Compilation:rules:3:lhs:
 Compilation:rules:3:lhs:agent_id_0:
 Compilation:rules:3:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
@@ -240,40 +242,40 @@ Id=43
   Id=42
    Node(site_type:1<1)
     Id=41
-     Node(site_type:4<1)
+     Node(site_type:1000000<1)
       Id=0
        Leaf False 
 
       Id=40
-       Node(site_type:4<2)
+       Node(site_type:1000000<2)
         Id=39
-         Node(site_type:5<1)
+         Node(site_type:1000001<1)
           Id=0
            Leaf False 
 
           Id=38
-           Node(site_type:5<2)
+           Node(site_type:1000001<2)
             Id=37
-             Node(site_type:6<1)
+             Node(site_type:1000002<1)
               Id=0
                Leaf False 
 
               Id=14
-               Node(site_type:6<2)
+               Node(site_type:1000002<2)
                 Id=13
-                 Node(site_type:7<0)
+                 Node(site_type:1000003<0)
                   Id=0
                    Leaf False 
 
                   Id=12
-                   Node(site_type:7<2)
+                   Node(site_type:1000003<2)
                     Id=11
-                     Node(site_type:8<0)
+                     Node(site_type:1000004<0)
                       Id=0
                        Leaf False 
 
                       Id=10
-                       Node(site_type:8<2)
+                       Node(site_type:1000004<2)
                         Id=1
                          Leaf True 
 
@@ -309,40 +311,40 @@ Id=43
   Id=42
    Node(site_type:1<1)
     Id=41
-     Node(site_type:4<1)
+     Node(site_type:1000000<1)
       Id=0
        Leaf False 
 
       Id=40
-       Node(site_type:4<2)
+       Node(site_type:1000000<2)
         Id=39
-         Node(site_type:5<1)
+         Node(site_type:1000001<1)
           Id=0
            Leaf False 
 
           Id=38
-           Node(site_type:5<2)
+           Node(site_type:1000001<2)
             Id=37
-             Node(site_type:6<1)
+             Node(site_type:1000002<1)
               Id=0
                Leaf False 
 
               Id=14
-               Node(site_type:6<2)
+               Node(site_type:1000002<2)
                 Id=13
-                 Node(site_type:7<0)
+                 Node(site_type:1000003<0)
                   Id=0
                    Leaf False 
 
                   Id=12
-                   Node(site_type:7<2)
+                   Node(site_type:1000003<2)
                     Id=11
-                     Node(site_type:8<0)
+                     Node(site_type:1000004<0)
                       Id=0
                        Leaf False 
 
                       Id=10
-                       Node(site_type:8<2)
+                       Node(site_type:1000004<2)
                         Id=1
                          Leaf True 
 
@@ -378,40 +380,40 @@ Id=43
   Id=42
    Node(site_type:1<1)
     Id=41
-     Node(site_type:4<1)
+     Node(site_type:1000000<1)
       Id=0
        Leaf False 
 
       Id=40
-       Node(site_type:4<2)
+       Node(site_type:1000000<2)
         Id=39
-         Node(site_type:5<1)
+         Node(site_type:1000001<1)
           Id=0
            Leaf False 
 
           Id=38
-           Node(site_type:5<2)
+           Node(site_type:1000001<2)
             Id=37
-             Node(site_type:6<1)
+             Node(site_type:1000002<1)
               Id=0
                Leaf False 
 
               Id=14
-               Node(site_type:6<2)
+               Node(site_type:1000002<2)
                 Id=13
-                 Node(site_type:7<0)
+                 Node(site_type:1000003<0)
                   Id=0
                    Leaf False 
 
                   Id=12
-                   Node(site_type:7<2)
+                   Node(site_type:1000003<2)
                     Id=11
-                     Node(site_type:8<0)
+                     Node(site_type:1000004<0)
                       Id=0
                        Leaf False 
 
                       Id=10
-                       Node(site_type:8<2)
+                       Node(site_type:1000004<2)
                         Id=1
                          Leaf True 
 
@@ -453,40 +455,40 @@ Id=66
   Id=65
    Node(site_type:1<2)
     Id=62
-     Node(site_type:4<1)
+     Node(site_type:1000000<1)
       Id=0
        Leaf False 
 
       Id=61
-       Node(site_type:4<2)
+       Node(site_type:1000000<2)
         Id=60
-         Node(site_type:5<1)
+         Node(site_type:1000001<1)
           Id=0
            Leaf False 
 
           Id=59
-           Node(site_type:5<2)
+           Node(site_type:1000001<2)
             Id=58
-             Node(site_type:6<1)
+             Node(site_type:1000002<1)
               Id=0
                Leaf False 
 
               Id=57
-               Node(site_type:6<2)
+               Node(site_type:1000002<2)
                 Id=56
-                 Node(site_type:7<1)
+                 Node(site_type:1000003<1)
                   Id=0
                    Leaf False 
 
                   Id=12
-                   Node(site_type:7<2)
+                   Node(site_type:1000003<2)
                     Id=11
-                     Node(site_type:8<0)
+                     Node(site_type:1000004<0)
                       Id=0
                        Leaf False 
 
                       Id=10
-                       Node(site_type:8<2)
+                       Node(site_type:1000004<2)
                         Id=1
                          Leaf True 
 
@@ -528,40 +530,40 @@ Id=81
   Id=80
    Node(site_type:1<2)
     Id=77
-     Node(site_type:4<1)
+     Node(site_type:1000000<1)
       Id=0
        Leaf False 
 
       Id=76
-       Node(site_type:4<2)
+       Node(site_type:1000000<2)
         Id=75
-         Node(site_type:5<1)
+         Node(site_type:1000001<1)
           Id=0
            Leaf False 
 
           Id=74
-           Node(site_type:5<2)
+           Node(site_type:1000001<2)
             Id=73
-             Node(site_type:6<1)
+             Node(site_type:1000002<1)
               Id=0
                Leaf False 
 
               Id=72
-               Node(site_type:6<2)
+               Node(site_type:1000002<2)
                 Id=71
-                 Node(site_type:7<0)
+                 Node(site_type:1000003<0)
                   Id=0
                    Leaf False 
 
                   Id=29
-                   Node(site_type:7<2)
+                   Node(site_type:1000003<2)
                     Id=28
-                     Node(site_type:8<1)
+                     Node(site_type:1000004<1)
                       Id=0
                        Leaf False 
 
                       Id=10
-                       Node(site_type:8<2)
+                       Node(site_type:1000004<2)
                         Id=1
                          Leaf True 
 
@@ -605,40 +607,40 @@ Id=85
   Id=84
    Node(site_type:1<2)
     Id=41
-     Node(site_type:4<1)
+     Node(site_type:1000000<1)
       Id=0
        Leaf False 
 
       Id=40
-       Node(site_type:4<2)
+       Node(site_type:1000000<2)
         Id=39
-         Node(site_type:5<1)
+         Node(site_type:1000001<1)
           Id=0
            Leaf False 
 
           Id=38
-           Node(site_type:5<2)
+           Node(site_type:1000001<2)
             Id=37
-             Node(site_type:6<1)
+             Node(site_type:1000002<1)
               Id=0
                Leaf False 
 
               Id=14
-               Node(site_type:6<2)
+               Node(site_type:1000002<2)
                 Id=13
-                 Node(site_type:7<0)
+                 Node(site_type:1000003<0)
                   Id=0
                    Leaf False 
 
                   Id=12
-                   Node(site_type:7<2)
+                   Node(site_type:1000003<2)
                     Id=11
-                     Node(site_type:8<0)
+                     Node(site_type:1000004<0)
                       Id=0
                        Leaf False 
 
                       Id=10
-                       Node(site_type:8<2)
+                       Node(site_type:1000004<2)
                         Id=1
                          Leaf True 
 
@@ -705,27 +707,27 @@ A can occur in the model if A.and.B.
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=103
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=102
+  Id=97
    Node(site_type:1<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -739,27 +741,27 @@ Id=103
      Leaf False 
 
 agent_type:0:A:cv_id:1
-Id=103
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=102
+  Id=97
    Node(site_type:1<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -773,27 +775,27 @@ Id=103
      Leaf False 
 
 agent_type:0:A:cv_id:2
-Id=103
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=102
+  Id=97
    Node(site_type:1<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -811,27 +813,27 @@ Id=103
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=103
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=102
+  Id=97
    Node(site_type:1<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -854,19 +856,19 @@ Id=105
   Id=104
    Node(site_type:2<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -889,19 +891,19 @@ Id=107
   Id=106
    Node(site_type:0<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -923,27 +925,27 @@ A(y) => [ A(y[.]) [ only if A.and.B ] v A(y[y.A]) [ only if A.and.B ] ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=103
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=102
+  Id=97
    Node(site_type:1<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -966,19 +968,19 @@ Id=105
   Id=104
    Node(site_type:2<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -1001,19 +1003,19 @@ Id=107
   Id=106
    Node(site_type:0<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -1037,27 +1039,27 @@ EXTENSIONAL DESCRIPTION:
 * Properties of counters
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=103
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=102
+  Id=97
    Node(site_type:1<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -1080,19 +1082,19 @@ Id=105
   Id=104
    Node(site_type:2<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -1115,19 +1117,19 @@ Id=107
   Id=106
    Node(site_type:0<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -1142,27 +1144,27 @@ Id=107
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=103
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=102
+  Id=97
    Node(site_type:1<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -1185,19 +1187,19 @@ Id=105
   Id=104
    Node(site_type:2<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 
@@ -1220,19 +1222,19 @@ Id=107
   Id=106
    Node(site_type:0<2)
     Id=24
-     Node(site_type:5<1)
+     Node(site_type:1000001<1)
       Id=0
        Leaf False 
 
       Id=23
-       Node(site_type:5<2)
+       Node(site_type:1000001<2)
         Id=22
-         Node(site_type:6<1)
+         Node(site_type:1000002<1)
           Id=0
            Leaf False 
 
           Id=6
-           Node(site_type:6<2)
+           Node(site_type:1000002<2)
             Id=1
              Leaf True 
 

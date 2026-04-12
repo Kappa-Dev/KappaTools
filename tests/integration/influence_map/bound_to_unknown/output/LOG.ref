@@ -1,6 +1,5 @@
 Parsing bound_to.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -35,6 +34,11 @@ Signature:duals:1:
 Signature:duals:1:0:
 Signature:duals:1:0:1:
 Signature:duals:1:0:1:agent_type:0,site_type:1,state_id:2
+Signature: 
+Signature:agents info:0:
+A -> 15File "bound_to.ka", line 1, characters 8-9:File "bound_to.ka", line 4, characters 5-6:File "bound_to.ka", line 4, characters 19-20:File "bound_to.ka", line 5, characters 5-6:File "bound_to.ka", line 5, characters 13-14:File "bound_to.ka", line 5, characters 24-25:File "bound_to.ka", line 5, characters 32-33:File "bound_to.ka", line 6, characters 5-6:File "bound_to.ka", line 6, characters 13-14:File "bound_to.ka", line 6, characters 24-25:File "bound_to.ka", line 6, characters 32-33:File "bound_to.ka", line 7, characters 5-6:File "bound_to.ka", line 7, characters 24-25:File "bound_to.ka", line 8, characters 5-6:File "bound_to.ka", line 8, characters 18-19:
+Signature:agents info:1:
+B -> 3File "bound_to.ka", line 2, characters 8-9:File "bound_to.ka", line 7, characters 13-14:File "bound_to.ka", line 7, characters 32-33:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

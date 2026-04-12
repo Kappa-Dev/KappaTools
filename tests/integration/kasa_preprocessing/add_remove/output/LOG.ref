@@ -1,6 +1,5 @@
 Parsing add_remove.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -20,6 +19,11 @@ Signature:states:1:0:
 Signature:states:1:0:state_id:0->u
 Signature:states:1:0:state_id:1->p
 Signature:duals: 
+Signature: 
+Signature:agents info:0:
+A -> 6File "add_remove.ka", line 4, characters 8-9:File "add_remove.ka", line 7, characters 0-1:File "add_remove.ka", line 7, characters 27-28:File "add_remove.ka", line 7, characters 40-41:File "add_remove.ka", line 8, characters 0-1:File "add_remove.ka", line 8, characters 14-15:
+Signature:agents info:1:
+B -> 6File "add_remove.ka", line 5, characters 8-9:File "add_remove.ka", line 7, characters 11-12:File "add_remove.ka", line 9, characters 0-1:File "add_remove.ka", line 9, characters 14-15:File "add_remove.ka", line 10, characters 0-1:File "add_remove.ka", line 10, characters 14-15:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

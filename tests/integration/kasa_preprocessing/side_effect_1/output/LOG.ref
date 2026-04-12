@@ -1,6 +1,5 @@
 Parsing side_effect.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -46,6 +45,13 @@ Signature:duals:2:
 Signature:duals:2:0:
 Signature:duals:2:0:1:
 Signature:duals:2:0:1:agent_type:0,site_type:1,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 6File "side_effect.ka", line 5, characters 8-9:File "side_effect.ka", line 11, characters 5-6:File "side_effect.ka", line 12, characters 5-6:File "side_effect.ka", line 12, characters 25-26:File "side_effect.ka", line 13, characters 5-6:File "side_effect.ka", line 14, characters 5-6:
+Signature:agents info:1:
+B -> 5File "side_effect.ka", line 6, characters 8-9:File "side_effect.ka", line 12, characters 14-15:File "side_effect.ka", line 12, characters 34-35:File "side_effect.ka", line 13, characters 14-15:File "side_effect.ka", line 13, characters 31-32:
+Signature:agents info:2:
+C -> 3File "side_effect.ka", line 7, characters 8-9:File "side_effect.ka", line 14, characters 14-15:File "side_effect.ka", line 14, characters 31-32:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

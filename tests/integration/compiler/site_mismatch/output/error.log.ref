@@ -1,2 +1,3 @@
-File "crash.ka", line 4, characters 52-53:
-Site 'z' was not mentionned in the left-hand side.
+File "crash.ka", line 4, characters 5-69:
+Left hand side/right hand side site mismatch
+Fatal error: exception Kappa_data_structures.ExceptionDefn.Malformed_Decl(_)

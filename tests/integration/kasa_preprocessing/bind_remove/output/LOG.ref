@@ -1,6 +1,5 @@
 Parsing create1.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -30,6 +29,13 @@ Signature:duals:1:
 Signature:duals:1:0:
 Signature:duals:1:0:1:
 Signature:duals:1:0:1:agent_type:0,site_type:0,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 3File "create1.ka", line 5, characters 8-9:File "create1.ka", line 11, characters 5-6:File "create1.ka", line 11, characters 25-26:
+Signature:agents info:1:
+B -> 4File "create1.ka", line 6, characters 8-9:File "create1.ka", line 11, characters 14-15:File "create1.ka", line 11, characters 34-35:File "create1.ka", line 12, characters 5-6:
+Signature:agents info:2:
+C -> 2File "create1.ka", line 7, characters 8-9:File "create1.ka", line 12, characters 20-21:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

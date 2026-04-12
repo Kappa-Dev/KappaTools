@@ -1,6 +1,5 @@
 Parsing covering_class_trivial.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -20,6 +19,9 @@ Signature:states:0:2:
 Signature:states:0:2:state_id:0->u
 Signature:states:0:2:state_id:1->p
 Signature:duals: 
+Signature: 
+Signature:agents info:0:
+A -> 7File "covering_class_trivial.ka", line 4, characters 8-9:File "covering_class_trivial.ka", line 7, characters 5-6:File "covering_class_trivial.ka", line 7, characters 28-29:File "covering_class_trivial.ka", line 8, characters 5-6:File "covering_class_trivial.ka", line 8, characters 28-29:File "covering_class_trivial.ka", line 9, characters 5-6:File "covering_class_trivial.ka", line 9, characters 37-38:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

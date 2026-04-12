@@ -1,6 +1,5 @@
 Parsing sanity.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -17,6 +16,9 @@ Signature:states:0:1:
 Signature:states:0:1:state_id:0->u
 Signature:states:0:1:state_id:1->p
 Signature:duals: 
+Signature: 
+Signature:agents info:0:
+A -> 3File "sanity.ka", line 5, characters 8-9:File "sanity.ka", line 9, characters 5-6:File "sanity.ka", line 9, characters 28-29:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:variables:0:

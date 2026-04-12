@@ -1,6 +1,5 @@
 Parsing bdu_analysis.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -52,6 +51,13 @@ Signature:duals:2:
 Signature:duals:2:0:
 Signature:duals:2:0:1:
 Signature:duals:2:0:1:agent_type:0,site_type:3,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 12File "bdu_analysis.ka", line 5, characters 8-9:File "bdu_analysis.ka", line 9, characters 10-11:File "bdu_analysis.ka", line 10, characters 12-13:File "bdu_analysis.ka", line 11, characters 12-13:File "bdu_analysis.ka", line 12, characters 5-6:File "bdu_analysis.ka", line 13, characters 5-6:File "bdu_analysis.ka", line 14, characters 5-6:File "bdu_analysis.ka", line 14, characters 18-19:File "bdu_analysis.ka", line 15, characters 5-6:File "bdu_analysis.ka", line 15, characters 25-26:File "bdu_analysis.ka", line 16, characters 5-6:File "bdu_analysis.ka", line 16, characters 31-32:
+Signature:agents info:1:
+B -> 4File "bdu_analysis.ka", line 6, characters 8-9:File "bdu_analysis.ka", line 10, characters 21-22:File "bdu_analysis.ka", line 15, characters 14-15:File "bdu_analysis.ka", line 15, characters 33-34:
+Signature:agents info:2:
+C -> 4File "bdu_analysis.ka", line 7, characters 8-9:File "bdu_analysis.ka", line 11, characters 23-24:File "bdu_analysis.ka", line 16, characters 20-21:File "bdu_analysis.ka", line 16, characters 45-46:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

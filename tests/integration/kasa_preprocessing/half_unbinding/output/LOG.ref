@@ -1,6 +1,5 @@
 Parsing haft_unbinding.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -23,6 +22,13 @@ Signature:states:2:0:state_id:0->u
 Signature:states:2:1:
 Signature:states:2:1:state_id:0->p
 Signature:duals: 
+Signature: 
+Signature:agents info:0:
+A -> 3File "haft_unbinding.ka", line 5, characters 8-9:File "haft_unbinding.ka", line 11, characters 5-6:File "haft_unbinding.ka", line 12, characters 23-24:
+Signature:agents info:1:
+B -> 2File "haft_unbinding.ka", line 6, characters 8-9:File "haft_unbinding.ka", line 11, characters 20-21:
+Signature:agents info:2:
+C -> 2File "haft_unbinding.ka", line 7, characters 8-9:File "haft_unbinding.ka", line 12, characters 5-6:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

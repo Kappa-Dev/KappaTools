@@ -1,0 +1,2 @@
+File "counter_max.ka", line 2, characters 10-26:
+Counter should not be tested in the rhs of a rule.

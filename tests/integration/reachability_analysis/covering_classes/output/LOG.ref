@@ -1,6 +1,5 @@
 Parsing covering_classes.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -90,6 +89,13 @@ Signature:duals:2:2:1:agent_type:0,site_type:2,state_id:2
 Signature:duals:2:3:
 Signature:duals:2:3:1:
 Signature:duals:2:3:1:agent_type:0,site_type:3,state_id:2
+Signature: 
+Signature:agents info:0:
+A -> 15File "covering_classes.ka", line 1, characters 10-11:File "covering_classes.ka", line 4, characters 5-6:File "covering_classes.ka", line 5, characters 5-6:File "covering_classes.ka", line 5, characters 27-28:File "covering_classes.ka", line 6, characters 5-6:File "covering_classes.ka", line 6, characters 38-39:File "covering_classes.ka", line 7, characters 16-17:File "covering_classes.ka", line 7, characters 41-42:File "covering_classes.ka", line 9, characters 5-6:File "covering_classes.ka", line 10, characters 5-6:File "covering_classes.ka", line 10, characters 27-28:File "covering_classes.ka", line 11, characters 6-7:File "covering_classes.ka", line 11, characters 39-40:File "covering_classes.ka", line 12, characters 17-18:File "covering_classes.ka", line 12, characters 42-43:
+Signature:agents info:1:
+B -> 9File "covering_classes.ka", line 2, characters 10-11:File "covering_classes.ka", line 5, characters 13-14:File "covering_classes.ka", line 5, characters 35-36:File "covering_classes.ka", line 6, characters 13-14:File "covering_classes.ka", line 6, characters 46-47:File "covering_classes.ka", line 10, characters 13-14:File "covering_classes.ka", line 10, characters 35-36:File "covering_classes.ka", line 11, characters 14-15:File "covering_classes.ka", line 11, characters 47-48:
+Signature:agents info:2:
+C -> 11File "covering_classes.ka", line 3, characters 10-11:File "covering_classes.ka", line 6, characters 24-25:File "covering_classes.ka", line 6, characters 57-58:File "covering_classes.ka", line 7, characters 5-6:File "covering_classes.ka", line 7, characters 30-31:File "covering_classes.ka", line 8, characters 5-6:File "covering_classes.ka", line 11, characters 25-26:File "covering_classes.ka", line 11, characters 58-59:File "covering_classes.ka", line 12, characters 6-7:File "covering_classes.ka", line 12, characters 31-32:File "covering_classes.ka", line 13, characters 6-7:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

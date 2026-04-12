@@ -1,6 +1,5 @@
 Parsing labels.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -14,6 +13,9 @@ Signature:states:0:0:state_id:0->u
 Signature:states:0:0:state_id:1->p
 Signature:states:0:0:state_id:2->q
 Signature:duals: 
+Signature: 
+Signature:agents info:0:
+A -> 9File "labels.ka", line 1, characters 8-9:File "labels.ka", line 3, characters 40-41:File "labels.ka", line 3, characters 54-55:File "labels.ka", line 4, characters 38-39:File "labels.ka", line 4, characters 52-53:File "labels.ka", line 5, characters 5-6:File "labels.ka", line 5, characters 19-20:File "labels.ka", line 6, characters 5-6:File "labels.ka", line 6, characters 19-20:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

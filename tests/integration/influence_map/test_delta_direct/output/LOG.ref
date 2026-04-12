@@ -1,6 +1,5 @@
 Parsing test_delta.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -27,6 +26,13 @@ Signature:states:2:0:
 Signature:states:2:0:state_id:0->u
 Signature:states:2:0:state_id:1->p
 Signature:duals: 
+Signature: 
+Signature:agents info:0:
+A -> 11File "test_delta.ka", line 7, characters 8-9:File "test_delta.ka", line 10, characters 10-11:File "test_delta.ka", line 11, characters 10-11:File "test_delta.ka", line 1, characters 0-1:File "test_delta.ka", line 1, characters 39-40:File "test_delta.ka", line 1, characters 39-40:File "test_delta.ka", line 1, characters 0-1:File "test_delta.ka", line 2, characters 0-1:File "test_delta.ka", line 2, characters 30-31:File "test_delta.ka", line 2, characters 30-31:File "test_delta.ka", line 2, characters 0-1:
+Signature:agents info:1:
+B -> 11File "test_delta.ka", line 8, characters 8-9:File "test_delta.ka", line 12, characters 10-11:File "test_delta.ka", line 13, characters 10-11:File "test_delta.ka", line 1, characters 11-12:File "test_delta.ka", line 1, characters 22-23:File "test_delta.ka", line 1, characters 11-12:File "test_delta.ka", line 1, characters 22-23:File "test_delta.ka", line 2, characters 43-44:File "test_delta.ka", line 2, characters 54-55:File "test_delta.ka", line 2, characters 43-44:File "test_delta.ka", line 2, characters 54-55:
+Signature:agents info:2:
+C -> 7File "test_delta.ka", line 9, characters 8-9:File "test_delta.ka", line 14, characters 10-11:File "test_delta.ka", line 15, characters 10-11:File "test_delta.ka", line 1, characters 54-55:File "test_delta.ka", line 1, characters 54-55:File "test_delta.ka", line 2, characters 11-12:File "test_delta.ka", line 2, characters 11-12:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:variables:0:

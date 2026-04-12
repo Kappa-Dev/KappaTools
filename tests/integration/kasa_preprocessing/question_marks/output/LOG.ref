@@ -1,6 +1,5 @@
 Parsing question_marks.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -21,6 +20,9 @@ Signature:duals:0:
 Signature:duals:0:1:
 Signature:duals:0:1:1:
 Signature:duals:0:1:1:agent_type:0,site_type:1,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 18File "question_marks.ka", line 1, characters 8-9:File "question_marks.ka", line 3, characters 0-1:File "question_marks.ka", line 3, characters 14-15:File "question_marks.ka", line 4, characters 0-1:File "question_marks.ka", line 4, characters 11-12:File "question_marks.ka", line 5, characters 0-1:File "question_marks.ka", line 5, characters 8-9:File "question_marks.ka", line 5, characters 19-20:File "question_marks.ka", line 5, characters 27-28:File "question_marks.ka", line 6, characters 0-1:File "question_marks.ka", line 6, characters 14-15:File "question_marks.ka", line 7, characters 0-1:File "question_marks.ka", line 7, characters 14-15:File "question_marks.ka", line 8, characters 0-1:File "question_marks.ka", line 9, characters 0-1:File "question_marks.ka", line 9, characters 8-9:File "question_marks.ka", line 9, characters 19-20:File "question_marks.ka", line 9, characters 27-28:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

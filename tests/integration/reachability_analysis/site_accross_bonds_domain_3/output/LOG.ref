@@ -1,6 +1,5 @@
 Parsing site_accross_bonds_domain.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -146,6 +145,23 @@ Signature:duals:7:
 Signature:duals:7:0:
 Signature:duals:7:0:1:
 Signature:duals:7:0:1:agent_type:3,site_type:1,state_id:2
+Signature: 
+Signature:agents info:0:
+A -> 4File "site_accross_bonds_domain.ka", line 1, characters 8-9:File "site_accross_bonds_domain.ka", line 9, characters 19-20:File "site_accross_bonds_domain.ka", line 10, characters 8-9:File "site_accross_bonds_domain.ka", line 10, characters 69-70:
+Signature:agents info:1:
+B -> 4File "site_accross_bonds_domain.ka", line 2, characters 8-9:File "site_accross_bonds_domain.ka", line 9, characters 32-33:File "site_accross_bonds_domain.ka", line 10, characters 21-22:File "site_accross_bonds_domain.ka", line 10, characters 82-83:
+Signature:agents info:2:
+E -> 4File "site_accross_bonds_domain.ka", line 3, characters 8-9:File "site_accross_bonds_domain.ka", line 12, characters 19-20:File "site_accross_bonds_domain.ka", line 13, characters 8-9:File "site_accross_bonds_domain.ka", line 13, characters 69-70:
+Signature:agents info:3:
+F -> 4File "site_accross_bonds_domain.ka", line 4, characters 8-9:File "site_accross_bonds_domain.ka", line 12, characters 32-33:File "site_accross_bonds_domain.ka", line 13, characters 21-22:File "site_accross_bonds_domain.ka", line 13, characters 82-83:
+Signature:agents info:4:
+C -> 8File "site_accross_bonds_domain.ka", line 5, characters 8-9:File "site_accross_bonds_domain.ka", line 9, characters 11-12:File "site_accross_bonds_domain.ka", line 9, characters 45-46:File "site_accross_bonds_domain.ka", line 10, characters 0-1:File "site_accross_bonds_domain.ka", line 10, characters 34-35:File "site_accross_bonds_domain.ka", line 11, characters 0-1:File "site_accross_bonds_domain.ka", line 12, characters 11-12:File "site_accross_bonds_domain.ka", line 13, characters 0-1:
+Signature:agents info:5:
+D -> 5File "site_accross_bonds_domain.ka", line 6, characters 8-9:File "site_accross_bonds_domain.ka", line 10, characters 61-62:File "site_accross_bonds_domain.ka", line 10, characters 95-96:File "site_accross_bonds_domain.ka", line 12, characters 45-46:File "site_accross_bonds_domain.ka", line 13, characters 34-35:
+Signature:agents info:6:
+G -> 2File "site_accross_bonds_domain.ka", line 7, characters 8-9:File "site_accross_bonds_domain.ka", line 13, characters 61-62:
+Signature:agents info:7:
+H -> 2File "site_accross_bonds_domain.ka", line 8, characters 8-9:File "site_accross_bonds_domain.ka", line 13, characters 95-96:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

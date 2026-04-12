@@ -1,6 +1,5 @@
 Parsing parallel_bonds.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -42,6 +41,11 @@ Signature:duals:1:0:1:agent_type:0,site_type:0,state_id:1
 Signature:duals:1:1:
 Signature:duals:1:1:1:
 Signature:duals:1:1:1:agent_type:0,site_type:1,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 7File "parallel_bonds.ka", line 1, characters 8-9:File "parallel_bonds.ka", line 4, characters 10-11:File "parallel_bonds.ka", line 6, characters 10-11:File "parallel_bonds.ka", line 8, characters 0-1:File "parallel_bonds.ka", line 8, characters 11-12:File "parallel_bonds.ka", line 9, characters 0-1:File "parallel_bonds.ka", line 9, characters 19-20:
+Signature:agents info:1:
+B -> 5File "parallel_bonds.ka", line 2, characters 8-9:File "parallel_bonds.ka", line 5, characters 10-11:File "parallel_bonds.ka", line 6, characters 23-24:File "parallel_bonds.ka", line 9, characters 8-9:File "parallel_bonds.ka", line 9, characters 27-28:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

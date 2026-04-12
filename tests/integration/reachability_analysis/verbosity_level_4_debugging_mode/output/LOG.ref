@@ -1,6 +1,5 @@
 Parsing ../verbosity.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -26,6 +25,9 @@ Signature:states:0:2:
 Signature:states:0:2:state_id:0->u
 Signature:states:0:2:state_id:1->q
 Signature:duals: 
+Signature: 
+Signature:agents info:0:
+A -> 15File "../verbosity.ka", line 1, characters 5-6:File "../verbosity.ka", line 2, characters 0-1:File "../verbosity.ka", line 2, characters 14-15:File "../verbosity.ka", line 3, characters 0-1:File "../verbosity.ka", line 3, characters 22-23:File "../verbosity.ka", line 4, characters 0-1:File "../verbosity.ka", line 4, characters 30-31:File "../verbosity.ka", line 5, characters 0-1:File "../verbosity.ka", line 5, characters 14-15:File "../verbosity.ka", line 6, characters 0-1:File "../verbosity.ka", line 6, characters 22-23:File "../verbosity.ka", line 7, characters 0-1:File "../verbosity.ka", line 7, characters 22-23:File "../verbosity.ka", line 8, characters 5-6:File "../verbosity.ka", line 8, characters 27-28:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

@@ -1,6 +1,5 @@
 Parsing covering_class.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -42,6 +41,11 @@ Signature:duals:1:0:1:agent_type:0,site_type:0,state_id:1
 Signature:duals:1:1:
 Signature:duals:1:1:1:
 Signature:duals:1:1:1:agent_type:0,site_type:1,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 7File "covering_class.ka", line 5, characters 8-9:File "covering_class.ka", line 10, characters 5-6:File "covering_class.ka", line 10, characters 35-36:File "covering_class.ka", line 11, characters 5-6:File "covering_class.ka", line 11, characters 25-26:File "covering_class.ka", line 12, characters 5-6:File "covering_class.ka", line 12, characters 25-26:
+Signature:agents info:1:
+B -> 7File "covering_class.ka", line 6, characters 8-9:File "covering_class.ka", line 10, characters 19-20:File "covering_class.ka", line 10, characters 50-51:File "covering_class.ka", line 11, characters 14-15:File "covering_class.ka", line 11, characters 34-35:File "covering_class.ka", line 12, characters 14-15:File "covering_class.ka", line 12, characters 34-35:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

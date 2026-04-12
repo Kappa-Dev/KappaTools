@@ -1,0 +1,2 @@
+File "counter_2.ka", lines 1-35, characters 0-0:
+Counter should not be tested in the rhs of a rule.

@@ -1,6 +1,5 @@
 Parsing dead_agents.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -32,6 +31,15 @@ Signature:states:3:
 Signature:states:3:0:
 Signature:states:3:0:state_id:0->free
 Signature:duals: 
+Signature: 
+Signature:agents info:0:
+A -> 15File "dead_agents.ka", line 20, characters 9-10:File "dead_agents.ka", line 10, characters 0-1:File "dead_agents.ka", line 10, characters 25-26:File "dead_agents.ka", line 12, characters 0-1:File "dead_agents.ka", line 12, characters 15-16:File "dead_agents.ka", line 12, characters 15-16:File "dead_agents.ka", line 12, characters 0-1:File "dead_agents.ka", line 13, characters 0-1:File "dead_agents.ka", line 13, characters 14-15:File "dead_agents.ka", line 14, characters 0-1:File "dead_agents.ka", line 14, characters 14-15:File "dead_agents.ka", line 15, characters 0-1:File "dead_agents.ka", line 15, characters 14-15:File "dead_agents.ka", line 17, characters 15-16:File "dead_agents.ka", line 18, characters 15-16:
+Signature:agents info:1:
+B -> 7File "dead_agents.ka", line 21, characters 9-10:File "dead_agents.ka", line 10, characters 11-12:File "dead_agents.ka", line 10, characters 36-37:File "dead_agents.ka", line 11, characters 0-1:File "dead_agents.ka", line 11, characters 15-16:File "dead_agents.ka", line 11, characters 15-16:File "dead_agents.ka", line 11, characters 0-1:
+Signature:agents info:2:
+D -> 1File "dead_agents.ka", line 17, characters 0-1:
+Signature:agents info:3:
+E -> 1File "dead_agents.ka", line 18, characters 0-1:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

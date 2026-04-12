@@ -1,6 +1,5 @@
 Parsing double_agents.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -60,6 +59,13 @@ Signature:duals:2:
 Signature:duals:2:0:
 Signature:duals:2:0:1:
 Signature:duals:2:0:1:agent_type:1,site_type:2,state_id:2
+Signature: 
+Signature:agents info:0:
+A -> 8File "double_agents.ka", line 1, characters 8-9:File "double_agents.ka", line 5, characters 12-13:File "double_agents.ka", line 5, characters 23-24:File "double_agents.ka", line 8, characters 5-6:File "double_agents.ka", line 8, characters 24-25:File "double_agents.ka", line 9, characters 5-6:File "double_agents.ka", line 9, characters 13-14:File "double_agents.ka", line 9, characters 20-21:
+Signature:agents info:1:
+B -> 12File "double_agents.ka", line 2, characters 8-9:File "double_agents.ka", line 6, characters 12-13:File "double_agents.ka", line 6, characters 23-24:File "double_agents.ka", line 7, characters 5-6:File "double_agents.ka", line 7, characters 27-28:File "double_agents.ka", line 8, characters 13-14:File "double_agents.ka", line 8, characters 32-33:File "double_agents.ka", line 11, characters 13-14:File "double_agents.ka", line 11, characters 32-33:File "double_agents.ka", line 12, characters 5-6:File "double_agents.ka", line 12, characters 9-10:File "double_agents.ka", line 12, characters 19-20:
+Signature:agents info:2:
+C -> 4File "double_agents.ka", line 3, characters 8-9:File "double_agents.ka", line 10, characters 10-11:File "double_agents.ka", line 11, characters 5-6:File "double_agents.ka", line 11, characters 24-25:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

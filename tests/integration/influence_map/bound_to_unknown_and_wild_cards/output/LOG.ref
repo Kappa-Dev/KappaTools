@@ -1,6 +1,5 @@
 Parsing influence.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -46,6 +45,13 @@ Signature:duals:2:
 Signature:duals:2:0:
 Signature:duals:2:0:1:
 Signature:duals:2:0:1:agent_type:0,site_type:1,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 7File "influence.ka", line 5, characters 8-9:File "influence.ka", line 1, characters 0-1:File "influence.ka", line 1, characters 28-29:File "influence.ka", line 2, characters 0-1:File "influence.ka", line 2, characters 28-29:File "influence.ka", line 3, characters 0-1:File "influence.ka", line 3, characters 28-29:
+Signature:agents info:1:
+B -> 7File "influence.ka", line 6, characters 8-9:File "influence.ka", line 1, characters 14-15:File "influence.ka", line 1, characters 43-44:File "influence.ka", line 2, characters 14-15:File "influence.ka", line 2, characters 43-44:File "influence.ka", line 3, characters 14-15:File "influence.ka", line 3, characters 43-44:
+Signature:agents info:2:
+C -> 4File "influence.ka", line 7, characters 8-9:File "influence.ka", line 1, characters 52-53:File "influence.ka", line 2, characters 52-53:File "influence.ka", line 3, characters 52-53:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

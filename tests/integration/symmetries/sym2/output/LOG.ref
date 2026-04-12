@@ -13,7 +13,6 @@ done
 	 -initial conditions
 Parsing sym2.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -43,6 +42,9 @@ Signature:duals:0:1:1:
 Signature:duals:0:1:1:agent_type:0,site_type:0,state_id:2
 Signature:duals:0:1:2:
 Signature:duals:0:1:2:agent_type:0,site_type:1,state_id:2
+Signature: 
+Signature:agents info:0:
+A -> 33File "sym2.ka", line 6, characters 10-11:File "sym2.ka", line 1, characters 0-1:File "sym2.ka", line 1, characters 13-14:File "sym2.ka", line 1, characters 30-31:File "sym2.ka", line 1, characters 43-44:File "sym2.ka", line 1, characters 30-31:File "sym2.ka", line 1, characters 43-44:File "sym2.ka", line 1, characters 0-1:File "sym2.ka", line 1, characters 13-14:File "sym2.ka", line 2, characters 0-1:File "sym2.ka", line 2, characters 13-14:File "sym2.ka", line 2, characters 30-31:File "sym2.ka", line 2, characters 43-44:File "sym2.ka", line 2, characters 30-31:File "sym2.ka", line 2, characters 43-44:File "sym2.ka", line 2, characters 0-1:File "sym2.ka", line 2, characters 13-14:File "sym2.ka", line 3, characters 0-1:File "sym2.ka", line 3, characters 13-14:File "sym2.ka", line 3, characters 30-31:File "sym2.ka", line 3, characters 43-44:File "sym2.ka", line 3, characters 30-31:File "sym2.ka", line 3, characters 43-44:File "sym2.ka", line 3, characters 0-1:File "sym2.ka", line 3, characters 13-14:File "sym2.ka", line 4, characters 0-1:File "sym2.ka", line 4, characters 13-14:File "sym2.ka", line 4, characters 30-31:File "sym2.ka", line 4, characters 43-44:File "sym2.ka", line 4, characters 30-31:File "sym2.ka", line 4, characters 43-44:File "sym2.ka", line 4, characters 0-1:File "sym2.ka", line 4, characters 13-14:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

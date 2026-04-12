@@ -1,6 +1,5 @@
 Parsing empty_agents.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -26,6 +25,19 @@ Signature:states:5:
 Signature:states:5:0:
 Signature:states:5:0:state_id:0->u
 Signature:duals: 
+Signature: 
+Signature:agents info:0:
+A -> 2File "empty_agents.ka", line 1, characters 7-8:File "empty_agents.ka", line 2, characters 0-1:
+Signature:agents info:1:
+B -> 2File "empty_agents.ka", line 2, characters 11-12:File "empty_agents.ka", line 3, characters 2-3:
+Signature:agents info:2:
+C -> 2File "empty_agents.ka", line 3, characters 9-10:File "empty_agents.ka", line 4, characters 0-1:
+Signature:agents info:3:
+D -> 1File "empty_agents.ka", line 4, characters 11-12:
+Signature:agents info:4:
+E -> 1File "empty_agents.ka", line 5, characters 0-1:
+Signature:agents info:5:
+F -> 1File "empty_agents.ka", line 5, characters 11-12:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

@@ -1,0 +1,2 @@
+File "counters_smaller_than.ka", line 9, characters 10-18:
+Counter should not be tested in the rhs of a rule.

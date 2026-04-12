@@ -1,6 +1,5 @@
 Parsing parallel_bonds.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -120,6 +119,19 @@ Signature:duals:5:0:2:agent_type:5,site_type:1,state_id:1
 Signature:duals:5:1:
 Signature:duals:5:1:1:
 Signature:duals:5:1:1:agent_type:5,site_type:0,state_id:2
+Signature: 
+Signature:agents info:0:
+A -> 6File "parallel_bonds.ka", line 1, characters 8-9:File "parallel_bonds.ka", line 7, characters 10-11:File "parallel_bonds.ka", line 14, characters 5-6:File "parallel_bonds.ka", line 14, characters 18-19:File "parallel_bonds.ka", line 14, characters 34-35:File "parallel_bonds.ka", line 14, characters 47-48:
+Signature:agents info:1:
+B -> 6File "parallel_bonds.ka", line 2, characters 8-9:File "parallel_bonds.ka", line 8, characters 10-11:File "parallel_bonds.ka", line 15, characters 5-6:File "parallel_bonds.ka", line 15, characters 18-19:File "parallel_bonds.ka", line 15, characters 34-35:File "parallel_bonds.ka", line 15, characters 47-48:
+Signature:agents info:2:
+C -> 8File "parallel_bonds.ka", line 3, characters 8-9:File "parallel_bonds.ka", line 9, characters 10-11:File "parallel_bonds.ka", line 16, characters 5-6:File "parallel_bonds.ka", line 16, characters 18-19:File "parallel_bonds.ka", line 16, characters 26-27:File "parallel_bonds.ka", line 16, characters 37-38:File "parallel_bonds.ka", line 16, characters 50-51:File "parallel_bonds.ka", line 16, characters 58-59:
+Signature:agents info:3:
+D -> 8File "parallel_bonds.ka", line 4, characters 8-9:File "parallel_bonds.ka", line 10, characters 10-11:File "parallel_bonds.ka", line 17, characters 5-6:File "parallel_bonds.ka", line 17, characters 18-19:File "parallel_bonds.ka", line 17, characters 26-27:File "parallel_bonds.ka", line 17, characters 37-38:File "parallel_bonds.ka", line 17, characters 50-51:File "parallel_bonds.ka", line 17, characters 58-59:
+Signature:agents info:4:
+E -> 8File "parallel_bonds.ka", line 5, characters 8-9:File "parallel_bonds.ka", line 11, characters 10-11:File "parallel_bonds.ka", line 18, characters 5-6:File "parallel_bonds.ka", line 18, characters 18-19:File "parallel_bonds.ka", line 18, characters 26-27:File "parallel_bonds.ka", line 18, characters 37-38:File "parallel_bonds.ka", line 18, characters 50-51:File "parallel_bonds.ka", line 18, characters 58-59:
+Signature:agents info:5:
+F -> 8File "parallel_bonds.ka", line 6, characters 8-9:File "parallel_bonds.ka", line 12, characters 10-11:File "parallel_bonds.ka", line 19, characters 5-6:File "parallel_bonds.ka", line 19, characters 18-19:File "parallel_bonds.ka", line 19, characters 26-27:File "parallel_bonds.ka", line 19, characters 37-38:File "parallel_bonds.ka", line 19, characters 50-51:File "parallel_bonds.ka", line 19, characters 58-59:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

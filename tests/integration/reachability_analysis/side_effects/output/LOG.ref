@@ -1,6 +1,5 @@
 Parsing side_effects.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -84,6 +83,17 @@ Signature:duals:4:
 Signature:duals:4:1:
 Signature:duals:4:1:1:
 Signature:duals:4:1:1:agent_type:3,site_type:1,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 8File "side_effects.ka", line 1, characters 10-11:File "side_effects.ka", line 6, characters 5-6:File "side_effects.ka", line 7, characters 5-6:File "side_effects.ka", line 7, characters 27-28:File "side_effects.ka", line 8, characters 5-6:File "side_effects.ka", line 8, characters 38-39:File "side_effects.ka", line 9, characters 16-17:File "side_effects.ka", line 9, characters 41-42:
+Signature:agents info:1:
+B -> 5File "side_effects.ka", line 2, characters 10-11:File "side_effects.ka", line 7, characters 13-14:File "side_effects.ka", line 7, characters 35-36:File "side_effects.ka", line 8, characters 13-14:File "side_effects.ka", line 8, characters 46-47:
+Signature:agents info:2:
+C -> 6File "side_effects.ka", line 3, characters 10-11:File "side_effects.ka", line 8, characters 24-25:File "side_effects.ka", line 8, characters 57-58:File "side_effects.ka", line 9, characters 5-6:File "side_effects.ka", line 9, characters 30-31:File "side_effects.ka", line 10, characters 5-6:
+Signature:agents info:3:
+D -> 5File "side_effects.ka", line 4, characters 10-11:File "side_effects.ka", line 11, characters 6-7:File "side_effects.ka", line 11, characters 31-32:File "side_effects.ka", line 12, characters 6-7:File "side_effects.ka", line 12, characters 17-18:
+Signature:agents info:4:
+E -> 3File "side_effects.ka", line 5, characters 10-11:File "side_effects.ka", line 11, characters 17-18:File "side_effects.ka", line 11, characters 42-43:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

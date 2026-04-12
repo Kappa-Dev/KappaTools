@@ -1,6 +1,5 @@
 Parsing wild_cards.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -46,6 +45,13 @@ Signature:duals:2:
 Signature:duals:2:0:
 Signature:duals:2:0:1:
 Signature:duals:2:0:1:agent_type:0,site_type:1,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 3File "wild_cards.ka", line 1, characters 8-9:File "wild_cards.ka", line 5, characters 5-6:File "wild_cards.ka", line 5, characters 33-34:
+Signature:agents info:1:
+B -> 3File "wild_cards.ka", line 2, characters 8-9:File "wild_cards.ka", line 5, characters 19-20:File "wild_cards.ka", line 5, characters 48-49:
+Signature:agents info:2:
+C -> 2File "wild_cards.ka", line 3, characters 8-9:File "wild_cards.ka", line 5, characters 57-58:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

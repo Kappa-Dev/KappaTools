@@ -1,2 +1,2 @@
-File "counters.ka", line 23, characters 12-13:
-Counter c becomes less than the   minimal value 0
+File "counters.ka", line 4, characters 10-32:
+Counter should not be tested in the rhs of a rule.

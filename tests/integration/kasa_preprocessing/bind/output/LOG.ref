@@ -1,6 +1,5 @@
 Parsing bind.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -46,6 +45,13 @@ Signature:duals:2:
 Signature:duals:2:0:
 Signature:duals:2:0:1:
 Signature:duals:2:0:1:agent_type:0,site_type:0,state_id:2
+Signature: 
+Signature:agents info:0:
+A -> 7File "bind.ka", line 5, characters 8-9:File "bind.ka", line 11, characters 5-6:File "bind.ka", line 11, characters 29-30:File "bind.ka", line 11, characters 29-30:File "bind.ka", line 11, characters 5-6:File "bind.ka", line 12, characters 5-6:File "bind.ka", line 12, characters 25-26:
+Signature:agents info:1:
+B -> 7File "bind.ka", line 6, characters 8-9:File "bind.ka", line 11, characters 14-15:File "bind.ka", line 11, characters 38-39:File "bind.ka", line 11, characters 38-39:File "bind.ka", line 11, characters 14-15:File "bind.ka", line 13, characters 5-6:File "bind.ka", line 13, characters 28-29:
+Signature:agents info:2:
+C -> 5File "bind.ka", line 7, characters 8-9:File "bind.ka", line 12, characters 14-15:File "bind.ka", line 12, characters 34-35:File "bind.ka", line 13, characters 17-18:File "bind.ka", line 13, characters 40-41:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

@@ -1,6 +1,5 @@
 Parsing ode5.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -100,6 +99,15 @@ Signature:duals:3:1:1:agent_type:2,site_type:1,state_id:1
 Signature:duals:3:2:
 Signature:duals:3:2:1:
 Signature:duals:3:2:1:agent_type:0,site_type:4,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 7File "ode5.ka", line 5, characters 8-9:File "ode5.ka", line 11, characters 5-6:File "ode5.ka", line 11, characters 28-29:File "ode5.ka", line 12, characters 5-6:File "ode5.ka", line 12, characters 28-29:File "ode5.ka", line 15, characters 24-25:File "ode5.ka", line 15, characters 64-65:
+Signature:agents info:1:
+B -> 5File "ode5.ka", line 6, characters 8-9:File "ode5.ka", line 11, characters 17-18:File "ode5.ka", line 11, characters 40-41:File "ode5.ka", line 13, characters 5-6:File "ode5.ka", line 13, characters 30-31:
+Signature:agents info:2:
+C -> 5File "ode5.ka", line 7, characters 8-9:File "ode5.ka", line 12, characters 17-18:File "ode5.ka", line 12, characters 40-41:File "ode5.ka", line 14, characters 5-6:File "ode5.ka", line 14, characters 30-31:
+Signature:agents info:3:
+D -> 7File "ode5.ka", line 8, characters 8-9:File "ode5.ka", line 13, characters 19-20:File "ode5.ka", line 13, characters 44-45:File "ode5.ka", line 14, characters 19-20:File "ode5.ka", line 14, characters 44-45:File "ode5.ka", line 15, characters 5-6:File "ode5.ka", line 15, characters 45-46:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

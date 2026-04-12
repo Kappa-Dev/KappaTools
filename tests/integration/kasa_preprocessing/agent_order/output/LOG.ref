@@ -1,6 +1,5 @@
 Parsing agent_order.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -28,6 +27,11 @@ Signature:duals:1:
 Signature:duals:1:0:
 Signature:duals:1:0:1:
 Signature:duals:1:0:1:agent_type:0,site_type:0,state_id:1
+Signature: 
+Signature:agents info:0:
+A -> 7File "agent_order.ka", line 2, characters 8-9:File "agent_order.ka", line 5, characters 7-8:File "agent_order.ka", line 5, characters 26-27:File "agent_order.ka", line 6, characters 9-10:File "agent_order.ka", line 6, characters 17-18:File "agent_order.ka", line 6, characters 32-33:File "agent_order.ka", line 6, characters 50-51:
+Signature:agents info:1:
+B -> 4File "agent_order.ka", line 3, characters 8-9:File "agent_order.ka", line 5, characters 15-16:File "agent_order.ka", line 5, characters 34-35:File "agent_order.ka", line 6, characters 42-43:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:agent definition:0:A:

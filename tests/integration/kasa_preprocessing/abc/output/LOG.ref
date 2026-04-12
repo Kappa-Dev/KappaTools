@@ -1,6 +1,5 @@
 Parsing abc.ka...
 done
-Scan rules!
 Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
@@ -64,6 +63,13 @@ Signature:duals:2:2:1:agent_type:0,site_type:1,state_id:1
 Signature:duals:2:3:
 Signature:duals:2:3:1:
 Signature:duals:2:3:1:agent_type:0,site_type:1,state_id:2
+Signature: 
+Signature:agents info:0:
+A -> 14File "abc.ka", line 5, characters 8-9:File "abc.ka", line 31, characters 15-16:File "abc.ka", line 10, characters 6-7:File "abc.ka", line 10, characters 26-27:File "abc.ka", line 10, characters 26-27:File "abc.ka", line 10, characters 6-7:File "abc.ka", line 12, characters 7-8:File "abc.ka", line 12, characters 35-36:File "abc.ka", line 13, characters 21-22:File "abc.ka", line 13, characters 44-45:File "abc.ka", line 14, characters 6-7:File "abc.ka", line 14, characters 43-44:File "abc.ka", line 15, characters 9-10:File "abc.ka", line 15, characters 46-47:
+Signature:agents info:1:
+B -> 6File "abc.ka", line 6, characters 8-9:File "abc.ka", line 31, characters 19-20:File "abc.ka", line 10, characters 14-15:File "abc.ka", line 10, characters 34-35:File "abc.ka", line 10, characters 34-35:File "abc.ka", line 10, characters 14-15:
+Signature:agents info:2:
+C -> 10File "abc.ka", line 7, characters 8-9:File "abc.ka", line 32, characters 13-14:File "abc.ka", line 12, characters 20-21:File "abc.ka", line 12, characters 48-49:File "abc.ka", line 13, characters 9-10:File "abc.ka", line 13, characters 32-33:File "abc.ka", line 14, characters 19-20:File "abc.ka", line 14, characters 56-57:File "abc.ka", line 15, characters 22-23:File "abc.ka", line 15, characters 59-60:
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:variables:0:
