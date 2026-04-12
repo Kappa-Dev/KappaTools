@@ -7,9 +7,8 @@
 (license LGPL-3.0-only)
 (authors
   "Jean Krivine" "Jérôme Feret" "Pierre Boutillier"
-  "Ioana Cristescu" "Mutaamba Maasha" "Lý Kim Quyên" "Antoine Pouille")
-(maintainers "Antoine Pouille <antoine.a.pouille@inria.fr>"
-             "Jérôme Feret <jerome.feret@info.ens.psl.eu>")
+  "Ioana Cristescu" "Rebecca Ghidini" "Mutaamba Maasha" "Lý Kim Quyên" "Antoine Pouille")
+(maintainers "Jérôme Feret <jerome.feret@info.ens.psl.eu>")
 (homepage https://kappalanguage.org/)
 (documentation https://kappalanguage.org/sites/kappalanguage.org/files/inline-files/Kappa_Manual.pdf)
 

@@ -6,11 +6,10 @@ Jérôme Feret respectively.
 The simulator was implemented by Jean Krivine (CNRS 2010-2016) and
 Pierre Boutillier (PPS 2015 and HMS 2016-2020).
 
-The computation of stories was implemented by Jérôme Feret (INRIA
-2010-2020).
+The computation of stories was implemented by Jérôme Feret (INRIA & DIENS
+2010-2026).
 
-The static analyser was implemented by Jérôme Feret (INRIA 2010-2020)
-and Kim Quyên Lý (INRIA 2015-2017).
+The static analyser was implemented by Jérôme Feret (INRIA 2010-2026), Kim Quyên Lý (INRIA & DIENS 2015-2017), and Rebecca Ghidini (DIENS 2025-2026)
 
 The interactive aspects of the simulator were the work of Mutaamba
 Maasha (HMS 2016-2017) and Pierre Boutillier (HMS 2016-2020).
@@ -18,5 +17,8 @@ Maasha (HMS 2016-2017) and Pierre Boutillier (HMS 2016-2020).
 ######################################################################
 HMS = Harvard Medical School.
 CNRS = Centre National de la Recherche Scientifique.
+DIENS = Département d'Informatique de École Normale Supérieure 
+  Ecole normale supérieure, UMR 8548 CNRS, INRIA, Univ PSL 
+INRIA = Institut national de recherche en sciences et technologies du numérique
 PPS = Preuves Programmes Systèmes at
   Univ Paris Diderot, Sorbonne Paris Cité, PPS, UMR 7126 CNRS.
