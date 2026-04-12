@@ -443,14 +443,15 @@ module Domain = struct
         in
         error, init_global_static, init_global_dynamic, None
       | Some (static', local, new_elts) ->
-        let covering_class = 
+        let patch = 
           static'.domain_static_information_covering_class 
         in 
         let compil = Analyzer_headers.get_cc_code static in
         let handler_kappa = Analyzer_headers.get_kappa_handler static in   
+
         let error, domain_static_information_covering_class = 
             Covering_classes_main.scan_predicate_covering_classes 
-            ~covering_class parameters error handler_kappa compil
+            ~patch parameters error handler_kappa compil
         in
 
         ( error,

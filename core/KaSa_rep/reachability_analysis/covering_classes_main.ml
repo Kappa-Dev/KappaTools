@@ -362,22 +362,25 @@ let store_remanent parameters error covering_class _modified_map remanent
   (0) inter (0,1) -> 0
 *)
 
-let clean_classes parameters error covering_classes modified_map
+let clean_classes ?patch parameters error covering_classes modified_map
     nr_guard_parameters =
-  let error, init_pointer =
-    Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameters
+  let error, init_remanent = 
+    match patch with 
+    | None -> 
+      let error, init_pointer =
+        Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameters
       error 0
-  in
-  let init_store_dic =
+      in
+      let init_store_dic =
     Covering_classes_type.Dictionary_of_List_sites_or_guard.init ()
-  in
+      in
   (*------------------------------------------------------------------------*)
   (*init state of dictionary*)
-  let init_remanent =
-    {
-      Covering_classes_type.store_pointer_backward = init_pointer;
+    error,     {
+          Covering_classes_type.store_pointer_backward = init_pointer;
       Covering_classes_type.store_dic = init_store_dic;
     }
+    | Some a -> error, a 
   in
   (*------------------------------------------------------------------------*)
   (*cleaning*)
@@ -457,17 +460,20 @@ let clean_classes parameters error covering_classes modified_map
 (*-------------------------------------------------------------------------*)
 (*compute covering classes in the set of rules*)
 
-let scan_rule_set_remanent ?patch parameters error kappa_handler rules =
+let scan_rule_set_remanent 
+  ?patch parameters error kappa_handler rules =
   (*create a new initial state to store after cleaning the covering classes*)
-  let error, init_result, patch   = 
+  let error, init_result   = 
     match patch with 
-    | None -> let error, init = Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+    | None -> 
+      let error, init = Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
       parameters error 0 in 
-              error, init, None 
-    | Some (init_result, new_elts) -> error, init_result, Some new_elts 
+              error, init
+    | Some init_result -> 
+      error, init_result.Covering_classes_type.store_covering_classes_predicate
   in 
   let error, store_covering_classes =
-    scan_rule_set_covering_classes ?patch parameters error kappa_handler rules
+    scan_rule_set_covering_classes parameters error kappa_handler rules
   in
   let result_covering_classes =
     store_covering_classes.Covering_classes_type.store_covering_classes
@@ -487,10 +493,14 @@ let scan_rule_set_remanent ?patch parameters error kappa_handler rules =
           | error, None -> error, Ckappa_sig.Site_map_and_set.Map.empty
           | error, Some m -> error, m
         in
+        let error, patch = 
+          Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get parameters error agent_type 
+        init_remanent 
+        in 
         (*-----------------------------------------------------------------*)
         (*clean the covering classes, removed duplicate of covering classes*)
         let error, store_remanent_dic =
-          clean_classes parameters error covering_class modified_map
+          clean_classes ?patch parameters error covering_class modified_map
             (Handler.get_nr_guard_parameters kappa_handler)
         in
         (*---------------------------------------------------------------*)
@@ -571,10 +581,10 @@ let scan_rule_set_remanent ?patch parameters error kappa_handler rules =
 (**************************************************************************)
 (*MAIN*)
 
-let covering_classes parameters error kappa_handler cc_compil =
+let covering_classes ?patch parameters error kappa_handler cc_compil =
   let parameters = Remanent_parameters.update_prefix parameters "agent_type:" in
   let error, result =
-    scan_rule_set_remanent parameters error kappa_handler
+    scan_rule_set_remanent ?patch parameters error kappa_handler
       cc_compil.Cckappa_sig.rules
   in
   error, result
@@ -690,10 +700,9 @@ let collect_remanent_triple parameters error store_remanent =
       error, store_result)
     store_remanent empty_array
 
-let scan_predicate_covering_classes ?covering_class parameters error handler_kappa compil =
-  let _ = covering_class in 
-  let error, store_covering_classes =
-    covering_classes parameters error handler_kappa compil
+let scan_predicate_covering_classes ?patch  parameters error handler_kappa compil =
+   let error, store_covering_classes =
+    covering_classes ?patch parameters error handler_kappa compil
   in
   (*-----------------------------------------------------------------------*)
   let error, store_list_of_site_type_in_covering_classes =
