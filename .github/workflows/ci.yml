@@ -9,7 +9,7 @@ jobs:
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: 4.14.x
+          ocaml-compiler: 4.14.2
           dune-cache: true
       - name: Install dependencies
         run: |
@@ -28,7 +28,7 @@ jobs:
       matrix: # 2x2 versions ran here, with 2 different ocaml versions and with/without labltk
         ocaml-compiler:
           - 4.13.x
-          - 4.14.x
+          - 4.14.2
         additional-packages:
           - ''
           - labltk
@@ -58,7 +58,7 @@ jobs:
         run: opam exec -- make --jobs=2 check
       - name: Archive documentation
         uses: actions/upload-artifact@v4
-        if: matrix.ocaml-compiler == '4.14.x' && matrix.additional-packages == ''
+        if: matrix.ocaml-compiler == '4.14.2' && matrix.additional-packages == ''
         with:
           name: doc
           path: |
