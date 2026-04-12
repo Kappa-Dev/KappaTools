@@ -566,9 +566,9 @@ let scan_compil_incremental ~do_not_declare parameters error ?diff compil
       (local_trace || Remanent_parameters.get_trace parameters)
   in
   let remanent = error, remanent in
-  let also_explore_tested_agents = true in 
-(*    Remanent_parameters.lexical_analysis_of_tested_only_patterns parameters*)
-(*  in*)
+  let also_explore_tested_agents = true in
+  (*    Remanent_parameters.lexical_analysis_of_tested_only_patterns parameters*)
+  (*  in*)
   let scan_tested_mixture =
     if also_explore_tested_agents then
       scan_mixture
