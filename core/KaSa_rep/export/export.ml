@@ -2457,7 +2457,11 @@ functor
       let log = Remanent_parameters.get_logger parameters in
       let state, summary_ast = state, summary in
       (* Former summary could be stored in remanent state *)
-      let files = Option.map (fun x -> [ x ]) patch_file_name in
+      let files = 
+        match patch_file_name with 
+        | None -> None 
+        | Some x -> Some [x] 
+      in 
       let do_we_show_title =
         match do_we_show_title with
         | Some true -> true
