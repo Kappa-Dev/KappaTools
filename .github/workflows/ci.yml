@@ -172,7 +172,7 @@ jobs:
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: 4.13.x
+          ocaml-compiler: 4.14.2
           dune-cache: true
       - name: Install OPAM dependencies
         run: opam install --yes . --deps-only
