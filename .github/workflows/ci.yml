@@ -197,13 +197,7 @@ jobs:
         with:
           name: windows
           path: KappappWin.zip
-      - name: Update nightly release
-        uses: pyTooling/Actions/releaser@r0
-        with: 
-          tag: nightly 
-          rm: true 
-          token: ${{ secrets.GITHUB_TOKEN }}
-          files: KappappWin.zip 
+     
 
   #webapp-playwright-test:
 #    needs: [cli-and-doc, webapp-ubuntu]
@@ -286,6 +280,19 @@ jobs:
         with:
           name: macos-dist 
           path: Kappapp.app.zip 
+
+  night_windows: 
+    needs: [webapp-windows]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout mac os code 
+        uses: actions/checkout@v5
+      - name: Download artifact 
+        uses: actions/download-artifact@v4 
+        with:
+          name: windows
+          path: KappappWin.zip
+  
   
   deploy:
     needs: [cli-and-doc, webapp-ubuntu, webapp-macos, webapp-windows]
