@@ -11,8 +11,8 @@
 # or in output/experiments_output_compare_ws_plot.png (plot)
 
 DEBUG=false
-VERBOSE=true
-INSTALL_DEPS=true
+VERBOSE=false
+INSTALL_DEPS=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${SCRIPT_DIR}/../../.."
@@ -255,6 +255,7 @@ echo
 echo "📝 The mean of all runtimes can be found in: $OUTPUT_MEAN_RUNTIMES"
 
 OUTPUT_LATEX_RUNTIMES="${OUTPUT_DIR}experiments_output_compare_ws.tex"
+OUTPUT_HTML_RUNTIMES="${OUTPUT_DIR}experiments_output_compare_ws.html"
 
 cmd=(python3 
     "${SCRIPT_DIR}/latex_table_compare_ws.py" 
@@ -267,6 +268,7 @@ fi
 { ${cmd[@]}; }
 
 echo "📊 The latex table of the runtimes can be found in: $OUTPUT_LATEX_RUNTIMES"
+echo "🕸️ The html table of the runtimes can be found in: $OUTPUT_HTML_RUNTIMES"
 
 cmd=(python3 
     "${SCRIPT_DIR}/plot.py" "${OUTPUT_DIR}experiments_output_mean.csv" "${OUTPUT_DIR}runtimes"

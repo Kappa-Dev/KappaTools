@@ -361,8 +361,9 @@ echo
 echo "📝 The mean of all runtimes can be found in: $OUTPUT_MEAN_RUNTIMES"
 
 OUTPUT_LATEX_RUNTIMES="${OUTPUT_DIR}experiments_output.tex"
+OUTPUT_HTML_RUNTIMES="${OUTPUT_DIR}experiments_output.html"
 
-# draw a latex table with the runtimes
+# draw a latex and a html table with the runtimes
 
 cmd=(python3 
     "${SCRIPT_DIR}/latex_table_of_runtimes.py" 
@@ -375,5 +376,6 @@ fi
 { ${cmd[@]}; }
 
 echo "📊 The latex table of the runtimes can be found in: $OUTPUT_LATEX_RUNTIMES"
+echo "🕸️ The html table of the runtimes can be found in: $OUTPUT_HTML_RUNTIMES"
 
 deactivate
