@@ -165,6 +165,8 @@ jobs:
             -exec codesign --deep -s - \{\} \;
           codesign -s - Kappapp.app
           zip -y -r Kappapp.app.zip Kappapp.app 
+      - name: Vérifier que les fichiers sont là
+        run: ls -l /Users/runner/work/KappaTools/KappaTools
       - name: Save MacOs Binaries 
         uses: actions/upload-artifact@v4 
         with:
@@ -280,32 +282,38 @@ jobs:
         with:
           name: macos-dist 
           path: Kappapp.app.zip 
-      - name: Update nightly release
+      - name: Vérifier que les fichiers sont là
+        run: ls -l /home/runner/work/KappaTools/KappaTools/
+      - name: Update macos nightly release
         uses: pyTooling/Actions/releaser@r0
         with:
           tag: nightly 
           rm: true 
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: Kappapp.app.zip 
+          files: |
+            /home/runner/work/KappaTools/KappaTools/Kappapp.app.zip 
 
   night_windows: 
     needs: [webapp-windows]
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout mac os code 
+      - name: Checkout windows code 
         uses: actions/checkout@v5
       - name: Download artifact 
         uses: actions/download-artifact@v4 
         with:
           name: windows
           path: KappappWin.zip
-      - name: Update nightly release
+      - name: Vérifier que les fichiers sont là aussi 
+        run: ls -l /home/runner/work/KappaTools/KappaTools/
+      - name: Update nightly windows release 
         uses: pyTooling/Actions/releaser@r0
         with:
           tag: nightly 
           rm: true 
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: KappappWin.zip 
+          files: |
+            /home/runner/work/KappaTools/KappaTools/KappappWin.zip 
   
   
   deploy:
