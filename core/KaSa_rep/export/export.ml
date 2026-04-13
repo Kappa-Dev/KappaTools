@@ -2481,10 +2481,12 @@ functor
       let errors, summary_file =
         Diff.get_file ~filename:old_file_name parameters errors summary_ast'
       in
-      let summary =
-        Diff.update_file ~filename:old_file_name summary_file summary_ast
-      in
-      let errors, diff =
+      let state, kappa_handler = get_handler state in
+      let next_rule = Handler.nrules parameters errors kappa_handler in 
+      let next_init = Handler.ninit parameters errors 
+      kappa_handler in 
+      let next_agent_sig = Ckappa_sig.int_of_agent_name (Handler.nagents parameters errors kappa_handler) in 
+      let errors, diff, summary_file =
         Diff.diff
           (Ast.diff_pos_parsing_compil_rule Ast.diff_pos_rule)
           (Ast.diff_pos_init_statement Ast.diff_pos_mixture Ast.diff_pos_mixture
@@ -2494,9 +2496,13 @@ functor
           (Ast.fold_pos_init_statement Ast.fold_pos_mixture Ast.fold_pos_mixture
              Loc.fold_pos_flat)
           Ast.fold_pos_agent_sig parameters errors ~filename:old_file_name
-          ~before:summary_ast ~after:summary_file
+          ~before:summary_ast ~after:summary_file 
+          ~next_rule ~next_init ~next_agent_sig   
       in
-      let state, kappa_handler = get_handler state in
+        let summary =
+        Diff.update_file ~filename:old_file_name summary_file summary_ast
+      in
+    
       let errors, kappa_handler =
         Cckappa_sig.remove_pos_kappa_handler_with_errors parameters errors
           (Diff.remove_of_diff diff) kappa_handler
