@@ -280,6 +280,13 @@ jobs:
         with:
           name: macos-dist 
           path: Kappapp.app.zip 
+      - name: Update nightly release
+        uses: pyTooling/Actions/releaser@r0
+        with:
+          tag: nightly 
+          rm: true 
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: Kappapp.app.zip 
 
   night_windows: 
     needs: [webapp-windows]
@@ -292,6 +299,13 @@ jobs:
         with:
           name: windows
           path: KappappWin.zip
+      - name: Update nightly release
+        uses: pyTooling/Actions/releaser@r0
+        with:
+          tag: nightly 
+          rm: true 
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: KappappWin.zip 
   
   
   deploy:
