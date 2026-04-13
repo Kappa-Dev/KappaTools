@@ -89,13 +89,37 @@ def main(inp_path, out_path):
         lines.append(" & ".join(row_elems) + r" \\")
     lines.append(r"\bottomrule")
     lines.append(r"\end{tabular}")
-
     # write output
     with open(out_path, "w") as outf:
         outf.write("\n".join(lines))
 
+    # Build HTML
+    lines = []
+    lines.append("<table>")
+    lines.append("  <tr>")
+    lines.append("    <th>Nr. of rules in working set</th>")
+    for step in all_steps:
+        lines.append("    <th>" + step + "</th>")
+    lines.append("  </tr>")
+
+    for test_instance in sorted(data.keys()):
+        row_elems = []
+        row_elems.append(latex_escape(test_instance))
+        analysis_items = all_steps
+        for s in analysis_items:
+            val = data[test_instance].get(s, "")
+            if val == "":
+                row_elems.append("")  # empty cell if missing
+            else:
+                row_elems.append(format_time(val))
+        lines.append("  <tr>\n    <td>" + "</td>\n    <td>".join(row_elems) + "</td>\n  </tr>")
+    lines.append("</table>")
+    # write output
+    with open(out_path[:-4] + ".html", "w") as outf:
+        outf.write("\n".join(lines))
+
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python3 latex_table_of_runtimes.py input.csv output.tex")
+        print("Usage: python3 latex_table_compare_ws.py input.csv output.tex")
         sys.exit(1)
     main(sys.argv[1], sys.argv[2])

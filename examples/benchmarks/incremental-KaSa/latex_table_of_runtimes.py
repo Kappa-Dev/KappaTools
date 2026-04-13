@@ -35,6 +35,15 @@ def latex_escape(s: str) -> str:
         s = s.replace(k, v)
     return s
 
+def html_escape(s: str) -> str:
+    # minimal escaping for LaTeX special chars
+    replace = {
+        '\\': ' '
+    }
+    for k, v in replace.items():
+        s = s.replace(k, v)
+    return s
+
 def format_time(t):
     # compact formatting: up to 3 significant digits
     try:
@@ -68,7 +77,13 @@ def main(inp_path, out_path):
             if model not in model_nr_rules:
                 model_nr_rules[model] = nr_rules
 
-    total_step_count = 4
+    # sort by number of rules in the model
+    sorted_data = sorted(data.keys(), key=lambda k: int(model_nr_rules.get(k, "0")))
+
+    step_names = [r"analysis", r"initial\\analysis", r"disable\\rules", r"add\\a rule"]
+    analysis_items = [("1_full",["1_init"]), ("2_decremental",["1_init", "4_disable"]), ("3_incremental",["1_init"])]
+
+    total_step_count = len(step_names)
     col_spec = "l c " + " ".join(["c"] * total_step_count)
 
     # Build LaTeX
@@ -82,14 +97,14 @@ def main(inp_path, out_path):
     lines.append(r"\cmidrule(lr){3-3}")
     lines.append(r"\cmidrule(lr){4-6}")
     # Second header row
-    lines.append(r"& & \bfseries\shortstack{analysis} & \bfseries\shortstack{initial\\analysis} & \bfseries\shortstack{disable\\rules} & \bfseries\shortstack{add\\a rule}\\")
+    header = r"& & \bfseries\shortstack{" + r"} & \bfseries\shortstack{".join(step_names) + r"}\\"
+    lines.append(header)
     lines.append(r"\midrule")
 
-    for model in sorted(data.keys(), key=lambda k: int(model_nr_rules.get(k, "0"))):# sort by number of rules in the model
+    for model in sorted_data:
         row_elems = []
         row_elems.append(r"\texttt{" + latex_escape(model) + "}")
         row_elems.append(latex_escape(model_nr_rules.get(model, "")))
-        analysis_items = [("1_full",["1_init"]), ("2_decremental",["1_init", "4_disable"]), ("3_incremental",["1_init"])]
         for a, steps in analysis_items:
             for s in steps:
                 val = data[model].get(a, {}).get(s, "")
@@ -100,9 +115,39 @@ def main(inp_path, out_path):
         lines.append(" & ".join(row_elems) + r" \\")
     lines.append(r"\bottomrule")
     lines.append(r"\end{tabular}")
-
     # write output
     with open(out_path, "w") as outf:
+        outf.write("\n".join(lines))
+
+    # Build HTML
+    lines = []
+    lines.append("<table>")
+    # First header row
+    lines.append("  <tr>")
+    lines.append("    <th rowspan=\"2\">Model</th>")
+    lines.append("    <th rowspan=\"2\">Nr. of rules</th>")
+    lines.append("    <th colspan=\"1\">non-incremental</th>")
+    lines.append("    <th colspan=\"3\">incremental</th>")
+    lines.append("  </tr>")
+    # Second header row
+    header = "  <tr>\n    <th>" + "</th>\n    <th>".join([html_escape(step) for step in step_names]) + "</th>\n  </tr>"
+    lines.append(header)
+
+    for model in sorted_data:
+        row_elems = []
+        row_elems.append(model)
+        row_elems.append(model_nr_rules.get(model, ""))
+        for a, steps in analysis_items:
+            for s in steps:
+                val = data[model].get(a, {}).get(s, "")
+                if val == "":
+                    row_elems.append("")  # empty cell if missing
+                else:
+                    row_elems.append(format_time(val))
+        lines.append("  <tr>\n    <td>" + "</td>\n    <td>".join(row_elems) + "</td>\n  </tr>")
+    lines.append("</table>")
+    # write output
+    with open(out_path[:-4] + ".html", "w") as outf:
         outf.write("\n".join(lines))
 
 if __name__ == "__main__":
