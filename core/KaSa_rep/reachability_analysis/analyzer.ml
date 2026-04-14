@@ -54,9 +54,9 @@ module type Analyzer = sig
     static_information ->
     dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->
-    ('static, 'dynamic) Analyzer_headers.kasa_state ->
+    (static_information, dynamic_information) Analyzer_headers.kasa_state ->
     Exception.exceptions_caught_and_uncaught
-    * ('static, 'dynamic) Analyzer_headers.kasa_state
+    * (static_information, dynamic_information) Analyzer_headers.kasa_state
 
   val print :
     static_information ->
@@ -376,6 +376,11 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       Remanent_state.set_bdu_handler
         (Analyzer_headers.get_mvbdu_handler
            (Domain.get_global_dynamic_information dynamic))
+        kasa_state
+    in
+    let kasa_state =
+      Remanent_state.set_reachability_result
+        ((global, static), dynamic)
         kasa_state
     in
     error, (*dynamic,*) kasa_state

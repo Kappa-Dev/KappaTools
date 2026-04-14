@@ -54,9 +54,9 @@ module type Analyzer = sig
     static_information ->
     dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->
-    ('static, 'dynamic) Analyzer_headers.kasa_state ->
+    (static_information, dynamic_information) Analyzer_headers.kasa_state ->
     Exception.exceptions_caught_and_uncaught
-    * ('static, 'dynamic) Analyzer_headers.kasa_state
+    * (static_information, dynamic_information) Analyzer_headers.kasa_state
 
   val print :
     static_information ->

@@ -608,6 +608,18 @@ functor
     (******************************************************************)
     (*Reachability*)
     (******************************************************************)
+    let set_reachability_result (static, dynamic) state =
+      let bdu_handler = Reachability.get_bdu_handler dynamic in
+      let state = Remanent_state.set_bdu_handler bdu_handler state in
+      Remanent_state.set_reachability_result (static, dynamic) state
+
+    let reachability_export global static dynamic error state =
+      let bdu_handler = Reachability.get_bdu_handler dynamic in
+      let state = Remanent_state.set_bdu_handler bdu_handler state in
+      let error, state =
+        Reachability.export global static dynamic error state
+      in
+      Remanent_state.set_errors error state
 
     let compute_reachability_result show_title state =
       let state, c_compil = get_c_compilation state in
@@ -620,17 +632,8 @@ functor
       let error, log_info, (global, static), dynamic =
         Reachability.main parameters log_info error bdu_handler c_compil handler
       in
-      let bdu_handler = Reachability.get_bdu_handler dynamic in
-      let state = Remanent_state.set_bdu_handler bdu_handler state in
-      let error, state =
-        Reachability.export global static dynamic error state
-      in
-      let state = Remanent_state.set_errors error state in
+      let state = reachability_export global static dynamic error state in
       let state = Remanent_state.set_log_info log_info state in
-      let state = Remanent_state.set_bdu_handler bdu_handler state in
-      let state =
-        Remanent_state.set_reachability_result ((global, static), dynamic) state
-      in
       state, ((global, static), dynamic)
 
     let update_reachability_result ?do_not_restart_fixpoint_computation
@@ -649,17 +652,8 @@ functor
       let error, dynamic, static =
         Reachability.enable_or_disable_rule static dynamic error c_compil
       in
-      let bdu_handler = Reachability.get_bdu_handler dynamic in
-      let state = Remanent_state.set_bdu_handler bdu_handler state in
-      let error, state =
-        Reachability.export global static dynamic error state
-      in
-      let state = Remanent_state.set_errors error state in
+      let state = reachability_export global static dynamic error state in
       let state = Remanent_state.set_log_info log_info state in
-      let state = Remanent_state.set_bdu_handler bdu_handler state in
-      let state =
-        Remanent_state.set_reachability_result ((global, static), dynamic) state
-      in
       let state = Remanent_state.reset_reachability_memoized_values state in
       state, ((global, static), dynamic)
 
@@ -667,21 +661,13 @@ functor
       get_gen ~log_title:"Reachability analysis"
         Remanent_state.get_reachability_result compute_reachability_result
 
-    let get_reachability_analysis state =
-      let state, (static, dynamic) = get_reachability_analysis state in
-      let handler = Remanent_state.get_bdu_handler state in
-      let dynamic = Reachability.set_bdu_handler handler dynamic in
-      state, (static, dynamic)
-
     let output_reachability_result state =
       let error = Remanent_state.get_errors state in
       let parameters = Remanent_state.get_parameters state in
       let log = Remanent_parameters.get_logger parameters in
       let state, (static, dynamic) = get_reachability_analysis state in
       let error, dynamic = Reachability.print (snd static) dynamic error log in
-      let state =
-        Remanent_state.set_reachability_result (static, dynamic) state
-      in
+      let state = set_reachability_result (static, dynamic) state in
       let state = Remanent_state.set_errors error state in
       state
 
@@ -1119,9 +1105,7 @@ functor
           handler error compil (snd static) dynamic inhibition_map false
       in
       let state = Remanent_state.set_errors error state in
-      let state =
-        Remanent_state.set_reachability_result (static, dynamic) state
-      in
+      let state = set_reachability_result (static, dynamic) state in
       let state =
         Remanent_state.set_internal_influence_map Public_data.High
           (nodes, wake_up_map, inhibition_map)
@@ -1530,9 +1514,7 @@ functor
           Contact_map_scc.filter_edges_in_converted_contact_map parameters
             errors handler static dynamic maybe_reachable cm_graph
       in
-      let state =
-        Remanent_state.set_reachability_result (static, dynamic) state
-      in
+      let state = set_reachability_result (static, dynamic) state in
       let errors, graph_scc =
         Contact_map_scc.compute_graph_scc parameters errors cm_graph
       in
@@ -2294,11 +2276,9 @@ functor
           | None -> assert false
           | Some global -> global
         in
-        let error, state =
-          Reachability.export global static dynamic error state
-        in
+        let state = reachability_export global static dynamic error state in
         let state = Remanent_state.reset_reachability_memoized_values state in
-        Remanent_state.set_errors error state
+        state
       ) else
         Remanent_state.set_errors error state
 
