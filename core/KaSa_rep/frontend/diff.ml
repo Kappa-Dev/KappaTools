@@ -446,12 +446,13 @@ let summarize_from_cckappa parameters error (compil : Cckappa_sig.compil) =
   in
   error, summary
 
-let diff_gen diff_pos scan_pos set_id get_id get_obj 
-            set_map get_map parameters errors ~before
-    ~after ~delta =
+let diff_gen diff_pos scan_pos set_id get_id get_obj set_map get_map parameters
+    errors ~before ~after ~delta =
   let map_before = get_map before in
   let map_after = get_map after in
-  let errors, (removed_list, created_list, pos_renaming, pos_removing, map_after, _) =
+  let ( errors,
+        (removed_list, created_list, pos_renaming, pos_removing, map_after, _) )
+      =
     Mods.StringMap.monadic_fold2 parameters errors
       (fun _parameters errors _ elt elt'
            (removed_list, added_list, pos_diff, pos_removing, map_after, next_id) ->
@@ -459,58 +460,73 @@ let diff_gen diff_pos scan_pos set_id get_id get_obj
           ( removed_list,
             added_list,
             diff_pos (get_obj elt) (get_obj elt') pos_diff,
-            pos_removing, map_after, next_id ) ))
+            pos_removing,
+            map_after,
+            next_id ) ))
       (fun _parameters errors _ elt
            (removed_list, added_list, pos_diff, pos_deleted, map_after, next_id) ->
         ( errors,
           ( get_id elt :: removed_list,
             added_list,
             pos_diff,
-            scan_pos (fun a b -> a :: b) (get_obj elt) pos_deleted, map_after, next_id ) ))
+            scan_pos (fun a b -> a :: b) (get_obj elt) pos_deleted,
+            map_after,
+            next_id ) ))
       (fun _parameters errors key elt
            (removed_list, added_list, pos_diff, pos_removing, map_after, next_id) ->
-            let id = get_id elt in 
-            let elt = set_id next_id elt in 
-        errors, (removed_list, id :: added_list, pos_diff, pos_removing, Mods.StringMap.add
-                 key elt map_after, next_id+1 ))
+        let id = get_id elt in
+        let elt = set_id next_id elt in
+        ( errors,
+          ( removed_list,
+            id :: added_list,
+            pos_diff,
+            pos_removing,
+            Mods.StringMap.add key elt map_after,
+            next_id + 1 ) ))
       map_before map_after
       ([], [], Loc.diff_pos_empty, Loc.remove_pos_empty, map_after, delta)
   in
-  let after = set_map map_after after in 
+  let after = set_map map_after after in
   ( errors,
     {
       new_elt = created_list;
       removed_elt = removed_list;
       pos_renaming;
       pos_removing;
-    }, after)
+    },
+    after )
 
 let diff diff_pos_rule diff_pos_init diff_pos_agent_sig scan_pos_rule
-    scan_pos_init scan_pos_agent_sig parameters errors ~before ~filename ~after ~next_rule ~next_agent_sig ~next_init 
-    =
+    scan_pos_init scan_pos_agent_sig parameters errors ~before ~filename ~after
+    ~next_rule ~next_agent_sig ~next_init =
   let before =
     match Mods.StringMap.find_option filename before with
     | None -> empty_summary_file
     | Some x -> x
   in
-  let errors, diff_agent_sig, after=
-    diff_gen diff_pos_agent_sig scan_pos_agent_sig 
-    (fun a (_,b) -> (a,b)) fst snd
-      (fun summary_agent_sig_map x -> {x with summary_agent_sig_map})
-    (fun x -> x.summary_agent_sig_map)
-      parameters errors ~before ~after ~delta:next_agent_sig 
+  let errors, diff_agent_sig, after =
+    diff_gen diff_pos_agent_sig scan_pos_agent_sig
+      (fun a (_, b) -> a, b)
+      fst snd
+      (fun summary_agent_sig_map x -> { x with summary_agent_sig_map })
+      (fun x -> x.summary_agent_sig_map)
+      parameters errors ~before ~after ~delta:next_agent_sig
   in
   let errors, diff_rules, after =
-    diff_gen diff_pos_rule scan_pos_rule  (fun a (_,b) -> (a,b))  fst snd
-      (fun summary_rule_map x -> {x with summary_rule_map})
+    diff_gen diff_pos_rule scan_pos_rule
+      (fun a (_, b) -> a, b)
+      fst snd
+      (fun summary_rule_map x -> { x with summary_rule_map })
       (fun x -> x.summary_rule_map)
-      parameters errors ~before ~after ~delta:next_rule 
+      parameters errors ~before ~after ~delta:next_rule
   in
   let errors, diff_init, after =
-    diff_gen diff_pos_init scan_pos_init (fun a (_,b) -> (a,b))  fst snd
-       (fun summary_init_state_map x -> {x with summary_init_state_map})
+    diff_gen diff_pos_init scan_pos_init
+      (fun a (_, b) -> a, b)
+      fst snd
+      (fun summary_init_state_map x -> { x with summary_init_state_map })
       (fun x -> x.summary_init_state_map)
-      parameters errors ~before ~after ~delta:next_init 
+      parameters errors ~before ~after ~delta:next_init
   in
   errors, { diff_rules; diff_init; diff_agent_sig }, after
 

@@ -539,6 +539,35 @@ functor
 
     (******************************************************************)
 
+    let status (a, b, c, d) ?dynamic error state =
+      let parameters = Remanent_state.get_parameters state in
+      let error, i' =
+        match dynamic with
+        | None -> error, None
+        | Some dynamic ->
+          let mvbdu_handler' = Reachability.get_bdu_handler dynamic in
+          let error, _mvbdu_handler, i' =
+            Ckappa_sig.Views_bdu.last_entry parameters mvbdu_handler' error ()
+          in
+          error, Some i'
+      in
+      let mvbdu_handler = Remanent_state.get_bdu_handler state in
+      let error, _mvbdu_handler, i =
+        Ckappa_sig.Views_bdu.last_entry parameters mvbdu_handler error ()
+      in
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "%s.%i.%i.%i -> %i%s" a b c d i
+          (match i' with
+          | None -> ""
+          | Some i -> Format.sprintf "/%i" i)
+      in
+      let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      in
+      error
+
     let convert_label a =
       if a < 0 then
         Public_data.Side_effect (-(a + 1))
@@ -622,9 +651,9 @@ functor
       in
       let bdu_handler = Reachability.get_bdu_handler dynamic in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
-      (*let error, state =
-        Reachability.export global static dynamic error state
-      in*)
+      let error, state =
+          Reachability.export global static dynamic error state
+        in
       let state = Remanent_state.set_errors error state in
       let state = Remanent_state.set_log_info log_info state in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
@@ -637,6 +666,12 @@ functor
     let get_reachability_analysis =
       get_gen ~log_title:"Reachability analysis"
         Remanent_state.get_reachability_result compute_reachability_result
+
+    let get_reachability_analysis state =
+      let state, (static, dynamic) = get_reachability_analysis state in
+      let handler = Remanent_state.get_bdu_handler state in
+      let dynamic = Reachability.set_bdu_handler handler dynamic in
+      state, (static, dynamic)
 
     let output_reachability_result state =
       let error = Remanent_state.get_errors state in
@@ -2236,7 +2271,7 @@ functor
 
     let enable_or_disable_rule bool permanently_disable working_set_indexes
         state =
-        let parameters = get_parameters state in 
+      let parameters = get_parameters state in
       let error = get_errors state in
       let error, state, changed =
         toggle_working_set_boolean_parameters_in_compilation error bool state
@@ -2249,7 +2284,10 @@ functor
           Reachability.enable_or_disable_rule (snd static) dynamic error
             c_compil
         in
-        let error, dynamic  = Reachability.print static dynamic error (Remanent_parameters.get_logger parameters) in 
+        let error, dynamic =
+          Reachability.print static dynamic error
+            (Remanent_parameters.get_logger parameters)
+        in
         let global = Remanent_state.get_global_static_information state in
         let global =
           match global with
@@ -2484,10 +2522,12 @@ functor
         Diff.get_file ~filename:old_file_name parameters errors summary_ast'
       in
       let state, kappa_handler = get_handler state in
-      let next_rule = Handler.nrules parameters errors kappa_handler in 
-      let next_init = Handler.ninit parameters errors 
-      kappa_handler in 
-      let next_agent_sig = Ckappa_sig.int_of_agent_name (Handler.nagents parameters errors kappa_handler) in 
+      let next_rule = Handler.nrules parameters errors kappa_handler in
+      let next_init = Handler.ninit parameters errors kappa_handler in
+      let next_agent_sig =
+        Ckappa_sig.int_of_agent_name
+          (Handler.nagents parameters errors kappa_handler)
+      in
       let errors, diff, summary_file =
         Diff.diff
           (Ast.diff_pos_parsing_compil_rule Ast.diff_pos_rule)
@@ -2498,13 +2538,13 @@ functor
           (Ast.fold_pos_init_statement Ast.fold_pos_mixture Ast.fold_pos_mixture
              Loc.fold_pos_flat)
           Ast.fold_pos_agent_sig parameters errors ~filename:old_file_name
-          ~before:summary_ast ~after:summary_file 
-          ~next_rule ~next_init ~next_agent_sig   
+          ~before:summary_ast ~after:summary_file ~next_rule ~next_init
+          ~next_agent_sig
       in
-        let summary =
+      let summary =
         Diff.update_file ~filename:old_file_name summary_file summary_ast
       in
-    
+
       let errors, kappa_handler =
         Cckappa_sig.remove_pos_kappa_handler_with_errors parameters errors
           (Diff.remove_of_diff diff) kappa_handler

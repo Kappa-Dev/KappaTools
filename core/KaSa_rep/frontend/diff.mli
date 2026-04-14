@@ -109,11 +109,13 @@ val diff :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   before:('rule, 'init, 'agent_sig) summary ->
   filename:string ->
-  after:('rule, 'init, 'agent_sig) summary_file -> 
+  after:('rule, 'init, 'agent_sig) summary_file ->
   next_rule:int ->
   next_agent_sig:int ->
   next_init:int ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * diff * ('rule, 'init, 'agent_sig) summary_file 
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * diff
+  * ('rule, 'init, 'agent_sig) summary_file
 
 val dump_diff :
   Remanent_parameters_sig.parameters ->

@@ -83,6 +83,9 @@ module type Analyzer = sig
     * static_information
 
   val get_bdu_handler : dynamic_information -> Ckappa_sig.Views_bdu.handler
+
+  val set_bdu_handler :
+    Ckappa_sig.Views_bdu.handler -> dynamic_information -> dynamic_information
 end
 
 (***************************************************************************)
@@ -404,4 +407,9 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
   let get_bdu_handler dynamic =
     let global = Domain.get_global_dynamic_information dynamic in
     Analyzer_headers.get_mvbdu_handler global
+
+  let set_bdu_handler h dynamic =
+    let global = Domain.get_global_dynamic_information dynamic in
+    let global = Analyzer_headers.set_mvbdu_handler h global in
+    Domain.set_global_dynamic_information global dynamic
 end
