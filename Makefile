@@ -188,7 +188,7 @@ build/KappappWin:
 	+$(MAKE) APP_EXT=local build/site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
 	FILE=$$(mktemp -t electronXXXX); \
-	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-win32-x64.zip && \
+	wget -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-win32-x64.zip && \
 	unzip $$FILE -d build/KappappWin
 	mv build/site build/KappappWin/resources/app
 	mv build/KappappWin/electron.exe build/KappappWin/Kappapp.exe
