@@ -622,9 +622,9 @@ functor
       in
       let bdu_handler = Reachability.get_bdu_handler dynamic in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
-      let error, state =
+      (*let error, state =
         Reachability.export global static dynamic error state
-      in
+      in*)
       let state = Remanent_state.set_errors error state in
       let state = Remanent_state.set_log_info log_info state in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
@@ -2236,6 +2236,7 @@ functor
 
     let enable_or_disable_rule bool permanently_disable working_set_indexes
         state =
+        let parameters = get_parameters state in 
       let error = get_errors state in
       let error, state, changed =
         toggle_working_set_boolean_parameters_in_compilation error bool state
@@ -2248,6 +2249,7 @@ functor
           Reachability.enable_or_disable_rule (snd static) dynamic error
             c_compil
         in
+        let error, dynamic  = Reachability.print static dynamic error (Remanent_parameters.get_logger parameters) in 
         let global = Remanent_state.get_global_static_information state in
         let global =
           match global with

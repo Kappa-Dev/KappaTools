@@ -197,49 +197,42 @@ let main () =
         let state = print_result parameters state false in
         loop (Some (summary, state)) start_time
       | input, Some (summary, state) ->
-        let success, state =
+        let state =
           match parse_input input with
           | Enable (false, i) ->
             let () =
               Loggers.fprintf log "Disabling rule with label '%s'...\n" i
             in
-            true, Export_to_KaSa.disable_rule i state
+            Export_to_KaSa.disable_rule i state
           | Enable (true, i) ->
             let () =
               Loggers.fprintf log "Enabling rule with label '%s'...\n" i
             in
-            true, Export_to_KaSa.enable_rule i state
+            Export_to_KaSa.enable_rule i state
           | Enable_index (false, i) ->
             let () =
               Loggers.fprintf log
                 "Disabling initial states or rules at index %s...\n"
                 (String.concat "," (List.map string_of_int (List.rev i)))
             in
-            true, Export_to_KaSa.disable_rule_index i state
+            Export_to_KaSa.disable_rule_index i state
           | Enable_index (true, i) ->
             let () =
               Loggers.fprintf log
                 "Enabling initial states or rules at index %s...\n"
                 (String.concat "," (List.map string_of_int (List.rev i)))
             in
-            true, Export_to_KaSa.enable_rule_index i state
+            Export_to_KaSa.enable_rule_index i state
           | Parsing_error s ->
             let error = Export_to_KaSa.get_errors state in
             let error, () =
               Exception.warn parameters error __POS__
                 ~message:("Parsing error: " ^ s) Exit ()
             in
-            false, Export_to_KaSa.set_errors error state
+            Export_to_KaSa.set_errors error state
         in
-        let state =
-          if success then
-            print_result parameters state true
-          else (
-            let error = Export_to_KaSa.get_errors state in
-            let () = Exception.print parameters error in
-            state
-          )
-        in
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
         loop (Some (summary, state)) start_time
     with End_of_file -> ()
   in
