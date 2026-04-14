@@ -80,7 +80,10 @@ let on_message post text =
   | Some (id, `List [ `String "INIT"; compil ]) ->
     (try
        let compil = Ast.compil_of_json compil in
-       let () = gState := init ~compil () in
+       let state = init ~compil () in
+       let state, summary = summarize_from_ast state in
+       let () = gState := state in
+       let () = gSummary := summary in
        send_response post id `Null
      with e -> send_exception post ~id e)
   | Some (id, `List [ `String "PATCH"; file_name; compil ]) ->

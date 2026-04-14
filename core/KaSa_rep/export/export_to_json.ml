@@ -31,6 +31,14 @@ module type Type = sig
     Diff.summary
     * state
 
+  val summarize_from_ast :
+    state ->
+    state
+    * ( Ast.rule Ast.compil_rule,
+        (Ast.mixture, Ast.mixture, string) Ast.init_statement,
+        Ast.agent_sig )
+      Diff.summary
+
   val get_compilation : state -> state * Ast.parsing_compil
 
   val get_contact_map :
