@@ -1061,30 +1061,28 @@ let print_configuration f ((n, _), l) =
 
 let print_guard = Pp.option ~with_space:false LKappa.print_guard
 
-let print_working_set_prefix id working_set_values =
-  string_of_int id ^ ". "
-  ^
-  match Mods.IntMap.find_option id working_set_values with
-  | None -> "[FAIL]"
-  | Some None -> "[PERMANENTLY DISABLED] "
-  | Some (Some true) -> "[ENABLED] "
-  | Some (Some false) -> "[DISABLED] "
+let print_working_set_prefix_opt working_set_values =
+  Pp.option ~with_space:false (fun f id ->
+      let prefix =
+        match Mods.IntMap.find_option id working_set_values with
+        | None -> "[FAIL]"
+        | Some None -> "[PERMANENTLY DISABLED]"
+        | Some (Some true) -> "[ENABLED]"
+        | Some (Some false) -> "[DISABLED]"
+      in
+      Format.fprintf f "@[%d.@ %s@ @]" id prefix)
 
 let print_init c f = function
   | ws_id, (g, (n, _), INIT_MIX (m, _)) ->
-    Format.fprintf f "@[%s@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]@]"
-      (match ws_id with
-      | None -> ""
-      | Some id -> print_working_set_prefix id c.working_set_values)
-      print_guard g print_ast_alg_expr n
+    Format.fprintf f "@[%a%%init: @[%a@]@ @[%a@]@ @[%a@]@]"
+      (print_working_set_prefix_opt c.working_set_values)
+      ws_id print_guard g print_ast_alg_expr n
       (print_ast_mix ~print_counter)
       m
   | ws_id, (g, (n, _), INIT_TOK t) ->
-    Format.fprintf f "@[%s@[%%init: @[%a@]@ %a %a@]]"
-      (match ws_id with
-      | None -> ""
-      | Some id -> print_working_set_prefix id c.working_set_values)
-      print_guard g print_ast_alg_expr n
+    Format.fprintf f "@[%a%%init: @[%a@]@ %a %a@]"
+      (print_working_set_prefix_opt c.working_set_values)
+      ws_id print_guard g print_ast_alg_expr n
       (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
       t
 
@@ -1186,10 +1184,9 @@ let print_parsing_compil_kappa f c =
          Format.fprintf f "@[%%plot:@ @[%a@]@]" print_ast_alg_expr a))
     c.observables
     (Pp.list Pp.space (fun f (ws_id, s, guard, (r, _)) ->
-         Format.fprintf f "@[@[%s%a%a%a@]@]"
-           (match ws_id with
-           | None -> ""
-           | Some id -> print_working_set_prefix id c.working_set_values)
+         Format.fprintf f "@[@[%a%a%a%a@]@]"
+           (print_working_set_prefix_opt c.working_set_values)
+           ws_id
            (Pp.option ~with_space:false (fun f (s, _) ->
                 Format.fprintf f "'%s'@ " s))
            s print_guard guard print_ast_rule r))
@@ -1209,38 +1206,21 @@ let print_parsing_compil_kappa f c =
     c.sequential_bonds
 
 let print_working_set f c =
-  Format.fprintf f "@[<v>%a%a@]@."
-    (Pp.list
-       (fun f -> Format.fprintf f "@.")
-       (fun f init ->
+  Format.fprintf f "@[<v>%a@,%a@]@."
+    (Pp.list Pp.space (fun f init ->
          match init with
-         | ws_id, (g, (n, _), INIT_MIX (m, _)) ->
+         | ws_id, _ ->
            (match ws_id with
-           | None -> ()
-           | Some id ->
-             Format.fprintf f "@[%s@[%%init: @[%a@]@ @[%a@]@ @[%a@]@]"
-               (print_working_set_prefix id c.working_set_values)
-               print_guard g print_ast_alg_expr n
-               (print_ast_mix ~print_counter)
-               m)
-         | ws_id, (g, (n, _), INIT_TOK t) ->
-           (match ws_id with
-           | None -> ()
-           | Some id ->
-             Format.fprintf f "@[%s@[%%init: @[%a@]@ %a %a@]]"
-               (print_working_set_prefix id c.working_set_values)
-               print_guard g print_ast_alg_expr n
-               (Pp.list Pp.space (fun f (x, _) -> Format.pp_print_string f x))
-               t)))
+           | None -> Format.fprintf f ""
+           | Some _ -> print_init c f init)))
     c.init
-    (Pp.list
-       (fun f -> Format.fprintf f "@.")
-       (fun f (ws_id, s, guard, (r, _)) ->
+    (Pp.list Pp.space (fun f (ws_id, s, guard, (r, _)) ->
          match ws_id with
          | None -> ()
-         | Some id ->
-           Format.fprintf f "@[%s%a%a%a@]"
-             (print_working_set_prefix id c.working_set_values)
+         | Some _ ->
+           Format.fprintf f "@[%a%a%a%a@]"
+             (print_working_set_prefix_opt c.working_set_values)
+             ws_id
              (Pp.option ~with_space:false (fun f (s, _) ->
                   Format.fprintf f "'%s'@ " s))
              s print_guard guard print_ast_rule r))
