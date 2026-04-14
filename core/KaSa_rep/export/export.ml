@@ -652,8 +652,8 @@ functor
       let bdu_handler = Reachability.get_bdu_handler dynamic in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
       let error, state =
-          Reachability.export global static dynamic error state
-        in
+        Reachability.export global static dynamic error state
+      in
       let state = Remanent_state.set_errors error state in
       let state = Remanent_state.set_log_info log_info state in
       let state = Remanent_state.set_bdu_handler bdu_handler state in
