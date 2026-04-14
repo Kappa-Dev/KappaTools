@@ -199,7 +199,16 @@ jobs:
         with:
           name: windows
           path: KappappWin.zip
-     
+      - name: Deploy Windows release
+        uses: WebFreak001/deploy-nightly@v3.2.0
+        with:
+          upload_url: https://uploads.github.com/repos/Kappa-Dev/KappaTools/releases/308266490/assets{?name,label} # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases in your browser and copy the full "upload_url" value including the {?name,label} part
+          release_id: 308266490 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+          asset_path: ./KappappWin.zip  # path to archive to upload
+          asset_name: KappappWin.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+          asset_content_type: application/zip # required by GitHub API
+          max_releases: 2# optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
+          ignore_hash: true # optional, if there is already a release associated with the repo's current commit, should we go ahead and upload the asset anyway.    
 
   #webapp-playwright-test:
 #    needs: [cli-and-doc, webapp-ubuntu]
