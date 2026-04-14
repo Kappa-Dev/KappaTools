@@ -219,8 +219,9 @@ let guard_of_string parameters handler guard_p_name error =
   match bool, output with
   | _, None ->
     Exception.warn parameters error __POS__ Exit
-      Ckappa_sig.dummy_guard_parameter
-  | _, Some (i, _, _, _) -> error, i
+      (Ckappa_sig.dummy_guard_parameter, false)
+  | true, Some (i, _, _, _) -> error, (i, false)
+  | _, Some (i, _, _, _) -> error, (i, true)
 
 let info_of_rule parameters ?(with_rates = false) ?(original = false) error
     compiled (rule_id : Ckappa_sig.c_rule_id) =

@@ -1165,10 +1165,13 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
 
 let translate_guard parameters error handler guard =
   let convert (guard_p_name, loc) error =
-    let error, i =
+    let error, (i, b) =
       Handler.guard_of_string parameters handler guard_p_name error
     in
-    error, (i, loc)
+    if b then
+      error, (i, loc)
+    else
+      Exception.warn parameters error __POS__ Exit (i, loc)
   in
   match guard with
   | None -> error, None
@@ -2343,12 +2346,15 @@ let translate_c_compil parameters error handler compil =
     Mods.IntMap.fold
       (fun id bool (error, valuations) ->
         let guard_name = Ast.working_set_index_to_string id in
-        let error, guard_p_id =
+        let error, (guard_p_id, b) =
           Handler.guard_of_string parameters handler guard_name error
         in
-        let id = Ckappa_sig.working_set_index_of_int id in
-        Ckappa_sig.Ws_index_map_and_set.Map.add parameters error id
-          (guard_p_id, bool) valuations)
+        if b then (
+          let id = Ckappa_sig.working_set_index_of_int id in
+          Ckappa_sig.Ws_index_map_and_set.Map.add parameters error id
+            (guard_p_id, bool) valuations
+        ) else
+          error, valuations)
       compil.Ast.working_set_values
       (error, Ckappa_sig.Ws_index_map_and_set.Map.empty)
   in

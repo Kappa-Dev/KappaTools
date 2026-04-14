@@ -501,7 +501,7 @@ val guard_of_string :
   string ->
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * Ckappa_sig.c_guard_parameter
+  * (Ckappa_sig.c_guard_parameter * bool)
 
 val mvbdu_to_string_formula :
   Remanent_parameters_sig.parameters ->
