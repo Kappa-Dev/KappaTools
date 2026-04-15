@@ -18,7 +18,11 @@ let help_message =
    one.\n\
   \    update file foo.ka as foo'.ka\n\
   \        Replace the content of the current verion of the file foo'.ka with \
-   the content of the file foo.ka\n"
+   the content of the file foo.ka\n\
+  \    output contact map\n\
+  \        Outputs the contact map in output/contact.dot.\n\
+  \    output influence map\n\
+  \        Outputs the influence graph in output/influence.dot.\n"
 
 type parsed_instruction =
   | Enable_index of bool * int list
@@ -166,6 +170,41 @@ let main () =
         loop (Some (summary, state)) None
       | ("print result" | "p result" | "p"), Some (summary, state) ->
         let state = print_result parameters state true in
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
+        loop (Some (summary, state)) start_time
+      | ("output influence map" | "o im"), Some (summary, state) ->
+        let state =
+          Export_to_KaSa.output_influence_map
+            ~accuracy_level:
+              (match
+                 Remanent_parameters.get_influence_map_accuracy_level parameters
+               with
+              | Remanent_parameters_sig.None | Remanent_parameters_sig.Low ->
+                Public_data.Low
+              | Remanent_parameters_sig.Medium -> Public_data.Medium
+              | Remanent_parameters_sig.High | Remanent_parameters_sig.Full ->
+                Public_data.High)
+            state
+        in
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
+        loop (Some (summary, state)) start_time
+      | ("output contact map" | "o cm"), Some (summary, state) ->
+        let state =
+          match
+            Remanent_parameters.get_contact_map_accuracy_level parameters
+          with
+          | Remanent_parameters_sig.Medium | Remanent_parameters_sig.High
+          | Remanent_parameters_sig.Full ->
+            Export_to_KaSa.output_internal_contact_map
+              ~accuracy_level:Public_data.Medium state
+          | Remanent_parameters_sig.None | Remanent_parameters_sig.Low ->
+            Export_to_KaSa.output_internal_contact_map
+              ~accuracy_level:Public_data.Low state
+        in
+        let error = Export_to_KaSa.get_errors state in
+        let () = Exception.print parameters error in
         loop (Some (summary, state)) start_time
       | input, Some (summary, state)
         when String.length input > 12 && String.sub input 0 12 = "update file "
