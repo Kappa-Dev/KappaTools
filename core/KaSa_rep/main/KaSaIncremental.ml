@@ -170,8 +170,6 @@ let main () =
         loop (Some (summary, state)) None
       | ("print result" | "p result" | "p"), Some (summary, state) ->
         let state = print_result parameters state true in
-        let error = Export_to_KaSa.get_errors state in
-        let () = Exception.print parameters error in
         loop (Some (summary, state)) start_time
       | ("output influence map" | "o im"), Some (summary, state) ->
         let state =
