@@ -267,8 +267,12 @@ let remove_file () : unit Api.lwt_result =
       | Some _ -> x
       | None ->
         State_project.eval_with_project ~label:"remove_file" (fun manager ->
-            manager#file_delete name >>= fun y ->
-            x >>= fun x -> Lwt.return (Api_common.result_combine [ x; y ])))
+            match React.S.value current_filename with
+            | None -> Lwt.return (Result_util.ok ())
+            | Some current_file_name ->
+              manager#file_update_ws current_file_name >>= fun _ ->
+              manager#file_delete name >>= fun y ->
+              x >>= fun x -> Lwt.return (Api_common.result_combine [ x; y ])))
 
 let do_a_move state file_id rank =
   match
