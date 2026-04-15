@@ -37,6 +37,11 @@
           (ExceptionDefn.Malformed_Decl
              ("The mod component is not consistent (mixture compilation).",e))
 
+  let fail_sig_error_mod_compilation e _  = 
+ raise
+          (ExceptionDefn.Malformed_Decl
+             ("The mod component is not consistent (signature compilation).",e))
+
 let fail_with_two_occurrences_of_a_site _ site = 
  raise
           (ExceptionDefn.Malformed_Decl
@@ -68,10 +73,15 @@ let fail_with_two_occurrences_of_a_site _ site =
           (ExceptionDefn.Malformed_Decl
              ((Format.sprintf "Lnk state is missing in a site.",e)))*)
 
-   let fail_with_several_lnk_states e   = 
+   let fail_with_absent_agent_in_sig e = 
+     raise
+          (ExceptionDefn.Malformed_Decl
+             ("Absent agents are not allowed in agent signature",e))    
+             
+    let fail_with_several_lnk_states s e   = 
        raise
           (ExceptionDefn.Malformed_Decl
-             ((Format.sprintf "Several Lnk states in a site.",e)))
+             ((Format.sprintf "Several Lnk states in the  site %s." s,e)))
   
   let fail_with_bad_counter_test e   = 
        raise
@@ -103,7 +113,7 @@ let fail_with_two_occurrences_of_a_site _ site =
           (ExceptionDefn.Malformed_Decl
              ((Format.sprintf "The binding state of the site %s is not specified enough in the lhs" s),e))
 
-  let fail_with_several_link_state s e = 
+  let fail_with_several_link_states s e = 
       raise
           (ExceptionDefn.Malformed_Decl
              ((Format.sprintf "Site %s has several binding states" s),e))
@@ -122,6 +132,18 @@ let fail_with_underspecified_internal_state_in_rhs s e =
       raise
           (ExceptionDefn.Malformed_Decl
              ((Format.sprintf "Site %s has several internal states" s),e))
+
+  let fail_with_multiple_occurrence_of_the_link_state s e = 
+raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "Multiple occurrence of the link state %s" s),e))
+
+  let fail_with_multiple_occurrence_of_the_internal_state s e = 
+raise
+          (ExceptionDefn.Malformed_Decl
+             ((Format.sprintf "Multiple occurrence of the internal state %s" s),e))
+
+
 
   let rec check_list get_pos_elt check_elt e a = 
     match a with 
@@ -155,15 +177,77 @@ let fail_with_underspecified_internal_state_in_rhs s e =
     if a.Ast.counter_test = None 
     then () 
     else fail_with_bad_counter_test loc 
+  let check_counter_sig _loc _a = () 
 
-  let check_port_int _e _a = ()
-  let check_port_link _e _a = ()
+  
+
+  let anonym a = 
+    match a with 
+      | LKappa.ANY_FREE 
+      | LKappa.LNK_FREE 
+      | LKappa.LNK_ANY 
+      | LKappa.LNK_SOME ->  a
+      | LKappa.LNK_TYPE ((s,_),(s',_)) -> 
+        LKappa.LNK_TYPE(Loc.annot_with_dummy s,Loc.annot_with_dummy s') 
+      | LKappa.LNK_VALUE (_i,()) -> a 
+
+  let check_port_int_link_sig anonym m s _e a = 
+    let a = 
+    List.sort (fun (a,_) (b,_) -> compare (anonym a) (anonym b)) a in 
+    let rec aux l = 
+      match l with 
+      | (a,_)::(b,pos)::_ when anonym a=anonym b -> m s pos
+      | _::q -> aux q 
+      | [] -> () 
+    in aux a 
+
+  let check_port_link_sig = 
+      check_port_int_link_sig anonym 
+        (fun s e -> 
+          fail_with_multiple_occurrence_of_the_link_state (s:string) (e:Loc.t)
+        )
+
+  let check_port_int_sig s e = 
+      check_port_int_link_sig (fun a -> a)
+        (fun s e -> 
+          fail_with_multiple_occurrence_of_the_internal_state (s:string) (e:Loc.t) 
+        ) s e 
+
+
+  let check_port_int _e s a = 
+    match a with 
+      | [] | [_] -> () 
+     | _ :: (_, pos) :: _ ->
+      fail_with_several_internal_states (fst s) pos 
+    
+  let check_port_link _e (s:string*Loc.t) a = 
+    match a with 
+      | [] | [_] -> () 
+     | _ :: (_, (pos:Loc.t)) :: _ ->
+      fail_with_several_lnk_states (fst s) pos 
+ 
+
+let check_port_sig (e:Loc.t) a = 
+    if a.Ast.port_int_mod = None && a.Ast.port_link_mod = None 
+    then 
+      begin 
+        let () = 
+          check_port_int_sig 
+          (fst a.Ast.port_name)
+          e
+          a.Ast.port_int 
+        in 
+        check_port_link_sig (fst a.Ast.port_name) e a.Ast.port_link 
+      end 
+    else 
+      fail_with_bad_site_state_modification e 
+   
   let check_port_lhs e a = 
     if a.Ast.port_int_mod = None && a.Ast.port_link_mod = None 
     then 
       begin 
-        let () = check_port_int e a.Ast.port_int in 
-        check_port_link e a.Ast.port_link 
+        let () = check_port_int e a.Ast.port_name a.Ast.port_int in 
+        check_port_link e a.Ast.port_name  a.Ast.port_link 
       end 
     else 
       fail_with_bad_site_state_modification e 
@@ -173,8 +257,8 @@ let fail_with_underspecified_internal_state_in_rhs s e =
     if a.Ast.port_int_mod = None && a.Ast.port_link_mod = None 
     then 
       begin 
-        let () = check_port_int e a.Ast.port_int in 
-        check_port_link e a.Ast.port_link 
+        let () = check_port_int e a.Ast.port_name a.Ast.port_int in 
+        check_port_link e a.Ast.port_name a.Ast.port_link 
       end 
     else 
       fail_with_bad_site_state_modification_in_creation e 
@@ -231,7 +315,7 @@ let fail_with_underspecified_internal_state_in_rhs s e =
 
     | _, _ :: (_, pos) :: _ 
     | _ :: (_, pos) :: _, _ ->
-      fail_with_several_link_state s pos 
+      fail_with_several_link_states s pos 
       in 
       match sa.Ast.port_int, sb.Ast.port_int with
     | [], [] | [ (None, _) ], [ _ ] 
@@ -245,28 +329,28 @@ let fail_with_underspecified_internal_state_in_rhs s e =
       fail_with_several_internal_states s pos 
       
   
-  let sort_interface = 
+  let sort_interface get_counter_name = 
    List.sort 
         (fun x y -> 
         match x,y with Ast.Port a,Port b -> compare (fst a.port_name) (fst b.port_name) 
-           | Ast.Counter a,Ast.Counter b ->  compare (fst a.Ast.counter_name) (fst b.Ast.counter_name) 
+           | Ast.Counter a,Ast.Counter b ->  compare (fst (get_counter_name a)) (fst (get_counter_name b)) 
            | Ast.Port _,Ast.Counter _  -> -1 
            | Ast.Counter _, Ast.Port _ -> 1)
   
 
-  let check_interface_gen check_port check_counter e inta = 
-    let inta = sort_interface inta in 
+  let check_interface_gen check_port get_counter_name check_counter e inta = 
+    let inta = sort_interface get_counter_name inta in 
     let check_elt e a former = 
        match a with 
       | Ast.Port a when (Some (fst a.Ast.port_name)) =  former ->  fail_with_two_occurrences_of_a_site e a.Ast.port_name 
-      | Ast.Counter a when (Some (fst a.Ast.counter_name)) =  former ->  
-       fail_with_two_occurrences_of_a_site e a.Ast.counter_name 
+      | Ast.Counter a when (Some (fst (get_counter_name a))) =  former ->  
+       fail_with_two_occurrences_of_a_site e (get_counter_name a)
       | Ast.Port a -> 
       let () = check_port e a in 
       Some (fst a.Ast.port_name)  
       | Ast.Counter a -> 
       let () = check_counter e a 
-      in Some (fst a.Ast.counter_name)  
+      in Some (fst (get_counter_name a))
     in 
     let rec aux e inta former =   
       match inta with 
@@ -276,13 +360,14 @@ let fail_with_underspecified_internal_state_in_rhs s e =
       | [] -> () 
   in aux e inta None 
   
-  let check_interface_lhs = check_interface_gen check_port_lhs check_counter_lhs
-  let check_interface_rhs = check_interface_gen check_port_rhs check_counter_rhs 
-  
+  let check_interface_lhs = check_interface_gen check_port_lhs (fun a -> a.Ast.counter_name)  check_counter_lhs
+  let check_interface_rhs = check_interface_gen check_port_rhs (fun a -> a.Ast.counter_name)   check_counter_rhs 
+  let check_interface_sig = check_interface_gen 
+  check_port_sig (fun (a:Counters_info.counter_sig)  -> a.Counters_info.counter_sig_name)   check_counter_sig 
 
   let check_interface_both e inta intb = 
-    let inta = sort_interface inta in 
-    let intb = sort_interface intb in 
+    let inta = sort_interface (fun a ->a.Ast.counter_name) inta in 
+    let intb = sort_interface (fun a -> a.Ast.counter_name)  intb in 
     let check_elt e a b former = 
        match a, b with 
       | Ast.Port a, Ast.Port b ->  
@@ -319,6 +404,13 @@ let fail_with_underspecified_internal_state_in_rhs s e =
       | _::_, [] | [],_::_-> fail_with_site_mismatch e  inta intb 
   in aux e inta intb None 
   
+  let check_agent_sig e a = 
+    match a with 
+      | Ast.Absent pos -> fail_with_absent_agent_in_sig pos 
+      | Ast.Present(_,intf, Ast.NoMod) ->  check_interface_sig e intf 
+      | Ast.Present(_,_,(Ast.Erase | Ast.Create)) -> 
+       fail_sig_error_mod_compilation e ()
+
   let check_agent_lhs e (_,intf) = 
     check_interface_lhs e intf  
   let check_agent_rhs e (_,intf) = 
@@ -344,7 +436,7 @@ let fail_with_underspecified_internal_state_in_rhs s e =
   let check_rule_line  = 
       check_list2 get_pos_agent fail_missing_agent fail_missing_agent check_agent_both 
     
-  let _get_pos_parametric_agent _ agent_sig = 
+  let get_pos_parametric_agent  agent_sig = 
     match agent_sig with 
       | Ast.Absent pos -> pos 
       | Ast.Present ((_,pos),_,_) -> pos 
@@ -357,8 +449,8 @@ let fail_with_underspecified_internal_state_in_rhs s e =
   | Ast.GUARD_PARAM ((_,pos),_) 
   | Ast.TOKENSIG (_,pos)  
   | Ast.PLOT (_,pos) 
-  | Ast.PERT (_,pos) -> pos    
-  | Ast.SIG _ 
+  | Ast.PERT (_,pos) -> pos  
+  | Ast.SIG ag -> get_pos_parametric_agent ag 
   | Ast.CONFIG _ 
   | Ast.VOLSIG _ 
   | Ast.INIT _ 
@@ -370,11 +462,13 @@ let fail_with_underspecified_internal_state_in_rhs s e =
       check_list2 get_pos_rule_line fail_missing_rule_line fail_missing_rule_line  check_rule_line   
 
 
+
+
   let deal_with_port _e acc port = 
     match port.Ast.port_link with 
     | [ (ANY_FREE | LNK_FREE | LNK_ANY | LNK_SOME | LNK_TYPE _) ,_ ] | [] -> acc 
     | [ LNK_VALUE (i, _),_ ] -> i::acc 
-    | (_,e)::_::_ -> fail_with_several_lnk_states e 
+    | (_,e)::_::_ -> fail_with_several_link_states (fst port.Ast.port_name)  e 
 
   let deal_with_site e acc site = 
     match site with 
@@ -467,6 +561,7 @@ let check_expr e a =
 
 
 
+
  
 
 
@@ -491,7 +586,7 @@ let check_init_statement e (_,expr,i) =
      | Ast.RULE (_,_,rule,_) -> check_rule e rule 
      | Ast.INIT (init_statement,_) -> 
             check_init_statement e init_statement   
-     | Ast.SIG _ 
+     | Ast.SIG agent_sig  -> check_agent_sig e agent_sig 
      | Ast.TOKENSIG _  | Ast.VOLSIG _ -> ()    
      | Ast.DECLARE var_def 
      | Ast.OBS var_def  -> check_var_def e var_def 
