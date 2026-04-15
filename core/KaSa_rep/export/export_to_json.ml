@@ -146,7 +146,12 @@ functor
       state, Public_data.nodes_of_influence_map_to_json (accuracy_level, nodes)
 
     let default_origin_of_influence_map state =
-      refined_node_of_flattened_id state 0
+      let state, nrules = nrules state in
+      let state, nvars = nvars state in
+      if nrules = 0 && nvars = 0 then
+        state, None
+      else
+        refined_node_of_flattened_id state 0
 
     let short_default_origin_of_influence_map state =
       let state, origin_opt = default_origin_of_influence_map state in
@@ -163,14 +168,24 @@ functor
 
     let get_local_influence_map ?(accuracy_level = Public_data.Low) ?bwd ?fwd
         ~total ?origin state =
-      let state, flattened_id =
-        flattened_id_of_short_node_opt_or_default_origin state origin
+      let state, origin, influence_map =
+        let state, nrules = nrules state in
+        let state, nvars = nvars state in
+        if nvars = 0 && nrules = 0 && origin = None then
+          state, None, Public_data.empty_influence_map
+        else (
+          let state, flattened_id =
+            flattened_id_of_short_node_opt_or_default_origin state origin
+          in
+          let node_id = Ckappa_sig.rule_id_of_int flattened_id in
+          let state, influence_map =
+            get_local_influence_map ~accuracy_level ?fwd ?bwd ~total node_id
+              state
+          in
+          let state, id = refined_node_of_flattened_id state flattened_id in
+          state, id, influence_map
+        )
       in
-      let node_id = Ckappa_sig.rule_id_of_int flattened_id in
-      let state, influence_map =
-        get_local_influence_map ~accuracy_level ?fwd ?bwd ~total node_id state
-      in
-      let state, origin = refined_node_of_flattened_id state flattened_id in
       ( state,
         Public_data.local_influence_map_to_json
           (accuracy_level, total, bwd, fwd, origin, influence_map) )

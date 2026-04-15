@@ -738,10 +738,18 @@ functor
     let flattened_id_of_short_node_opt state short_node_opt =
       let parameters = get_parameters state in
       let error = get_errors state in
+      let state, nrules = nrules state in
+      let state, nvars = nvars state in
       let error, (state, flattened_id) =
         match short_node_opt with
         | Some short_node -> error, flattened_id_of_short_node state short_node
-        | None -> Exception.warn parameters error __POS__ Exit (state, 0)
+        | None ->
+          if nrules = 0 && nvars = 0 then
+            Exception.warn ~to_ui:true
+              ~message:"there is no node in the influence map yet" parameters
+              error __POS__ Exit (state, 0)
+          else
+            Exception.warn parameters error __POS__ Exit (state, 0)
       in
       let state = set_errors error state in
       state, flattened_id
@@ -760,7 +768,11 @@ functor
               (Ckappa_sig.rule_id_of_int flattened_id)
           in
           error, Some refined_id
-        ) else
+        ) else if nvars = 0 && nrules = 0 then
+          Exception.warn ~to_ui:true
+            ~message:"there is no node in the influence map yet" parameters
+            error __POS__ Exit None
+        else
           Exception.warn parameters error __POS__ Exit None
       in
       let state = set_errors error state in

@@ -597,6 +597,13 @@ type influence_map = {
   negative: half_influence_map;
 }
 
+let empty_influence_map =
+  {
+    nodes = [];
+    positive = InfluenceNodeMap.empty;
+    negative = InfluenceNodeMap.empty;
+  }
+
 (* Location labels *)
 let location_to_json a =
   match a with

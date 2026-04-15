@@ -121,6 +121,7 @@ type influence_map = {
   negative: location pair list InfluenceNodeMap.t InfluenceNodeMap.t;
 }
 
+val empty_influence_map : influence_map
 val influence_map_to_json : accuracy_level * influence_map -> Yojson.Basic.t
 val influence_map_of_json : Yojson.Basic.t -> accuracy_level * influence_map
 
