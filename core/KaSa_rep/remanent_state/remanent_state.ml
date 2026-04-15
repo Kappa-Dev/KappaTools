@@ -779,6 +779,7 @@ let reset_reachability_memoized_values state =
     bidirectional_influence_map = Public_data.AccuracyMap.empty;
     local_influence_map_blackboard = None;
     contact_map = Public_data.AccuracyMap.empty;
+    internal_contact_map = Public_data.AccuracyMap.empty;
     internal_scc_decomposition = Public_data.AccuracyMap.empty;
     scc_decomposition = Public_data.AccuracyMap.empty;
     signature = None;
