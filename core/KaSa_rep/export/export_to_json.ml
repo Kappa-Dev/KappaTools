@@ -117,9 +117,13 @@ functor
       init ?compil ~called_from:Remanent_parameters_sig.Server ()
 
     let patch ?compil ~old_file_name ~summary state =
-      patch ~do_not_restart_fixpoint_computation:false ?compil
-        ~called_from:Remanent_parameters_sig.Server ~old_file_name ~summary
-        state
+      let summary, state =
+        patch ~do_not_restart_fixpoint_computation:false ?compil
+          ~called_from:Remanent_parameters_sig.Server ~old_file_name ~summary
+          state
+      in
+      let state, _ = get_reachability_analysis state in
+      summary, state
 
     let get_contact_map ?(accuracy_level = Public_data.Low) state =
       let state, cm = get_contact_map ~accuracy_level state in
