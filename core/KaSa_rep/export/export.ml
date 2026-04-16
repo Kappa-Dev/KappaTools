@@ -11,8 +11,8 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-let warn parameters mh pos exn default =
-  Exception.warn parameters mh pos exn default
+let warn ?to_ui ?message parameters mh pos exn default =
+  Exception.warn ?to_ui ?message parameters mh pos exn default
 
 (****************************************************************)
 (*module signatures*)
@@ -659,7 +659,12 @@ functor
 
     let get_reachability_analysis =
       get_gen ~log_title:"Reachability analysis"
-        Remanent_state.get_reachability_result compute_reachability_result
+        (fun state ->
+          if Remanent_state.is_reachability_result_available state then
+            Remanent_state.get_reachability_result state
+          else
+            None)
+        compute_reachability_result
 
     let output_reachability_result state =
       let error = Remanent_state.get_errors state in
@@ -1379,7 +1384,18 @@ functor
         Remanent_state.get_internal_contact_map Public_data.Medium state
       with
       | Some map -> state, map
-      | None -> assert false
+      | None ->
+        let parameters = Remanent_state.get_parameters state in
+        let errors = Remanent_state.get_errors state in
+        let errors, map =
+          warn ~to_ui:true
+            ~message:
+              "Reachability analysis has not filled the intermediary contact \
+               map"
+            parameters errors __POS__ Exit Preprocess.init_contact_map
+        in
+        let state = set_errors errors state in
+        state, map
 
     let get_intermediary_internal_contact_map =
       get_gen ~do_we_show_title:title_only_in_kasa
@@ -1877,17 +1893,47 @@ functor
                 Array.fold_left
                   (fun (state, acc) site ->
                     let x = site.User_graph.site_name in
-                    let states, rev_binding =
+                    let state, states, rev_binding =
                       match site.User_graph.site_type with
                       | User_graph.Counter _ ->
-                        failwith "KaSa does not deal with counters yet"
+                        let parameters = Remanent_state.get_parameters state in
+                        let errors = Remanent_state.get_errors state in
+                        let errors, () =
+                          warn ~to_ui:true
+                            ~message:
+                              "Reachability analysis has not filled the \
+                               intermediary contact map"
+                            parameters errors __POS__ Exit ()
+                        in
+                        let state = set_errors errors state in
+                        state, [], []
                       | User_graph.Port p ->
-                        ( Option_util.unsome [] p.User_graph.port_states,
-                          (match p.User_graph.port_links with
+                        let state, port_states =
+                          state, Option_util.unsome [] p.User_graph.port_states
+                        in
+
+                        let state, link_states =
+                          match p.User_graph.port_links with
                           | User_graph.LINKS l ->
-                            List.rev_map (fun ((_, i), j) -> i, j) l
-                          | SOME | WHATEVER | TYPE _ -> assert false) )
+                            state, List.rev_map (fun ((_, i), j) -> i, j) l
+                          | SOME | WHATEVER | TYPE _ ->
+                            let parameters =
+                              Remanent_state.get_parameters state
+                            in
+                            let errors = Remanent_state.get_errors state in
+                            let errors, () =
+                              warn ~to_ui:true
+                                ~message:
+                                  "Not fully specified states not allowed in \
+                                   the computation of the signature"
+                                parameters errors __POS__ Exit ()
+                            in
+                            let state = set_errors errors state in
+                            state, []
+                        in
+                        state, port_states, link_states
                     in
+
                     let state, binding' =
                       List.fold_left
                         (fun (state, list) (x, y) ->
@@ -1968,7 +2014,16 @@ functor
       let state, _ = get_reachability_analysis state in
       match Remanent_state.get_dead_rules state with
       | Some l -> state, l
-      | None -> assert false
+      | None ->
+        let parameters = Remanent_state.get_parameters state in
+        let errors = Remanent_state.get_errors state in
+        let errors, map =
+          warn ~to_ui:true
+            ~message:"Reachability analysis has not filled dead rules"
+            parameters errors __POS__ Exit []
+        in
+        let state = set_errors errors state in
+        state, map
 
     let get_dead_rules =
       get_gen ~do_we_show_title:title_only_in_kasa
@@ -1980,7 +2035,17 @@ functor
       let state, _ = get_reachability_analysis state in
       match Remanent_state.get_conditionally_dead_rules state with
       | Some l -> state, l
-      | None -> assert false
+      | None ->
+        let parameters = Remanent_state.get_parameters state in
+        let errors = Remanent_state.get_errors state in
+        let errors, map =
+          warn ~to_ui:true
+            ~message:
+              "Reachability analysis has not filled conditional dead rules"
+            parameters errors __POS__ Exit []
+        in
+        let state = set_errors errors state in
+        state, map
 
     let get_conditionally_dead_rules =
       get_gen ~do_we_show_title:title_only_in_kasa
@@ -1996,12 +2061,21 @@ functor
         Remanent_parameters.set_compute_separating_transitions parameters true
       in
       let state' = set_parameters parameters' state in
-      let state', _ = compute_reachability_result _show_title state' in
       let state', _ = get_reachability_analysis state' in
       let state = set_parameters parameters state' in
       match Remanent_state.get_separating_transitions state with
       | Some l -> state, l
-      | None -> assert false
+      | None ->
+        let parameters = Remanent_state.get_parameters state in
+        let errors = Remanent_state.get_errors state in
+        let errors, map =
+          warn ~to_ui:true
+            ~message:
+              "Reachability analysis has not filled separating transisitions"
+            parameters errors __POS__ Exit []
+        in
+        let state = set_errors errors state in
+        state, map
 
     let get_separating_transitions =
       get_gen ~do_we_show_title:title_only_in_kasa
@@ -2016,7 +2090,16 @@ functor
       let state, _ = get_reachability_analysis state in
       match Remanent_state.get_dead_agents state with
       | Some map -> state, map
-      | None -> assert false
+      | None ->
+        let parameters = Remanent_state.get_parameters state in
+        let errors = Remanent_state.get_errors state in
+        let errors, map =
+          warn ~to_ui:true
+            ~message:"Reachability analysis has not filled dead agents"
+            parameters errors __POS__ Exit []
+        in
+        let state = set_errors errors state in
+        state, map
 
     let get_dead_agents =
       get_gen ~do_we_show_title:title_only_in_kasa
@@ -2028,7 +2111,17 @@ functor
       let state, _ = get_reachability_analysis state in
       match Remanent_state.get_conditionally_dead_agents state with
       | Some map -> state, map
-      | None -> assert false
+      | None ->
+        let parameters = Remanent_state.get_parameters state in
+        let errors = Remanent_state.get_errors state in
+        let errors, map =
+          warn ~to_ui:true
+            ~message:
+              "Reachability analysis has not filled conditional dead agents"
+            parameters errors __POS__ Exit []
+        in
+        let state = set_errors errors state in
+        state, map
 
     let get_conditionally_dead_agents =
       get_gen ~do_we_show_title:title_only_in_kasa

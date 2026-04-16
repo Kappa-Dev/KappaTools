@@ -495,6 +495,9 @@ val get_working_set_elements :
 val reset_reachability_memoized_values :
   ('global, 'static, 'compile) state -> ('global, 'static, 'compile) state
 
+val is_reachability_result_available :
+  ('global, 'static, 'compile) state -> bool
+
 val rename_pos :
   ( Remanent_parameters_sig.parameters,
     Exception.exceptions_caught_and_uncaught,

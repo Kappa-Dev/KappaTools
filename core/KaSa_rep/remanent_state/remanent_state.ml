@@ -218,6 +218,7 @@ type ('global_static, 'static, 'dynamic) state = {
   bdu_handler: Mvbdu_wrapper.Mvbdu.handler;
   reachability_state:
     ('global_static, 'static, 'dynamic) reachability_result option;
+  is_reachability_result_available: bool;
   subviews_info: subviews_info option;
   dead_rules: dead_rules option;
   conditionally_dead_rules: rule_deadness_conditions option;
@@ -300,6 +301,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     transition_system_length = None;
     patch = None;
     global_static_information = None;
+    is_reachability_result_available = false;
   }
 
 (**************)
@@ -661,7 +663,11 @@ let get_scc_decomposition accuracy accuracy' state =
 let get_reachability_result state = state.reachability_state
 
 let set_reachability_result reachability_state state =
-  { state with reachability_state = Some reachability_state }
+  {
+    state with
+    reachability_state = Some reachability_state;
+    is_reachability_result_available = true;
+  }
 
 let get_dead_rules state = state.dead_rules
 
@@ -784,7 +790,11 @@ let reset_reachability_memoized_values state =
     scc_decomposition = Public_data.AccuracyMap.empty;
     signature = None;
     constraint_list = None;
+    is_reachability_result_available = false;
   }
+
+let is_reachability_result_available state =
+  state.is_reachability_result_available
 
 let set_handler_opt h_opt state =
   match h_opt with
