@@ -1,7 +1,6 @@
 %init: 10 EGF()
 %init: 10 EGFR()
 
-
 EGF(r[.]),EGFR(l[.]) -> EGF(r[1]),EGFR(l[1]) @ 1
 EGFR(l[_],r[.]),EGFR(l[_],r[.]) -> EGFR(l[_],r[1]),EGFR(l[_],r[1]) @ 1
 EGFR(r[1],c[.]),EGFR(r[1],n[.]) -> EGFR(r[1],c[2]),EGFR(r[1],n[2]) @1

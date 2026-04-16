@@ -54,29 +54,29 @@ build/site/external: build/site
 build/site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist: external_deps_versions.mk
 	mkdir -p build/site/external
 	FILE=$$(mktemp -t bootstrapXXXX); \
-	curl -LsS -o $$FILE https://github.com/twbs/bootstrap/releases/download/v$(BOOTSTRAP_VERSION)/bootstrap-$(BOOTSTRAP_VERSION)-dist.zip && \
+	wget -o $$FILE https://github.com/twbs/bootstrap/releases/download/v$(BOOTSTRAP_VERSION)/bootstrap-$(BOOTSTRAP_VERSION)-dist.zip && \
 	rm -rf $@ && unzip -d $(dir $@) $$FILE && rm $$FILE
 	touch $@
 
 build/site/external/codemirror-$(CODEMIRROR_VERSION): external_deps_versions.mk
 	mkdir -p build/site/external
 	FILE=$$(mktemp -t codemirrorXXXX); \
-	curl -LsS -o $$FILE http://codemirror.net/codemirror-$(CODEMIRROR_VERSION).zip &&\
+	wget -o $$FILE http://codemirror.net/codemirror-$(CODEMIRROR_VERSION).zip &&\
 	rm -rf $@ && unzip -d $(dir $@) $$FILE && rm $$FILE
 	touch $@
 
 build/site/external/d3: external_deps_versions.mk
 	mkdir -p $@
-	curl -LsS -o $@/d3.v4.min.js http://d3js.org/d3.v4.min.js
+	wget -o $@/d3.v4.min.js http://d3js.org/d3.v4.min.js
 
 build/site/external/dagre-d3: external_deps_versions.mk
 	mkdir -p $@
-	curl -LsS -o $@/dagre-d3.min.js https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.min.js
+	wget -o $@/dagre-d3.min.js https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.min.js
 
 build/site/external/jquery: external_deps_versions.mk
 	mkdir -p $@
-	curl -LsS -o build/site/external/jquery/jquery.js https://code.jquery.com/jquery-$(JQUERY_VERSION).min.js
-	curl -LsS -o build/site/external/jquery/jquery-ui.min.js http://code.jquery.com/ui/$(JQUERY_UI_VERSION)/jquery-ui.min.js
+	wget -o build/site/external/jquery/jquery.js https://code.jquery.com/jquery-$(JQUERY_VERSION).min.js
+	wget -o build/site/external/jquery/jquery-ui.min.js http://code.jquery.com/ui/$(JQUERY_UI_VERSION)/jquery-ui.min.js
 
 %.bc.js: $(filter-out _build/,$(wildcard */*.ml*))
 	dune build $@
@@ -164,7 +164,7 @@ build/Kappapp:
 	+$(MAKE) APP_EXT=local build/site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
 	FILE=$$(mktemp -t electronXXXX); \
-	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-linux-x64.zip && \
+	wget -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-linux-x64.zip && \
 	unzip $$FILE -d build/Kappapp
 	mv build/Kappapp/electron build/Kappapp/kappapp
 	mv build/site build/Kappapp/resources/app
@@ -188,7 +188,7 @@ build/KappappWin:
 	+$(MAKE) APP_EXT=local build/site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
 	FILE=$$(mktemp -t electronXXXX); \
-	wget -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-win32-x64.zip && \
+	curl -LsS -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-win32-x64.zip && \
 	unzip $$FILE -d build/KappappWin
 	mv build/site build/KappappWin/resources/app
 	mv build/KappappWin/electron.exe build/KappappWin/Kappapp.exe
