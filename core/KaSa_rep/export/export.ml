@@ -652,9 +652,9 @@ functor
       let error, dynamic, static =
         Reachability.enable_or_disable_rule static dynamic error c_compil
       in
+      let state = Remanent_state.reset_reachability_memoized_values state in
       let state = reachability_export global static dynamic error state in
       let state = Remanent_state.set_log_info log_info state in
-      let state = Remanent_state.reset_reachability_memoized_values state in
       state, ((global, static), dynamic)
 
     let get_reachability_analysis =
@@ -2381,8 +2381,8 @@ functor
           | None -> assert false
           | Some global -> global
         in
-        let state = reachability_export global static dynamic error state in
         let state = Remanent_state.reset_reachability_memoized_values state in
+        let state = reachability_export global static dynamic error state in
         state
       ) else
         Remanent_state.set_errors error state

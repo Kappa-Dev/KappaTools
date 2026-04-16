@@ -315,7 +315,6 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       let error, dynamic =
         close_event parameters error analysis_event None dynamic
       in
-      let error, dynamic = print static dynamic error log in
       let log_info =
         Analyzer_headers.get_log_info
           (Domain.get_global_dynamic_information dynamic)

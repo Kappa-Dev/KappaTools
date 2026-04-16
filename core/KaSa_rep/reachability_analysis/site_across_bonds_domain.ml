@@ -504,13 +504,7 @@ module Domain = struct
           error, static)
         compil.Cckappa_sig.rules static
     in
-    match start with
-    | Some _ ->
-      (* We do not allow to add new covering classes, during incremental analysis.  *)
-      (* We leave it as future works. *)
-      (* This is sound, but it may lead less precise analysis result. *)
-      error, static, dynamic
-    | None ->
+    (* TO DO, THIS CAN BE DONE INCREMENTALLY *)
       (*------------------------------------------------------------*)
       (*partition map with key is the pair of the bonds in the rhs*)
       let store_potential_tuple_pair = get_potential_tuple_pair static in

@@ -85,14 +85,9 @@ let main () =
   in
   let module Export_to_KaSa = (val export_to_kasa : Export_to_KaSa.Type) in
   let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
-  let print_result parameters state print_analysis =
+  let print_result parameters state =
     let state, _ = Export_to_KaSa.get_reachability_analysis state in
-    let state =
-      if print_analysis then
-        Export_to_KaSa.output_reachability_result state
-      else
-        state
-    in
+    let state = Export_to_KaSa.output_reachability_result state in
     let error = Export_to_KaSa.get_errors state in
     let () = Exception.print parameters error in
     state
@@ -151,7 +146,7 @@ let main () =
           else
             state
         in
-        let state = print_result parameters state false in
+        let state = print_result parameters state in
         let state, summary = Export_to_KaSa.summarize_from_ast state in
         loop (Some (summary, state)) start_time
       | ("print rules" | "p rules"), Some (summary, state) ->
@@ -169,7 +164,7 @@ let main () =
         let () = Exception.print parameters error in
         loop (Some (summary, state)) None
       | ("print result" | "p result" | "p"), Some (summary, state) ->
-        let state = print_result parameters state true in
+        let state = print_result parameters state in
         loop (Some (summary, state)) start_time
       | ("output influence map" | "o im"), Some (summary, state) ->
         let state =
@@ -231,7 +226,7 @@ let main () =
             in
             summary, Export_to_KaSa.set_errors error state
         in
-        let state = print_result parameters state false in
+        let state = print_result parameters state in
         loop (Some (summary, state)) start_time
       | input, Some (summary, state) ->
         let state =

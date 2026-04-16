@@ -421,13 +421,7 @@ module Domain = struct
           scan_rule static dynamic error rule_id rule.Cckappa_sig.e_rule_c_rule)
         compil.Cckappa_sig.rules static
     in
-    match start with
-    | Some _ ->
-      (* We do not allow to add new covering classes, during incremental analysis.  *)
-      (* We leave it as future works. *)
-      (* This is sound, but it may lead less precise analysis result. *)
-      error, static, dynamic
-    | None ->
+    (* TO DO, THIS CAN BE DONE INCREMENTALLY *)
       (*------------------------------------------------------*)
       (*A(x!1, y), B(x!1, y): first site is an action binding*)
       (*------------------------------------------------------*)
