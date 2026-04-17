@@ -632,7 +632,11 @@ functor
       let error, log_info, (global, static), dynamic =
         Reachability.main parameters log_info error bdu_handler c_compil handler
       in
+      (* dump the result *)
       let state = reachability_export global static dynamic error state in
+      let bdu_handler = Reachability.get_bdu_handler dynamic in
+      let state = Remanent_state.set_bdu_handler bdu_handler state in
+      let state = Remanent_state.set_errors error state in
       let state = Remanent_state.set_log_info log_info state in
       state, ((global, static), dynamic)
 

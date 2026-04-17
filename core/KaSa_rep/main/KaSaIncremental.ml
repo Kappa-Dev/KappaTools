@@ -146,7 +146,7 @@ let main () =
           else
             state
         in
-        let state = print_result parameters state in
+        let state, _ = Export_to_KaSa.get_reachability_analysis state in
         let state, summary = Export_to_KaSa.summarize_from_ast state in
         loop (Some (summary, state)) start_time
       | ("print rules" | "p rules"), Some (summary, state) ->
