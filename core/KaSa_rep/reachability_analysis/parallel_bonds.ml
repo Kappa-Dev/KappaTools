@@ -422,65 +422,65 @@ module Domain = struct
         compil.Cckappa_sig.rules static
     in
     (* TO DO, THIS CAN BE DONE INCREMENTALLY *)
-      (*------------------------------------------------------*)
-      (*A(x!1, y), B(x!1, y): first site is an action binding*)
-      (*------------------------------------------------------*)
-      let lift_map error s =
-        Ckappa_sig.Rule_map_and_set.Map.fold
-          (fun _ big_store (error, set) ->
-            Parallel_bonds_static.project_away_ag_id_and_convert_into_set
-              parameters error big_store set)
-          s
-          (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty)
-      in
-      let error, store_result1 =
-        lift_map error (get_rule_double_bonds_lhs static)
-      in
-      let error, store_result2 =
-        lift_map error (get_rule_double_bonds_rhs static)
-      in
-      let error, store_result =
-        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
-          parameters error store_result1 store_result2
-      in
-      let error, (store_result, map) =
-        apply_closure_to_tuples_of_interest parameters error store_result
-      in
-      let static = set_tuples_of_interest store_result static in
-      let static = set_closure map static in
-      (*------------------------------------------------------*)
-      let tuples_of_interest = store_result in
-      let store_action_binding = get_action_binding static in
-      let error, store_result =
-        Parallel_bonds_static.collect_fst_site_create_parallel_bonds_rhs
-          parameters error store_action_binding tuples_of_interest
-      in
-      let static = set_fst_site_create_parallel_bonds_rhs store_result static in
-      (*------------------------------------------------------*)
-      (*A(x, y!1), B(x, y!1): second site is an action binding *)
-      let error, store_result =
-        Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
-          parameters error store_action_binding tuples_of_interest
-      in
-      let static = set_snd_site_create_parallel_bonds_rhs store_result static in
-      (*------------------------------------------------------*)
-      (*map tuples to sites*)
-      let tuples_of_interest = get_tuples_of_interest static in
-      let error, store_result =
-        Parallel_bonds_static.collect_tuple_to_sites parameters error
-          tuples_of_interest
-      in
-      let static = set_tuple_to_sites store_result static in
-      (*------------------------------------------------------*)
-      (*map sites to tuple*)
-      let tuple_to_sites = get_tuple_to_sites static in
-      let store_sites_to_tuple = get_sites_to_tuple static in
-      let error, store_result =
-        Parallel_bonds_static.collect_sites_to_tuple parameters error
-          tuple_to_sites store_sites_to_tuple
-      in
-      let static = set_sites_to_tuple store_result static in
-      error, static, dynamic
+    (*------------------------------------------------------*)
+    (*A(x!1, y), B(x!1, y): first site is an action binding*)
+    (*------------------------------------------------------*)
+    let lift_map error s =
+      Ckappa_sig.Rule_map_and_set.Map.fold
+        (fun _ big_store (error, set) ->
+          Parallel_bonds_static.project_away_ag_id_and_convert_into_set
+            parameters error big_store set)
+        s
+        (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty)
+    in
+    let error, store_result1 =
+      lift_map error (get_rule_double_bonds_lhs static)
+    in
+    let error, store_result2 =
+      lift_map error (get_rule_double_bonds_rhs static)
+    in
+    let error, store_result =
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union parameters
+        error store_result1 store_result2
+    in
+    let error, (store_result, map) =
+      apply_closure_to_tuples_of_interest parameters error store_result
+    in
+    let static = set_tuples_of_interest store_result static in
+    let static = set_closure map static in
+    (*------------------------------------------------------*)
+    let tuples_of_interest = store_result in
+    let store_action_binding = get_action_binding static in
+    let error, store_result =
+      Parallel_bonds_static.collect_fst_site_create_parallel_bonds_rhs
+        parameters error store_action_binding tuples_of_interest
+    in
+    let static = set_fst_site_create_parallel_bonds_rhs store_result static in
+    (*------------------------------------------------------*)
+    (*A(x, y!1), B(x, y!1): second site is an action binding *)
+    let error, store_result =
+      Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
+        parameters error store_action_binding tuples_of_interest
+    in
+    let static = set_snd_site_create_parallel_bonds_rhs store_result static in
+    (*------------------------------------------------------*)
+    (*map tuples to sites*)
+    let tuples_of_interest = get_tuples_of_interest static in
+    let error, store_result =
+      Parallel_bonds_static.collect_tuple_to_sites parameters error
+        tuples_of_interest
+    in
+    let static = set_tuple_to_sites store_result static in
+    (*------------------------------------------------------*)
+    (*map sites to tuple*)
+    let tuple_to_sites = get_tuple_to_sites static in
+    let store_sites_to_tuple = get_sites_to_tuple static in
+    let error, store_result =
+      Parallel_bonds_static.collect_sites_to_tuple parameters error
+        tuple_to_sites store_sites_to_tuple
+    in
+    let static = set_sites_to_tuple store_result static in
+    error, static, dynamic
 
   (***************************************************************)
 

@@ -505,137 +505,133 @@ module Domain = struct
         compil.Cckappa_sig.rules static
     in
     (* TO DO, THIS CAN BE DONE INCREMENTALLY *)
-      (*------------------------------------------------------------*)
-      (*partition map with key is the pair of the bonds in the rhs*)
-      let store_potential_tuple_pair = get_potential_tuple_pair static in
-      let error, store_partition_created_bonds_map =
-        Site_across_bonds_domain_static.collect_partition_created_bonds_map
-          parameters error store_potential_tuple_pair
-      in
-      let static =
-        set_partition_created_bonds_map store_partition_created_bonds_map static
-      in
-      (*------------------------------------------------------------*)
-      (*a site is modified explicitly*)
-      let error, store_partition_modified_map_1 =
-        Site_across_bonds_domain_static.collect_partition_modified_map_1
-          parameters error store_potential_tuple_pair
-      in
-      let static =
-        set_partition_modified_map_1 store_partition_modified_map_1 static
-      in
-      let error, store_partition_modified_map_2 =
-        Site_across_bonds_domain_static.collect_partition_modified_map_2
-          parameters error store_potential_tuple_pair
-      in
-      let static =
-        set_partition_modified_map_2 store_partition_modified_map_2 static
-      in
-      (*------------------------------------------------------------*)
-      (*potential tuple pair that are modified depend on rule_id*)
-      let store_potential_tuple_pair_rule_rhs =
-        get_potential_tuple_pair_rule_rhs static
-      in
-      let store_rule_partition_modified_map_1 =
-        get_rule_partition_modified_map_1 static
-      in
-      let error, store_rule_partition_modified_map_1 =
-        Site_across_bonds_domain_static.collect_rule_partition_modified_map_1
-          parameters error store_potential_tuple_pair_rule_rhs
-          store_rule_partition_modified_map_1
-      in
-      let static =
-        set_rule_partition_modified_map_1 store_rule_partition_modified_map_1
-          static
-      in
-      (*------------------------------------------------------------*)
-      let store_rule_partition_modified_map_2 =
-        get_rule_partition_modified_map_2 static
-      in
-      let error, store_rule_partition_modified_map_2 =
-        Site_across_bonds_domain_static.collect_rule_partition_modified_map_2
-          parameters error store_potential_tuple_pair_rule_rhs
-          store_rule_partition_modified_map_2
-      in
-      let static =
-        set_rule_partition_modified_map_2 store_rule_partition_modified_map_2
-          static
-      in
-      (*------------------------------------------------------------*)
-      let store_partition_created_bonds_map =
-        get_partition_created_bonds_map static
-      in
-      let store_partition_created_bonds_map_1 =
-        get_partition_created_bonds_map_1 static
-      in
-      let error, store_partition_created_bonds_map_1 =
-        Site_across_bonds_domain_static.collect_partition_created_bonds_map_1
-          parameters error store_partition_created_bonds_map
-          store_partition_created_bonds_map_1
-      in
-      let static =
-        set_partition_created_bonds_map_1 store_partition_created_bonds_map_1
-          static
-      in
-      (* *)
-      let store_partition_created_bonds_map_2 =
-        get_partition_created_bonds_map_2 static
-      in
-      let error, store_partition_created_bonds_map_2 =
-        Site_across_bonds_domain_static.collect_partition_created_bonds_map_2
-          parameters error store_partition_created_bonds_map
-          store_partition_created_bonds_map_2
-      in
-      let static =
-        set_partition_created_bonds_map_2 store_partition_created_bonds_map_2
-          static
-      in
-      (*------------------------------------------------------------*)
-      let store_rule_partition_created_bonds_map_1 =
-        get_rule_partition_created_bonds_map_1 static
-      in
-      let error, store_rule_partition_created_bonds_map_1 =
-        Site_across_bonds_domain_static
-        .collect_rule_partition_created_bonds_map_1 parameters error
-          store_potential_tuple_pair_rule_rhs
-          store_rule_partition_created_bonds_map_1
-      in
-      let static =
-        set_rule_partition_created_bonds_map_1
-          store_rule_partition_created_bonds_map_1 static
-      in
-      let store_rule_partition_created_bonds_map_2 =
-        get_rule_partition_created_bonds_map_2 static
-      in
-      let error, store_rule_partition_created_bonds_map_2 =
-        Site_across_bonds_domain_static
-        .collect_rule_partition_created_bonds_map_1 parameters error
-          store_potential_tuple_pair_rule_rhs
-          store_rule_partition_created_bonds_map_2
-      in
-      let static =
-        set_rule_partition_created_bonds_map_2
-          store_rule_partition_created_bonds_map_2 static
-      in
-      (*------------------------------------------------------------*)
-      (* Restrict tuples in lhs to the tuples of interest *)
-      let store_potential_tuple_pair_lhs =
-        get_potential_tuple_pair_lhs static
-      in
-      let store_potential_tuple_pair_lhs =
-        Ckappa_sig.Rule_map_and_set.Map.map
-          (Site_across_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set
-           .filter (fun ((a, b, c, d, _), (a', b', c', d', _)) ->
-               Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Set
-               .mem
-                 ((a, b, c, d), (a', b', c', d'))
-                 store_potential_tuple_pair))
-          store_potential_tuple_pair_lhs
-      in
-      let static =
-        set_potential_tuple_pair_lhs store_potential_tuple_pair_lhs static
-      in
-      error, static, dynamic
+    (*------------------------------------------------------------*)
+    (*partition map with key is the pair of the bonds in the rhs*)
+    let store_potential_tuple_pair = get_potential_tuple_pair static in
+    let error, store_partition_created_bonds_map =
+      Site_across_bonds_domain_static.collect_partition_created_bonds_map
+        parameters error store_potential_tuple_pair
+    in
+    let static =
+      set_partition_created_bonds_map store_partition_created_bonds_map static
+    in
+    (*------------------------------------------------------------*)
+    (*a site is modified explicitly*)
+    let error, store_partition_modified_map_1 =
+      Site_across_bonds_domain_static.collect_partition_modified_map_1
+        parameters error store_potential_tuple_pair
+    in
+    let static =
+      set_partition_modified_map_1 store_partition_modified_map_1 static
+    in
+    let error, store_partition_modified_map_2 =
+      Site_across_bonds_domain_static.collect_partition_modified_map_2
+        parameters error store_potential_tuple_pair
+    in
+    let static =
+      set_partition_modified_map_2 store_partition_modified_map_2 static
+    in
+    (*------------------------------------------------------------*)
+    (*potential tuple pair that are modified depend on rule_id*)
+    let store_potential_tuple_pair_rule_rhs =
+      get_potential_tuple_pair_rule_rhs static
+    in
+    let store_rule_partition_modified_map_1 =
+      get_rule_partition_modified_map_1 static
+    in
+    let error, store_rule_partition_modified_map_1 =
+      Site_across_bonds_domain_static.collect_rule_partition_modified_map_1
+        parameters error store_potential_tuple_pair_rule_rhs
+        store_rule_partition_modified_map_1
+    in
+    let static =
+      set_rule_partition_modified_map_1 store_rule_partition_modified_map_1
+        static
+    in
+    (*------------------------------------------------------------*)
+    let store_rule_partition_modified_map_2 =
+      get_rule_partition_modified_map_2 static
+    in
+    let error, store_rule_partition_modified_map_2 =
+      Site_across_bonds_domain_static.collect_rule_partition_modified_map_2
+        parameters error store_potential_tuple_pair_rule_rhs
+        store_rule_partition_modified_map_2
+    in
+    let static =
+      set_rule_partition_modified_map_2 store_rule_partition_modified_map_2
+        static
+    in
+    (*------------------------------------------------------------*)
+    let store_partition_created_bonds_map =
+      get_partition_created_bonds_map static
+    in
+    let store_partition_created_bonds_map_1 =
+      get_partition_created_bonds_map_1 static
+    in
+    let error, store_partition_created_bonds_map_1 =
+      Site_across_bonds_domain_static.collect_partition_created_bonds_map_1
+        parameters error store_partition_created_bonds_map
+        store_partition_created_bonds_map_1
+    in
+    let static =
+      set_partition_created_bonds_map_1 store_partition_created_bonds_map_1
+        static
+    in
+    (* *)
+    let store_partition_created_bonds_map_2 =
+      get_partition_created_bonds_map_2 static
+    in
+    let error, store_partition_created_bonds_map_2 =
+      Site_across_bonds_domain_static.collect_partition_created_bonds_map_2
+        parameters error store_partition_created_bonds_map
+        store_partition_created_bonds_map_2
+    in
+    let static =
+      set_partition_created_bonds_map_2 store_partition_created_bonds_map_2
+        static
+    in
+    (*------------------------------------------------------------*)
+    let store_rule_partition_created_bonds_map_1 =
+      get_rule_partition_created_bonds_map_1 static
+    in
+    let error, store_rule_partition_created_bonds_map_1 =
+      Site_across_bonds_domain_static.collect_rule_partition_created_bonds_map_1
+        parameters error store_potential_tuple_pair_rule_rhs
+        store_rule_partition_created_bonds_map_1
+    in
+    let static =
+      set_rule_partition_created_bonds_map_1
+        store_rule_partition_created_bonds_map_1 static
+    in
+    let store_rule_partition_created_bonds_map_2 =
+      get_rule_partition_created_bonds_map_2 static
+    in
+    let error, store_rule_partition_created_bonds_map_2 =
+      Site_across_bonds_domain_static.collect_rule_partition_created_bonds_map_1
+        parameters error store_potential_tuple_pair_rule_rhs
+        store_rule_partition_created_bonds_map_2
+    in
+    let static =
+      set_rule_partition_created_bonds_map_2
+        store_rule_partition_created_bonds_map_2 static
+    in
+    (*------------------------------------------------------------*)
+    (* Restrict tuples in lhs to the tuples of interest *)
+    let store_potential_tuple_pair_lhs = get_potential_tuple_pair_lhs static in
+    let store_potential_tuple_pair_lhs =
+      Ckappa_sig.Rule_map_and_set.Map.map
+        (Site_across_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set
+         .filter (fun ((a, b, c, d, _), (a', b', c', d', _)) ->
+             Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Set
+             .mem
+               ((a, b, c, d), (a', b', c', d'))
+               store_potential_tuple_pair))
+        store_potential_tuple_pair_lhs
+    in
+    let static =
+      set_potential_tuple_pair_lhs store_potential_tuple_pair_lhs static
+    in
+    error, static, dynamic
 
   (***************************************************************************)
   (*INITIAL STATES*)
