@@ -25,9 +25,8 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-      matrix: # 2x2 versions ran here, with 2 different ocaml versions and with/without labltk
+      matrix: # 2 versions ran here, with 1 caml version and with/without labltk
         ocaml-compiler:
-          - 4.13.x
           - 4.14.2
         additional-packages:
           - ''
