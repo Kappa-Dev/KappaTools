@@ -19,6 +19,81 @@
 let domain_name = "View domain"
 let local_trace = false
 
+let check ?force (a, b, c, d) parameters string =
+  if
+    local_trace
+    || (match force with
+       | Some true -> true
+       | _ -> false)
+    || Remanent_parameters.get_trace parameters
+    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
+  then (
+    let () =
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameters)
+        "%s.%i.%i.%i %s" a b c d string
+    in
+    let () =
+      Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    in
+    ()
+  )
+
+let print_newline ?force parameters =
+  if
+    local_trace
+    || (match force with
+       | Some true -> true
+       | _ -> false)
+    || Remanent_parameters.get_trace parameters
+    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
+  then (
+    let () =
+      Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    in
+    ()
+  )
+
+let print_list ?force f g p h e r =
+  if
+    local_trace
+    || (match force with
+       | Some true -> true
+       | _ -> false)
+    || Remanent_parameters.get_trace p
+    || Remanent_parameters.get_dump_reachability_analysis_diff p
+  then
+    Usual_domains.print_list f g p h e r
+  else
+    e, h
+
+let print_composite_bdu ?force ~threshold parameters kappa_handler bdu_handler
+    error bdu =
+  if
+    local_trace
+    || (match force with
+       | Some true -> true
+       | _ -> false)
+    || Remanent_parameters.get_trace parameters
+    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
+  then (
+    let error, bdu_handler, list =
+      Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu ~threshold parameters
+        bdu_handler error bdu
+    in
+    (*---------------------------------------------------------------------*)
+    let error, bdu_handler =
+      List.fold_left
+        (fun (error, bdu_handler) (_list, mvbdu) ->
+          (* TO DO print list. *)
+          Handler.print_guard_mvbdu parameters error kappa_handler bdu_handler
+            mvbdu)
+        (error, bdu_handler) list
+    in
+    error, bdu_handler
+  ) else
+    error, bdu_handler
+
 module Domain = struct
   (* the type of the struct that contains all static information as in the
      previous version of the analysis *)
@@ -745,6 +820,8 @@ module Domain = struct
         (fun (error, renaming_list) var ->
           match Ckappa_sig.site_or_guard_p_of_mvbdu_var var nsites with
           | Ckappa_sig.Guard_p _ -> error, (var, var) :: renaming_list
+          | Ckappa_sig.Site x when Ckappa_sig.dummy_site_name = x ->
+            error, (var, var) :: renaming_list
           | Ckappa_sig.Site _ ->
             let error, renamed =
               Ckappa_sig.Mvbdu_var_nearly_Inf_Int_storage_Imperatif.get
@@ -800,19 +877,6 @@ module Domain = struct
       in
       (*-------------------------------------------------------------------*)
       let log = Remanent_parameters.get_logger parameters in
-      let error, dynamic =
-        if local_trace || Remanent_parameters.get_trace parameters then (
-          let () = Loggers.fprintf log "%sINTENSIONAL DESCRIPTION:" prefix in
-          let () = Loggers.print_newline log in
-          (*print bdu different: this will print in a format of bdu*)
-          let () = Ckappa_sig.Views_bdu.print parameters bdu_diff in
-          (*print a list of relations: this will print in a format readable*)
-          let () = Loggers.fprintf log "%sEXTENSIONAL DESCRIPTION:" prefix in
-          let () = Loggers.print_newline log in
-          error, dynamic
-        ) else
-          error, dynamic
-      in
       (*rename bdu to the original indexes*)
       let error, bdu_handler, bdu_diff =
         rename_bdu_to_original_names parameters error bdu_handler bdu_diff map2
@@ -868,8 +932,8 @@ module Domain = struct
                     (Remanent_parameters.get_logger parameters)
                     " => "
                 in
-                Handler.print_guard_mvbdu parameters error kappa_handler
-                  bdu_handler bdu
+                print_composite_bdu ~threshold parameters kappa_handler
+                  bdu_handler error bdu
               ) else
                 error, bdu_handler
             in
@@ -1180,13 +1244,34 @@ module Domain = struct
 
   (*****************************************************************)
 
-  let step_list_empty dynamic parameters error agent_id agent_type site_name
-      cv_list fixpoint_result proj_bdu_test_restriction bdu_false bdu_true
-      site_correspondence =
+  let step_list_empty parameters error agent_id agent_type site_name cv_list
+      static dynamic fixpoint_result proj_bdu_test_restriction bdu_false
+      bdu_true site_correspondence =
+    let kappa_handler = Analyzer_headers.get_kappa_handler static in
+    let threshold =
+      Ckappa_sig.int_of_site_name (Handler.get_nsites kappa_handler)
+    in
+    let error, agent_name =
+      Handler.string_of_agent parameters error kappa_handler agent_type
+    in
+    let error, site_name_st =
+      Handler.string_of_site parameters error kappa_handler agent_type site_name
+    in
+
+    let () =
+      check __POS__ parameters
+        (Format.sprintf "STEP LIST EMPTY %s %s " agent_name site_name_st)
+    in
+
     (*------------------------------------------------------------*)
     let error, dynamic, bdu =
       List.fold_left
         (fun (error, dynamic, bdu) cv_id ->
+          let () =
+            check __POS__ parameters
+              (Format.sprintf "STEP ITERATION %s %s " agent_name site_name_st)
+          in
+
           let error, (map1, _) =
             get_list_of_sites_correspondence_map parameters error agent_type
               cv_id site_correspondence
@@ -1194,6 +1279,7 @@ module Domain = struct
           let error, new_site_name =
             get_new_site_name parameters error site_name map1
           in
+
           (*--------------------------------------------------------------*)
           (* fetch the bdu for the agent type and the cv_id in
              the current state of the iteration *)
@@ -1206,6 +1292,17 @@ module Domain = struct
             | error, None -> error, bdu_false
             | error, Some bdu -> error, bdu
           in
+          let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+          let () =
+            check __POS__ parameters
+              (Format.sprintf "STEP ITERATION: ITERATION %s %s " agent_name
+                 site_name_st)
+          in
+          let error, bdu_handler =
+            print_composite_bdu ~threshold parameters kappa_handler bdu_handler
+              error bdu_X
+          in
+          let () = print_newline parameters in
           (*get bdu test*)
           let error, bdu_test =
             match
@@ -1216,11 +1313,31 @@ module Domain = struct
             | None -> error, bdu_true
             | Some bdu -> error, bdu
           in
+          let () =
+            check __POS__ parameters
+              (Format.sprintf "STEP ITERATION: TEST %s %s " agent_name
+                 site_name_st)
+          in
+
+          let error, bdu_handler =
+            print_composite_bdu ~threshold parameters kappa_handler bdu_handler
+              error bdu_test
+          in
+          let () = print_newline parameters in
           (*Bdu_X and Bdu_test*)
-          let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
           let error, bdu_handler, bdu_test_X =
             Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu_X
               bdu_test
+          in
+          let () =
+            check __POS__ parameters
+              (Format.sprintf "STEP ITERATION: MEET %s %s " agent_name
+                 site_name_st)
+          in
+
+          let error, bdu_handler =
+            print_composite_bdu ~threshold parameters kappa_handler bdu_handler
+              error bdu_test_X
           in
           (* compute the projection over new_site_name *)
           let error, bdu_handler, singleton =
@@ -1228,8 +1345,18 @@ module Domain = struct
               error [ new_site_name ]
           in
           let error, bdu_handler, bdu_proj =
-            Ckappa_sig.Views_bdu.mvbdu_project_keep_only parameters bdu_handler
-              error bdu_test_X singleton
+            Ckappa_sig.Views_bdu.mvbdu_project_keep_only_with_threshold
+              parameters bdu_handler error ~threshold bdu_test_X singleton
+          in
+          let () =
+            check __POS__ parameters
+              (Format.sprintf "STEP ITERATION: PROJ %s %s " agent_name
+                 site_name_st)
+          in
+
+          let error, bdu_handler =
+            print_composite_bdu ~threshold parameters kappa_handler bdu_handler
+              error bdu_proj
           in
           (* rename new_site_name into 1 *)
           let error, bdu_handler, new_site_name_1 =
@@ -1241,11 +1368,31 @@ module Domain = struct
             Ckappa_sig.Views_bdu.mvbdu_rename parameters bdu_handler error
               bdu_proj new_site_name_1
           in
+          let () =
+            check __POS__ parameters
+              (Format.sprintf "STEP ITERATION: RENAMED %s %s " agent_name
+                 site_name_st)
+          in
+
           (* conjunction between bdu and bdu'*)
           let error, bdu_handler, bdu =
             Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu
               bdu_renamed
           in
+
+          let () =
+            check __POS__ parameters
+              (Format.sprintf "STEP ITERATION %s %s " agent_name site_name_st)
+          in
+          let error, bdu_handler =
+            print_composite_bdu ~threshold parameters kappa_handler bdu_handler
+              error bdu
+          in
+          let () = print_newline parameters in
+          let dynamic =
+            Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
+          in
+
           let dynamic =
             Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
           in
@@ -1254,29 +1401,69 @@ module Domain = struct
     in
     (*---------------------------------------------------------------------*)
     let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
-    let error, bdu_handler, list =
-      Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters bdu_handler error bdu
+    let () =
+      check __POS__ parameters
+        (Format.sprintf "STEP LIST INTERMEDIARY %s %s " agent_name site_name_st)
     in
-    let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
+    let error, bdu_handler =
+      print_composite_bdu ~threshold parameters kappa_handler bdu_handler error
+        bdu
+    in
+
+    (*let error, bdu_handler, list =
+        Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters bdu_handler error bdu
+      in*)
+    let error, bdu_handler, list =
+      Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu ~threshold parameters
+        bdu_handler error bdu
+    in
     (*---------------------------------------------------------------------*)
-    let error, state_list =
+    let error, (bdu_handler, state_list) =
       List.fold_left
-        (fun (error, output) list ->
+        (fun (error, (bdu_handler, output)) list ->
           match list with
-          | [ (_, state) ] ->
+          | [ (_x, state) ], mvbdu ->
             (* the site name is fictitious, do not take it *)
-            error, state :: output
+            (* TO DO *)
+            (* let pair_list =
+                   [ x, state]
+                 in
+                 let error, bdu_handler, mvbdu_case =
+                    Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters bdu_handler error
+                   pair_list
+                 in
+                 let error, bdu_handler, mvbdu_case =
+                   Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu mvbdu_case
+                 in
+                  let error, bdu_handler, singleton =
+                 Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler
+                   error [ x ]
+               in
+                    let error, bdu_handler, bdu_proj =
+                 Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler
+                   error mvbdu_case singleton
+               in
+                   (* ne garder que les conditions sur les parametres *) *)
+            error, (bdu_handler, (state, mvbdu) :: output)
           | _ ->
             Exception.warn parameters error __POS__ ~message:"state is empty"
-              Exit output)
-        (error, []) list
+              Exit (bdu_handler, output))
+        (error, (bdu_handler, []))
+        list
     in
+    let () =
+      check __POS__ parameters
+        (Format.sprintf "STEP LIST RESULT %s %s " agent_name site_name_st)
+    in
+
+    let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
+
     error, dynamic, Usual_domains.Val (List.rev state_list)
 
   (**************************************************************************)
   (*empty case of step list*)
 
-  let precondition_empty_step_list parameters error dynamic rule_id path
+  let precondition_empty_step_list parameters error static dynamic rule_id path
       store_agent_name bdu_false bdu_true store_covering_classes_id
       site_correspondence fixpoint_result proj_bdu_test_restriction =
     let error, agent_type =
@@ -1319,12 +1506,40 @@ module Domain = struct
     in
     (*---------------------------------------------------------------------*)
     let error, dynamic, new_answer =
-      step_list_empty dynamic parameters error path.Communication.agent_id
-        agent_type path.Communication.site cv_list fixpoint_result
+      step_list_empty parameters error path.Communication.agent_id agent_type
+        path.Communication.site cv_list static dynamic fixpoint_result
         proj_bdu_test_restriction bdu_false bdu_true
         (*store_new_index_pair_map*)
         site_correspondence
     in
+    let kappa_handler = Analyzer_headers.get_kappa_handler static in
+    let error, agent_name =
+      Handler.string_of_agent parameters error kappa_handler agent_type
+    in
+    let error, site_name =
+      Handler.string_of_site parameters error kappa_handler agent_type
+        path.Communication.site
+    in
+    let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+    let () =
+      check __POS__ parameters
+        (Format.sprintf "PRED FROM EMPTY %s %s " agent_name site_name)
+    in
+    let error, bdu_handler =
+      print_list
+        (fun p h e c ->
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger p)
+              "%i"
+              (Ckappa_sig.int_of_state_index c)
+          in
+          e, h)
+        (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
+        parameters bdu_handler error new_answer
+    in
+    let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
+
     error, dynamic, new_answer
 
   (***************************************************************)
@@ -1473,6 +1688,23 @@ module Domain = struct
     let error, (agent_type', site_out, site_in, agent_type_in) =
       get_tuple_pattern error path agent_type
     in
+    let threshold =
+      Ckappa_sig.int_of_site_name (Handler.get_nsites kappa_handler)
+    in
+    let error, agent_name_a =
+      Handler.string_of_agent parameters error kappa_handler agent_type'
+    in
+    let error, agent_name_b =
+      Handler.string_of_agent parameters error kappa_handler agent_type_in
+    in
+    let error, site_name_out =
+      Handler.string_of_site parameters error kappa_handler agent_type' site_out
+    in
+    let error, site_name_in =
+      Handler.string_of_site parameters error kappa_handler agent_type_in
+        site_in
+    in
+
     (*get the site path*)
     let site_path = path.Communication.site in
     (*get the information of state of the last agent
@@ -1573,8 +1805,17 @@ module Domain = struct
                     error, bdu_handler, bdu_X
                 in
                 let error, bdu_handler, bdu_proj =
-                  Ckappa_sig.Views_bdu.mvbdu_project_keep_only parameters
-                    bdu_handler error new_bdu singleton
+                  Ckappa_sig.Views_bdu.mvbdu_project_keep_only_with_threshold
+                    ~threshold parameters bdu_handler error new_bdu singleton
+                in
+                let () =
+                  check __POS__ parameters
+                    (Format.sprintf "STEP OUTSITE ITERATION: PROJ %s.%s--%s.%s "
+                       agent_name_a site_name_out site_name_in agent_name_b)
+                in
+                let error, bdu_handler =
+                  print_composite_bdu ~threshold parameters kappa_handler
+                    bdu_handler error bdu_proj
                 in
                 let error, bdu_handler, new_site_name_1 =
                   Ckappa_sig.Views_bdu.build_renaming_list parameters
@@ -1597,19 +1838,23 @@ module Domain = struct
           in
           let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
           let error, bdu_handler, list =
-            Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters bdu_handler
-              error bdu
+            Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu ~threshold
+              parameters bdu_handler error bdu
+          in
+          let error, (bdu_handler, state_list) =
+            List.fold_left
+              (fun (error, (handler, output)) list ->
+                match list with
+                | [ (_, state) ], mvbdu ->
+                  (* TO DO *)
+                  error, (handler, (state, mvbdu) :: output)
+                | _ ->
+                  Exception.warn parameters error __POS__ Exit (handler, output))
+              (error, (bdu_handler, []))
+              list
           in
           let dynamic =
             Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
-          in
-          let error, state_list =
-            List.fold_left
-              (fun (error, output) list ->
-                match list with
-                | [ (_, state) ] -> error, state :: output
-                | _ -> Exception.warn parameters error __POS__ Exit output)
-              (error, []) list
           in
           error, (dynamic, Usual_domains.Val (List.rev state_list))
       in
@@ -1892,6 +2137,7 @@ module Domain = struct
         (fun
           parameters
           error
+          static
           dynamic
           (current_path : Communication.path)
           former_answer
@@ -1933,16 +2179,37 @@ module Domain = struct
                   scan_bot ~also_scan_top:false __POS__ parameters error
                     new_answer " while navigating"
                 in
-                let update_answer =
-                  Usual_domains.glb_list new_answer former_answer
+                let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+                let error, bdu_handler, update_answer =
+                  Usual_domains.glb_list_with_and Ckappa_sig.Views_bdu.mvbdu_and
+                    parameters bdu_handler error new_answer former_answer
+                in
+                let () = check __POS__ parameters "FROM PATH" in
+                let error, bdu_handler =
+                  print_list
+                    (fun p h e c ->
+                      let () =
+                        Loggers.fprintf
+                          (Remanent_parameters.get_logger p)
+                          "%i"
+                          (Ckappa_sig.int_of_state_index c)
+                      in
+                      e, h)
+                    (fun p h e c ->
+                      Handler.print_guard_mvbdu p e kappa_handler h c)
+                    parameters bdu_handler error update_answer
+                in
+
+                let dynamic =
+                  Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
                 in
                 error, dynamic, update_answer
               (*--------------------------------------------------*)
               (*empty relative_adress*)
               | [] ->
                 let error, dynamic, new_answer =
-                  precondition_empty_step_list parameters error dynamic rule_id
-                    path store_agent_name bdu_false bdu_true
+                  precondition_empty_step_list parameters error static dynamic
+                    rule_id path store_agent_name bdu_false bdu_true
                     store_covering_classes_id site_correspondence_map
                     fixpoint_result proj_bdu_test_restriction
                 in
@@ -1951,16 +2218,84 @@ module Domain = struct
                     new_answer " while navigating (empty path)"
                 in
                 (*do I need to do the intersection with former answer?*)
-                let update_answer =
-                  Usual_domains.glb_list new_answer former_answer
+                let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+                let error, bdu_handler, update_answer =
+                  Usual_domains.glb_list_with_and Ckappa_sig.Views_bdu.mvbdu_and
+                    parameters bdu_handler error new_answer former_answer
+                in
+                let () = check __POS__ parameters "FROM EMPTY PATH" in
+                let error, bdu_handler =
+                  print_list
+                    (fun p h e c ->
+                      let () =
+                        Loggers.fprintf
+                          (Remanent_parameters.get_logger p)
+                          "%i"
+                          (Ckappa_sig.int_of_state_index c)
+                      in
+                      e, h)
+                    (fun p h e c ->
+                      Handler.print_guard_mvbdu p e kappa_handler h c)
+                    parameters bdu_handler error update_answer
+                in
+
+                let dynamic =
+                  Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
                 in
                 error, dynamic, update_answer
             in
             aux dynamic current_path
           in
           (*final intersection with contact map*)
-          let update_answer =
-            Usual_domains.glb_list answer_contact_map new_answer
+          let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+          let error, bdu_handler, update_answer =
+            Usual_domains.glb_list_with_and Ckappa_sig.Views_bdu.mvbdu_and
+              parameters bdu_handler error answer_contact_map new_answer
+          in
+          let () = check __POS__ parameters "FROM CONTACT MAP" in
+          let error, bdu_handler =
+            print_list
+              (fun p h e c ->
+                let () =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger p)
+                    "%i"
+                    (Ckappa_sig.int_of_state_index c)
+                in
+                e, h)
+              (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
+              parameters bdu_handler error answer_contact_map
+          in
+          let () = check __POS__ parameters "FROM REDUCTION" in
+          let error, bdu_handler =
+            print_list
+              (fun p h e c ->
+                let () =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger p)
+                    "%i"
+                    (Ckappa_sig.int_of_state_index c)
+                in
+                e, h)
+              (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
+              parameters bdu_handler error new_answer
+          in
+          let () = check __POS__ parameters "RESULT" in
+          let error, bdu_handler =
+            print_list
+              (fun p h e c ->
+                let () =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger p)
+                    "%i"
+                    (Ckappa_sig.int_of_state_index c)
+                in
+                e, h)
+              (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
+              parameters bdu_handler error update_answer
+          in
+          let dynamic =
+            Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
           in
           error, dynamic, update_answer)
     in
@@ -2516,6 +2851,7 @@ module Domain = struct
           (fun
             parameters
             error
+            _static
             (dynamic : Analyzer_headers.global_dynamic_information)
             (current_path : Communication.path)
             former_answer
@@ -2608,8 +2944,40 @@ module Domain = struct
                     scan_bot ~also_scan_top:false __POS__ parameters error
                       new_answer " whie navigating"
                   in
-                  let update_answer =
-                    Usual_domains.glb_list new_answer former_answer
+                  let bdu_handler =
+                    Analyzer_headers.get_mvbdu_handler dynamic
+                  in
+                  let error, bdu_handler, update_answer =
+                    Usual_domains.glb_list_with_and
+                      Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler
+                      error new_answer former_answer
+                  in
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger parameters)
+                      "WHILE NAVIGATING"
+                  in
+                  let () =
+                    Loggers.print_newline
+                      (Remanent_parameters.get_logger parameters)
+                  in
+                  let error, bdu_handler =
+                    print_list
+                      (fun p h e c ->
+                        let () =
+                          Loggers.fprintf
+                            (Remanent_parameters.get_logger p)
+                            "%i"
+                            (Ckappa_sig.int_of_state_index c)
+                        in
+                        e, h)
+                      (fun p h e c ->
+                        Handler.print_guard_mvbdu p e kappa_handler h c)
+                      parameters bdu_handler error update_answer
+                  in
+
+                  let dynamic =
+                    Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
                   in
                   error, dynamic, update_answer
                 | [] ->
@@ -2623,16 +2991,102 @@ module Domain = struct
                     scan_bot ~also_scan_top:false __POS__ parameters error
                       new_answer " while navigating (empty path)"
                   in
-                  let update_answer =
-                    Usual_domains.glb_list new_answer former_answer
+                  let l_true a =
+                    match a with
+                    | Usual_domains.Any -> Usual_domains.Any
+                    | Usual_domains.Undefined -> Usual_domains.Undefined
+                    | Usual_domains.Val l ->
+                      (* TO DO *)
+                      Usual_domains.Val
+                        (List.rev_map (fun a -> a, bdu_true) (List.rev l))
+                  in
+
+                  let handler = Analyzer_headers.get_mvbdu_handler dynamic in
+                  let error, handler, update_answer =
+                    Usual_domains.glb_list_with_and
+                      Ckappa_sig.Views_bdu.mvbdu_and parameters handler error
+                      (l_true new_answer) former_answer
+                  in
+                  let dynamic =
+                    Analyzer_headers.set_mvbdu_handler handler dynamic
                   in
                   error, dynamic, update_answer
               in
               aux dynamic current_path
             in
             (*---------------------------------------------------------*)
-            let update_answer =
-              Usual_domains.glb_list answer_contact_map new_answer
+            let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+            let error, bdu_handler, update_answer =
+              Usual_domains.glb_list_with_and Ckappa_sig.Views_bdu.mvbdu_and
+                parameters bdu_handler error answer_contact_map new_answer
+            in
+            let () =
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameters)
+                "FROM CONTACT MAP"
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
+            let error, bdu_handler =
+              Usual_domains.print_list
+                (fun p h e c ->
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger p)
+                      "%i"
+                      (Ckappa_sig.int_of_state_index c)
+                  in
+                  e, h)
+                (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
+                parameters bdu_handler error answer_contact_map
+            in
+            let () =
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameters)
+                "FROM REDUCTION"
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
+
+            let error, bdu_handler =
+              Usual_domains.print_list
+                (fun p h e c ->
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger p)
+                      "%i"
+                      (Ckappa_sig.int_of_state_index c)
+                  in
+                  e, h)
+                (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
+                parameters bdu_handler error new_answer
+            in
+            let () =
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameters)
+                "RESULT"
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
+
+            let error, bdu_handler =
+              Usual_domains.print_list
+                (fun p h e c ->
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger p)
+                      "%i"
+                      (Ckappa_sig.int_of_state_index c)
+                  in
+                  e, h)
+                (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
+                parameters bdu_handler error update_answer
+            in
+            let dynamic =
+              Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
             in
             error, dynamic, update_answer)
       in
@@ -2712,8 +3166,8 @@ module Domain = struct
 
   (***************************************************************)
 
-  let compute_bdu_update_side_effects static dynamic error bdu_test list_a bdu_X
-      precondition_guard_bdu =
+  let compute_bdu_update_side_effects static dynamic error bdu_test list_a
+      (bdu, bdu_X) precondition_guard_bdu =
     let parameters = get_parameter static in
     let restriction_bdu = get_restriction_mvbdu static in
     let parameter_views =
@@ -2723,6 +3177,11 @@ module Domain = struct
     let error, bdu_handler, bdu_inter =
       Ckappa_sig.mvbdu_and_for_guards parameter_views bdu_handler error bdu_X
         bdu_test
+    in
+    let error, bdu_handler, bdu_inter =
+      (* TO DO CHECK *)
+      Ckappa_sig.mvbdu_and_for_guards parameter_views bdu_handler error bdu
+        bdu_inter
     in
     (*redefine with modification list*)
     let error, bdu_handler, bdu_redefine =
@@ -2920,7 +3379,7 @@ module Domain = struct
     error, dynamic, (precondition, event_list)
 
   let apply_one_side_effect static dynamic error _rule_id
-      (_, (agent_name, site, state)) precondition =
+      (_, (agent_name, site, (state, bdu))) precondition =
     let parameters = get_parameter static in
     let error, dynamic, precondition_guard_bdu =
       get_state_of_guard_parameters parameters dynamic error precondition
@@ -2967,7 +3426,7 @@ module Domain = struct
           in
           let error, dynamic, bdu_update =
             compute_bdu_update_side_effects static dynamic error bdu_test
-              list_modif bdu_X precondition_guard_bdu
+              list_modif (bdu, bdu_X) precondition_guard_bdu
           in
           let error, dynamic, event_list =
             add_link ~title:"Dealing with side effects" error static dynamic
@@ -3036,7 +3495,7 @@ module Domain = struct
         List.fold_left
           (fun (error, bdu_handler, output) bdu ->
             (* rename bdu to the original variable names *)
-            let error, bdu_handler, renamed_mvbdu =
+            let error', bdu_handler, renamed_mvbdu =
               rename_bdu_to_original_names parameters error bdu_handler bdu map2
                 nsites
             in
@@ -3127,18 +3586,6 @@ module Domain = struct
                 if (is_true && with_threshold) || is_false then
                   error, (bdu_handler, list)
                 else (
-                  let error, bdu_handler =
-                    if local_trace || Remanent_parameters.get_trace parameters
-                    then (
-                      let () = Loggers.fprintf log "INTENSIONAL DESCRIPTION:" in
-                      let () = Loggers.print_newline log in
-                      let () = Ckappa_sig.Views_bdu.print parameters mvbdu in
-                      let () = Loggers.fprintf log "EXTENSIONAL DESCRIPTION:" in
-                      let () = Loggers.print_newline log in
-                      error, bdu_handler
-                    ) else
-                      error, bdu_handler
-                  in
                   let error, (bdu_handler, translation) =
                     Translation_in_natural_language.translate parameters
                       bdu_handler error handler_kappa
@@ -3192,18 +3639,6 @@ module Domain = struct
             let error, (bdu_handler, list) =
               List.fold_left
                 (fun (error, (bdu_handler, list)) mvbdu ->
-                  let error, bdu_handler =
-                    if local_trace || Remanent_parameters.get_trace parameters
-                    then (
-                      let () = Loggers.fprintf log "INTENSIONAL DESCRIPTION:" in
-                      let () = Loggers.print_newline log in
-                      let () = Ckappa_sig.Views_bdu.print parameters mvbdu in
-                      let () = Loggers.fprintf log "EXTENSIONAL DESCRIPTION:" in
-                      let () = Loggers.print_newline log in
-                      error, bdu_handler
-                    ) else
-                      error, bdu_handler
-                  in
                   let rename_site parameters error site_type =
                     match
                       Ckappa_sig.site_or_guard_p_of_mvbdu_var site_type nsites

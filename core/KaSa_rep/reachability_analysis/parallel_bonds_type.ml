@@ -1,6 +1,6 @@
 (* Time-stamp: <Jul 02 2016> *)
 
-let local_trace = true 
+let local_trace = false
 
 type agent_site =
   Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state
@@ -197,7 +197,10 @@ let add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu =
 let add_parallel_bond_lattice_variable_to_mvbdu parameters bdu_handler error
     value mvbdu =
   match value with
-  | Usual_domains.Val bool ->
+  | Usual_domains.Val (bool, g) ->
+    let error, bdu_handler, mvbdu =
+      Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error mvbdu g
+    in
     add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu
   | Usual_domains.Any -> error, bdu_handler, mvbdu
   | Usual_domains.Undefined ->
@@ -560,6 +563,7 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
         error, bdu_handler
       )
     in
+
     let error =
       (* printing for which values of the guards the double bonds can be both parallel and non-parallel *)
       if depends_on_parameters then
@@ -631,8 +635,8 @@ let add_value_bool parameters error x bdu_handler bool store_result mvbdu
 let add_value_and_event parameters error kappa_handler x value store_set
     store_result guard_mvbdu bdu_handler restriction_mvbdu =
   let error, bdu_handler, value_mvbdu =
-    add_parallel_bond_lattice_variable_to_mvbdu parameters bdu_handler error
-      value guard_mvbdu
+    Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error value
+      guard_mvbdu
   in
   let error, bdu_handler, mvbdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
@@ -657,11 +661,11 @@ let add_value_and_event parameters error kappa_handler x value store_set
   else (
     (*check whether or not if this is a fresh value*)
     let error, bdu_handler =
-      if local_trace 
-        || Remanent_parameters.get_trace parameters 
-      || 
-        Remanent_parameters.get_dump_reachability_analysis_diff parameters 
-        then
+      if
+        local_trace
+        || Remanent_parameters.get_trace parameters
+        || Remanent_parameters.get_dump_reachability_analysis_diff parameters
+      then
         print_parallel_constraint ~verbose:false ~dump_any:true parameters error
           kappa_handler x value_mvbdu bdu_handler restriction_mvbdu
       else
@@ -689,6 +693,11 @@ let project2 = snd
 
 let add_value_from_refined_tuple parameters error x =
   add_value_lattice parameters error (project2 x)
+
+let add_value_mvbdu_from_refined_tuple parameters error x bdu_handler
+    store_result mvbdu_refined restriction_mvbdu =
+  add_value_mvbdu parameters error (project2 x) bdu_handler store_result
+    mvbdu_refined restriction_mvbdu
 
 let swap_sites_in_tuple (a, b, s, s', st, st') = a, b, s', s, st', st
 

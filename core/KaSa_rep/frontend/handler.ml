@@ -699,9 +699,32 @@ let mvbdu_var_to_string parameters kappa_handler guard_name error =
   match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
   | Ckappa_sig.Guard_p guard_name ->
     string_of_guard parameters guard_name kappa_handler error
-  | Ckappa_sig.Site _ -> Exception.warn parameters error __POS__ Exit ""
+  | Ckappa_sig.Site s when s = Ckappa_sig.dummy_site_name ->
+    error, "double_bond"
+  | Ckappa_sig.Site i ->
+    Exception.warn parameters error __POS__ Exit
+      ~message:
+        (Format.sprintf "Predicate MVBDU contains the site %i"
+           (Ckappa_sig.int_of_site_name i))
+      (Ckappa_sig.string_of_site_name i)
 
-let mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu =
+let mvbdu_var_with_dummy_to_string dummy_name_pos parameters kappa_handler
+    guard_name error =
+  let nsites = get_nsites kappa_handler in
+  match Ckappa_sig.site_or_guard_p_of_mvbdu_var guard_name nsites with
+  | Ckappa_sig.Guard_p guard_name ->
+    string_of_guard parameters guard_name kappa_handler error
+  | Ckappa_sig.Site s when s = Ckappa_sig.dummy_site_name ->
+    error, dummy_name_pos
+  | Ckappa_sig.Site i ->
+    Exception.warn parameters error __POS__ Exit
+      ~message:
+        (Format.sprintf "Predicate MVBDU contains the site %i"
+           (Ckappa_sig.int_of_site_name i))
+      (Ckappa_sig.string_of_site_name i)
+
+let mvbdu_to_string_formula mvbdu_var_to_string parameters error kappa_handler
+    bdu_handler mvbdu =
   let error, bdu_handler, formula =
     mvbdu_to_formula parameters error kappa_handler bdu_handler mvbdu
   in
@@ -719,7 +742,8 @@ let mvbdu_to_string_formula_option parameters error kappa_handler bdu_handler
   | None -> error, bdu_handler, None
   | Some mvbdu ->
     let error, handler, bdu_handler =
-      mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu
+      mvbdu_to_string_formula mvbdu_var_to_string parameters error kappa_handler
+        bdu_handler mvbdu
     in
     error, handler, Some bdu_handler
 
@@ -729,13 +753,22 @@ let print_formula parameters formula =
       Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" s)
     formula
 
-let print_guard_mvbdu parameters error kappa_handler bdu_handler mvbdu =
+let print_guard_mvbdu mvbdu_to_string parameters error kappa_handler bdu_handler
+    mvbdu =
   let error, bdu_handler, formula =
-    mvbdu_to_string_formula parameters error kappa_handler bdu_handler mvbdu
+    mvbdu_to_string_formula mvbdu_to_string parameters error kappa_handler
+      bdu_handler mvbdu
   in
   let formula = Logical_formulae.simplify formula in
   let () = print_formula parameters formula in
   error, bdu_handler
+
+let mvbdu_to_string_formula = mvbdu_to_string_formula mvbdu_var_to_string
+
+let print_guard_with_dummy_mvbdu =
+  print_guard_mvbdu (mvbdu_var_with_dummy_to_string "parallel")
+
+let print_guard_mvbdu = print_guard_mvbdu mvbdu_var_to_string
 
 let print_guard_option parameters error kappa_handler bdu_handler mvbdu =
   match mvbdu with

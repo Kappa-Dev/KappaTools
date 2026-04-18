@@ -13,6 +13,35 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
+let local_trace = false
+
+let check (a, b, c, d) parameters string =
+  if
+    local_trace
+    || Remanent_parameters.get_trace parameters
+    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
+  then (
+    let () =
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameters)
+        "%s.%i.%i.%i %s" a b c d string
+    in
+    let () =
+      Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    in
+    ()
+  )
+
+let print_list f g p h e r =
+  if
+    local_trace
+    || Remanent_parameters.get_trace p
+    || Remanent_parameters.get_dump_reachability_analysis_diff p
+  then
+    Usual_domains.print_list f g p h e r
+  else
+    e, h
+
 type path_defined_in =
   | LHS of (Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule)
   | RHS of (Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule)
@@ -117,13 +146,17 @@ type precondition = {
   state_of_sites_in_precondition:
     Remanent_parameters_sig.parameters ->
     Exception.exceptions_caught_and_uncaught ->
+    Analyzer_headers.global_static_information ->
     Analyzer_headers.global_dynamic_information ->
     path ->
     Exception.exceptions_caught_and_uncaught
     * Analyzer_headers.global_dynamic_information
-    * Ckappa_sig.c_state list Usual_domains.flat_lattice;
+    * (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu) list
+      Usual_domains.flat_lattice;
   cache_state_of_sites:
-    Ckappa_sig.c_state list Usual_domains.flat_lattice PathMap.t;
+    (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu) list
+    Usual_domains.flat_lattice
+    PathMap.t;
   state_of_guard_parameters: Ckappa_sig.Views_bdu.mvbdu option;
   partner_map:
     Exception.exceptions_caught_and_uncaught ->
@@ -183,7 +216,7 @@ let dummy_precondition =
     precondition_dummy = ();
     the_rule_is_applied_for_the_first_time = Usual_domains.Maybe;
     state_of_sites_in_precondition =
-      (fun _ error dynamic _ -> error, dynamic, Usual_domains.Any);
+      (fun _ error _static dynamic _ -> error, dynamic, Usual_domains.Any);
     cache_state_of_sites = PathMap.empty Usual_domains.Any;
     state_of_guard_parameters = None;
     partner_map = (fun error _ _ _ -> error, Usual_domains.Any);
@@ -389,9 +422,100 @@ let rec follow_path_inside_cc parameters error kappa_handler cc path =
         else
           error, Cannot_exist))
 
+let smash_list parameters error _kappa_handler bdu_handler l =
+  let rec aux error bdu_handler l current acc =
+    match l, current with
+    | [], None -> error, bdu_handler, List.rev acc
+    | [], Some h -> error, bdu_handler, List.rev (h :: acc)
+    | (a, b) :: tail, Some (c, d) when a = c ->
+      let error, bdu_handler, bdu =
+        Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error b d
+      in
+      aux error bdu_handler tail (Some (c, bdu)) acc
+    | a :: tail, Some h -> aux error bdu_handler tail (Some a) (h :: acc)
+    | a :: tail, None -> aux error bdu_handler tail (Some a) acc
+  in
+  aux error bdu_handler l None []
+
+let smash_list parameters error kappa_handler bdu_handler l =
+  let error, bdu_handler, output =
+    smash_list parameters error kappa_handler bdu_handler l
+  in
+  let error, bdu_handler =
+    if
+      local_trace
+      || Remanent_parameters.get_trace parameters
+      || Remanent_parameters.get_dump_reachability_analysis_diff parameters
+    then (
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "SMASH LIST ARG:"
+      in
+      let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      in
+      let error, bdu_handler =
+        List.fold_left
+          (fun (error, bdu_handler) (s, c) ->
+            let () =
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameters)
+                "%i -> "
+                (Ckappa_sig.int_of_state_index s)
+            in
+            let error, bdu_handler =
+              Handler.print_guard_mvbdu parameters error kappa_handler
+                bdu_handler c
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
+            error, bdu_handler)
+          (error, bdu_handler) l
+      in
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "SMASH LIST RESULT:"
+      in
+
+      let error, bdu_handler =
+        List.fold_left
+          (fun (error, bdu_handler) (s, c) ->
+            let () =
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameters)
+                "%i -> "
+                (Ckappa_sig.int_of_state_index s)
+            in
+            let error, bdu_handler =
+              Handler.print_guard_mvbdu parameters error kappa_handler
+                bdu_handler c
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
+            error, bdu_handler)
+          (error, bdu_handler) output
+      in
+      error, bdu_handler
+    ) else
+      error, bdu_handler
+  in
+  error, bdu_handler, output
+
 let rec post_condition error rule_id r precondition static dynamic path =
   let parameters = Analyzer_headers.get_parameter static in
   let kappa_handler = Analyzer_headers.get_kappa_handler static in
+  let guards_mvbdus = Analyzer_headers.get_guard_mvbdus static in
+  let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+  let error, bdu_handler, bdu =
+    match Ckappa_sig.Rule_setmap.Map.find_option rule_id guards_mvbdus with
+    | None -> Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+    | Some bdu -> error, bdu_handler, bdu
+  in
+  let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
   let rule = r.Cckappa_sig.e_rule_c_rule in
   let cc = rule.Cckappa_sig.rule_rhs in
   (*---------------------------------------------------------*)
@@ -432,7 +556,9 @@ let rec post_condition error rule_id r precondition static dynamic path =
             then
               (* the agent has been created and the site not specified *)
               (* we know that its state is 0 *)
-              error, (Usual_domains.Val [ Ckappa_sig.dummy_state_index ], None)
+              ( error,
+                (Usual_domains.Val [ Ckappa_sig.dummy_state_index, bdu ], None)
+              )
             else
               ( error,
                 ( Usual_domains.Any,
@@ -458,15 +584,15 @@ let rec post_condition error rule_id r precondition static dynamic path =
                 if Ckappa_sig.compare_state_index k min < 0 then
                   output
                 else
-                  aux (Ckappa_sig.pred_state_index k) (k :: output)
+                  aux (Ckappa_sig.pred_state_index k) ((k, bdu) :: output)
               in
               aux max []
             in
             error, (Usual_domains.Val list, None))))
   in
   match potential_values with
-  | Usual_domains.Undefined | Usual_domains.Val _ ->
-    error, dynamic, potential_values
+  | Usual_domains.Undefined -> error, dynamic, Usual_domains.Undefined
+  | Usual_domains.Val l -> error, dynamic, Usual_domains.Val l
   | Usual_domains.Any ->
     let error, path =
       match continuation_opt with
@@ -491,20 +617,26 @@ let rec post_condition error rule_id r precondition static dynamic path =
           rule path.path
       in
       let error, list = may_be_modified parameters error rule path.path in
-
       match values with
       | Usual_domains.Val l ->
         if bool || list <> [] then (
           let l_side =
             if bool then
-              Ckappa_sig.state_index_of_int 0 :: l
+              (Ckappa_sig.state_index_of_int 0, bdu) :: l
             else
               l
           in
-          let l_all =
-            List_util.remove_consecutive_double
-              (List.sort Ckappa_sig.compare_state_index
-                 (List.rev_append list l_side))
+          let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in  
+          let error, bdu_handler, l_all =
+            smash_list parameters error kappa_handler bdu_handler
+              (List.sort
+                 (fun (a, _) (b, _) -> Ckappa_sig.compare_state_index a b)
+                 (List.rev_append
+                    (List.rev_map (fun a -> a, bdu) (List.rev list))
+                    l_side))
+          in
+          let dynamic =
+            Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
           in
           error, dynamic, Usual_domains.Val l_all
         ) else
@@ -517,22 +649,66 @@ and get_state_of_site error precondition static dynamic path =
   match path.defined_in with
   | LHS _ | Pattern ->
     let error, dynamic, range =
-      precondition.state_of_sites_in_precondition parameters error dynamic
-        path.path
+      precondition.state_of_sites_in_precondition parameters error static
+        dynamic path.path
     in
-    error, dynamic, precondition, range
+    let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+    let kappa_handler = Analyzer_headers.get_kappa_handler static in
+    let () = check __POS__ parameters "STATE (LHS)" in
+    let error, bdu_handler =
+      print_list
+        (fun p h e c ->
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger p)
+              "%i"
+              (Ckappa_sig.int_of_state_index c)
+          in
+          e, h)
+        (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
+        parameters bdu_handler error range
+    in
+    let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
+    ( error,
+      dynamic,
+      precondition,
+      (range
+        : (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu) list
+          Usual_domains.flat_lattice) )
   | RHS (rule_id, rule) ->
-    let error, dynamic, range =
+    let ( error,
+          dynamic,
+          (range :
+            (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu) list
+            Usual_domains.flat_lattice) ) =
       post_condition error rule_id rule precondition static dynamic path.path
     in
+    let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
+    let kappa_handler = Analyzer_headers.get_kappa_handler static in
+    let () = check __POS__ parameters "STATE (RHS)" in
+    let error, bdu_handler =
+      print_list
+        (fun p h e c ->
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger p)
+              "%i"
+              (Ckappa_sig.int_of_state_index c)
+          in
+          e, h)
+        (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
+        parameters bdu_handler error range
+    in
+    let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, precondition, range
 
 let refine_information_about_state_of_sites_in_precondition precondition f =
-  let new_f parameter error dynamic path =
+  let new_f parameter error static dynamic path =
     let error, dynamic, old_output =
-      precondition.state_of_sites_in_precondition parameter error dynamic path
+      precondition.state_of_sites_in_precondition parameter error static dynamic
+        path
     in
-    f parameter error dynamic path old_output
+    f parameter error static dynamic path old_output
   in
   {
     precondition with
@@ -545,6 +721,7 @@ let get_state_of_site_in_pre_post_condition get_global_static_information
     dynamic agent_id site_type defined_in precondition =
   let static = get_global_static_information static in
   let parameter = Analyzer_headers.get_parameter static in
+  let bdu = Analyzer_headers.get_restriction_mvbdu static in
   let path_in_pattern = { agent_id; relative_address = []; site = site_type } in
   let path = { defined_in; path = path_in_pattern } in
   (*get a list of site_type2 state in the precondition*)
@@ -579,7 +756,7 @@ let get_state_of_site_in_pre_post_condition get_global_static_information
           if l = [] then
             Exception.warn parameter error __POS__ Exit []
           else
-            error, l
+            error, List.rev_map (fun x -> x, bdu) (List.rev l)
         | Pattern -> Exception.warn parameter error __POS__ Exit []
       in
       error, l

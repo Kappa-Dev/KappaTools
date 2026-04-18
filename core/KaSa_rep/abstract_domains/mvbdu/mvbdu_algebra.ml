@@ -631,6 +631,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input
       in
       error, (handler, Some (mvbdu_output : 'mvbdu)))
 
+(* TO DO MAKE A WITH THRESHOLD VERSION *)
 let rec monotonicaly_rename allocate memoized_fun error parameters handler
     mvbdu_input list_input =
   match
@@ -644,7 +645,14 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler
       | Mvbdu_sig.Node mvbdu ->
         (match list_input.List_sig.value with
         | List_sig.Empty ->
-          Exception.warn parameters error __POS__ Exit (handler, None)
+          if compare 10000 mvbdu.Mvbdu_sig.variable <= 0 then
+            error, (handler, Some mvbdu_input)
+          else
+            (*error, (handler, Some mvbdu_input)*)
+            Exception.warn
+              ~message:(Format.sprintf "it remains %i" mvbdu.Mvbdu_sig.variable)
+              parameters error __POS__ Exit
+              (handler, Some mvbdu_input)
         | List_sig.Cons list ->
           let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
           if cmp < 0 then

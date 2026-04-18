@@ -1009,9 +1009,22 @@ module Domain = struct
   let check_association_list parameters error bdu_false pair check dynamic =
     let store_result = get_value dynamic in
     let bdu_handler = get_mvbdu_handler dynamic in
+    let check, bdu_list =
+      List.fold_left
+        (fun (check, bdu_list) (a, (b, c)) -> (a, b) :: check, c :: bdu_list)
+        ([], []) (List.rev check)
+    in
+
     let error, bdu_handler, mvbdu =
       Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters bdu_handler
         error check
+    in
+    let error, bdu_handler, mvbdu =
+      List.fold_left
+        (fun (error, bdu_handler, bdu) bdu' ->
+          Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu bdu')
+        (error, bdu_handler, mvbdu)
+        bdu_list
     in
     let error, bdu_handler, bool =
       Site_across_bonds_domain_type.check parameters error bdu_false bdu_handler
@@ -1144,10 +1157,12 @@ module Domain = struct
                   (*general case*)
                   List.fold_left
                     (fun (error, bool, dynamic, precondition, modified_sites)
-                         state'_x ->
+                         (state'_x, _bdu) ->
+                      (* TO DO use it *)
                       List.fold_left
                         (fun (error, bool, dynamic, precondition, modified_sites)
-                             state'_y ->
+                             (state'_y, _bdu) ->
+                          (* TO DO use it *)
                           let pair_list =
                             [
                               Ckappa_sig.fst_site, state'_x;
@@ -1209,10 +1224,10 @@ module Domain = struct
         (get_global_dynamic_information dynamic)
         path
     in
-    let error, state_list =
+    let error, dynamic, state_list =
       match state_list_lattice with
-      | Usual_domains.Val l -> error, l
-      | Usual_domains.Undefined -> error, []
+      | Usual_domains.Val l -> error, dynamic, l
+      | Usual_domains.Undefined -> error, dynamic, []
       | Usual_domains.Any ->
         let parameter = get_parameter static in
         let error, () =
@@ -1222,8 +1237,16 @@ module Domain = struct
             error, ()
         in
         let kappa_handler = get_kappa_handler static in
-        Handler.state_list parameter kappa_handler error agent_type_y
-          site_type_y
+        let mvbdu_handler = get_mvbdu_handler dynamic in
+        let error, mvbdu_handler, mvbdu_true =
+          Ckappa_sig.Views_bdu.mvbdu_true parameter mvbdu_handler error
+        in
+        let error, l =
+          Handler.state_list parameter kappa_handler error agent_type_y
+            site_type_y
+        in
+        let dynamic = set_mvbdu_handler mvbdu_handler dynamic in
+        error, dynamic, List.rev_map (fun a -> a, mvbdu_true) (List.rev l)
     in
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
@@ -1247,10 +1270,10 @@ module Domain = struct
         (get_global_dynamic_information dynamic)
         path
     in
-    let error, state_list =
+    let error, dynamic, state_list =
       match state_list_lattice with
-      | Usual_domains.Val l -> error, l
-      | Usual_domains.Undefined -> error, []
+      | Usual_domains.Val l -> error, dynamic, l
+      | Usual_domains.Undefined -> error, dynamic, []
       | Usual_domains.Any ->
         let parameter = get_parameter static in
         let error, () =
@@ -1260,8 +1283,17 @@ module Domain = struct
             error, ()
         in
         let kappa_handler = get_kappa_handler static in
-        Handler.state_list parameter kappa_handler error agent_type site
+        let mvbdu_handler = get_mvbdu_handler dynamic in
+        let error, mvbdu_handler, mvbdu_true =
+          Ckappa_sig.Views_bdu.mvbdu_true parameter mvbdu_handler error
+        in
+        let error, l =
+          Handler.state_list parameter kappa_handler error agent_type site
+        in
+        let dynamic = set_mvbdu_handler mvbdu_handler dynamic in
+        error, dynamic, List.rev_map (fun a -> a, mvbdu_true) (List.rev l)
     in
+
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
 
@@ -1413,7 +1445,7 @@ module Domain = struct
               in
               List.fold_left
                 (fun (error, bool, dynamic, precondition, modified_sites)
-                     state'_other ->
+                     (state'_other, bdu) ->
                   let pair_list =
                     match pos with
                     | Fst ->
@@ -1427,6 +1459,12 @@ module Domain = struct
                         Ckappa_sig.snd_site, state_mod;
                       ]
                   in
+                  let bdu_handler = get_mvbdu_handler dynamic in
+                  let error, bdu_handler, guard_bdu =
+                    Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error
+                      bdu guard_bdu
+                  in
+                  let dynamic = set_mvbdu_handler bdu_handler dynamic in
                   let pair =
                     ( (agent_type_x, site_type_x, site_type'_x, state_x),
                       (agent_type_y, site_type_y, site_type'_y, state_y) )
@@ -1446,14 +1484,18 @@ module Domain = struct
                            has not been created by the rule *)
                         (* this is the state before the modification *)
                         (* otherwise, nothing to check *)
-                        (Ckappa_sig.snd_site, state'_other) :: check
+                        (Ckappa_sig.snd_site, (state'_other, guard_bdu))
+                        :: check
+                        (* TO DO -> BETTER *)
                       | Snd ->
                         (* to do: add info about the other site *)
                         (* if the bond between site_type_x and site_type_y
                            has not been created by the rule *)
                         (* this is the state before the modification *)
                         (* this is the state before the modification *)
-                        (Ckappa_sig.fst_site, state'_other) :: check
+                        (Ckappa_sig.fst_site, (state'_other, guard_bdu))
+                        :: check
+                        (* TO DO -> BETTER *)
                     ) else
                       check
                   in
@@ -1661,7 +1703,8 @@ module Domain = struct
   (***************************************************************************)
 
   let apply_one_side_effect static dynamic error _
-      (_, (agent_name, site, state)) precondition =
+      (_, (agent_name, site, (state, _bdu))) precondition =
+    (* TO DO, check *)
     let parameters = get_parameter static in
     let dump_title () =
       if

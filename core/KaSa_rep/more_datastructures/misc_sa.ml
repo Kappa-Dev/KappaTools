@@ -43,6 +43,21 @@ let rev_inter_list compare l1 l2 =
   in
   aux l1 l2 []
 
+let rev_inter_list_with_and and_fun compare parameters handler error l1 l2 =
+  let rec aux error handler l1 l2 rep =
+    match l1, l2 with
+    | [], _ | _, [] -> error, handler, List.rev rep
+    | (a, a') :: b, (c, c') :: d ->
+      if compare a c = 0 then (
+        let error, handler, answer = and_fun parameters handler error a' c' in
+        aux error handler b d ((a, answer) :: rep)
+      ) else if compare a c < 0 then
+        aux error handler b l2 rep
+      else
+        aux error handler l1 d rep
+  in
+  aux error handler l1 l2 []
+
 let trace parameters string =
   if
     parameters.Remanent_parameters_sig.marshalisable_parameters
@@ -55,6 +70,12 @@ let trace parameters string =
         .Remanent_parameters_sig.prefix (string ())
 
 let inter_list compare l1 l2 = List.rev (rev_inter_list compare l1 l2)
+
+let inter_list_with_and fun_and compare parameters handler error l1 l2 =
+  let error, handler, rep =
+    rev_inter_list_with_and fun_and compare parameters handler error l1 l2
+  in
+  error, handler, List.rev rep
 
 let list_0_n k =
   let rec aux k sol =

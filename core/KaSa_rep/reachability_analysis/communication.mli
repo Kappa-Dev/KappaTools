@@ -142,12 +142,15 @@ val refine_information_about_state_of_sites_in_precondition :
   precondition ->
   (Remanent_parameters_sig.parameters ->
   Exception.exceptions_caught_and_uncaught ->
+  Analyzer_headers.global_static_information ->
   Analyzer_headers.global_dynamic_information ->
   path ->
-  Ckappa_sig.c_state list Usual_domains.flat_lattice ->
+  (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu) list
+  Usual_domains.flat_lattice ->
   Exception.exceptions_caught_and_uncaught
   * Analyzer_headers.global_dynamic_information
-  * Ckappa_sig.c_state list Usual_domains.flat_lattice) ->
+  * (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu) list
+    Usual_domains.flat_lattice) ->
   precondition
 
 val get_potential_partner :
@@ -200,7 +203,8 @@ val get_state_of_site :
   Exception.exceptions_caught_and_uncaught
   * Analyzer_headers.global_dynamic_information
   * precondition
-  * Ckappa_sig.c_state list Usual_domains.flat_lattice
+  * (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu) list
+    Usual_domains.flat_lattice
 
 val follow_path_inside_cc :
   Remanent_parameters_sig.parameters ->
@@ -224,7 +228,7 @@ val get_state_of_site_in_precondition :
   Exception.exceptions_caught_and_uncaught
   * 'dynamic
   * precondition
-  * Ckappa_sig.c_state list
+  * (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu) list
 
 val get_state_of_site_in_postcondition :
   ('static -> Analyzer_headers.global_static_information) ->
@@ -240,7 +244,7 @@ val get_state_of_site_in_postcondition :
   Exception.exceptions_caught_and_uncaught
   * 'b
   * precondition
-  * Ckappa_sig.c_state list
+  * (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu) list
 
 val add_rule :
   ?local_trace:bool ->

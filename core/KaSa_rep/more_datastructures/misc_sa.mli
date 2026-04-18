@@ -15,3 +15,13 @@ val list_0_n : int -> int list
 val list_minus : 'a list -> 'a list -> 'a list
 val print_comma : Remanent_parameters_sig.parameters -> bool -> string -> unit
 val fetch_array : int -> 'a option array -> 'a -> 'a
+
+val inter_list_with_and :
+  ('parameters -> 'handler -> 'error -> 'a -> 'a -> 'error * 'handler * 'a) ->
+  ('b -> 'b -> int) ->
+  'parameters ->
+  'handler ->
+  'error ->
+  ('b * 'a) list ->
+  ('b * 'a) list ->
+  'error * 'handler * ('b * 'a) list

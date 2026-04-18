@@ -101,7 +101,9 @@ module type Domain = sig
       * Ckappa_sig.c_site_name
       * Ckappa_sig.c_state)
       option
-      * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state),
+      * (Ckappa_sig.c_agent_name
+        * Ckappa_sig.c_site_name
+        * (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu)),
       Communication.precondition,
       Communication.precondition * Communication.event list )
     ternary

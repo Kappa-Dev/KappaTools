@@ -779,7 +779,7 @@ functor
         error, dynamic, (precondition, event_list)
 
     let apply_one_side_effect static dynamic error _rule_id
-        (_, (agent, site, state)) precondition =
+        (_, (agent, site, (state, _))) precondition =
       let parameters = get_parameter static in
       let backward = get_backward_pointers static in
       let dump_title () =

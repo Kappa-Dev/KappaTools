@@ -292,6 +292,8 @@ let try_partitioning parameters bdu_handler error kappa_handler
     let rec aux l (error, bdu_handler) =
       match l with
       | [] -> error, bdu_handler, None
+      | head :: tail when Ckappa_sig.int_of_mvbdu_var head = 0 ->
+        aux tail (error, bdu_handler)
       | head :: tail ->
         let error', bdu_handler, singleton =
           Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error
@@ -331,9 +333,30 @@ let try_partitioning parameters bdu_handler error kappa_handler
             | [] -> error, output
             | ([ (x, i) ], m) :: tail when x = head ->
               aux2 tail (error, (i, m) :: output)
-            | _ :: tail ->
+            | ([ (x, _) ], _) :: tail ->
               (*TODO: bdu_ex*)
-              aux2 tail (Exception.warn parameters error __POS__ Exit output)
+              aux2 tail
+                (Exception.warn parameters
+                   ~message:
+                     (Format.sprintf "MVar:%i" (Ckappa_sig.int_of_mvbdu_var x))
+                   error __POS__ Exit output)
+            | ([ (x', _); (x, _) ], _) :: tail ->
+              (*TODO: bdu_ex*)
+              aux2 tail
+                (Exception.warn parameters
+                   ~message:
+                     (Format.sprintf "MVar:%i %i %o"
+                        (Ckappa_sig.int_of_mvbdu_var head)
+                        (Ckappa_sig.int_of_mvbdu_var x')
+                        (Ckappa_sig.int_of_mvbdu_var x))
+                   error __POS__ Exit output)
+            | (l, _) :: tail ->
+              aux2 tail
+                (Exception.warn parameters
+                   ~message:
+                     (Format.sprintf "NOT A SINGLETON %i / %i" (List.length l)
+                        (Ckappa_sig.int_of_mvbdu_var head))
+                   error __POS__ Exit output)
           in
           aux2 list_asso (error, [])
         in
@@ -543,13 +566,22 @@ let translate parameters bdu_handler error kappa_handler
     | [] ->
       error, (bdu_handler, No_known_translation list_with_mvbdu)
       (* indirectly checks if the mvbdu is true *)
+    | [ x ]
+      when Ckappa_sig.Site Ckappa_sig.dummy_site_name
+           = Ckappa_sig.site_or_guard_p_of_mvbdu_var x nsites ->
+      error, (bdu_handler, No_known_translation list_with_mvbdu)
     | [ x ] ->
       let error, list_with_mvbdu =
         List.fold_left
           (fun (error, list) (elt, mvbdu) ->
             match elt with
             | [ (a, b) ] when a = x -> error, (b, mvbdu) :: list
-            | _ -> Exception.warn parameters error __POS__ Exit list)
+            | _ ->
+              let () =
+                Loggers.print_newline
+                  (Remanent_parameters.get_logger parameters)
+              in
+              Exception.warn parameters error __POS__ Exit list)
           (error, []) list_with_mvbdu
       in
       error, (bdu_handler, Range (x, list_with_mvbdu))

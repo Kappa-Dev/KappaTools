@@ -513,7 +513,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
 
   let check_side_effect static dynamic error precondition event_list r_id rule
       source target =
-    let agent_id, _, site, state = source in
+    let agent_id, _, site, (state : Ckappa_sig.c_state) = source in
     let error, dynamic, precondition, state_list =
       Communication.get_state_of_site_in_precondition
         get_global_static_information get_global_dynamic_information
@@ -521,7 +521,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
         agent_id (*A*)
         site precondition
     in
-    if List.mem state state_list then
+    if List.exists (fun (a, _) -> a = state) state_list then
       apply_one_side_effect static dynamic error r_id (Some source, target)
         precondition event_list
     else
@@ -536,6 +536,15 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
         [] r_id
         (Analyzer_headers.get_potential_side_effects_per_rule
            (get_global_static_information static))
+    in
+    let bdu = Analyzer_headers.get_restriction_mvbdu (fst static) in
+    let error, _ =
+      ( error,
+        bdu
+        (* TO DO
+           Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs parameters error
+           bdu r_id (Analyzer_headers.get_guard_mvbdus (get_global_static_information static)) *)
+      )
     in
     let error, rule_opt = get_rule parameters error static r_id in
     match rule_opt with
@@ -552,12 +561,17 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
             check_side_effect static dynamic error precondition event_list r_id
               rule source target)
           (error, dynamic, (precondition, event_list))
-          side_effects
+          (List.rev_map
+             (fun (a, (b, c, d)) -> a, (b, c, (d, bdu)))
+             (List.rev side_effects))
       | Some side_effects ->
         let error, dynamic, (precondition, event_list) =
           Ckappa_sig.AgentSiteState_map_and_set.Set.fold
             (fun target (error, dynamic, (precondition, event_list)) ->
-              apply_one_side_effect static dynamic error r_id (None, target)
+              apply_one_side_effect static dynamic error r_id
+                ( None,
+                  let a, b, c = target in
+                  a, b, (c, bdu) )
                 precondition event_list)
             side_effects.Ckappa_sig.seen
             (error, dynamic, (precondition, event_list))
@@ -565,8 +579,10 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
         let error, dynamic, (precondition, event_list) =
           Ckappa_sig.AgentsSiteState_map_and_set.Map.fold
             (fun source target (error, dynamic, (precondition, event_list)) ->
+              let a, b, c = target in
               apply_one_side_effect static dynamic error r_id
-                (Some source, target) precondition event_list)
+                (Some source, (a, b, (c, bdu)))
+                precondition event_list)
             side_effects.Ckappa_sig.not_seen_yet
             (error, dynamic, (precondition, event_list))
         in

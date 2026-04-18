@@ -173,9 +173,14 @@ module Domain = struct
             Ckappa_sig.empty_side_effects
         | error, Some side_effects -> error, side_effects
       in
+      let target =
+        let a, b, (c, _) = target in
+        a, b, c
+      in
       let error, seen =
         Ckappa_sig.AgentSiteState_map_and_set.Set.add_when_not_in parameter
-          error target side_effects_r_id.Ckappa_sig.seen
+          error target
+          side_effects_r_id.Ckappa_sig.seen (* TO DO HANDLE THE GUARD *)
       in
       if seen == side_effects_r_id.Ckappa_sig.seen then
         error, dynamic, (precondition, [])

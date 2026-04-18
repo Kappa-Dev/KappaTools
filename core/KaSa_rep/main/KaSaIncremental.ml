@@ -85,12 +85,17 @@ let main () =
   in
   let module Export_to_KaSa = (val export_to_kasa : Export_to_KaSa.Type) in
   let module KaSaUtil = KaSaUtil.KaSaUtil (Export_to_KaSa) in
-  let print_result parameters state =
+  let print_result state =
     let state, _ = Export_to_KaSa.get_reachability_analysis state in
     let state = Export_to_KaSa.output_reachability_result state in
+    state
+  in
+  let print_and_reset_errors state =
+    let parameters = Export_to_KaSa.get_parameters state in
     let error = Export_to_KaSa.get_errors state in
     let () = Exception.print parameters error in
-    state
+    Export_to_KaSa.set_errors Exception.empty_exceptions_caught_and_uncaught
+      state
   in
   let log = Remanent_parameters.get_logger parameters in
   let rec loop ?command state start_time =
@@ -109,10 +114,8 @@ let main () =
       match state with
       | None -> None
       | Some (summary, state) ->
-        Some
-          ( summary,
-            Export_to_KaSa.set_errors
-              Exception.empty_exceptions_caught_and_uncaught state )
+        let state = print_and_reset_errors state in
+        Some (summary, state)
     in
     let s =
       match command with
@@ -121,15 +124,6 @@ let main () =
         let () = Loggers.fprintf log "> " in
         let () = Loggers.flush_logger log in
         String.trim (read_line ())
-    in
-    let state =
-      match state with
-      | None -> None
-      | Some (summary, state) ->
-        Some
-          ( summary,
-            Export_to_KaSa.set_errors
-              Exception.empty_exceptions_caught_and_uncaught state )
     in
     try
       let start_time = Some (Sys.time ()) in
@@ -154,17 +148,13 @@ let main () =
         let () =
           Loggers.fprintf log "%a" Ast.print_parsing_compil_kappa compilation
         in
-        let error = Export_to_KaSa.get_errors state in
-        let () = Exception.print parameters error in
         loop (Some (summary, state)) None
       | ("print working set" | "print ws" | "p ws"), Some (summary, state) ->
         let state, compilation = Export_to_KaSa.get_compilation state in
         let () = Loggers.fprintf log "%a" Ast.print_working_set compilation in
-        let error = Export_to_KaSa.get_errors state in
-        let () = Exception.print parameters error in
         loop (Some (summary, state)) None
       | ("print result" | "p result" | "p"), Some (summary, state) ->
-        let state = print_result parameters state in
+        let state = print_result state in
         loop (Some (summary, state)) start_time
       | ("output influence map" | "o im"), Some (summary, state) ->
         let state =
@@ -180,8 +170,6 @@ let main () =
                 Public_data.High)
             state
         in
-        let error = Export_to_KaSa.get_errors state in
-        let () = Exception.print parameters error in
         loop (Some (summary, state)) start_time
       | ("output contact map" | "o cm"), Some (summary, state) ->
         let state =
@@ -196,8 +184,6 @@ let main () =
             Export_to_KaSa.output_internal_contact_map
               ~accuracy_level:Public_data.Low state
         in
-        let error = Export_to_KaSa.get_errors state in
-        let () = Exception.print parameters error in
         loop (Some (summary, state)) start_time
       | input, Some (summary, state)
         when String.length input > 12 && String.sub input 0 12 = "update file "
@@ -226,7 +212,7 @@ let main () =
             in
             summary, Export_to_KaSa.set_errors error state
         in
-        let state = print_result parameters state in
+        let state = print_result state in
         loop (Some (summary, state)) start_time
       | input, Some (summary, state) ->
         let state =
@@ -263,8 +249,6 @@ let main () =
             in
             Export_to_KaSa.set_errors error state
         in
-        let error = Export_to_KaSa.get_errors state in
-        let () = Exception.print parameters error in
         loop (Some (summary, state)) start_time
     with End_of_file -> ()
   in

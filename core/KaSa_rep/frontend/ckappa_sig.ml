@@ -1408,6 +1408,7 @@ module Views_bdu :
 module Views_intbdu = Mvbdu_wrapper.Internalize (Views_bdu)
 
 type side_effects = {
+  (* TO DO -> Guards ? *)
   not_seen_yet:
     (c_agent_name * c_site_name * c_state) AgentsSiteState_map_and_set.Map.t;
   seen: AgentSiteState_map_and_set.Set.t;
