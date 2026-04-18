@@ -1238,6 +1238,7 @@ module Domain = struct
       let dump_title () =
         if
           local_trace
+          || Remanent_parameters.get_trace parameters 
           || Remanent_parameters.get_dump_reachability_analysis_diff parameters
         then (
           let () =
@@ -1444,6 +1445,7 @@ module Domain = struct
         if
           bool
           && (local_trace
+              || Remanent_parameters.get_trace parameters 
              || Remanent_parameters.get_dump_reachability_analysis_diff
                   parameters)
         then

@@ -1,5 +1,7 @@
 (* Time-stamp: <Jul 02 2016> *)
 
+let local_trace = true 
+
 type agent_site =
   Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state
 
@@ -655,7 +657,11 @@ let add_value_and_event parameters error kappa_handler x value store_set
   else (
     (*check whether or not if this is a fresh value*)
     let error, bdu_handler =
-      if Remanent_parameters.get_dump_reachability_analysis_diff parameters then
+      if local_trace 
+        || Remanent_parameters.get_trace parameters 
+      || 
+        Remanent_parameters.get_dump_reachability_analysis_diff parameters 
+        then
         print_parallel_constraint ~verbose:false ~dump_any:true parameters error
           kappa_handler x value_mvbdu bdu_handler restriction_mvbdu
       else
