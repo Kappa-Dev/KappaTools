@@ -450,41 +450,37 @@ let diff_gen diff_pos scan_pos set_id get_id get_obj set_map get_map parameters
     errors ~before ~after ~delta =
   let map_before = get_map before in
   let map_after = get_map after in
-  let ( errors,
-        (removed_list, created_list, pos_renaming, pos_removing, map_after, _) )
+  let errors, (removed_list, created_list, pos_renaming, pos_removing, map_after)
       =
     Mods.StringMap.monadic_fold2 parameters errors
       (fun _parameters errors _ elt elt'
-           (removed_list, added_list, pos_diff, pos_removing, map_after, next_id) ->
+           (removed_list, added_list, pos_diff, pos_removing, map_after) ->
         ( errors,
           ( removed_list,
             added_list,
             diff_pos (get_obj elt) (get_obj elt') pos_diff,
             pos_removing,
-            map_after,
-            next_id ) ))
+            map_after ) ))
       (fun _parameters errors _ elt
-           (removed_list, added_list, pos_diff, pos_deleted, map_after, next_id) ->
+           (removed_list, added_list, pos_diff, pos_deleted, map_after) ->
         ( errors,
           ( get_id elt :: removed_list,
             added_list,
             pos_diff,
             scan_pos (fun a b -> a :: b) (get_obj elt) pos_deleted,
-            map_after,
-            next_id ) ))
+            map_after ) ))
       (fun _parameters errors key elt
-           (removed_list, added_list, pos_diff, pos_removing, map_after, next_id) ->
+           (removed_list, added_list, pos_diff, pos_removing, map_after) ->
         let id = get_id elt in
-        let elt = set_id next_id elt in
+        let elt = set_id (id + delta) elt in
         ( errors,
           ( removed_list,
             id :: added_list,
             pos_diff,
             pos_removing,
-            Mods.StringMap.add key elt map_after,
-            next_id + 1 ) ))
+            Mods.StringMap.add key elt map_after ) ))
       map_before map_after
-      ([], [], Loc.diff_pos_empty, Loc.remove_pos_empty, map_after, delta)
+      ([], [], Loc.diff_pos_empty, Loc.remove_pos_empty, map_after)
   in
   let after = set_map map_after after in
   ( errors,
