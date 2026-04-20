@@ -3,30 +3,6 @@ done
 Compiling...
 Generating the raw contact map...
 Reachability analysis...
-
-WRONG TUPLE: !!! 
- Rule 1 agent_id_t: 0->:R( site_type_x: 2:y), agent_type_y:0:R: (site_type_y:3:z) 
-
-WRONG TUPLE: !!! 
- Rule 1 agent_id_t: 1->:R( site_type_x: 2:y), agent_type_y:0:R: (site_type_y:3:z) 
-
-WRONG TUPLE: !!! 
- Rule 1 agent_id_t: 0<-:R( site_type_x: 3:z), agent_type_y:0:R: (site_type_y:2:y) 
-
-WRONG TUPLE: !!! 
- Rule 1 agent_id_t: 1<-:R( site_type_x: 3:z), agent_type_y:0:R: (site_type_y:2:y) 
-
-WRONG TUPLE: !!! 
- Rule 1 agent_id_t: 0->:R( site_type_x: 2:y), agent_type_y:0:R: (site_type_y:3:z) 
-
-WRONG TUPLE: !!! 
- Rule 1 agent_id_t: 1->:R( site_type_x: 2:y), agent_type_y:0:R: (site_type_y:3:z) 
-
-WRONG TUPLE: !!! 
- Rule 1 agent_id_t: 0<-:R( site_type_x: 3:z), agent_type_y:0:R: (site_type_y:2:y) 
-
-WRONG TUPLE: !!! 
- Rule 1 agent_id_t: 1<-:R( site_type_x: 3:z), agent_type_y:0:R: (site_type_y:2:y) 
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -37,14 +13,11 @@ every agent may occur in the model
 ------------------------------------------------------------
 R() =>
    [
-	  R()
-   ]
-R() =>
-   [
 	  R(a{p})
 	v R(a{u})
    ]
 R(x) => [ R(x[.]) v R(x[x.R]) ]
+R(y) => [ R(y[.]) v R(y[z.R]) ]
 R(z) => [ R(z[.]) v R(z[y.R]) ]
 
 ------------------------------------------------------------
@@ -55,6 +28,13 @@ R() =>
 	  R(a{p})
 	v R(a{u})
    ]
+R() =>
+   [
+	  R(x[x.R],y[.],z[y.R])
+	v R(x[x.R],y[.],z[.])
+	v R(x[x.R],y[z.R],z[.])
+	v R(x[.],y[.],z[.])
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -62,18 +42,18 @@ R(x[1]),R(x[1]) =>
 	[
 		  R(x[1],y[z.R]),R(x[1],y[.])
 		v R(x[1],y[.]),R(x[1],y[.])
-		v R(x[1],y[.]),R(x[1])
+		v R(x[1],y[.]),R(x[1],y[z.R])
 	]
 R(x[1]),R(x[1]) => 
 	[
-		  R(x[1],y[z.R]),R(x[1])
+		  R(x[1],y[z.R]),R(x[1],z[y.R])
 		v R(x[1],y[.]),R(x[1],z[.])
 	]
 R(x[1]),R(x[1]) => 
 	[
 		  R(x[1],z[y.R]),R(x[1],z[.])
 		v R(x[1],z[.]),R(x[1],z[.])
-		v R(x[1],z[.]),R(x[1])
+		v R(x[1],z[.]),R(x[1],z[y.R])
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds

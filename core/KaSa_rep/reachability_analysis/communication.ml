@@ -626,7 +626,7 @@ let rec post_condition error rule_id r precondition static dynamic path =
             else
               l
           in
-          let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in  
+          let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
           let error, bdu_handler, l_all =
             smash_list parameters error kappa_handler bdu_handler
               (List.sort

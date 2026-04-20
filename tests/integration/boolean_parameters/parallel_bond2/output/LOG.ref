@@ -1596,21 +1596,21 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: M
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-P.and.Q
+Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-P.and.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 P.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1P0.T.
@@ -1641,21 +1641,21 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: M
 QQcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-P.and.Q
+Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-P.and.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
@@ -1700,21 +1700,21 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: M
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-P.and.Q
+Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-P.and.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 P.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1P0.T.
@@ -1745,21 +1745,21 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: M
 QQcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-P.and.Q
+Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-P.and.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -2090,24 +2090,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
@@ -2117,24 +2117,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
@@ -2144,24 +2144,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
@@ -2171,24 +2171,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -2199,16 +2199,16 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 		Update information about potential double bindings
 
@@ -2243,24 +2243,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
@@ -2270,24 +2270,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
@@ -2297,24 +2297,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
@@ -2324,24 +2324,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -2352,16 +2352,16 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 		Update information about potential double bindings
 
@@ -2386,26 +2386,26 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T.P.or.Q.T.P.or.Q
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
@@ -2413,26 +2413,26 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T.P.or.Q.T.P.or.Q
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
@@ -2442,33 +2442,33 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q.T.P.or.Q
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+1R0R
 SMASH LIST ARG:
+0 -> R
 1 -> R
 1 -> R
-SMASH LIST RESULT:1 -> R
+1 -> R
+SMASH LIST RESULT:0 -> R
+1 -> R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1R
-
-WRONG TUPLE: !!! 
- Rule 8 agent_id_t: 0->:A( site_type_x: 1:x), agent_type_y:0:A: (site_type_y:1:x) 
+0R1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
@@ -2476,24 +2476,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 P.or.Q.or.R.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1P.or.Q.or.R0.T.
@@ -2521,24 +2521,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
@@ -2546,33 +2546,33 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q.T.P.or.Q
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+1R0R
 SMASH LIST ARG:
+0 -> R
 1 -> R
 1 -> R
-SMASH LIST RESULT:1 -> R
+1 -> R
+SMASH LIST RESULT:0 -> R
+1 -> R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1R
-
-WRONG TUPLE: !!! 
- Rule 8 agent_id_t: 0<-:A( site_type_x: 1:x), agent_type_y:0:A: (site_type_y:1:x) 
+0R1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
@@ -2580,24 +2580,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 P.or.Q.or.R.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1P.or.Q.or.R0.T.
@@ -2625,24 +2625,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -2677,26 +2677,26 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
@@ -2704,26 +2704,26 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1.T.0.T.
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
@@ -2733,33 +2733,33 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T.P.or.Q.T.P.or.Q
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+1R0R
 SMASH LIST ARG:
+0 -> R
 1 -> R
 1 -> R
-SMASH LIST RESULT:1 -> R
+1 -> R
+SMASH LIST RESULT:0 -> R
+1 -> R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1R
-
-WRONG TUPLE: !!! 
- Rule 9 agent_id_t: 0->:A( site_type_x: 0:y), agent_type_y:0:A: (site_type_y:0:y) 
+0R1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
@@ -2767,24 +2767,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.y--y.A 
 P.or.Q.or.R.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1P.or.Q.or.R0.T.
@@ -2812,24 +2812,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
@@ -2837,33 +2837,33 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T.P.or.Q.T.P.or.Q
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+1R0R
 SMASH LIST ARG:
+0 -> R
 1 -> R
 1 -> R
-SMASH LIST RESULT:1 -> R
+1 -> R
+SMASH LIST RESULT:0 -> R
+1 -> R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1R
-
-WRONG TUPLE: !!! 
- Rule 9 agent_id_t: 0<-:A( site_type_x: 0:y), agent_type_y:0:A: (site_type_y:0:y) 
+0R1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
@@ -2871,24 +2871,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.y--y.A 
 P.or.Q.or.R.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1P.or.Q.or.R0.T.
@@ -2916,24 +2916,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -3679,21 +3679,21 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: M
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-P.and.Q
+Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-P.and.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 P.or.Q.or.R.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1P.or.Q.or.R0.T.
@@ -3724,21 +3724,21 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: M
 QQcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-P.and.Q
+Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-P.and.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
@@ -3783,21 +3783,21 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: M
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-P.and.Q
+Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-P.and.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 P.or.Q.or.R.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1P.or.Q.or.R0.T.
@@ -3828,21 +3828,21 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: M
 QQcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-P.and.Q
+Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-P.and.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1P.and.Q
+0Q
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -4162,24 +4162,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
@@ -4189,24 +4189,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
@@ -4216,24 +4216,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
@@ -4243,24 +4243,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -4271,16 +4271,16 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 		Update information about potential double bindings
 
@@ -4309,24 +4309,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
@@ -4336,24 +4336,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
@@ -4363,24 +4363,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
@@ -4390,24 +4390,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -4418,16 +4418,16 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1581.29.36 STORE PARALLEL BONDS
-R.and.parallel
+parallel.and.R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1587.29.36 DONE
 		Update information about potential double bindings
 
@@ -4450,26 +4450,26 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T.P.or.Q.T.P.or.Q
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
@@ -4477,26 +4477,26 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T.P.or.Q.T.P.or.Q
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
@@ -4506,33 +4506,33 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q.T.P.or.Q
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+1R0R
 SMASH LIST ARG:
+0 -> R
 1 -> R
 1 -> R
-SMASH LIST RESULT:1 -> R
+1 -> R
+SMASH LIST RESULT:0 -> R
+1 -> R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1R
-
-WRONG TUPLE: !!! 
- Rule 8 agent_id_t: 0->:A( site_type_x: 1:x), agent_type_y:0:A: (site_type_y:1:x) 
+0R1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
@@ -4540,24 +4540,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 P.or.Q.or.R.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1P.or.Q.or.R0.T.
@@ -4585,24 +4585,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
@@ -4610,33 +4610,33 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q.T.P.or.Q
+RR
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+1R0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+1R0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+1R0R
 SMASH LIST ARG:
+0 -> R
 1 -> R
 1 -> R
-SMASH LIST RESULT:1 -> R
+1 -> R
+SMASH LIST RESULT:0 -> R
+1 -> R
 core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1R
-
-WRONG TUPLE: !!! 
- Rule 8 agent_id_t: 0<-:A( site_type_x: 1:x), agent_type_y:0:A: (site_type_y:1:x) 
+0R1R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
@@ -4644,24 +4644,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 P.or.Q.or.R.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1P.or.Q.or.R0.T.
@@ -4689,309 +4689,24 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: I
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
+RRcore/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T.P.or.Q
+R
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+Rcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
+0R
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
+0R
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
-		Update information about potential double bindings
-
-		Update information about potential double bindings
-
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
-
-
-	Applying rule #[R]A(x[.] y[1]), A(x[.]), A(y[1]) -> A(x[1] y[2]), A(x[1]), A(y[2]) (File "example_double_bonds2.ka", line 25, characters 0-73:):
-		the precondition is satisfied
-
-		Updating the views for A(y[],x[],P,Q,R)
-
-		Updating the views for A(y[],x[],P,Q,R)
-
-		Updating the views for A(y[],x[],P,Q,R)
-core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.T.P.or.Q.or.R.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
-R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
-Any
-core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.T.P.or.Q.or.R.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
-R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
-Any
-core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.T.P.or.Q.or.R.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
-R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T.P.or.Q.T.P.or.Q
-core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-
-core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
-core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
-Any
-core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
-core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
-core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
-SMASH LIST ARG:
-1 -> R
-1 -> R
-SMASH LIST RESULT:1 -> R
-core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1R
-
-WRONG TUPLE: !!! 
- Rule 9 agent_id_t: 0->:A( site_type_x: 0:y), agent_type_y:0:A: (site_type_y:0:y) 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.T.P.or.Q.or.R.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
-R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
-Any
-core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.y--y.A 
-P.or.Q.or.R.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
-1P.or.Q.or.R0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
-Any
-core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1P.or.Q.or.R0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1P.or.Q.or.R0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1P.or.Q.or.R0.T.
-SMASH LIST ARG:
-0 -> .T.
-1 -> R
-1 -> R
-1 -> P.or.Q.or.R
-SMASH LIST RESULT:0 -> .T.
-1 -> R
-core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-0.T.1R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.T.P.or.Q.or.R.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
-R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
-Any
-core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.T.P.or.Q.or.R.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
-R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-P.or.Q.T.P.or.Q.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T.P.or.Q.T.P.or.Q
-core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T.P.or.Q.T.P.or.Qcore/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-
-core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-
-core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
-Any
-core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-
-core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-
-core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-
-SMASH LIST ARG:
-1 -> R
-1 -> R
-SMASH LIST RESULT:1 -> R
-core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-1R
-
-WRONG TUPLE: !!! 
- Rule 9 agent_id_t: 0<-:A( site_type_x: 0:y), agent_type_y:0:A: (site_type_y:0:y) 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.T.P.or.Q.or.R.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
-R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
-Any
-core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.y--y.A 
-P.or.Q.or.R.T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
-1P.or.Q.or.R0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
-Any
-core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1P.or.Q.or.R0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1P.or.Q.or.R0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1P.or.Q.or.R0.T.
-SMASH LIST ARG:
-0 -> .T.
-1 -> R
-1 -> R
-1 -> P.or.Q.or.R
-SMASH LIST RESULT:0 -> .T.
-1 -> R
-core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
-0.T.1R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.T.P.or.Q.or.R.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
-R
-core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
-.T.P.or.Q.or.R.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
-.T..T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
-core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
-Any
-core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
-core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+0R
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -5021,12 +4736,12 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=249
+Id=272
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=248
+  Id=271
    Node(site_type:1<1)
     Id=87
      Node(site_type:2<0)
@@ -5071,14 +4786,14 @@ Id=249
         Id=0
          Leaf False 
 
-    Id=247
+    Id=270
      Node(site_type:1<2)
-      Id=246
+      Id=269
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=245
+        Id=268
          Node(site_type:2<1)
           Id=11
            Node(site_type:1000000<0)
@@ -5113,21 +4828,21 @@ Id=249
               Id=0
                Leaf False 
 
-          Id=244
+          Id=267
            Node(site_type:2<2)
-            Id=243
+            Id=266
              Node(site_type:1000000<0)
               Id=0
                Leaf False 
 
-              Id=242
+              Id=265
                Node(site_type:1000000<1)
-                Id=241
+                Id=264
                  Node(site_type:1000001<0)
                   Id=0
                    Leaf False 
 
-                  Id=240
+                  Id=263
                    Node(site_type:1000001<1)
                     Id=14
                      Node(site_type:1000002<1)
@@ -5220,27 +4935,23 @@ A() =>
 ------------------------------------------------------------
 A(y[1]),A(y[1]) => 
 	[
-		  A(x[x.A],y[1]),A(x[.],y[1]) [ only if Q ]
-		v A(x[x.A],y[1]),A(x[.],y[1]) [ only if P.or.Q ]
-		v A(x[_],y[1]),A(x[.],y[1])
-		v A(x[x.A],y[1]),A(x[x.A],y[1])
+		  A(x[x.A],y[1]),A(x[.],y[1]) [ only if Q.or.R ]
+		v A(x[x.A],y[1]),A(x[x.A],y[1]) [ only if P.or.Q.or.R ]
 		v A(x[.],y[1]),A(x[.],y[1])
-		v A(x[.],y[1]),A(x[x.A],y[1])
+		v A(x[.],y[1]),A(x[x.A],y[1]) [ only if Q.or.R ]
 	]
 A(x[1]),A(x[1]) => 
 	[
-		  A(x[1],y[y.A]),A(x[1],y[.]) [ only if Q ]
-		v A(x[1],y[y.A]),A(x[1],y[.]) [ only if P.or.Q ]
-		v A(x[1],y[_]),A(x[1],y[.])
-		v A(x[1],y[y.A]),A(x[1],y[y.A])
+		  A(x[1],y[y.A]),A(x[1],y[.]) [ only if Q.or.R ]
+		v A(x[1],y[y.A]),A(x[1],y[y.A]) [ only if P.or.Q.or.R ]
 		v A(x[1],y[.]),A(x[1],y[.])
-		v A(x[1],y[.]),A(x[1],y[y.A])
+		v A(x[1],y[.]),A(x[1],y[y.A]) [ only if Q.or.R ]
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
 A(x[2],y[1]),A(x[2],y[1]) => P.or.R
-A(x[2],y[1]),A(y[1]),A(x[2]) => (.not.1).or.P.or.Q
+A(x[2],y[1]),A(y[1]),A(x[2]) => Q.or.R
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
@@ -5267,395 +4978,25 @@ A()=> [
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 A(y[1]),A(y[1])=> [
-		  A(x[x.A],y[1]),A(x[x.A],y[1])
+		  A(x[x.A],y[1]),A(x[.],y[1]) [ only if Q.or.R ]
+		v A(x[x.A],y[1]),A(x[x.A],y[1]) [ only if P.or.Q.or.R ]
 		v A(x[.],y[1]),A(x[.],y[1])
-		v A(x[.],y[1]),A(x[x.A],y[1])]
+		v A(x[.],y[1]),A(x[x.A],y[1]) [ only if Q.or.R ]]
 A(x[1]),A(x[1])=> [
-		  A(x[1],y[y.A]),A(x[1],y[y.A])
+		  A(x[1],y[y.A]),A(x[1],y[.]) [ only if Q.or.R ]
+		v A(x[1],y[y.A]),A(x[1],y[y.A]) [ only if P.or.Q.or.R ]
 		v A(x[1],y[.]),A(x[1],y[.])
-		v A(x[1],y[.]),A(x[1],y[y.A])]
+		v A(x[1],y[.]),A(x[1],y[y.A]) [ only if Q.or.R ]]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 A(x[x.A],y[y.A])=> [
 		  A(x[2],y[1]),A(x[2],y[1]) [ only if P.or.R ]
-		v A(x[2],y[1]),A(y[1]),A(x[2]) [ only if (.not.1).or.P.or.Q ]]
+		v A(x[2],y[1]),A(y[1]),A(x[2]) [ only if Q.or.R ]]
 
 ------------------------------------------------------------
 * Export Counters to JSon (internal constraints_list):
 ------------------------------------------------------------
 
-Some exceptions have been raised
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/boolean_mvbdu.ml; message: line 1881; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 4 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 6 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 6 agent_id 1 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 6 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 6 agent_id 1 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 7 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 7 agent_id 1 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 7 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 7 agent_id 1 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1139:  rule 8 agent_id 2 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1150: empty list in potential states in post condition; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1128:  rule 8 agent_id 2 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1150: empty list in potential states in post condition; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1409:  rule 8 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 8 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 8 agent_id 2 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1409:  rule 8 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 8 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 8 agent_id 2 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1139:  rule 9 agent_id 1 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1128:  rule 9 agent_id 1 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1409:  rule 9 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 9 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 9 agent_id 1 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1409:  rule 9 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 9 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 9 agent_id 1 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 6 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 6 agent_id 1 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 6 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 6 agent_id 1 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 7 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 7 agent_id 1 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 7 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 7 agent_id 1 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1139:  rule 8 agent_id 2 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1150: empty list in potential states in post condition; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1128:  rule 8 agent_id 2 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1150: empty list in potential states in post condition; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1409:  rule 8 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 8 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 8 agent_id 2 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1409:  rule 8 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 8 agent_id 0 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 8 agent_id 2 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1139:  rule 9 agent_id 1 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1128:  rule 9 agent_id 1 site_type 0; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1409:  rule 9 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 9 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 9 agent_id 1 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/views_domain.ml; message: line 1449: state is empty; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1409:  rule 9 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 9 agent_id 0 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/reachability_analysis/site_across_bonds_domain.ml; message: line 1435:  rule 9 agent_id 1 site_type 1; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/boolean_mvbdu.ml; message: line 1881; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 705: Predicate MVBDU contains the site 1; exception:Exit
+execution finished without any exception

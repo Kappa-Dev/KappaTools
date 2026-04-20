@@ -18,19 +18,13 @@ every agent may occur in the model
 ------------------------------------------------------------
 E() =>
    [
-	  130:3
-130:3
-130:3
-E(~?)
-	v 130:3
-130:3
-130:3
-E(~?)
+	  E(x!x.R)
+	v E(x)
    ]
 R() =>
    [
-	  R(n!cr.R)
-	v R(n)
+	  R(x!x.E)
+	v R(x)
    ]
 R(c?) => [ R(c) v R(c!c.R) ]
 R(cr?) => [ R(cr) v R(cr!n.R) ]
@@ -41,14 +35,8 @@ R(n?) => [ R(n) v R(n!cr.R) ]
 ------------------------------------------------------------
 E() =>
    [
-	  130:3
-130:3
-130:3
-E(~?)
-	v 130:3
-130:3
-130:3
-E(~?)
+	  E(x!x.R)
+	v E(x)
    ]
 R() =>
    [
@@ -76,108 +64,4 @@ R(c!1),R(c!1) =>
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-130:3
-130:3
-130:3
-130:3
-130:3
-130:3
-130:3
-130:3
-130:3
-130:3
-130:3
-130:3
-Some exceptions have been raised
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 226: undefined site; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 65; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 72; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 240: undefined site state; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 65; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 72; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 255: undefined site state; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 570; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 580; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 226: undefined site; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 65; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 72; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 240: undefined site state; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 65; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 72; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 255: undefined site state; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 570; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 580; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 226: undefined site; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 65; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 72; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 240: undefined site state; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 65; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 72; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 255: undefined site state; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 570; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 580; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 226: undefined site; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 65; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 72; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 240: undefined site state; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 65; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 72; exception:Exit
-error: file_name: core/KaSa_rep/site_graphs/site_graphs.ml; message: line 255: undefined site state; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 53; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 197; exception:Exit
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 570; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 161: missing entry; exception:Unknown
-error: file_name: core/KaSa_rep/frontend/handler.ml; message: line 580; exception:Exit
+execution finished without any exception

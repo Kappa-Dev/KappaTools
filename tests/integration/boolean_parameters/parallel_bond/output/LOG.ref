@@ -2310,7 +2310,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -2337,7 +2337,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -2364,7 +2364,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -2391,7 +2391,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -2469,7 +2469,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -2514,7 +2514,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -2559,7 +2559,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -2604,7 +2604,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -2668,28 +2668,28 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 .T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
+.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1.T.0.T.
@@ -2713,28 +2713,28 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 .T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
+.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1.T.0.T.
@@ -2758,28 +2758,28 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 .T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
+.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1.T.0.T.
@@ -2803,28 +2803,28 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 .T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
+.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -2855,7 +2855,7 @@ Undefined
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -2882,7 +2882,7 @@ Undefined
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -2909,7 +2909,7 @@ Undefined
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -2936,7 +2936,7 @@ Undefined
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3020,7 +3020,7 @@ Undefined
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3047,7 +3047,7 @@ Undefined
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3074,7 +3074,7 @@ Undefined
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3101,7 +3101,7 @@ Undefined
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3175,7 +3175,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3202,7 +3202,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3229,7 +3229,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3256,7 +3256,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3303,7 +3303,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3348,7 +3348,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3393,7 +3393,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3438,7 +3438,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3463,7 +3463,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3490,7 +3490,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3530,7 +3530,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1199.36.43 COMPATIBLE STAT
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3557,7 +3557,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3597,7 +3597,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1199.36.43 COMPATIBLE STAT
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3624,7 +3624,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3673,7 +3673,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1199.36.43 COMPATIBLE STAT
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3700,7 +3700,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3772,7 +3772,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3799,7 +3799,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3826,7 +3826,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3853,7 +3853,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -3900,7 +3900,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3945,7 +3945,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -3990,7 +3990,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -4035,7 +4035,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -4060,7 +4060,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4087,7 +4087,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4135,7 +4135,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1199.36.43 COMPATIBLE STAT
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4162,7 +4162,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4210,7 +4210,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1199.36.43 COMPATIBLE STAT
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4237,7 +4237,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4278,7 +4278,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1199.36.43 COMPATIBLE STAT
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4305,7 +4305,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .not.P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4379,7 +4379,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -4406,7 +4406,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -4433,7 +4433,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -4460,7 +4460,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
@@ -4526,7 +4526,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4553,7 +4553,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4580,7 +4580,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4607,7 +4607,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 P
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4683,7 +4683,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4728,7 +4728,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4773,7 +4773,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4818,7 +4818,7 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
@@ -4880,28 +4880,28 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 .T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
+.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1.T.0.T.
@@ -4925,28 +4925,28 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 .T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
+.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1.T.0.T.
@@ -4970,28 +4970,28 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 .T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
+.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1812.24.31 STEP OUTSITE ITERATION: PROJ A.x--x.A 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.2187.31.38 FROM PATH
 1.T.0.T.
@@ -5015,28 +5015,28 @@ core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
 core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A y 
-.not.P.T.
+.T..T..T..T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A y 
 .T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A y 
 .T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A y 
 .T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A y 
-.T..T.
+.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A y 
-.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A y 
 core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A y 
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
 Any
 core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
-1.T.0.T.
+1.T.
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
@@ -5062,12 +5062,12 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=117
+Id=123
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=116
+  Id=122
    Node(site_type:1<2)
     Id=61
      Node(site_type:2<0)
