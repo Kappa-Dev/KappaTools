@@ -626,80 +626,10 @@ Influence_map:Inhibition_map:rule(7):'' A(z[1]),E(t[1])->A(z[.]),E(t[.]) -> var(
 Reachability analysis...
 	Views in initial state:
 
-INTENSIONAL DESCRIPTION:
-Id=54
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=53
-   Node(site_type:1<1)
-    Id=52
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=51
-       Node(site_type:2<1)
-        Id=50
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=49
-           Node(site_type:3<1)
-            Id=3
-             Node(site_type:1000000<0)
-              Id=0
-               Leaf False 
-
-              Id=2
-               Node(site_type:1000000<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[.],y[.],z[.])
 
 	Views in initial state:
 
-INTENSIONAL DESCRIPTION:
-Id=62
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=61
-   Node(site_type:1<1)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(t[.])
 
 
@@ -710,82 +640,22 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],z[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=72
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=71
-   Node(site_type:1<2)
-    Id=68
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=67
-       Node(site_type:2<1)
-        Id=66
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=65
-           Node(site_type:3<1)
-            Id=8
-             Node(site_type:1000000<0)
-              Id=0
-               Leaf False 
-
-              Id=7
-               Node(site_type:1000000<1)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[t.E],y[.],z[.]) => .not.P
 
 
 		Updating the views for E(t[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=80
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=79
-   Node(site_type:1<2)
-    Id=8
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=7
-       Node(site_type:1000000<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(t[x.A]) => .not.P
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule #[[not] P]A(y[.]), E(t[.]) -> A(y[1]), E(t[1]) (File "example_views.ka", line 15, characters 0-51:):
@@ -795,83 +665,23 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],z[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=89
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=88
-   Node(site_type:1<2)
-    Id=87
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=86
-       Node(site_type:2<2)
-        Id=66
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=65
-           Node(site_type:3<1)
-            Id=8
-             Node(site_type:1000000<0)
-              Id=0
-               Leaf False 
-
-              Id=7
-               Node(site_type:1000000<1)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[t.E],y[t.E],z[.]) => .not.P
 		A(x[.],y[t.E],z[.]) => .not.P
 
 
 		Updating the views for E(t[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=101
- Node(site_type:1<2)
-  Id=0
-   Leaf False 
-
-  Id=100
-   Node(site_type:1<3)
-    Id=8
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=7
-       Node(site_type:1000000<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(t[y.A]) => .not.P
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule #[P]A(x[.] y[.]), E(t[.]) -> A(x[.] y[1]), E(t[1]) (File "example_views.ka", line 18, characters 0-55:):
@@ -881,82 +691,22 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],z[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=115
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=114
-   Node(site_type:1<1)
-    Id=113
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=112
-       Node(site_type:2<2)
-        Id=107
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=106
-           Node(site_type:3<1)
-            Id=4
-             Node(site_type:1000000<1)
-              Id=0
-               Leaf False 
-
-              Id=2
-               Node(site_type:1000000<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[.],y[t.E],z[.]) => P
 
 
 		Updating the views for E(t[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=125
- Node(site_type:1<2)
-  Id=0
-   Leaf False 
-
-  Id=124
-   Node(site_type:1<3)
-    Id=4
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(t[y.A]) => P
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule #[P]A(x[.] y[.]), E(t[.]) -> A(x[1] y[.]), E(t[1]) (File "example_views.ka", line 19, characters 0-55:):
@@ -966,82 +716,22 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],z[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=133
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=132
-   Node(site_type:1<2)
-    Id=109
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=108
-       Node(site_type:2<1)
-        Id=107
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=106
-           Node(site_type:3<1)
-            Id=4
-             Node(site_type:1000000<1)
-              Id=0
-               Leaf False 
-
-              Id=2
-               Node(site_type:1000000<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[t.E],y[.],z[.]) => P
 
 
 		Updating the views for E(t[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=140
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=139
-   Node(site_type:1<2)
-    Id=4
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(t[x.A]) => P
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x[_] y[_] z[.]), E(t[.]) -> A(x[_] y[_] z[1]), E(t[1]) (File "example_views.ka", line 21, characters 0-64:):
@@ -1051,82 +741,22 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],z[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=150
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=149
-   Node(site_type:1<2)
-    Id=148
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=147
-       Node(site_type:2<2)
-        Id=146
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=145
-           Node(site_type:3<2)
-            Id=8
-             Node(site_type:1000000<0)
-              Id=0
-               Leaf False 
-
-              Id=7
-               Node(site_type:1000000<1)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[t.E],y[t.E],z[t.E]) => .not.P
 
 
 		Updating the views for E(t[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=167
- Node(site_type:1<3)
-  Id=0
-   Leaf False 
-
-  Id=166
-   Node(site_type:1<4)
-    Id=8
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=7
-       Node(site_type:1000000<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(t[z.A]) => .not.P
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x[1]), E(t[1]) -> A(x[.]), E(t[.]) (File "example_views.ka", line 23, characters 0-40:):
@@ -1136,55 +766,20 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],z[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=185
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=184
-   Node(site_type:1<1)
-    Id=148
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=147
-       Node(site_type:2<2)
-        Id=146
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=145
-           Node(site_type:3<2)
-            Id=8
-             Node(site_type:1000000<0)
-              Id=0
-               Leaf False 
-
-              Id=7
-               Node(site_type:1000000<1)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[.],y[t.E],z[t.E]) => .not.P
 
 
 		Updating the views for E(t[],P)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(y[1]), E(t[1]) -> A(y[.]), E(t[.]) (File "example_views.ka", line 24, characters 0-40:):
 		the precondition is satisfied
@@ -1193,56 +788,21 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],z[],P)
 
-INTENSIONAL DESCRIPTION:
-Id=210
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=209
-   Node(site_type:1<2)
-    Id=208
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=207
-       Node(site_type:2<1)
-        Id=146
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=145
-           Node(site_type:3<2)
-            Id=8
-             Node(site_type:1000000<0)
-              Id=0
-               Leaf False 
-
-              Id=7
-               Node(site_type:1000000<1)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[t.E],y[.],z[t.E]) => .not.P
 		A(x[.],y[.],z[t.E]) => .not.P
 
 
 		Updating the views for E(t[],P)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(z[1]), E(t[1]) -> A(z[.]), E(t[.]) (File "example_views.ka", line 25, characters 0-40:):
 		the precondition is satisfied
@@ -1252,6 +812,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],z[],P)
 
 		Updating the views for E(t[],P)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule #[[not] P]A(x[.]), E(t[.]) -> A(x[1]), E(t[1]) (File "example_views.ka", line 14, characters 0-51:):
 		the precondition is satisfied
@@ -1259,6 +829,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],z[],P)
 
 		Updating the views for E(t[],P)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule #[[not] P]A(y[.]), E(t[.]) -> A(y[1]), E(t[1]) (File "example_views.ka", line 15, characters 0-51:):
 		the precondition is satisfied
@@ -1266,6 +846,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],z[],P)
 
 		Updating the views for E(t[],P)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule #[P]A(x[.] y[.]), E(t[.]) -> A(x[.] y[1]), E(t[1]) (File "example_views.ka", line 18, characters 0-55:):
 		the precondition is satisfied
@@ -1273,6 +863,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],z[],P)
 
 		Updating the views for E(t[],P)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule #[P]A(x[.] y[.]), E(t[.]) -> A(x[1] y[.]), E(t[1]) (File "example_views.ka", line 19, characters 0-55:):
 		the precondition is satisfied
@@ -1280,6 +880,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],z[],P)
 
 		Updating the views for E(t[],P)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x[_] y[_] z[.]), E(t[.]) -> A(x[_] y[_] z[1]), E(t[1]) (File "example_views.ka", line 21, characters 0-64:):
 		the precondition is satisfied
@@ -1287,6 +897,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],z[],P)
 
 		Updating the views for E(t[],P)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x[1]), E(t[1]) -> A(x[.]), E(t[.]) (File "example_views.ka", line 23, characters 0-40:):
 		the precondition is satisfied
@@ -1294,6 +914,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],z[],P)
 
 		Updating the views for E(t[],P)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(y[1]), E(t[1]) -> A(y[.]), E(t[.]) (File "example_views.ka", line 24, characters 0-40:):
 		the precondition is satisfied
@@ -1301,6 +931,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],z[],P)
 
 		Updating the views for E(t[],P)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 ------------------------------------------------------------
 * There are some non applyable rules
@@ -1494,305 +1134,37 @@ Id=169
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=235
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=175
-   Node(site_type:1<2)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=44
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=43
-   Node(site_type:0<2)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=239
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=238
-   Node(site_type:2<1)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=158
-     Node(site_type:2<2)
-      Id=8
-       Node(site_type:1000000<0)
-        Id=0
-         Leaf False 
-
-        Id=7
-         Node(site_type:1000000<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=241
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=240
-   Node(site_type:0<3)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=170
-     Node(site_type:0<4)
-      Id=8
-       Node(site_type:1000000<0)
-        Id=0
-         Leaf False 
-
-        Id=7
-         Node(site_type:1000000<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A(x) => [ A(x[.]) v A(x[t.E]) ]
+A() =>
+   [
+	  A(x[t.E])
+	v A(x[.])
+   ]
 A(y) => [ A(y[.]) v A(y[t.E]) ]
 A(z) => [ A(z[.]) v A(z[t.E]) [ only if .not.P ] ]
-E(t) => [ E(t[.]) v E(t[x.A]) v E(t[y.A]) v E(t[z.A]) [ only if .not.P ] ]
+E() =>
+   [
+	  E(t[z.A]) [ only if .not.P ]
+	v E(t[y.A])
+	v E(t[x.A])
+	v E(t[.])
+   ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=239
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=238
-   Node(site_type:2<1)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=158
-     Node(site_type:2<2)
-      Id=8
-       Node(site_type:1000000<0)
-        Id=0
-         Leaf False 
-
-        Id=7
-         Node(site_type:1000000<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=251
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=250
-   Node(site_type:0<1)
-    Id=235
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=175
-       Node(site_type:1<2)
-        Id=3
-         Node(site_type:1000000<0)
-          Id=0
-           Leaf False 
-
-          Id=2
-           Node(site_type:1000000<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=249
-     Node(site_type:0<2)
-      Id=82
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=81
-         Node(site_type:1<1)
-          Id=3
-           Node(site_type:1000000<0)
-            Id=0
-             Leaf False 
-
-            Id=2
-             Node(site_type:1000000<2)
-              Id=1
-               Leaf True 
-
-              Id=0
-               Leaf False 
-
-          Id=79
-           Node(site_type:1<2)
-            Id=8
-             Node(site_type:1000000<0)
-              Id=0
-               Leaf False 
-
-              Id=7
-               Node(site_type:1000000<1)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=241
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=240
-   Node(site_type:0<3)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=170
-     Node(site_type:0<4)
-      Id=8
-       Node(site_type:1000000<0)
-        Id=0
-         Leaf False 
-
-        Id=7
-         Node(site_type:1000000<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 A() =>
    [
 	  A(x[t.E],y[.])
 	v A(x[t.E],y[t.E]) [ only if .not.P ]
 	v A(x[.],y[.])
 	v A(x[.],y[t.E])
+   ]
+E() =>
+   [
+	  E(t[z.A]) [ only if .not.P ]
+	v E(t[y.A])
+	v E(t[x.A])
+	v E(t[.])
    ]
 ------------------------------------------------------------
 * Properties in connected agents
@@ -1803,312 +1175,32 @@ A() =>
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=235
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=175
-   Node(site_type:1<2)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=44
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=43
-   Node(site_type:0<2)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=239
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=238
-   Node(site_type:2<1)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=158
-     Node(site_type:2<2)
-      Id=8
-       Node(site_type:1000000<0)
-        Id=0
-         Leaf False 
-
-        Id=7
-         Node(site_type:1000000<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=241
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=240
-   Node(site_type:0<3)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=170
-     Node(site_type:0<4)
-      Id=8
-       Node(site_type:1000000<0)
-        Id=0
-         Leaf False 
-
-        Id=7
-         Node(site_type:1000000<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=239
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=238
-   Node(site_type:2<1)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=158
-     Node(site_type:2<2)
-      Id=8
-       Node(site_type:1000000<0)
-        Id=0
-         Leaf False 
-
-        Id=7
-         Node(site_type:1000000<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=251
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=250
-   Node(site_type:0<1)
-    Id=235
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=175
-       Node(site_type:1<2)
-        Id=3
-         Node(site_type:1000000<0)
-          Id=0
-           Leaf False 
-
-          Id=2
-           Node(site_type:1000000<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=249
-     Node(site_type:0<2)
-      Id=82
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=81
-         Node(site_type:1<1)
-          Id=3
-           Node(site_type:1000000<0)
-            Id=0
-             Leaf False 
-
-            Id=2
-             Node(site_type:1000000<2)
-              Id=1
-               Leaf True 
-
-              Id=0
-               Leaf False 
-
-          Id=79
-           Node(site_type:1<2)
-            Id=8
-             Node(site_type:1000000<0)
-              Id=0
-               Leaf False 
-
-              Id=7
-               Node(site_type:1000000<1)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=241
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=240
-   Node(site_type:0<3)
-    Id=3
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1000000<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=170
-     Node(site_type:0<4)
-      Id=8
-       Node(site_type:1000000<0)
-        Id=0
-         Leaf False 
-
-        Id=7
-         Node(site_type:1000000<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(x)=> [
-		  A(x[.])
-		v A(x[t.E])]
+A()=> [
+		  A(x[t.E])
+		v A(x[.])]
 A(y)=> [
 		  A(y[.])
 		v A(y[t.E])]
 A(z)=> [
 		  A(z[.])
 		v A(z[t.E]) [ only if .not.P ]]
-E(t)=> [
-		  E(t[.])
-		v E(t[x.A])
+E()=> [
+		  E(t[z.A]) [ only if .not.P ]
 		v E(t[y.A])
-		v E(t[z.A]) [ only if .not.P ]]
+		v E(t[x.A])
+		v E(t[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+E()=> [
+		  E(t[z.A]) [ only if .not.P ]
+		v E(t[y.A])
+		v E(t[x.A])
+		v E(t[.])]
 A()=> [
 		  A(x[t.E],y[.])
 		v A(x[t.E],y[t.E]) [ only if .not.P ]

@@ -13,14 +13,23 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+A() =>
+   [
+	  A(x{p})
+	v A(x{u})
+   ]
 A(w) => [ A(w{u}) v A(w{p}) ]
-A(x) => [ A(x{u}) v A(x{p}) ]
 A(y) => [ A(y{u}) v A(y{p}) ]
 A(z) => [ A(z{u}) v A(z{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
+A() =>
+   [
+	  A(x{p})
+	v A(x{u})
+   ]
 A(w{p}) => A(w{p},z{p})
 A(y{p}) => A(x{p},y{p})
 ------------------------------------------------------------
@@ -261,99 +270,14 @@ Influence_map:Inhibition_map:rule(4):'' A(x{u}[.],z{u}[.])->A(x{u}[.],z{p}[.]) -
 Reachability analysis...
 	Views in initial state:
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=19
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=18
-Influence_map:   Node(site_type:1<1)
-Influence_map:    Id=7
-Influence_map:     Node(site_type:2<0)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=6
-Influence_map:       Node(site_type:2<1)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(y{u},z{u})
 
 	Views in initial state:
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=25
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=24
-Influence_map:   Node(site_type:1<1)
-Influence_map:    Id=23
-Influence_map:     Node(site_type:2<0)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=22
-Influence_map:       Node(site_type:2<1)
-Influence_map:        Id=13
-Influence_map:         Node(site_type:3<0)
-Influence_map:          Id=0
-Influence_map:           Leaf False 
-
-Influence_map:          Id=12
-Influence_map:           Node(site_type:3<1)
-Influence_map:            Id=1
-Influence_map:             Leaf True 
-
-Influence_map:            Id=0
-Influence_map:             Leaf False 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x{u},z{u},w{u})
 
 	Views in initial state:
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=19
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=18
-Influence_map:   Node(site_type:1<1)
-Influence_map:    Id=7
-Influence_map:     Node(site_type:2<0)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=6
-Influence_map:       Node(site_type:2<1)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x{u},y{u})
 
 
@@ -364,72 +288,22 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x{},z{},w{})
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=31
-Influence_map: Node(site_type:1<1)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=30
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=23
-Influence_map:     Node(site_type:2<0)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=22
-Influence_map:       Node(site_type:2<1)
-Influence_map:        Id=13
-Influence_map:         Node(site_type:3<0)
-Influence_map:          Id=0
-Influence_map:           Leaf False 
-
-Influence_map:          Id=12
-Influence_map:           Node(site_type:3<1)
-Influence_map:            Id=1
-Influence_map:             Leaf True 
-
-Influence_map:            Id=0
-Influence_map:             Leaf False 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x{p},z{u},w{u})
 
 
 		Influence_map:Updating the views for A(x{},y{})
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=9
-Influence_map: Node(site_type:1<1)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=8
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=7
-Influence_map:     Node(site_type:2<0)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=6
-Influence_map:       Node(site_type:2<1)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x{p},y{u})
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
@@ -441,62 +315,22 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(y{},z{})
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=9
-Influence_map: Node(site_type:1<1)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=8
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=7
-Influence_map:     Node(site_type:2<0)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=6
-Influence_map:       Node(site_type:2<1)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(y{p},z{u})
 
 
 		Influence_map:Updating the views for A(x{},y{})
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=39
-Influence_map: Node(site_type:1<1)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=38
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=11
-Influence_map:     Node(site_type:2<1)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=10
-Influence_map:       Node(site_type:2<2)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x{p},y{p})
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
@@ -506,76 +340,26 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x{},z{},w{})
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=47
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=46
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=15
-Influence_map:     Node(site_type:2<1)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=14
-Influence_map:       Node(site_type:2<2)
-Influence_map:        Id=13
-Influence_map:         Node(site_type:3<0)
-Influence_map:          Id=0
-Influence_map:           Leaf False 
-
-Influence_map:          Id=12
-Influence_map:           Node(site_type:3<1)
-Influence_map:            Id=1
-Influence_map:             Leaf True 
-
-Influence_map:            Id=0
-Influence_map:             Leaf False 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x{p},z{p},w{u})
 		Influence_map:A(x{u},z{p},w{u})
 
 
 		Influence_map:Updating the views for A(y{},z{})
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=39
-Influence_map: Node(site_type:1<1)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=38
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=11
-Influence_map:     Node(site_type:2<1)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=10
-Influence_map:       Node(site_type:2<2)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(y{p},z{p})
 
 
 		Influence_map:Updating the views for A(x{},y{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:):
 		the precondition is satisfied
@@ -584,47 +368,22 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x{},z{},w{})
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=58
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=57
-Influence_map:   Node(site_type:1<1)
-Influence_map:    Id=56
-Influence_map:     Node(site_type:2<1)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=55
-Influence_map:       Node(site_type:2<2)
-Influence_map:        Id=54
-Influence_map:         Node(site_type:3<1)
-Influence_map:          Id=0
-Influence_map:           Leaf False 
-
-Influence_map:          Id=53
-Influence_map:           Node(site_type:3<2)
-Influence_map:            Id=1
-Influence_map:             Leaf True 
-
-Influence_map:            Id=0
-Influence_map:             Leaf False 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x{u},z{p},w{p})
 
 
 		Influence_map:Updating the views for A(y{},z{})
 
 		Influence_map:Updating the views for A(x{},y{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:):
 		the precondition is satisfied
@@ -635,80 +394,40 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(y{},z{})
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=70
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=69
-Influence_map:   Node(site_type:1<1)
-Influence_map:    Id=11
-Influence_map:     Node(site_type:2<1)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=10
-Influence_map:       Node(site_type:2<2)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(y{u},z{p})
 
 
 		Influence_map:Updating the views for A(x{},y{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
 		the precondition is satisfied
 
 		Influence_map:Updating the views for A(x{},z{},w{})
 
-Influence_map:INTENSIONAL DESCRIPTION:
-Influence_map:Id=77
-Influence_map: Node(site_type:1<1)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=76
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=56
-Influence_map:     Node(site_type:2<1)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=55
-Influence_map:       Node(site_type:2<2)
-Influence_map:        Id=54
-Influence_map:         Node(site_type:3<1)
-Influence_map:          Id=0
-Influence_map:           Leaf False 
-
-Influence_map:          Id=53
-Influence_map:           Node(site_type:3<2)
-Influence_map:            Id=1
-Influence_map:             Leaf True 
-
-Influence_map:            Id=0
-Influence_map:             Leaf False 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x{p},z{p},w{p})
 
 
 		Influence_map:Updating the views for A(x{},y{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
 		the precondition is satisfied
@@ -718,6 +437,16 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(y{},z{})
 
 		Influence_map:Updating the views for A(x{},y{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
 		the precondition is satisfied
@@ -727,6 +456,16 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(y{},z{})
 
 		Influence_map:Updating the views for A(x{},y{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:):
 		the precondition is satisfied
@@ -736,6 +475,16 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(y{},z{})
 
 		Influence_map:Updating the views for A(x{},y{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:):
 		the precondition is satisfied
@@ -745,6 +494,16 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(y{},z{})
 
 		Influence_map:Updating the views for A(x{},y{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
 		the precondition is satisfied
@@ -752,6 +511,16 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:Updating the views for A(x{},z{},w{})
 
 		Influence_map:Updating the views for A(x{},y{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -876,200 +645,24 @@ Influence_map:       Leaf False
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=40
-Influence_map: Node(site_type:2<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=10
-Influence_map:   Node(site_type:2<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=83
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=4
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=59
-Influence_map: Node(site_type:3<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=53
-Influence_map:   Node(site_type:3<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=21
-Influence_map: Node(site_type:0<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=20
-Influence_map:   Node(site_type:0<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
+A() =>
+   [
+	  A(x{p})
+	v A(x{u})
+   ]
 A(w) => [ A(w{u}) v A(w{p}) ]
-A(x) => [ A(x{u}) v A(x{p}) ]
 A(y) => [ A(y{u}) v A(y{p}) ]
 A(z) => [ A(z{u}) v A(z{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=40
-Influence_map: Node(site_type:2<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=10
-Influence_map:   Node(site_type:2<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=83
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=4
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=62
-Influence_map: Node(site_type:2<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=61
-Influence_map:   Node(site_type:2<1)
-Influence_map:    Id=13
-Influence_map:     Node(site_type:3<0)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=12
-Influence_map:       Node(site_type:3<1)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=60
-Influence_map:     Node(site_type:2<2)
-Influence_map:      Id=59
-Influence_map:       Node(site_type:3<0)
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:        Id=53
-Influence_map:         Node(site_type:3<2)
-Influence_map:          Id=1
-Influence_map:           Leaf True 
-
-Influence_map:          Id=0
-Influence_map:           Leaf False 
-
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=21
-Influence_map: Node(site_type:0<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=20
-Influence_map:   Node(site_type:0<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=87
-Influence_map: Node(site_type:0<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=86
-Influence_map:   Node(site_type:0<1)
-Influence_map:    Id=3
-Influence_map:     Node(site_type:1<0)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=2
-Influence_map:       Node(site_type:1<1)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=85
-Influence_map:     Node(site_type:0<2)
-Influence_map:      Id=83
-Influence_map:       Node(site_type:1<0)
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:        Id=4
-Influence_map:         Node(site_type:1<2)
-Influence_map:          Id=1
-Influence_map:           Leaf True 
-
-Influence_map:          Id=0
-Influence_map:           Leaf False 
-
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 A(w{p}) => A(w{p},z{p})
+A() =>
+   [
+	  A(x{p})
+	v A(x{u})
+   ]
 A(y{p}) => A(x{p},y{p})
 ------------------------------------------------------------
 * Properties in connected agents
@@ -1080,191 +673,6 @@ A(y{p}) => A(x{p},y{p})
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=40
-Influence_map: Node(site_type:2<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=10
-Influence_map:   Node(site_type:2<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=83
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=4
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=59
-Influence_map: Node(site_type:3<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=53
-Influence_map:   Node(site_type:3<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=21
-Influence_map: Node(site_type:0<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=20
-Influence_map:   Node(site_type:0<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=40
-Influence_map: Node(site_type:2<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=10
-Influence_map:   Node(site_type:2<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=83
-Influence_map: Node(site_type:1<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=4
-Influence_map:   Node(site_type:1<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=62
-Influence_map: Node(site_type:2<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=61
-Influence_map:   Node(site_type:2<1)
-Influence_map:    Id=13
-Influence_map:     Node(site_type:3<0)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=12
-Influence_map:       Node(site_type:3<1)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=60
-Influence_map:     Node(site_type:2<2)
-Influence_map:      Id=59
-Influence_map:       Node(site_type:3<0)
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:        Id=53
-Influence_map:         Node(site_type:3<2)
-Influence_map:          Id=1
-Influence_map:           Leaf True 
-
-Influence_map:          Id=0
-Influence_map:           Leaf False 
-
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=21
-Influence_map: Node(site_type:0<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=20
-Influence_map:   Node(site_type:0<2)
-Influence_map:    Id=1
-Influence_map:     Leaf True 
-
-Influence_map:    Id=0
-Influence_map:     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Influence_map:Id=87
-Influence_map: Node(site_type:0<0)
-Influence_map:  Id=0
-Influence_map:   Leaf False 
-
-Influence_map:  Id=86
-Influence_map:   Node(site_type:0<1)
-Influence_map:    Id=3
-Influence_map:     Node(site_type:1<0)
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-Influence_map:      Id=2
-Influence_map:       Node(site_type:1<1)
-Influence_map:        Id=1
-Influence_map:         Leaf True 
-
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:    Id=85
-Influence_map:     Node(site_type:0<2)
-Influence_map:      Id=83
-Influence_map:       Node(site_type:1<0)
-Influence_map:        Id=0
-Influence_map:         Leaf False 
-
-Influence_map:        Id=4
-Influence_map:         Node(site_type:1<2)
-Influence_map:          Id=1
-Influence_map:           Leaf True 
-
-Influence_map:          Id=0
-Influence_map:           Leaf False 
-
-Influence_map:      Id=0
-Influence_map:       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 Refining further the influence map...
 FST:
 Influence_map:
@@ -1513,12 +921,12 @@ Influence_map:Inhibition_map:rule(0):'' A(x{u}[.])->A(x{p}[.]) -> rule(4):'' A(x
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+A()=> [
+		  A(x{p})
+		v A(x{u})]
 A(w)=> [
 		  A(w{u})
 		v A(w{p})]
-A(x)=> [
-		  A(x{u})
-		v A(x{p})]
 A(y)=> [
 		  A(y{u})
 		v A(y{p})]
@@ -1530,6 +938,9 @@ A(z)=> [
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A(w{p})=> [A(w{p},z{p})]
+A()=> [
+		  A(x{p})
+		v A(x{u})]
 A(y{p})=> [A(x{p},y{p})]
 
 ------------------------------------------------------------

@@ -214,16 +214,46 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule . -> A() (File "empty_agents.ka", line 1, characters 0-14:) is applied for the first time
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(), . -> ., B() (File "empty_agents.ka", line 2, characters 0-18:):
 		the precondition is satisfied
 
 		rule A(), . -> ., B() (File "empty_agents.ka", line 2, characters 0-18:) is applied for the first time
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule ., B() -> C(), . (File "empty_agents.ka", line 3, characters 0-18:):
 		the precondition is satisfied
 
 		rule ., B() -> C(), . (File "empty_agents.ka", line 3, characters 0-18:) is applied for the first time
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule C(), . -> ., D(x{u}[.]) (File "empty_agents.ka", line 4, characters 0-25:):
 		the precondition is satisfied
@@ -231,22 +261,17 @@ Reachability analysis...
 		rule C(), . -> ., D(x{u}[.]) (File "empty_agents.ka", line 4, characters 0-25:) is applied for the first time
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		D(x{u})
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule E(), . -> ., F(x{u}[.]) (File "empty_agents.ka", line 5, characters 0-25:):
@@ -254,6 +279,16 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule C(), . -> ., D(x{u}[.]) (File "empty_agents.ka", line 4, characters 0-25:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 ------------------------------------------------------------
 * There are some non applyable rules
@@ -287,41 +322,18 @@ Id=3
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-D(x) => D(x{u})
+D() =>
+   [
+	  D(x{u})
+   ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
+D() =>
+   [
+	  D(x{u})
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -331,44 +343,15 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-D(x)=> [D(x{u})]
+D()=> [D(x{u})]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+D()=> [D(x{u})]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

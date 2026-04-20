@@ -475,267 +475,22 @@ Influence_map:Inhibition_map:rule(5):'name 3_op' A(y[1]),B(y[1])->A(y[.]),B(y[.]
 Reachability analysis...
 	Views in initial state:
 
-INTENSIONAL DESCRIPTION:
-Id=42
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=41
-   Node(site_type:1<1)
-    Id=40
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=39
-       Node(site_type:2<1)
-        Id=34
-         Node(site_type:1000000<1)
-          Id=0
-           Leaf False 
-
-          Id=33
-           Node(site_type:1000000<2)
-            Id=32
-             Node(site_type:1000001<1)
-              Id=0
-               Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[.],y[.]) => test1.and.test2
 
 	Views in initial state:
 
-INTENSIONAL DESCRIPTION:
-Id=44
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=43
-   Node(site_type:1<1)
-    Id=34
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=33
-       Node(site_type:1000000<2)
-        Id=32
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=8
-           Node(site_type:1000001<2)
-            Id=7
-             Node(site_type:1000002<0)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		B(y[.]) => test1.and.test2
 
 	Views in initial state:
 
-INTENSIONAL DESCRIPTION:
-Id=44
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=43
-   Node(site_type:1<1)
-    Id=34
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=33
-       Node(site_type:1000000<2)
-        Id=32
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=8
-           Node(site_type:1000001<2)
-            Id=7
-             Node(site_type:1000002<0)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		C(x[.]) => test1.and.test2
 
 	Views in initial state:
 
-INTENSIONAL DESCRIPTION:
-Id=78
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=75
-   Node(site_type:1<2)
-    Id=74
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=73
-       Node(site_type:2<1)
-        Id=72
-         Node(site_type:1000000<0)
-          Id=0
-           Leaf False 
-
-          Id=71
-           Node(site_type:1000000<2)
-            Id=57
-             Node(site_type:1000001<0)
-              Id=0
-               Leaf False 
-
-              Id=56
-               Node(site_type:1000001<2)
-                Id=51
-                 Node(site_type:1000002<1)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[x.C],y[.]) => test3
 
 	Views in initial state:
 
-INTENSIONAL DESCRIPTION:
-Id=90
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=87
-   Node(site_type:1<2)
-    Id=72
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=71
-       Node(site_type:1000000<2)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		C(x[x.A]) => test3
 
 
@@ -746,112 +501,22 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],test1,test2,test3)
 
-INTENSIONAL DESCRIPTION:
-Id=109
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=108
-   Node(site_type:1<2)
-    Id=107
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=106
-       Node(site_type:2<1)
-        Id=105
-         Node(site_type:1000000<1)
-          Id=0
-           Leaf False 
-
-          Id=104
-           Node(site_type:1000000<2)
-            Id=103
-             Node(site_type:1000001<1)
-              Id=0
-               Leaf False 
-
-              Id=102
-               Node(site_type:1000001<2)
-                Id=101
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=100
-                   Node(site_type:1000002<1)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[x.C],y[.]) => test1.and.test2.and.(.not.test3)
 
 
 		Updating the views for C(x[],test1,test2,test3)
 
-INTENSIONAL DESCRIPTION:
-Id=120
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=119
-   Node(site_type:1<2)
-    Id=105
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=104
-       Node(site_type:1000000<2)
-        Id=103
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=102
-           Node(site_type:1000001<2)
-            Id=101
-             Node(site_type:1000002<0)
-              Id=0
-               Leaf False 
-
-              Id=100
-               Node(site_type:1000002<1)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		C(x[x.A]) => test1.and.test2.and.(.not.test3)
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule name 1_op (File "example_initial_state.ka", line 14, characters 0-52:):
@@ -861,162 +526,22 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],test1,test2,test3)
 
-INTENSIONAL DESCRIPTION:
-Id=136
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=135
-   Node(site_type:1<1)
-    Id=134
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=133
-       Node(site_type:2<1)
-        Id=132
-         Node(site_type:1000000<0)
-          Id=0
-           Leaf False 
-
-          Id=131
-           Node(site_type:1000000<1)
-            Id=57
-             Node(site_type:1000001<0)
-              Id=0
-               Leaf False 
-
-              Id=56
-               Node(site_type:1000001<2)
-                Id=51
-                 Node(site_type:1000002<1)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-            Id=130
-             Node(site_type:1000000<2)
-              Id=129
-               Node(site_type:1000001<0)
-                Id=0
-                 Leaf False 
-
-                Id=128
-                 Node(site_type:1000001<1)
-                  Id=51
-                   Node(site_type:1000002<1)
-                    Id=0
-                     Leaf False 
-
-                    Id=6
-                     Node(site_type:1000002<2)
-                      Id=1
-                       Leaf True 
-
-                      Id=0
-                       Leaf False 
-
-                  Id=0
-                   Leaf False 
-
-              Id=0
-               Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[.],y[.]) => ((.not.test1).or.(.not.test2)).and.test3
 
 
 		Updating the views for C(x[],test1,test2,test3)
 
-INTENSIONAL DESCRIPTION:
-Id=138
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=137
-   Node(site_type:1<1)
-    Id=132
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=131
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=130
-         Node(site_type:1000000<2)
-          Id=129
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=128
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		C(x[.]) => ((.not.test1).or.(.not.test2)).and.test3
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x[.] y[.]), B(y[.]) -> A(x[.] y[1]), B(y[1]) (File "example_initial_state.ka", line 15, characters 0-53:):
@@ -1026,112 +551,22 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],test1,test2,test3)
 
-INTENSIONAL DESCRIPTION:
-Id=160
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=159
-   Node(site_type:1<1)
-    Id=158
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=157
-       Node(site_type:2<2)
-        Id=34
-         Node(site_type:1000000<1)
-          Id=0
-           Leaf False 
-
-          Id=33
-           Node(site_type:1000000<2)
-            Id=32
-             Node(site_type:1000001<1)
-              Id=0
-               Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[.],y[y.B]) => test1.and.test2
 
 
 		Updating the views for B(y[],test1,test2,test3)
 
-INTENSIONAL DESCRIPTION:
-Id=115
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=114
-   Node(site_type:1<2)
-    Id=34
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=33
-       Node(site_type:1000000<2)
-        Id=32
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=8
-           Node(site_type:1000001<2)
-            Id=7
-             Node(site_type:1000002<0)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		B(y[y.A]) => test1.and.test2
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x[.] y[1]), B(y[1]) -> A(x[.] y[.]), B(y[.]) (File "example_initial_state.ka", line 15, characters 0-53:):
@@ -1142,6 +577,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],test1,test2,test3)
 
 		Updating the views for B(y[],test1,test2,test3)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule name 3 (File "example_initial_state.ka", line 16, characters 0-52:):
 		the precondition is satisfied
@@ -1150,65 +595,20 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x[],y[],test1,test2,test3)
 
-INTENSIONAL DESCRIPTION:
-Id=176
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=172
-   Node(site_type:1<2)
-    Id=158
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=157
-       Node(site_type:2<2)
-        Id=34
-         Node(site_type:1000000<1)
-          Id=0
-           Leaf False 
-
-          Id=33
-           Node(site_type:1000000<2)
-            Id=32
-             Node(site_type:1000001<1)
-              Id=0
-               Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x[x.C],y[y.B]) => test1.and.test2
 
 
 		Updating the views for B(y[],test1,test2,test3)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule name 3_op (File "example_initial_state.ka", line 16, characters 0-52:):
 		the precondition is satisfied
@@ -1218,6 +618,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],test1,test2,test3)
 
 		Updating the views for B(y[],test1,test2,test3)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule name 1 (File "example_initial_state.ka", line 14, characters 0-52:):
 		the precondition is satisfied
@@ -1225,6 +635,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],test1,test2,test3)
 
 		Updating the views for C(x[],test1,test2,test3)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule name 1_op (File "example_initial_state.ka", line 14, characters 0-52:):
 		the precondition is satisfied
@@ -1232,6 +652,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],test1,test2,test3)
 
 		Updating the views for C(x[],test1,test2,test3)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x[.] y[.]), B(y[.]) -> A(x[.] y[1]), B(y[1]) (File "example_initial_state.ka", line 15, characters 0-53:):
 		the precondition is satisfied
@@ -1239,6 +669,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],test1,test2,test3)
 
 		Updating the views for B(y[],test1,test2,test3)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x[.] y[1]), B(y[1]) -> A(x[.] y[.]), B(y[.]) (File "example_initial_state.ka", line 15, characters 0-53:):
 		the precondition is satisfied
@@ -1246,6 +686,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],test1,test2,test3)
 
 		Updating the views for B(y[],test1,test2,test3)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule name 3 (File "example_initial_state.ka", line 16, characters 0-52:):
 		the precondition is satisfied
@@ -1253,6 +703,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x[],y[],test1,test2,test3)
 
 		Updating the views for B(y[],test1,test2,test3)
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 ------------------------------------------------------------
 * There are some non applyable rules
@@ -1535,684 +995,41 @@ Id=150
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=196
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=195
-   Node(site_type:1<1)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=114
-     Node(site_type:1<2)
-      Id=34
-       Node(site_type:1000000<1)
-        Id=0
-         Leaf False 
-
-        Id=33
-         Node(site_type:1000000<2)
-          Id=32
-           Node(site_type:1000001<1)
-            Id=0
-             Leaf False 
-
-            Id=8
-             Node(site_type:1000001<2)
-              Id=7
-               Node(site_type:1000002<0)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=194
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=193
-   Node(site_type:0<2)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=197
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=168
-   Node(site_type:0<2)
-    Id=34
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=33
-       Node(site_type:1000000<2)
-        Id=32
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=8
-           Node(site_type:1000001<2)
-            Id=7
-             Node(site_type:1000002<0)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=194
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=193
-   Node(site_type:0<2)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A(x) => [ A(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ] v A(x[x.C]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ] ]
+A() =>
+   [
+	  A(x[x.C]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+	v A(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+   ]
 A(y) => [ A(y[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ] v A(y[y.B]) [ only if test1.and.test2 ] ]
-B(y) => [ B(y[.]) [ only if test1.and.test2 ] v B(y[y.A]) [ only if test1.and.test2 ] ]
-C(x) => [ C(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ] v C(x[x.A]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ] ]
+B() =>
+   [
+	  B(y[y.A]) [ only if test1.and.test2 ]
+	v B(y[.]) [ only if test1.and.test2 ]
+   ]
+C() =>
+   [
+	  C(x[x.A]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+	v C(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+   ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=196
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=195
-   Node(site_type:1<1)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=114
-     Node(site_type:1<2)
-      Id=34
-       Node(site_type:1000000<1)
-        Id=0
-         Leaf False 
-
-        Id=33
-         Node(site_type:1000000<2)
-          Id=32
-           Node(site_type:1000001<1)
-            Id=0
-             Leaf False 
-
-            Id=8
-             Node(site_type:1000001<2)
-              Id=7
-               Node(site_type:1000002<0)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=194
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=193
-   Node(site_type:0<2)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=197
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=168
-   Node(site_type:0<2)
-    Id=34
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=33
-       Node(site_type:1000000<2)
-        Id=32
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=8
-           Node(site_type:1000001<2)
-            Id=7
-             Node(site_type:1000002<0)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=194
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=193
-   Node(site_type:0<2)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
+A() =>
+   [
+	  A(x[x.C]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+	v A(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+   ]
+B() =>
+   [
+	  B(y[y.A]) [ only if test1.and.test2 ]
+	v B(y[.]) [ only if test1.and.test2 ]
+   ]
+C() =>
+   [
+	  C(x[x.A]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+	v C(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -2222,695 +1039,34 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=196
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=195
-   Node(site_type:1<1)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=114
-     Node(site_type:1<2)
-      Id=34
-       Node(site_type:1000000<1)
-        Id=0
-         Leaf False 
-
-        Id=33
-         Node(site_type:1000000<2)
-          Id=32
-           Node(site_type:1000001<1)
-            Id=0
-             Leaf False 
-
-            Id=8
-             Node(site_type:1000001<2)
-              Id=7
-               Node(site_type:1000002<0)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=194
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=193
-   Node(site_type:0<2)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=197
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=168
-   Node(site_type:0<2)
-    Id=34
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=33
-       Node(site_type:1000000<2)
-        Id=32
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=8
-           Node(site_type:1000001<2)
-            Id=7
-             Node(site_type:1000002<0)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=194
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=193
-   Node(site_type:0<2)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=196
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=195
-   Node(site_type:1<1)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=114
-     Node(site_type:1<2)
-      Id=34
-       Node(site_type:1000000<1)
-        Id=0
-         Leaf False 
-
-        Id=33
-         Node(site_type:1000000<2)
-          Id=32
-           Node(site_type:1000001<1)
-            Id=0
-             Leaf False 
-
-            Id=8
-             Node(site_type:1000001<2)
-              Id=7
-               Node(site_type:1000002<0)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=194
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=193
-   Node(site_type:0<2)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=197
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=168
-   Node(site_type:0<2)
-    Id=34
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=33
-       Node(site_type:1000000<2)
-        Id=32
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=8
-           Node(site_type:1000001<2)
-            Id=7
-             Node(site_type:1000002<0)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=194
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=193
-   Node(site_type:0<2)
-    Id=62
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=61
-       Node(site_type:1000000<1)
-        Id=57
-         Node(site_type:1000001<0)
-          Id=0
-           Leaf False 
-
-          Id=56
-           Node(site_type:1000001<2)
-            Id=51
-             Node(site_type:1000002<1)
-              Id=0
-               Leaf False 
-
-              Id=6
-               Node(site_type:1000002<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=60
-         Node(site_type:1000000<2)
-          Id=59
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=58
-             Node(site_type:1000001<1)
-              Id=51
-               Node(site_type:1000002<1)
-                Id=0
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:1000002<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=8
-               Node(site_type:1000001<2)
-                Id=7
-                 Node(site_type:1000002<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=6
-                   Node(site_type:1000002<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(x)=> [
-		  A(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
-		v A(x[x.C]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]]
+A()=> [
+		  A(x[x.C]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+		v A(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]]
 A(y)=> [
 		  A(y[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
 		v A(y[y.B]) [ only if test1.and.test2 ]]
-B(y)=> [
-		  B(y[.]) [ only if test1.and.test2 ]
-		v B(y[y.A]) [ only if test1.and.test2 ]]
-C(x)=> [
-		  C(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
-		v C(x[x.A]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]]
+B()=> [
+		  B(y[y.A]) [ only if test1.and.test2 ]
+		v B(y[.]) [ only if test1.and.test2 ]]
+C()=> [
+		  C(x[x.A]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+		v C(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+C()=> [
+		  C(x[x.A]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+		v C(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]]
+B()=> [
+		  B(y[y.A]) [ only if test1.and.test2 ]
+		v B(y[.]) [ only if test1.and.test2 ]]
+A()=> [
+		  A(x[x.C]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]
+		v A(x[.]) [ only if (test1.or.test3).and.((.not.test1).or.test2.or.test3) ]]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

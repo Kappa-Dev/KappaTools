@@ -110,42 +110,17 @@ Reachability analysis...
 		rule #[P1 && P2]. -> A(x{u}) (File "example_agents_params.ka", line 8, characters 0-28:) is applied for the first time
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=19
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=18
-   Node(site_type:1<1)
-    Id=11
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:1000000<2)
-        Id=9
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:1000001<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{u}) => P1.and.P2
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule #[P1 || P2]. -> B(x{u}) (File "example_agents_params.ka", line 9, characters 0-28:):
@@ -154,64 +129,44 @@ EXTENSIONAL DESCRIPTION:
 		rule #[P1 || P2]. -> B(x{u}) (File "example_agents_params.ka", line 9, characters 0-28:) is applied for the first time
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:1<1)
-    Id=15
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=14
-       Node(site_type:1000000<1)
-        Id=9
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:1000001<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=6
-         Node(site_type:1000000<2)
-          Id=5
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=4
-             Node(site_type:1000001<2)
-              Id=1
-               Leaf True 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		B(x{u}) => P1.or.P2
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule #[P1 && P2]. -> A(x{u}) (File "example_agents_params.ka", line 8, characters 0-28:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule #[P1 || P2]. -> B(x{u}) (File "example_agents_params.ka", line 9, characters 0-28:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 ------------------------------------------------------------
 * There are some non applyable rules
@@ -315,182 +270,26 @@ Id=21
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=27
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=26
-   Node(site_type:0<1)
-    Id=11
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:1000000<2)
-        Id=9
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:1000001<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=29
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=28
-   Node(site_type:0<1)
-    Id=15
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=14
-       Node(site_type:1000000<1)
-        Id=9
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:1000001<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=6
-         Node(site_type:1000000<2)
-          Id=5
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=4
-             Node(site_type:1000001<2)
-              Id=1
-               Leaf True 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A(x) => A(x{u}) [ only if P1.and.P2 ]
-B(x) => B(x{u}) [ only if P1.or.P2 ]
+A() =>
+   [
+	  A(x{u}) [ only if P1.and.P2 ]
+   ]
+B() =>
+   [
+	  B(x{u}) [ only if P1.or.P2 ]
+   ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=27
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=26
-   Node(site_type:0<1)
-    Id=11
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:1000000<2)
-        Id=9
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:1000001<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=29
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=28
-   Node(site_type:0<1)
-    Id=15
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=14
-       Node(site_type:1000000<1)
-        Id=9
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:1000001<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=6
-         Node(site_type:1000000<2)
-          Id=5
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=4
-             Node(site_type:1000001<2)
-              Id=1
-               Leaf True 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
+A() =>
+   [
+	  A(x{u}) [ only if P1.and.P2 ]
+   ]
+B() =>
+   [
+	  B(x{u}) [ only if P1.or.P2 ]
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -500,185 +299,17 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=27
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=26
-   Node(site_type:0<1)
-    Id=11
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:1000000<2)
-        Id=9
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:1000001<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=29
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=28
-   Node(site_type:0<1)
-    Id=15
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=14
-       Node(site_type:1000000<1)
-        Id=9
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:1000001<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=6
-         Node(site_type:1000000<2)
-          Id=5
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=4
-             Node(site_type:1000001<2)
-              Id=1
-               Leaf True 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=27
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=26
-   Node(site_type:0<1)
-    Id=11
-     Node(site_type:1000000<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:1000000<2)
-        Id=9
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:1000001<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=29
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=28
-   Node(site_type:0<1)
-    Id=15
-     Node(site_type:1000000<0)
-      Id=0
-       Leaf False 
-
-      Id=14
-       Node(site_type:1000000<1)
-        Id=9
-         Node(site_type:1000001<1)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:1000001<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=6
-         Node(site_type:1000000<2)
-          Id=5
-           Node(site_type:1000001<0)
-            Id=0
-             Leaf False 
-
-            Id=4
-             Node(site_type:1000001<2)
-              Id=1
-               Leaf True 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(x)=> [A(x{u}) [ only if P1.and.P2 ]]
-B(x)=> [B(x{u}) [ only if P1.or.P2 ]]
+A()=> [A(x{u}) [ only if P1.and.P2 ]]
+B()=> [B(x{u}) [ only if P1.or.P2 ]]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+B()=> [B(x{u}) [ only if P1.or.P2 ]]
+A()=> [A(x{u}) [ only if P1.and.P2 ]]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

@@ -280,21 +280,61 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule A(), B(), B(), . -> A(), ., ., C() (File "test_empty.ka", line 1, characters 0-35:) is applied for the first time
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(), ., ., C() -> A(), B(), B(), . (File "test_empty.ka", line 1, characters 0-35:):
 		the precondition is satisfied
 
 		rule A(), ., ., C() -> A(), B(), B(), . (File "test_empty.ka", line 1, characters 0-35:) is applied for the first time
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(), C(), ., . -> A(), ., B(), B() (File "test_empty.ka", line 2, characters 0-35:):
 		the precondition is satisfied
 
 		rule A(), C(), ., . -> A(), ., B(), B() (File "test_empty.ka", line 2, characters 0-35:) is applied for the first time
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(), ., B(), B() -> A(), C(), ., . (File "test_empty.ka", line 2, characters 0-35:):
 		the precondition is satisfied
 
 		rule A(), ., B(), B() -> A(), C(), ., . (File "test_empty.ka", line 2, characters 0-35:) is applied for the first time
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+Influence_map:		Update information about potential double bindings
+
+Influence_map:		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

@@ -869,81 +869,42 @@ Reachability analysis...
 		rule ., ., ., . -> C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]) (File "site_accross_bonds_domain.ka", line 9, characters 0-56:) is applied for the first time
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(z[x.C],t[t.B])
 
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		B(t[t.A],z[x.C])
 
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=10
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		C(x[z.B])
 		C(x[z.A])
+
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]), ., ., ., . -> ., ., ., ., D(x[1]), A(z[1] t[2]), B(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 10, characters 0-106:):
@@ -960,81 +921,42 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for C(x[])
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=12
- Node(site_type:1<2)
-  Id=0
-   Leaf False 
-
-  Id=11
-   Node(site_type:1<3)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(z[x.D],t[t.B])
 
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=16
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=15
-   Node(site_type:1<2)
-    Id=14
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=13
-       Node(site_type:2<3)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		B(t[t.A],z[x.D])
 
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=10
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		D(x[z.B])
 		D(x[z.A])
+
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule ., ., ., . -> C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 12, characters 0-56:):
@@ -1043,99 +965,45 @@ EXTENSIONAL DESCRIPTION:
 		rule ., ., ., . -> C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 12, characters 0-56:) is applied for the first time
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(z[x.C],t[t.F])
 
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		F(t[t.E],z[x.D])
 
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=18
- Node(site_type:1<3)
-  Id=0
-   Leaf False 
-
-  Id=17
-   Node(site_type:1<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		C(x[z.E])
 
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=18
- Node(site_type:1<3)
-  Id=0
-   Leaf False 
-
-  Id=17
-   Node(site_type:1<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		D(x[z.F])
+
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]), ., ., ., . -> ., ., ., ., G(x[1]), E(z[1] t[2]), F(t[2] z[3]), H(x[3]) (File "site_accross_bonds_domain.ka", line 13, characters 0-106:):
@@ -1152,195 +1020,102 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for D(x[])
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=12
- Node(site_type:1<2)
-  Id=0
-   Leaf False 
-
-  Id=11
-   Node(site_type:1<3)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(z[x.G],t[t.F])
 
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=16
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=15
-   Node(site_type:1<2)
-    Id=14
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=13
-       Node(site_type:2<3)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		F(t[t.E],z[x.H])
 
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		G(x[z.E])
 
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		H(x[z.F])
+
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule C() -> . (File "site_accross_bonds_domain.ka", line 11, characters 0-12:):
 		the precondition is satisfied
 
 		rule C() -> . (File "site_accross_bonds_domain.ka", line 11, characters 0-12:) is applied for the first time
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 	Dealing with side effects
 
-INTENSIONAL DESCRIPTION:
-Id=42
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=41
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(z[.],t[t.B])
 
 	Dealing with side effects
 
-INTENSIONAL DESCRIPTION:
-Id=50
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=49
-   Node(site_type:1<2)
-    Id=48
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=47
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		B(t[t.A],z[.])
 
 	Dealing with side effects
 
-INTENSIONAL DESCRIPTION:
-Id=42
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=41
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(z[.],t[t.F])
 
 
 	Applying rule ., ., ., . -> C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]) (File "site_accross_bonds_domain.ka", line 9, characters 0-56:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]), ., ., ., . -> ., ., ., ., D(x[1]), A(z[1] t[2]), B(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 10, characters 0-106:):
 		the precondition is satisfied
@@ -1352,9 +1127,61 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(t[],z[])
 
 		Updating the views for C(x[])
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule ., ., ., . -> C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 12, characters 0-56:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]), ., ., ., . -> ., ., ., ., G(x[1]), E(z[1] t[2]), F(t[2] z[3]), H(x[3]) (File "site_accross_bonds_domain.ka", line 13, characters 0-106:):
 		the precondition is satisfied
@@ -1366,9 +1193,45 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for F(t[],z[])
 
 		Updating the views for D(x[])
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+2.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule C() -> . (File "site_accross_bonds_domain.ka", line 11, characters 0-12:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -1533,382 +1396,94 @@ Id=3
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=23
-   Node(site_type:0<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=68
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=23
-   Node(site_type:0<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=10
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=70
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=70
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
+A() =>
+   [
+	  A(z[x.D])
+	v A(z[x.C])
+	v A(z[.])
+   ]
 A(t) => A(t[t.B])
-A(z) => [ A(z[.]) v A(z[x.C]) v A(z[x.D]) ]
-B(t) => B(t[t.A])
+B() =>
+   [
+	  B(t[t.A])
+   ]
 B(z) => [ B(z[.]) v B(z[x.C]) v B(z[x.D]) ]
-C(x) => [ C(x[z.A]) v C(x[z.B]) v C(x[z.E]) ]
-D(x) => [ D(x[z.A]) v D(x[z.B]) v D(x[z.F]) ]
+C() =>
+   [
+	  C(x[z.E])
+	v C(x[z.B])
+	v C(x[z.A])
+   ]
+D() =>
+   [
+	  D(x[z.F])
+	v D(x[z.B])
+	v D(x[z.A])
+   ]
+E() =>
+   [
+	  E(z[x.G])
+	v E(z[x.C])
+	v E(z[.])
+   ]
 E(t) => E(t[t.F])
-E(z) => [ E(z[.]) v E(z[x.C]) v E(z[x.G]) ]
-F(t) => F(t[t.E])
+F() =>
+   [
+	  F(t[t.E])
+   ]
 F(z) => [ F(z[x.D]) v F(z[x.H]) ]
-G(x) => G(x[z.E])
-H(x) => H(x[z.F])
+G() =>
+   [
+	  G(x[z.E])
+   ]
+H() =>
+   [
+	  H(x[z.F])
+   ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=23
-   Node(site_type:0<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=68
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=23
-   Node(site_type:0<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=10
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=70
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=70
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
+A() =>
+   [
+	  A(z[x.D])
+	v A(z[x.C])
+	v A(z[.])
+   ]
+B() =>
+   [
+	  B(t[t.A])
+   ]
+C() =>
+   [
+	  C(x[z.E])
+	v C(x[z.B])
+	v C(x[z.A])
+   ]
+D() =>
+   [
+	  D(x[z.F])
+	v D(x[z.B])
+	v D(x[z.A])
+   ]
+E() =>
+   [
+	  E(z[x.G])
+	v E(z[x.C])
+	v E(z[.])
+   ]
+F() =>
+   [
+	  F(t[t.E])
+   ]
+G() =>
+   [
+	  G(x[z.E])
+   ]
+H() =>
+   [
+	  H(x[z.F])
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -1932,402 +1507,62 @@ E(t[1]),F(t[1]) =>
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=23
-   Node(site_type:0<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=68
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=23
-   Node(site_type:0<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=10
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=70
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=70
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=23
-   Node(site_type:0<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=68
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=23
-   Node(site_type:0<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=10
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=70
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=70
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=40
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=19
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(t)=> [A(t[t.B])]
-A(z)=> [
-		  A(z[.])
+A()=> [
+		  A(z[x.D])
 		v A(z[x.C])
-		v A(z[x.D])]
-B(t)=> [B(t[t.A])]
+		v A(z[.])]
+A(t)=> [A(t[t.B])]
+B()=> [B(t[t.A])]
 B(z)=> [
 		  B(z[.])
 		v B(z[x.C])
 		v B(z[x.D])]
-C(x)=> [
-		  C(x[z.A])
+C()=> [
+		  C(x[z.E])
 		v C(x[z.B])
-		v C(x[z.E])]
-D(x)=> [
-		  D(x[z.A])
+		v C(x[z.A])]
+D()=> [
+		  D(x[z.F])
 		v D(x[z.B])
-		v D(x[z.F])]
-E(t)=> [E(t[t.F])]
-E(z)=> [
-		  E(z[.])
+		v D(x[z.A])]
+E()=> [
+		  E(z[x.G])
 		v E(z[x.C])
-		v E(z[x.G])]
-F(t)=> [F(t[t.E])]
+		v E(z[.])]
+E(t)=> [E(t[t.F])]
+F()=> [F(t[t.E])]
 F(z)=> [
 		  F(z[x.D])
 		v F(z[x.H])]
-G(x)=> [G(x[z.E])]
-H(x)=> [H(x[z.F])]
+G()=> [G(x[z.E])]
+H()=> [H(x[z.F])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+H()=> [H(x[z.F])]
+G()=> [G(x[z.E])]
+D()=> [
+		  D(x[z.F])
+		v D(x[z.B])
+		v D(x[z.A])]
+C()=> [
+		  C(x[z.E])
+		v C(x[z.B])
+		v C(x[z.A])]
+F()=> [F(t[t.E])]
+E()=> [
+		  E(z[x.G])
+		v E(z[x.C])
+		v E(z[.])]
+B()=> [B(t[t.A])]
+A()=> [
+		  A(z[x.D])
+		v A(z[x.C])
+		v A(z[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

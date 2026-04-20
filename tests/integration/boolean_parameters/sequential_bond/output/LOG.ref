@@ -17,13 +17,22 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+A() =>
+   [
+	  A(x{p})
+	v A(x{u})
+   ]
 A(x) => [ A(x[.]) v A(x[x.A]) ]
-A(x) => [ A(x{u}) v A(x{p}) ]
 A(y) => [ A(y[.]) v A(y[y.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
+A() =>
+   [
+	  A(x{p})
+	v A(x{u})
+   ]
 A() =>
    [
 	  A(x[x.A],y[.])
@@ -36,10 +45,10 @@ A() =>
 ------------------------------------------------------------
 A(y[1]),A(y[1]) => 
 	[
-		  A(x[x.A],y[1]),A(x[.],y[1])
+		  A(x[x.A],y[1]),A(x[.],y[1]) [ only if .not.@sq-A-x-y ]
 		v A(x[x.A],y[1]),A(x[x.A],y[1])
 		v A(x[.],y[1]),A(x[.],y[1]) [ only if .not.@sq-A-x-y ]
-		v A(x[.],y[1]),A(x[x.A],y[1])
+		v A(x[.],y[1]),A(x[x.A],y[1]) [ only if .not.@sq-A-x-y ]
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -47,7 +56,23 @@ A(y[1]),A(y[1]) =>
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-execution finished without any exception
+Some exceptions have been raised
+error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
+error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
+error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
+error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
+error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
+error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
+error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
+error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
+error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
+error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
+error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
+error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
+error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
+error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
+error: file_name: core/KaSa_rep/more_datastructures/dictionary.ml; message: line 232: wrong association (several images for the same key); exception:Unknown
+error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 730; exception:Exit
 Parsing example_sequential_bond.ka...
 done
 + simulation parameters

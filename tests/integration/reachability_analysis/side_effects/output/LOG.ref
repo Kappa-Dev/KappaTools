@@ -690,32 +690,21 @@ Reachability analysis...
 		rule r0 (File "side_effects.ka", line 1, characters 0-24:) is applied for the first time
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{u},x[.])
+
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule r1 (File "side_effects.ka", line 2, characters 0-24:):
@@ -724,32 +713,17 @@ EXTENSIONAL DESCRIPTION:
 		rule r1 (File "side_effects.ka", line 2, characters 0-24:) is applied for the first time
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		B(x{u},x[.])
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule r2 (File "side_effects.ka", line 3, characters 0-24:):
@@ -758,32 +732,21 @@ EXTENSIONAL DESCRIPTION:
 		rule r2 (File "side_effects.ka", line 3, characters 0-24:) is applied for the first time
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		C(x{u},x[.])
+
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule r3 (File "side_effects.ka", line 4, characters 0-24:):
@@ -792,32 +755,21 @@ EXTENSIONAL DESCRIPTION:
 		rule r3 (File "side_effects.ka", line 4, characters 0-24:) is applied for the first time
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		D(x{u},x[.])
+
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule r4 (File "side_effects.ka", line 5, characters 0-24:):
@@ -826,32 +778,21 @@ EXTENSIONAL DESCRIPTION:
 		rule r4 (File "side_effects.ka", line 5, characters 0-24:) is applied for the first time
 	Dealing with creation
 
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(x{u},x[.])
+
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule r5 (File "side_effects.ka", line 6, characters 0-23:):
@@ -864,62 +805,22 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},x[])
 
-INTENSIONAL DESCRIPTION:
-Id=25
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=24
-   Node(site_type:1<1)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{u},x[x.B])
 
 
 		Updating the views for B(x{},x[])
 
-INTENSIONAL DESCRIPTION:
-Id=17
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=16
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		B(x{p},x[x.A])
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule r7 (File "side_effects.ka", line 8, characters 0-71:):
@@ -935,62 +836,138 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for D(x{},x[])
 
-INTENSIONAL DESCRIPTION:
-Id=17
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=16
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		D(x{p},x[x.E])
 
 
 		Updating the views for E(x{},x[])
 
-INTENSIONAL DESCRIPTION:
-Id=17
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=16
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(x{p},x[x.D])
+
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY D x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY E x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY D x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY E x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule r11 (File "side_effects.ka", line 12, characters 0-28:):
@@ -1000,60 +977,20 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for D(x{},x[])
 
-INTENSIONAL DESCRIPTION:
-Id=15
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=14
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		D(x{p},x[.])
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 	Dealing with side effects
 
-INTENSIONAL DESCRIPTION:
-Id=15
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=14
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		E(x{p},x[.])
 
 
@@ -1061,21 +998,97 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 		rule r9 (File "side_effects.ka", line 10, characters 0-17:) is applied for the first time
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r0 (File "side_effects.ka", line 1, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r1 (File "side_effects.ka", line 2, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r2 (File "side_effects.ka", line 3, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r3 (File "side_effects.ka", line 4, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r4 (File "side_effects.ka", line 5, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r5 (File "side_effects.ka", line 6, characters 0-23:):
 		the precondition is satisfied
@@ -1083,33 +1096,18 @@ EXTENSIONAL DESCRIPTION:
 		rule r5 (File "side_effects.ka", line 6, characters 0-23:) is applied for the first time
 
 		Updating the views for A(x{},x[])
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 	Dealing with side effects
 
-INTENSIONAL DESCRIPTION:
-Id=15
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=14
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		B(x{p},x[.])
 
 
@@ -1119,6 +1117,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x{},x[])
 
 		Updating the views for B(x{},x[])
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r10 (File "side_effects.ka", line 11, characters 0-56:):
 		the precondition is satisfied
@@ -1126,6 +1134,132 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for D(x{},x[])
 
 		Updating the views for E(x{},x[])
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION D x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY D x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION E x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY E x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION D x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY D x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION E x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY E x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r7 (File "side_effects.ka", line 8, characters 0-71:):
 		the precondition is satisfied
@@ -1134,31 +1268,6 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},x[])
 
-INTENSIONAL DESCRIPTION:
-Id=19
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=18
-   Node(site_type:1<1)
-    Id=9
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=8
-       Node(site_type:2<3)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{u},x[x.C])
 
 
@@ -1166,32 +1275,179 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x{},x[])
 
-INTENSIONAL DESCRIPTION:
-Id=17
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=16
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		C(x{p},x[x.A])
+
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY C x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY C x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule r8 (File "side_effects.ka", line 9, characters 0-55:):
@@ -1203,90 +1459,200 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},x[])
 
-INTENSIONAL DESCRIPTION:
-Id=50
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=49
-   Node(site_type:1<2)
-    Id=9
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=8
-       Node(site_type:2<3)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{p},x[x.C])
+
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule r11 (File "side_effects.ka", line 12, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for D(x{},x[])
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r4 (File "side_effects.ka", line 5, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r3 (File "side_effects.ka", line 4, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r2 (File "side_effects.ka", line 3, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r9 (File "side_effects.ka", line 10, characters 0-17:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 	Dealing with side effects
 
-INTENSIONAL DESCRIPTION:
-Id=15
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=14
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{p},x[.])
 
 
 	Applying rule r1 (File "side_effects.ka", line 2, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r5 (File "side_effects.ka", line 6, characters 0-23:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},x[])
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r0 (File "side_effects.ka", line 1, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r10 (File "side_effects.ka", line 11, characters 0-56:):
 		the precondition is satisfied
@@ -1294,6 +1660,132 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for D(x{},x[])
 
 		Updating the views for E(x{},x[])
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION D x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY D x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION E x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY E x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION D x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY D x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION E x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY E x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r7 (File "side_effects.ka", line 8, characters 0-71:):
 		the precondition is satisfied
@@ -1303,41 +1795,198 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x{},x[])
 
 		Updating the views for C(x{},x[])
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION C x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY C x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION C x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY C x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r6 (File "side_effects.ka", line 7, characters 0-49:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},x[])
 
-INTENSIONAL DESCRIPTION:
-Id=17
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=16
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{p},x[x.B])
 
 
 		Updating the views for B(x{},x[])
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r8 (File "side_effects.ka", line 9, characters 0-55:):
 		the precondition is satisfied
@@ -1345,23 +1994,149 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for C(x{},x[])
 
 		Updating the views for A(x{},x[])
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T..T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T..T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r4 (File "side_effects.ka", line 5, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r11 (File "side_effects.ka", line 12, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for D(x{},x[])
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r3 (File "side_effects.ka", line 4, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r2 (File "side_effects.ka", line 3, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r9 (File "side_effects.ka", line 10, characters 0-17:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r10 (File "side_effects.ka", line 11, characters 0-56:):
 		the precondition is satisfied
@@ -1369,6 +2144,132 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for D(x{},x[])
 
 		Updating the views for E(x{},x[])
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION D x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY D x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION E x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY E x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION D x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION D x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY D x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT D x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY D x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION E x 
+.T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION E x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY E x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT E x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY E x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r7 (File "side_effects.ka", line 8, characters 0-71:):
 		the precondition is satisfied
@@ -1378,14 +2279,210 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x{},x[])
 
 		Updating the views for C(x{},x[])
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T..T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T..T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T..T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION C x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY C x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION A x 
+.T..T..T..T..T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST A x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION A x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY A x 
+.T..T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT A x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY A x 
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+1.T.0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1262.12.19 STEP LIST EMPTY C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1271.18.25 STEP ITERATION C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1297.18.25 STEP ITERATION: ITERATION C x 
+.T..T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1317.18.25 STEP ITERATION: TEST C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1333.18.25 STEP ITERATION: MEET C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1352.18.25 STEP ITERATION: PROJ C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1372.18.25 STEP ITERATION: RENAMED C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1384.18.25 STEP ITERATION C x 
+.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.1405.12.19 STEP LIST INTERMEDIARY C x 
+.T.core/KaSa_rep/reachability_analysis/views_domain.ml.1455.12.19 STEP LIST RESULT C x 
+core/KaSa_rep/reachability_analysis/views_domain.ml.1525.12.19 PRED FROM EMPTY C x 
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2226.31.38 FROM EMPTY PATH
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2255.25.32 FROM CONTACT MAP
+Any
+core/KaSa_rep/reachability_analysis/views_domain.ml.2269.25.32 FROM REDUCTION
+0.T.
+core/KaSa_rep/reachability_analysis/views_domain.ml.2283.25.32 RESULT
+0.T.
+core/KaSa_rep/reachability_analysis/communication.ml.657.19.26 STATE (LHS)
+0.T.
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r0 (File "side_effects.ka", line 1, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/communication.ml.688.19.26 STATE (RHS)
+Undefined
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r5 (File "side_effects.ka", line 6, characters 0-23:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},x[])
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r6 (File "side_effects.ka", line 7, characters 0-49:):
 		the precondition is satisfied
@@ -1393,9 +2490,29 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x{},x[])
 
 		Updating the views for B(x{},x[])
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule r1 (File "side_effects.ka", line 2, characters 0-24:):
 		the precondition is satisfied
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -1588,360 +2705,45 @@ Id=39
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=67
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=45
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=64
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=64
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=64
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=64
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
+A() =>
+   [
+	  A(x{p})
+	v A(x{u})
+   ]
 A(x) => [ A(x[.]) v A(x[x.B]) v A(x[x.C]) ]
-A(x) => [ A(x{u}) v A(x{p}) ]
+B() =>
+   [
+	  B(x{p})
+	v B(x{u})
+   ]
 B(x) => [ B(x[.]) v B(x[x.A]) ]
-B(x) => [ B(x{u}) v B(x{p}) ]
+C() =>
+   [
+	  C(x{p})
+	v C(x{u})
+   ]
 C(x) => [ C(x[.]) v C(x[x.A]) ]
-C(x) => [ C(x{u}) v C(x{p}) ]
+D() =>
+   [
+	  D(x{p})
+	v D(x{u})
+   ]
 D(x) => [ D(x[.]) v D(x[x.E]) ]
-D(x) => [ D(x{u}) v D(x{p}) ]
+E() =>
+   [
+	  E(x{p})
+	v E(x{u})
+   ]
 E(x) => [ E(x[.]) v E(x[x.D]) ]
-E(x) => [ E(x{u}) v E(x{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=67
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=45
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=71
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=70
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=69
-     Node(site_type:0<2)
-      Id=64
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=73
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=72
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=33
-     Node(site_type:0<2)
-      Id=13
-       Node(site_type:1<1)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=71
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=70
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=69
-     Node(site_type:0<2)
-      Id=64
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=71
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=70
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=69
-     Node(site_type:0<2)
-      Id=64
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
+A() =>
+   [
+	  A(x{p})
+	v A(x{u})
+   ]
 B(x[x.A]) => B(x{p}[x.A])
 C(x{p}) <=> C(x[x.A])
 D(x[x.E]) => D(x{p}[x.E])
@@ -1955,377 +2757,37 @@ E(x[x.D]) => E(x{p}[x.D])
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=67
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=45
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=64
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=64
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=64
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=64
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=67
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=45
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=71
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=70
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=69
-     Node(site_type:0<2)
-      Id=64
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=73
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=72
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=33
-     Node(site_type:0<2)
-      Id=13
-       Node(site_type:1<1)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=71
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=70
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=69
-     Node(site_type:0<2)
-      Id=64
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=71
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=70
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=69
-     Node(site_type:0<2)
-      Id=64
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(x)=> [
-		  A(x{u})
-		v A(x{p})]
+A()=> [
+		  A(x{p})
+		v A(x{u})]
 A(x)=> [
 		  A(x[.])
 		v A(x[x.B])
 		v A(x[x.C])]
-B(x)=> [
-		  B(x{u})
-		v B(x{p})]
+B()=> [
+		  B(x{p})
+		v B(x{u})]
 B(x)=> [
 		  B(x[.])
 		v B(x[x.A])]
-C(x)=> [
-		  C(x{u})
-		v C(x{p})]
+C()=> [
+		  C(x{p})
+		v C(x{u})]
 C(x)=> [
 		  C(x[.])
 		v C(x[x.A])]
-D(x)=> [
-		  D(x{u})
-		v D(x{p})]
+D()=> [
+		  D(x{p})
+		v D(x{u})]
 D(x)=> [
 		  D(x[.])
 		v D(x[x.E])]
-E(x)=> [
-		  E(x{u})
-		v E(x{p})]
+E()=> [
+		  E(x{p})
+		v E(x{u})]
 E(x)=> [
 		  E(x[.])
 		v E(x[x.D])]
@@ -2335,6 +2797,9 @@ E(x)=> [
 ------------------------------------------------------------
 D(x[x.E])=> [D(x{p}[x.E])]
 B(x[x.A])=> [B(x{p}[x.A])]
+A()=> [
+		  A(x{p})
+		v A(x{u})]
 C(x{p})=> [C(x[x.A])]
 E(x[x.D])=> [E(x{p}[x.D])]
 

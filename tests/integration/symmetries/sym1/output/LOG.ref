@@ -1068,41 +1068,6 @@ Influence_map:Inhibition_map:rule(23):'' A(x{p}[.],y{p}[.],z{p}[.])->A(x{p}[.],y
 Reachability analysis...
 	Views in initial state:
 
-INTENSIONAL DESCRIPTION:
-Id=11
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=10
-   Node(site_type:1<1)
-    Id=9
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=8
-       Node(site_type:2<1)
-        Id=7
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=6
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{u},y{u},z{u})
 
 
@@ -1113,42 +1078,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},y{},z{})
 
-INTENSIONAL DESCRIPTION:
-Id=15
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=14
-   Node(site_type:1<2)
-    Id=9
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=8
-       Node(site_type:2<1)
-        Id=7
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=6
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{p},y{u},z{u})
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{u}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
@@ -1157,6 +1097,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{u}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:):
 		the precondition is not satisfied yet
@@ -1177,42 +1127,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},y{},z{})
 
-INTENSIONAL DESCRIPTION:
-Id=29
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=28
-   Node(site_type:1<2)
-    Id=19
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=18
-       Node(site_type:2<2)
-        Id=7
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=6
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{p},y{p},z{u})
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:):
@@ -1221,6 +1146,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 6, characters 0-63:):
 		the precondition is satisfied
@@ -1229,42 +1164,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},y{},z{})
 
-INTENSIONAL DESCRIPTION:
-Id=31
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=30
-   Node(site_type:1<2)
-    Id=25
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=24
-       Node(site_type:2<1)
-        Id=23
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=22
-           Node(site_type:3<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{p},y{u},z{p})
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 6, characters 0-63:):
@@ -1273,6 +1183,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 6, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:):
 		the precondition is not satisfied yet
@@ -1284,42 +1204,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},y{},z{})
 
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:1<1)
-    Id=19
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=18
-       Node(site_type:2<2)
-        Id=7
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=6
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{u},y{p},z{u})
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:):
@@ -1332,42 +1227,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},y{},z{})
 
-INTENSIONAL DESCRIPTION:
-Id=27
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=26
-   Node(site_type:1<1)
-    Id=25
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=24
-       Node(site_type:2<1)
-        Id=23
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=22
-           Node(site_type:3<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{u},y{u},z{p})
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 10, characters 0-63:):
@@ -1377,42 +1247,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},y{},z{})
 
-INTENSIONAL DESCRIPTION:
-Id=35
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=34
-   Node(site_type:1<1)
-    Id=33
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=32
-       Node(site_type:2<2)
-        Id=23
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=22
-           Node(site_type:3<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{u},y{p},z{p})
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 10, characters 0-63:):
@@ -1421,6 +1266,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 10, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
 		the precondition is satisfied
@@ -1428,6 +1283,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
 		the precondition is satisfied
@@ -1435,6 +1300,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 13, characters 0-63:):
 		the precondition is satisfied
@@ -1443,42 +1318,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x{},y{},z{})
 
-INTENSIONAL DESCRIPTION:
-Id=37
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=36
-   Node(site_type:1<2)
-    Id=33
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=32
-       Node(site_type:2<2)
-        Id=23
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=22
-           Node(site_type:3<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 		A(x{p},y{p},z{p})
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 
 	Applying rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 13, characters 0-63:):
@@ -1487,6 +1337,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 13, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:):
 		the precondition is satisfied
@@ -1494,6 +1354,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:):
 		the precondition is satisfied
@@ -1501,6 +1371,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:):
 		the precondition is satisfied
@@ -1508,6 +1388,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:):
 		the precondition is satisfied
@@ -1515,16 +1405,46 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{u}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:):
 		the precondition is satisfied
@@ -1532,6 +1452,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:):
 		the precondition is satisfied
@@ -1539,6 +1469,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:):
 		the precondition is satisfied
@@ -1546,6 +1486,16 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:):
 		the precondition is satisfied
@@ -1553,26 +1503,76 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 6, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 6, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:):
 		the precondition is satisfied
@@ -1580,11 +1580,31 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:):
 		the precondition is satisfied
@@ -1592,36 +1612,106 @@ EXTENSIONAL DESCRIPTION:
 		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 10, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 10, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 13, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+		Update information about potential double bindings
+
+		Update information about potential double bindings
+
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -1668,103 +1758,22 @@ Id=81
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=85
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=16
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=84
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=39
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A(x) => [ A(x{u}) v A(x{p}) ]
+A() =>
+   [
+	  A(x{p})
+	v A(x{u})
+   ]
 A(y) => [ A(y{u}) v A(y{p}) ]
 A(z) => [ A(z{u}) v A(z{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=85
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=16
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=84
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=39
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
+A() =>
+   [
+	  A(x{p})
+	v A(x{u})
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -1774,102 +1783,12 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=85
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=16
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=84
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=39
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=85
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=16
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=84
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=39
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=38
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(x)=> [
-		  A(x{u})
-		v A(x{p})]
+A()=> [
+		  A(x{p})
+		v A(x{u})]
 A(y)=> [
 		  A(y{u})
 		v A(y{p})]
@@ -1880,6 +1799,9 @@ A(z)=> [
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
+A()=> [
+		  A(x{p})
+		v A(x{u})]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
