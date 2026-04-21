@@ -446,11 +446,10 @@ let summarize_from_cckappa parameters error (compil : Cckappa_sig.compil) =
   in
   error, summary
 
-let add_correct_id get_map set_map set_id diff after next_id =
+let add_correct_id set_id diff map_after next_id =
   let sorted_diff =
     List.sort (fun (_, _, id1) (_, _, id2) -> compare id1 id2) diff
   in
-  let map_after = get_map after in
   let map_after, _ =
     List.fold_left
       (fun (map_after, next_id) (key, elt, _) ->
@@ -458,8 +457,7 @@ let add_correct_id get_map set_map set_id diff after next_id =
         Mods.StringMap.add key elt map_after, next_id + 1)
       (map_after, next_id) sorted_diff
   in
-  let after = set_map map_after after in
-  after
+  map_after
 
 let diff_gen diff_pos scan_pos set_id get_id get_obj set_map get_map parameters
     errors ~before ~after ~delta =
@@ -470,39 +468,59 @@ let diff_gen diff_pos scan_pos set_id get_id get_obj set_map get_map parameters
           created_list,
           extended_created_list,
           pos_renaming,
-          pos_removing ) ) =
+          pos_removing,
+          map_after ) ) =
     Mods.StringMap.monadic_fold2 parameters errors
-      (fun _parameters errors _ elt elt'
-           (removed_list, added_list, e_added_list, pos_diff, pos_removing) ->
+      (fun _parameters errors key elt elt'
+           ( removed_list,
+             added_list,
+             e_added_list,
+             pos_diff,
+             pos_removing,
+             map_after ) ->
+        let id = get_id elt in
+        let new_elt' = set_id id elt' in
         ( errors,
           ( removed_list,
             added_list,
             e_added_list,
             diff_pos (get_obj elt) (get_obj elt') pos_diff,
-            pos_removing ) ))
+            pos_removing,
+            Mods.StringMap.add key new_elt' map_after ) ))
       (fun _parameters errors _ elt
-           (removed_list, added_list, e_added_list, pos_diff, pos_deleted) ->
+           ( removed_list,
+             added_list,
+             e_added_list,
+             pos_diff,
+             pos_deleted,
+             map_after ) ->
         ( errors,
           ( get_id elt :: removed_list,
             added_list,
             e_added_list,
             pos_diff,
-            scan_pos (fun a b -> a :: b) (get_obj elt) pos_deleted ) ))
+            scan_pos (fun a b -> a :: b) (get_obj elt) pos_deleted,
+            map_after ) ))
       (fun _parameters errors key elt
-           (removed_list, added_list, e_added_list, pos_diff, pos_removing) ->
+           ( removed_list,
+             added_list,
+             e_added_list,
+             pos_diff,
+             pos_removing,
+             map_after ) ->
         let id = get_id elt in
         ( errors,
           ( removed_list,
             id :: added_list,
             (key, elt, id) :: e_added_list,
             pos_diff,
-            pos_removing ) ))
+            pos_removing,
+            map_after ) ))
       map_before map_after
-      ([], [], [], Loc.diff_pos_empty, Loc.remove_pos_empty)
+      ([], [], [], Loc.diff_pos_empty, Loc.remove_pos_empty, map_after)
   in
-  let after =
-    add_correct_id get_map set_map set_id extended_created_list after delta
-  in
+  let map_after = add_correct_id set_id extended_created_list map_after delta in
+  let after = set_map map_after after in
   ( errors,
     {
       new_elt = created_list;
