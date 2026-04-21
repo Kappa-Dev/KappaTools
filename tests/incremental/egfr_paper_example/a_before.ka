@@ -6,8 +6,3 @@ EGFR(l[_],r[.]),EGFR(l[_],r[.]) -> EGFR(l[_],r[1]),EGFR(l[_],r[1]) @ 1
 EGFR(r[1],c[.]),EGFR(r[1],n[.]) -> EGFR(r[1],c[2]),EGFR(r[1],n[2]) @1
 
 EGFR(r[1]),EGFR(r[1],c[2]),EGFR(n[2]) -> EGFR(r[1]),EGFR(r[1],c[2]),EGFR(n[2]) @1
-
-
-
-EGF(r[1]),EGFR(l[1],r[.]) -> EGF(r[.]),EGFR(l[.],r[.]) @ 1
-EGFR(c[1]),EGFR(n[1]) -> EGFR(c[.]),EGFR(n[.]) @1
