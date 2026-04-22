@@ -13,6 +13,7 @@
 # The output is in output/experiments_output.tex
 
 DEBUG=false
+EXTENDED=false 
 VERBOSE=false
 INSTALL_DEPS=false
 
@@ -42,13 +43,14 @@ Options:
   -s <int>       Set how many rules to remove in each experiment (default: $NR_RULES)
   -i             Install dependencies before building and running
   -d             Set DEBUG to true (it runs the analysis with less reps and smaller models)
+  -e             Use the extented benchmarks instead 
   -v             Get more verbose output
   -h             Show this help message and exit
 EOF
 }
 
 # parse arguments
-while getopts ":t:r:s:idvh" opt; do
+while getopts ":t:r:s:idvhe" opt; do
     case "$opt" in
         t)
             TIMEOUT="$OPTARG"
@@ -61,6 +63,9 @@ while getopts ":t:r:s:idvh" opt; do
             ;;
         i)
             INSTALL_DEPS=true
+            ;;
+        e)
+            EXTENDED=true
             ;;
         d)
             DEBUG=true
@@ -103,22 +108,40 @@ OPTIONS="--reset-all --compute-reachability-analysis --enable-every-domain --pri
 # models
 MODELS_DIRECTORY="${SCRIPT_DIR}/models/"
 
-egfr_net="${MODELS_DIRECTORY}egfr_net.ka" # small model for debugging this script
+egfr_net="${MODELS_DIRECTORY}pathways/egfr_net.ka" # small model for debugging this script
 
 korkut_20170206="${MODELS_DIRECTORY}korkut/20170206/korkut_model.ka"
 korkut_20170113="${MODELS_DIRECTORY}korkut/20170113/prior_model.ka"
+korkut_20170117="${MODELS_DIRECTORY}korkut/20170117/prior_model.ka"
 wnt_20170322="${MODELS_DIRECTORY}wnt/20170322/full_model.ka"
+wnt_20160928="${MODELS_DIRECTORY}wnt/20160928/full_model.ka"
 wnt_20151228="${MODELS_DIRECTORY}wnt/20151228/model_bigwnt.ka"
 tgf_v19="${MODELS_DIRECTORY}tgf/V19/NTactivationTGF_19.ka"
+tgf_v20="${MODELS_DIRECTORY}tgf/V19/NTactivationTGF_20.ka"
+tgf_v21="${MODELS_DIRECTORY}tgf/V19/NTactivationTGF_21.ka"
+tgf_20170401="${MODELS_DIRECTORY}tgf/20170401/NTactivationTGF_20170401.ka"
 tgf_20180419="${MODELS_DIRECTORY}tgf/20180419/full.ka"
+fgf="${MODELS_DIRECTORY}pathways/fgf.ka"
+sfb="${MODELS_DIRECTORY}pathways/sfb.ka"
+ensemble="${MODELS_DIRECTORY}yeast/ensemble.ka"
+machine="${MODELS_DIRECTORY}yeast/machine.ka"
 
 korkut_20170206_nr_rules=5750
+korkut_20170117_nr_rules=12896 
 korkut_20170113_nr_rules=3916
 wnt_20170322_nr_rules=1470
+wnt_20160928_nr_rules=1419
 wnt_20151228_nr_rules=356
 egfr_net_nr_rules=23
 tgf_20180419_nr_rules=292
 tgf_v19_nr_rules=97
+tgf_v20_nr_rules=99
+tgf_v21_nr_rules=211
+tgf_20170401_nr_rules=215 
+fgf_nr_rules=42
+sfb_nr_rules=71 
+ensemble_nr_rules=233 
+machine_nr_rules=220 
 
 # Array of models
 MODELS=("tgf_v19" "tgf_20180419" "wnt_20151228" "wnt_20170322" "korkut_20170113" "korkut_20170206")
@@ -126,6 +149,10 @@ MODELS=("tgf_v19" "tgf_20180419" "wnt_20151228" "wnt_20170322" "korkut_20170113"
 OUTPUT_DIR="${SCRIPT_DIR}/output/"
 PROFILING_FILE="${KAPPA_OUTPUT_DIR}profiling.html"
 
+
+if $EXTENDED ; then 
+    MODELS=("fgf" "sfb" "ensemble" "machine"  "tgf_v19" "tgf_v20" "tgf_v21" "tgf_20170401" "tgf_20180419"  "wnt_20160928" "wnt_20151228" "wnt_20160928" "wnt_20170322" "korkut_20170113" "korkut_20170117" "korkut_20170206" ) 
+fi 
 if $DEBUG ; then
     MODELS=("egfr_net" "tgf_20180419" "wnt_20151228")
 fi
