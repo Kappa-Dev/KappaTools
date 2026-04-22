@@ -1,0 +1,8 @@
+%agent: A(x,y) 
+%agent: B(x,y) 
+%agent: C(x) 
+
+
+%working_set: [
+'r2' A(y[.]),B(y[.]) -> A(y[2]),B(y[2]) @2 
+]

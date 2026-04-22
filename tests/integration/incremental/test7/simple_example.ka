@@ -1,0 +1,14 @@
+// define agents
+%agent: A(a{u p}, x, y)
+%agent: B(b{u p})
+%agent: C(c{u p})
+%agent: D(d{u p})
+
+// initial states
+%init: 100 D(d{u})
+%init: 100 B(b{u})
+
+// rules
+'create.A.if.D' D(),. -> D(),A(a{u}) @ 1
+'bind.A_A' A(x[.]), A(y[.]) -> A(x[1]), A(y[1]) @ 3
+'state.A.p' A(x[_], a{u}) -> A(x[_], a{p}) @ 1

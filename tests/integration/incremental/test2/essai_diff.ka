@@ -1,0 +1,6 @@
+%agent: A(x,y) 
+
+
+%init: 20 A() 
+%init: 10 B() 
+A(x{u},y{u}) -> A(x{p},y{p}) @1  

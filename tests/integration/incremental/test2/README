@@ -1,0 +1,4 @@
+cat command.txt|"${KAPPABIN}"KaSaIncremental essai.ka essai2.ka
+
+#no relation at the beginning. 
+#then site x = site y 

@@ -30,7 +30,7 @@ jobs:
           - 4.14.2
         additional-packages:
           - ''
-          - labltk
+          #- labltk
     steps:
       - name: Checkout
         uses: actions/checkout@v5

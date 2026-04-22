@@ -1,0 +1,119 @@
+Parsing a_before.ka...
+done
+Compiling...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "a_before.ka", line 8, characters 0-81: will never be applied.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+EGF() =>
+   [
+	  EGF(r[l.EGFR])
+	v EGF(r[.])
+   ]
+EGFR() =>
+   [
+	  EGFR(l[r.EGF])
+	v EGFR(l[.])
+   ]
+EGFR(c) => [ EGFR(c[.]) v EGFR(c[n.EGFR]) ]
+EGFR(n) => [ EGFR(n[.]) v EGFR(n[c.EGFR]) ]
+EGFR(r) => [ EGFR(r[.]) v EGFR(r[r.EGFR]) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+EGF() =>
+   [
+	  EGF(r[l.EGFR])
+	v EGF(r[.])
+   ]
+EGFR(c[n.EGFR]) => EGFR(c[n.EGFR],r[r.EGFR])
+EGFR(n[c.EGFR]) => EGFR(n[c.EGFR],r[r.EGFR])
+EGFR(r[r.EGFR]) => EGFR(l[r.EGF],r[r.EGFR])
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+EGFR(r[1]),EGFR(r[1]) => 
+	[
+		  EGFR(c[n.EGFR],r[1]),EGFR(n[c.EGFR],r[1])
+		v EGFR(c[.],r[1]),EGFR(n[.],r[1])
+	]
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+EGFR(c[n.EGFR],r[r.EGFR]) => EGFR(c[2],r[1]),EGFR(n[2],r[1])
+EGFR(n[c.EGFR],r[r.EGFR]) => EGFR(n[2],r[1]),EGFR(c[2],r[1])
+
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+
+execution finished without any exception
+Parsing a_after.ka...
+done
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "a_before.ka", line 9, characters 0-81: will never be applied.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+EGF() =>
+   [
+	  EGF(r[l.EGFR])
+	v EGF(r[.])
+   ]
+EGFR() =>
+   [
+	  EGFR(l[r.EGF])
+	v EGFR(l[.])
+   ]
+EGFR(c) => [ EGFR(c[.]) v EGFR(c[n.EGFR]) ]
+EGFR(n) => [ EGFR(n[.]) v EGFR(n[c.EGFR]) ]
+EGFR(r) => [ EGFR(r[.]) v EGFR(r[r.EGFR]) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+EGF() =>
+   [
+	  EGF(r[l.EGFR])
+	v EGF(r[.])
+   ]
+EGFR(c[n.EGFR]) => EGFR(c[n.EGFR],r[r.EGFR])
+EGFR(n[c.EGFR]) => EGFR(n[c.EGFR],r[r.EGFR])
+EGFR(r[r.EGFR]) => EGFR(l[r.EGF],r[r.EGFR])
+EGFR(c,r[.]) => EGFR(c[.],r[.])
+EGFR(n,r[.]) => EGFR(n[.],r[.])
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+EGFR(r[1]),EGFR(r[1]) => 
+	[
+		  EGFR(c[n.EGFR],r[1]),EGFR(n[c.EGFR],r[1])
+		v EGFR(c[.],r[1]),EGFR(n[.],r[1])
+	]
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+EGFR(c[n.EGFR],r[r.EGFR]) => EGFR(c[2],r[1]),EGFR(n[2],r[1])
+EGFR(n[c.EGFR],r[r.EGFR]) => EGFR(n[2],r[1]),EGFR(c[2],r[1])
+
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+
+execution finished without any exception
+> 

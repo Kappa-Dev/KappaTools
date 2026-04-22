@@ -1,0 +1,5 @@
+disable 0 
+enable 0 
+disable 1
+enable 1 
+quit

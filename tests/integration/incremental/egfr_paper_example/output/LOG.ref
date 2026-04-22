@@ -1,0 +1,172 @@
+Parsing a_before.ka...
+done
+Compiling...
+Reachability analysis...
+
+	Applying rule #[@rule-2]EGF(r[.]), EGFR(l[.]) -> EGF(r[1]), EGFR(l[1]) (File "a_before.ka", line 4, characters 0-48:):
+		the precondition is satisfied
+
+		rule #[@rule-2]EGF(r[.]), EGFR(l[.]) -> EGF(r[1]), EGFR(l[1]) (File "a_before.ka", line 4, characters 0-48:) is applied for the first time
+
+	Applying rule #[@rule-3]EGFR(l[_] r[.]), EGFR(l[_] r[.]) -> EGFR(l[_] r[1]), EGFR(l[_] r[1]) (File "a_before.ka", line 5, characters 0-70:):
+		the precondition is satisfied
+
+		rule #[@rule-3]EGFR(l[_] r[.]), EGFR(l[_] r[.]) -> EGFR(l[_] r[1]), EGFR(l[_] r[1]) (File "a_before.ka", line 5, characters 0-70:) is applied for the first time
+
+	Applying rule #[@rule-4]EGFR(r[1] c[.]), EGFR(r[1] n[.]) -> EGFR(r[1] c[2]), EGFR(r[1] n[2]) (File "a_before.ka", line 6, characters 0-69:):
+		the precondition is satisfied
+
+		rule #[@rule-4]EGFR(r[1] c[.]), EGFR(r[1] n[.]) -> EGFR(r[1] c[2]), EGFR(r[1] n[2]) (File "a_before.ka", line 6, characters 0-69:) is applied for the first time
+
+	Applying rule #[@rule-5]EGFR(r[1]), EGFR(r[1] c[2]), EGFR(n[2]) -> EGFR(r[1]), EGFR(r[1] c[2]), EGFR(n[2]) (File "a_before.ka", line 8, characters 0-81:):
+		the precondition is not satisfied yet
+
+	Applying rule #[@rule-2]EGF(r[.]), EGFR(l[.]) -> EGF(r[1]), EGFR(l[1]) (File "a_before.ka", line 4, characters 0-48:):
+		the precondition is satisfied
+
+	Applying rule #[@rule-3]EGFR(l[_] r[.]), EGFR(l[_] r[.]) -> EGFR(l[_] r[1]), EGFR(l[_] r[1]) (File "a_before.ka", line 5, characters 0-70:):
+		the precondition is satisfied
+
+	Applying rule #[@rule-4]EGFR(r[1] c[.]), EGFR(r[1] n[.]) -> EGFR(r[1] c[2]), EGFR(r[1] n[2]) (File "a_before.ka", line 6, characters 0-69:):
+		the precondition is satisfied
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "a_before.ka", line 8, characters 0-81: will never be applied.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+EGF() =>
+   [
+	  EGF(r[l.EGFR])
+	v EGF(r[.])
+   ]
+EGFR() =>
+   [
+	  EGFR(l[r.EGF])
+	v EGFR(l[.])
+   ]
+EGFR(c) => [ EGFR(c[.]) v EGFR(c[n.EGFR]) ]
+EGFR(n) => [ EGFR(n[.]) v EGFR(n[c.EGFR]) ]
+EGFR(r) => [ EGFR(r[.]) v EGFR(r[r.EGFR]) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+EGF() =>
+   [
+	  EGF(r[l.EGFR])
+	v EGF(r[.])
+   ]
+EGFR(c[n.EGFR]) => EGFR(c[n.EGFR],r[r.EGFR])
+EGFR(n[c.EGFR]) => EGFR(n[c.EGFR],r[r.EGFR])
+EGFR(r[r.EGFR]) => EGFR(l[r.EGF],r[r.EGFR])
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+EGFR(r[1]),EGFR(r[1]) => 
+	[
+		  EGFR(c[n.EGFR],r[1]),EGFR(n[c.EGFR],r[1])
+		v EGFR(c[.],r[1]),EGFR(n[.],r[1])
+	]
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+EGFR(c[n.EGFR],r[r.EGFR]) => EGFR(c[2],r[1]),EGFR(n[2],r[1])
+EGFR(n[c.EGFR],r[r.EGFR]) => EGFR(n[2],r[1]),EGFR(c[2],r[1])
+
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+
+execution finished without any exception
+Parsing a_after.ka...
+done
+
+	Applying rule #[@rule-2]EGF(r[.]), EGFR(l[.]) -> EGF(r[1]), EGFR(l[1]) (File "a_before.ka", line 5, characters 0-48:):
+		the precondition is satisfied
+
+	Applying rule #[@rule-3]EGFR(l[_] r[.]), EGFR(l[_] r[.]) -> EGFR(l[_] r[1]), EGFR(l[_] r[1]) (File "a_before.ka", line 6, characters 0-70:):
+		the precondition is satisfied
+
+	Applying rule #[@rule-4]EGFR(r[1] c[.]), EGFR(r[1] n[.]) -> EGFR(r[1] c[2]), EGFR(r[1] n[2]) (File "a_before.ka", line 7, characters 0-69:):
+		the precondition is satisfied
+
+	Applying rule #[@rule-5]EGFR(r[1]), EGFR(r[1] c[2]), EGFR(n[2]) -> EGFR(r[1]), EGFR(r[1] c[2]), EGFR(n[2]) (File "a_before.ka", line 9, characters 0-81:):
+		the precondition is not satisfied yet
+
+	Applying rule #[@rule-6]EGFR(r[1] c[.] n[.]), EGFR(r[1] c[.] n[.]) -> EGFR(r[.] c[.] n[.]), EGFR(r[.] c[.] n[.]) (File "a_before.ka", line 11, characters 0-90:):
+		the precondition is satisfied
+
+		rule #[@rule-6]EGFR(r[1] c[.] n[.]), EGFR(r[1] c[.] n[.]) -> EGFR(r[.] c[.] n[.]), EGFR(r[.] c[.] n[.]) (File "a_before.ka", line 11, characters 0-90:) is applied for the first time
+
+	Applying rule #[@rule-2]EGF(r[.]), EGFR(l[.]) -> EGF(r[1]), EGFR(l[1]) (File "a_before.ka", line 5, characters 0-48:):
+		the precondition is satisfied
+
+	Applying rule #[@rule-3]EGFR(l[_] r[.]), EGFR(l[_] r[.]) -> EGFR(l[_] r[1]), EGFR(l[_] r[1]) (File "a_before.ka", line 6, characters 0-70:):
+		the precondition is satisfied
+
+	Applying rule #[@rule-4]EGFR(r[1] c[.]), EGFR(r[1] n[.]) -> EGFR(r[1] c[2]), EGFR(r[1] n[2]) (File "a_before.ka", line 7, characters 0-69:):
+		the precondition is satisfied
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "a_before.ka", line 9, characters 0-81: will never be applied.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+EGF() =>
+   [
+	  EGF(r[l.EGFR])
+	v EGF(r[.])
+   ]
+EGFR() =>
+   [
+	  EGFR(l[r.EGF])
+	v EGFR(l[.])
+   ]
+EGFR(c) => [ EGFR(c[.]) v EGFR(c[n.EGFR]) ]
+EGFR(n) => [ EGFR(n[.]) v EGFR(n[c.EGFR]) ]
+EGFR(r) => [ EGFR(r[.]) v EGFR(r[r.EGFR]) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+EGF() =>
+   [
+	  EGF(r[l.EGFR])
+	v EGF(r[.])
+   ]
+EGFR(c[n.EGFR]) => EGFR(c[n.EGFR],r[r.EGFR])
+EGFR(n[c.EGFR]) => EGFR(n[c.EGFR],r[r.EGFR])
+EGFR(r[r.EGFR]) => EGFR(l[r.EGF],r[r.EGFR])
+EGFR(c,r[.]) => EGFR(c[.],r[.])
+EGFR(n,r[.]) => EGFR(n[.],r[.])
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+EGFR(r[1]),EGFR(r[1]) => 
+	[
+		  EGFR(c[n.EGFR],r[1]),EGFR(n[c.EGFR],r[1])
+		v EGFR(c[.],r[1]),EGFR(n[.],r[1])
+	]
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+EGFR(c[n.EGFR],r[r.EGFR]) => EGFR(c[2],r[1]),EGFR(n[2],r[1])
+EGFR(n[c.EGFR],r[r.EGFR]) => EGFR(n[2],r[1]),EGFR(c[2],r[1])
+
+------------------------------------------------------------
+* Properties of counters
+------------------------------------------------------------
+
+execution finished without any exception
+> 

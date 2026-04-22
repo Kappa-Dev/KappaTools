@@ -1,13 +1,1 @@
-Command line:
-./KaSaIncremental essai.ka essai2.ka --do-restart-fixpoint-iterations --print-efficiency 
-
-On prompt:
-> update file essai_diff.ka as essai.ka 
-
-
-
-
-
-#at the beginning everything is possible
-#then A is dead, and r2,r5
-
+"${KAPPABIN}"KaSaIncremental  -d output counters.ka < (cat command.txt) || true

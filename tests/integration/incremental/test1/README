@@ -1,0 +1,5 @@
+cat command.txt|"${KAPPABIN}"KaSaIncremental essai.ka essai2.ka
+
+#at the beginning everything is possible
+#then A is dead, and r2,r5
+

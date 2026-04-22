@@ -1,0 +1,1 @@
+cat command.txt|"${KAPPABIN}"KaSaIncremental --current-chapter simple_example.ka 
