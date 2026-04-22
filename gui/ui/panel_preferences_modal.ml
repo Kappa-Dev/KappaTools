@@ -26,6 +26,7 @@ let option_withtrace = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 let option_withdeadrules = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 let option_withdeadagents = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 let option_withirreversible = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
+let option_incremental = Html.input ~a:[ Html.a_input_type `Checkbox ] ()
 
 let decrease_font =
   Html.button
@@ -117,6 +118,12 @@ let%html bodies =
     {|Show non weakly reversible transitions
     </label></div>
     </div>
+    <div class="form-group">
+    <div class="col-md-offset-2 col-md-5 checkbox"><label>|}
+    [ option_incremental ]
+    {|Enable incremental analysis
+    </label></div>
+    </div>
 |}
 
 let set_button =
@@ -199,6 +206,8 @@ let set_action () =
     (Js.to_bool (Tyxml_js.To_dom.of_input option_withdeadagents)##.checked);
   State_project.set_show_non_weakly_reversible_transitions
     (Js.to_bool (Tyxml_js.To_dom.of_input option_withirreversible)##.checked);
+  State_project.set_enable_incremental_analysis
+    (Js.to_bool (Tyxml_js.To_dom.of_input option_incremental)##.checked);
 
   Panel_projects_controller.set_manager
     (Js.to_string (Tyxml_js.To_dom.of_select backend_select)##.value)
@@ -242,6 +251,10 @@ let onload () =
          := Js.bool
               sp.State_project.model_parameters
                 .State_project.show_non_weakly_reversible_transitions;
+         (Tyxml_js.To_dom.of_input option_incremental)##.checked
+         := Js.bool
+              sp.State_project.model_parameters
+                .State_project.enable_incremental_analysis;
 
          (Tyxml_js.To_dom.of_select backend_select)##.value
          := Js.string

@@ -14,6 +14,7 @@ type parameters = {
   show_dead_rules: bool;
   show_dead_agents: bool;
   show_non_weakly_reversible_transitions: bool;
+  enable_incremental_analysis: bool;
 }
 
 type project_model = {
@@ -38,6 +39,7 @@ val set_store_trace : bool -> unit
 val set_show_dead_rules : bool -> unit
 val set_show_dead_agents : bool -> unit
 val set_show_non_weakly_reversible_transitions : bool -> unit
+val set_enable_incremental_analysis : bool -> unit
 val set_parameters_as_default : unit -> unit
 val set_project : string -> unit Api.lwt_result
 val create_project : string -> unit Api.lwt_result

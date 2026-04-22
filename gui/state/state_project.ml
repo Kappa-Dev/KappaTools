@@ -18,6 +18,9 @@ let showDeadAgentsParamId = Js.string "kappappShowDeadAgents"
 let showIrreversibleTransitionsParamId =
   Js.string "kappappShowIrreversibleTransition"
 
+let enableIncrementalAnalysisParamId =
+  Js.string "kappappEnableIncrementalAnalysis"
+
 type parameters = {
   plot_period: float;
   pause_condition: string;
@@ -26,6 +29,7 @@ type parameters = {
   show_dead_rules: bool;
   show_dead_agents: bool;
   show_non_weakly_reversible_transitions: bool;
+  enable_incremental_analysis: bool;
 }
 
 type a_project = {
@@ -90,6 +94,7 @@ let init_default_parameters =
     show_dead_rules = true;
     show_dead_agents = true;
     show_non_weakly_reversible_transitions = false;
+    enable_incremental_analysis = true;
   }
 
 let init_state =
@@ -172,6 +177,12 @@ let set_parameters_as_default () =
           else
             ls##removeItem showIrreversibleTransitionsParamId
         in
+        let () =
+          if pa.enable_incremental_analysis then
+            ls##setItem enableIncrementalAnalysisParamId (Js.string "true")
+          else
+            ls##setItem enableIncrementalAnalysisParamId (Js.string "false")
+        in
         ())
   in
   set_state
@@ -209,6 +220,9 @@ let set_show_non_weakly_reversible_transitions
     show_non_weakly_reversible_transitions =
   update_parameters (fun param ->
       { param with show_non_weakly_reversible_transitions })
+
+let set_enable_incremental_analysis enable_incremental_analysis =
+  update_parameters (fun param -> { param with enable_incremental_analysis })
 
 let update_state project project_catalog default_parameters project_parameters =
   project.project_manager#project_parse
@@ -436,6 +450,11 @@ let init_show_non_weakly_reversible_transitions (arg : string list) : unit =
   | [] -> ()
   | h :: _ -> set_show_non_weakly_reversible_transitions (h <> "false")
 
+let init_enable_incremental_analysis (arg : string list) : unit =
+  match arg with
+  | [] -> ()
+  | h :: _ -> set_enable_incremental_analysis (h <> "false")
+
 let init existing_projects : unit Lwt.t =
   let arg_plot_period =
     let default =
@@ -528,6 +547,19 @@ let init existing_projects : unit Lwt.t =
     in
     Common_state.url_args ~default "show_non_weakly_reversible_transitions"
   in
+  let arg_enable_incremental_analysis =
+    let default =
+      Js.Optdef.case
+        Dom_html.window##.localStorage
+        (fun () -> [])
+        (fun st ->
+          Js.Opt.case
+            (st##getItem enableIncrementalAnalysisParamId)
+            (fun () -> [])
+            (fun x -> [ Js.to_string x ]))
+    in
+    Common_state.url_args ~default "enable_incremental_analysis"
+  in
   let () = init_plot_period arg_plot_period in
   let () = init_pause_condition arg_pause_condition in
   let () = init_model_seed arg_model_seed in
@@ -538,6 +570,7 @@ let init existing_projects : unit Lwt.t =
     init_show_non_weakly_reversible_transitions
       arg_show_irreversible_transitions
   in
+  let () = init_enable_incremental_analysis arg_enable_incremental_analysis in
 
   let projects = Common_state.url_args ~default:[ "default" ] "project" in
   let rec add_projects projects : unit Lwt.t =

@@ -33,6 +33,16 @@ let current_filename =
         m.current)
     model
 
+let is_incremental () =
+  (React.S.value State_project.model).State_project.model_parameters
+    .State_project.enable_incremental_analysis
+
+let update_ws_if_incremental manager filename _ =
+  if is_incremental () then
+    manager#file_update_ws filename
+  else
+    Lwt.return (Result_util.ok ())
+
 let apply_on_current_pos_of_model f m =
   Option_util.bind
     (fun x ->
@@ -124,16 +134,16 @@ let create_file ~(filename : string) ~(content : string) : unit Api.lwt_result =
                     (fun acc { Kfiles.position; _ } -> max acc position)
                     0 catalog
                 in
-                manager#file_create (succ max_pos) filename content >>= fun _ ->
-                manager#file_update_ws filename
+                manager#file_create (succ max_pos) filename content
+                >>= update_ws_if_incremental manager filename
                 >>= Api_common.result_bind_with_lwt ~ok:(fun () ->
                         manager#file_catalog
                         >>= Api_common.result_bind_with_lwt ~ok:(fun catalog' ->
                                 Lwt.return
                                   (Result_util.ok (catalog', succ max_pos))))
               | metadata :: _ ->
-                manager#file_update filename content >>= fun _ ->
-                manager#file_update_ws filename
+                manager#file_update filename content
+                >>= update_ws_if_incremental manager filename
                 >>= Api_common.result_bind_with_lwt ~ok:(fun () ->
                         Lwt.return
                           (Result_util.ok (catalog, metadata.Kfiles.position))))
@@ -180,7 +190,7 @@ let select_file (filename : string) (line : int option) : unit Api.lwt_result =
                   in
                   send_refresh line)
                 (choose_file filename catalog))
-      >>= fun _ -> manager#file_update_ws filename)
+      >>= update_ws_if_incremental manager filename)
 
 let set_content (content : string) : unit Api.lwt_result =
   with_current_file (fun state active -> function
@@ -270,7 +280,7 @@ let remove_file () : unit Api.lwt_result =
             match React.S.value current_filename with
             | None -> Lwt.return (Result_util.ok ())
             | Some current_file_name ->
-              manager#file_update_ws current_file_name >>= fun _ ->
+              update_ws_if_incremental manager current_file_name () >>= fun _ ->
               manager#file_delete name >>= fun y ->
               x >>= fun x -> Lwt.return (Api_common.result_combine [ x; y ])))
 
