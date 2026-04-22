@@ -4417,19 +4417,16 @@
 %var: 'BCL2_0' 1.060000e+03
 %var: 'MMP1_0' 1.384700e+04
 
-// working_set
-'GSK3A_acetylation_TP53_acetyl_1' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'//rule1//
-'GSK3A_acetylation_TP53_acetyl_2' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'//rule2//
-'GSK3A_acetylation_TP53_acetyl_3' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'//rule3//
-'GSK3A_acetylation_TP53_acetyl_4' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'//rule4//
-'GSK3A_acetylation_TP53_acetyl_5' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'//rule5//
-//5//
-'GSK3A_acetylation_TP53_acetyl_6' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'//rule6//
-'GSK3A_acetylation_TP53_acetyl_7' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'//rule7//
-'GSK3A_acetylation_TP53_acetyl_8' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'//rule8//
-'GSK3A_acetylation_TP53_acetyl_9' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'//rule9//
-'GSK3A_acetylation_TP53_acetyl_10' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'//rule10//
-//10//
+'GSK3A_acetylation_TP53_acetyl_1' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
+'GSK3A_acetylation_TP53_acetyl_2' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
+'GSK3A_acetylation_TP53_acetyl_3' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
+'GSK3A_acetylation_TP53_acetyl_4' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
+'GSK3A_acetylation_TP53_acetyl_5' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
+'GSK3A_acetylation_TP53_acetyl_6' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
+'GSK3A_acetylation_TP53_acetyl_7' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
+'GSK3A_acetylation_TP53_acetyl_8' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
+'GSK3A_acetylation_TP53_acetyl_9' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
+'GSK3A_acetylation_TP53_acetyl_10' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
 'GSK3A_acetylation_TP53_acetyl_11' GSK3A(kinase~active),TP53(acetyl~n) -> GSK3A(kinase~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
 'GSK3A_acetylation_TP53_acetyl_12' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
 'GSK3A_acetylation_TP53_acetyl_13' GSK3A(activity~active),TP53(acetyl~n) -> GSK3A(activity~active),TP53(acetyl~y) @ 'kf_g_t_acetylation_1'
