@@ -730,49 +730,6 @@ let info_to_agent (agent_name, pos, agent_id) =
     Public_data.agent_position = pos;
   }
 
-let get_working_set_elements state =
-  match state.compilation with
-  | None -> []
-  | Some compilation ->
-    List.filter_map
-      (fun (ws_id, _, _, (_, loc)) ->
-        match ws_id with
-        | None -> None
-        | Some ws_id ->
-          (match
-             Mods.IntMap.find_option ws_id compilation.Ast.working_set_values
-           with
-          | None -> None (*the rule was permanently deleted*)
-          | Some b ->
-            Some
-              {
-                Public_data.rule_ws_id = ws_id;
-                Public_data.rule_ws_position = loc;
-                Public_data.rule_ws_enabled = b;
-              }))
-      compilation.Ast.rules
-    @ List.filter_map
-        (fun (ws_id, (_, _, init)) ->
-          match ws_id with
-          | None -> None
-          | Some ws_id ->
-            (match init with
-            | Ast.INIT_TOK _ -> None (*ignore tokens*)
-            | Ast.INIT_MIX (_, loc) ->
-              (match
-                 Mods.IntMap.find_option ws_id
-                   compilation.Ast.working_set_values
-               with
-              | None -> None (*the initial state was permanently deleted*)
-              | Some b ->
-                Some
-                  {
-                    Public_data.rule_ws_id = ws_id;
-                    Public_data.rule_ws_position = loc;
-                    Public_data.rule_ws_enabled = b;
-                  })))
-        compilation.Ast.init
-
 let reset_reachability_memoized_values state =
   {
     state with

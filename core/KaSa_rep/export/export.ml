@@ -2135,7 +2135,49 @@ functor
         Remanent_state.get_conditionally_dead_agents
         compute_conditionally_dead_agents
 
-    let get_working_set_elements = Remanent_state.get_working_set_elements
+    let get_working_set_elements state =
+      let state, compilation = get_compilation state in
+      ( state,
+        List.filter_map
+          (fun (ws_id, _, _, (_, loc)) ->
+            match ws_id with
+            | None -> None
+            | Some ws_id ->
+              (match
+                 Mods.IntMap.find_option ws_id
+                   compilation.Ast.working_set_values
+               with
+              | None | Some None -> None (*the rule was permanently deleted*)
+              | Some (Some b) ->
+                Some
+                  {
+                    Public_data.rule_ws_id = ws_id;
+                    Public_data.rule_ws_position = loc;
+                    Public_data.rule_ws_enabled = Some b;
+                  }))
+          compilation.Ast.rules
+        @ List.filter_map
+            (fun (ws_id, (_, _, init)) ->
+              match ws_id with
+              | None -> None
+              | Some ws_id ->
+                (match init with
+                | Ast.INIT_TOK _ -> None (*ignore tokens*)
+                | Ast.INIT_MIX (_, loc) ->
+                  (match
+                     Mods.IntMap.find_option ws_id
+                       compilation.Ast.working_set_values
+                   with
+                  | None | Some None ->
+                    None (*the initial state was permanently deleted*)
+                  | Some (Some b) ->
+                    Some
+                      {
+                        Public_data.rule_ws_id = ws_id;
+                        Public_data.rule_ws_position = loc;
+                        Public_data.rule_ws_enabled = Some b;
+                      })))
+            compilation.Ast.init )
 
     (****************************************************************)
     (*constraint_list*)

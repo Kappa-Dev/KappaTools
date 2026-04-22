@@ -232,7 +232,8 @@ let on_message post text =
       ( id,
         ( `List [ `String "WORKING_SET_ELEMENTS" ]
         | `String "WORKING_SET_ELEMENTS" ) ) ->
-    let out = get_working_set_elements !gState in
+    let state, out = get_working_set_elements !gState in
+    let () = gState := state in
     send_response post id out
   | Some (id, `List [ `String "RULE_ENABLE_OR_DISABLE"; rule_id; enable ]) ->
     let rule_id = JsonUtil.to_int rule_id in
