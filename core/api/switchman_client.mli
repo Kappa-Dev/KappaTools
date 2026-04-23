@@ -33,7 +33,7 @@ object
     string -> string -> (unit, Result_util.message list) Result_util.t Lwt.t
 
   method file_update_ws :
-    string -> (unit, Result_util.message list) Result_util.t Lwt.t
+    string option -> (unit, Result_util.message list) Result_util.t Lwt.t
 
   method get_constraints_list :
     ( (string * Public_data.agent list Public_data.lemma list) list,

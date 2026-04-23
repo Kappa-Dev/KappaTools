@@ -239,11 +239,18 @@ let working_set_elements_checkboxes =
         let () =
           Codemirror.clearGutter ~cm:codemirror ~gutter_id:working_set_gutter
         in
-        manager#get_working_set_elements >|= fun x ->
-        (match x.Result_util.value with
-        | Result.Ok rules ->
-          add_checkbox_to_working_set_elements rules codemirror
-        | Result.Error _ -> ()))
+        let model = React.S.value State_project.model in
+        if
+          model.State_project.model_parameters
+            .State_project.enable_incremental_analysis
+        then
+          manager#get_working_set_elements >|= fun x ->
+          match x.Result_util.value with
+          | Result.Ok rules ->
+            add_checkbox_to_working_set_elements rules codemirror
+          | Result.Error _ -> ()
+        else
+          Lwt.return ())
 
 let onload () : unit =
   let () = Editor_menu_file.onload () in

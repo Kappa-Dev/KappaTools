@@ -96,13 +96,19 @@ let file_patch ~id content catalog =
     Result.Ok ()
 
 let file_set_working_set ~id catalog =
-  match Hashtbl.find_all catalog.elements id with
-  | [] -> Result.Error ("Unknown file \"" ^ id ^ "\"")
-  | _ :: _ :: _ -> Result.Error "Serious problems in file catalog"
-  | [ { rank; _ } ] ->
-    let () = catalog.current_ws := Some rank in
+  match id with
+  | None ->
+    let () = catalog.current_ws := None in
     let () = catalog.ast := Empty in
     Result.Ok ()
+  | Some id ->
+    (match Hashtbl.find_all catalog.elements id with
+    | [] -> Result.Error ("Unknown file \"" ^ id ^ "\"")
+    | _ :: _ :: _ -> Result.Error "Serious problems in file catalog"
+    | [ { rank; _ } ] ->
+      let () = catalog.current_ws := Some rank in
+      let () = catalog.ast := Empty in
+      Result.Ok ())
 
 let file_delete ~id catalog =
   match Hashtbl.find_all catalog.elements id with

@@ -240,7 +240,8 @@ class virtual new_client ~is_running ~post mailbox =
           JsonUtil.write_sequence b
             [
               (fun b -> Yojson.Basic.write_string b "FileUpdateWS");
-              (fun b -> Yojson.Basic.write_string b file_id);
+              (fun b ->
+                JsonUtil.write_option Yojson.Basic.write_string b file_id);
             ])
 
     method file_move file_position file_id =

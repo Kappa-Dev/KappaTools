@@ -10,10 +10,24 @@ open Lwt.Infix
 
 type slot = { local: string option; name: string }
 type active = { rank: int; cursor_pos: Loc.position; out_of_sync: bool }
-type model = { current: active option; directory: slot Mods.IntMap.t }
+
+type model = {
+  current: active option;
+  directory: slot Mods.IntMap.t;
+  incremental: bool;
+}
 
 let dummy_cursor_pos = { Loc.line = -1; Loc.chr = 0 }
-let blank_state = { current = None; directory = Mods.IntMap.empty }
+
+let blank_state =
+  {
+    current = None;
+    directory = Mods.IntMap.empty;
+    incremental =
+      (React.S.value State_project.model).State_project.model_parameters
+        .State_project.enable_incremental_analysis;
+  }
+
 let model_hooked, set_directory_state = Hooked.S.create blank_state
 let model = Hooked.S.to_react_signal model_hooked
 
@@ -33,13 +47,27 @@ let current_filename =
         m.current)
     model
 
-let is_incremental () =
-  (React.S.value State_project.model).State_project.model_parameters
-    .State_project.enable_incremental_analysis
+let is_incremental () = (React.S.value model).incremental
+
+let toggle_incremental_analysis enable_incremental_analysis =
+  let state = React.S.value model in
+  if state.incremental <> enable_incremental_analysis then (
+    let () =
+      set_directory_state
+        { state with incremental = enable_incremental_analysis }
+    in
+    State_project.eval_with_project ~label:__LOC__
+      (fun (manager : Api.concrete_manager) ->
+        if enable_incremental_analysis then
+          manager#file_update_ws (React.S.value current_filename)
+        else
+          manager#file_update_ws None)
+  ) else
+    Lwt.return (Result_util.ok ())
 
 let update_ws_if_incremental manager filename _ =
   if is_incremental () then
-    manager#file_update_ws filename
+    manager#file_update_ws (Some filename)
   else
     Lwt.return (Result_util.ok ())
 
@@ -116,7 +144,7 @@ let update_directory ~reset current catalog =
          state.directory)
       catalog
   in
-  set_directory_state { current; directory }
+  set_directory_state { state with current; directory }
 
 let create_file ~(filename : string) ~(content : string) : unit Api.lwt_result =
   State_project.eval_with_project ~label:"create_file" (fun manager ->
@@ -200,12 +228,13 @@ let set_content (content : string) : unit Api.lwt_result =
           { local = Some content; name }
           state.directory
       in
-      let () = set_directory_state { current = state.current; directory } in
+      let () = set_directory_state { state with directory } in
       Lwt.return (Result_util.ok ())
     | { local = None; name } ->
       let () =
         set_directory_state
           {
+            state with
             current =
               Some
                 {
@@ -232,7 +261,7 @@ let set_compile file_id (compile : bool) : unit Api.lwt_result =
       let directory =
         Mods.IntMap.add rank { local = None; name } state.directory
       in
-      let () = set_directory_state { current = state.current; directory } in
+      let () = set_directory_state { state with directory } in
       State_project.eval_with_project ~label:"set_compile" (fun manager ->
           manager#file_create rank name content)
     ) else
@@ -250,9 +279,7 @@ let set_compile file_id (compile : bool) : unit Api.lwt_result =
                         { local = Some content; name }
                         state.directory
                     in
-                    let () =
-                      set_directory_state { current = state.current; directory }
-                    in
+                    let () = set_directory_state { state with directory } in
                     State_project.eval_with_project ~label:"set_compile'"
                       (fun manager -> manager#file_delete name)
                   ) else (
@@ -271,7 +298,7 @@ let remove_file () : unit Api.lwt_result =
             { rank; cursor_pos = dummy_cursor_pos; out_of_sync = false })
           (Mods.IntMap.root directory)
       in
-      let () = set_directory_state { current; directory } in
+      let () = set_directory_state { state with current; directory } in
       let x = send_refresh None in
       match local with
       | Some _ -> x
@@ -305,9 +332,9 @@ let do_a_move state file_id rank =
       State_project.eval_with_project ~label:"remove_file" (fun manager ->
           manager#file_move rank file_id
           >>= Api_common.result_bind_with_lwt ~ok:(fun () ->
-                  Lwt.return (Result_util.ok { current; directory })))
+                  Lwt.return (Result_util.ok { state with current; directory })))
     else
-      Lwt.return (Result_util.ok { current; directory })
+      Lwt.return (Result_util.ok { state with current; directory })
 
 let rec set_position state file_id rank =
   match Mods.IntMap.find_option rank state.directory with
@@ -340,6 +367,7 @@ let cursor_activity ~line ~ch =
   | Some { rank; out_of_sync; _ } ->
     set_directory_state
       {
+        v with
         current =
           Some
             {
@@ -347,7 +375,6 @@ let cursor_activity ~line ~ch =
               cursor_pos = { Loc.line = succ line; chr = ch };
               out_of_sync;
             };
-        directory = v.directory;
       }
 
 let out_of_sync out_of_sync =
@@ -356,10 +383,7 @@ let out_of_sync out_of_sync =
   | None -> ()
   | Some { rank; cursor_pos; _ } ->
     set_directory_state
-      {
-        current = Some { rank; cursor_pos; out_of_sync };
-        directory = v.directory;
-      }
+      { v with current = Some { rank; cursor_pos; out_of_sync } }
 
 let sync ?(reset = false) () : unit Api.lwt_result =
   State_project.eval_with_project ~label:"select_file" (fun manager ->

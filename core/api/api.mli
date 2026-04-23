@@ -33,7 +33,7 @@ class type virtual manager_model = object
   method file_create : int -> string -> string -> unit result Lwt.t
   method file_get : string -> (string * int) result Lwt.t
   method file_update : string -> string -> unit result Lwt.t
-  method file_update_ws : string -> unit result Lwt.t
+  method file_update_ws : string option -> unit result Lwt.t
   method file_move : int -> string -> unit result Lwt.t
   method file_delete : string -> unit result Lwt.t
 end

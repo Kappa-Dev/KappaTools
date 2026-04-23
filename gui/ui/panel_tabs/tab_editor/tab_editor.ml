@@ -211,6 +211,14 @@ let init_non_weakly_reversible_transitions () =
                Lwt.return (Result_util.ok ()))))
     State_project.model
 
+let init_incremental_analysis () =
+  React.S.l1
+    (fun model ->
+      State_file.toggle_incremental_analysis
+        model.State_project.model_parameters
+          .State_project.enable_incremental_analysis)
+    State_project.model
+
 let dont_gc_me = ref []
 
 let onload () =
@@ -218,6 +226,7 @@ let onload () =
   dont_gc_me := init_dead_rules () :: !dont_gc_me;
   dont_gc_me := init_dead_agents () :: !dont_gc_me;
   dont_gc_me := init_non_weakly_reversible_transitions () :: !dont_gc_me;
+  dont_gc_me := init_incremental_analysis () :: !dont_gc_me;
   let () = Subtab_contact_map.onload () in
   let () = Subtab_influences.onload () in
   let () = Subtab_constraints.onload () in

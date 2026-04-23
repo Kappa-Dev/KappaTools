@@ -40,10 +40,16 @@ val out_of_sync : bool -> unit
 
 type slot = { local: string option; name: string }
 type active = { rank: int; cursor_pos: Loc.position; out_of_sync: bool }
-type model = { current: active option; directory: slot Mods.IntMap.t }
+
+type model = {
+  current: active option;
+  directory: slot Mods.IntMap.t;
+  incremental: bool;
+}
 
 val model : model React.signal
 val current_filename : string option React.signal
+val toggle_incremental_analysis : bool -> unit Api.lwt_result
 
 val apply_on_current_pos_of_model :
   (string -> Loc.position -> 'a) -> model -> 'a option
