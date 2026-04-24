@@ -1,3 +1,40 @@
+let local_trace = true
+
+let check ?force (a, b, c, d) parameters string =
+  if
+    local_trace
+    || (match force with
+       | Some true -> true
+       | _ -> false)
+    || Remanent_parameters.get_trace parameters
+    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
+  then (
+    let () =
+      Loggers.fprintf
+        (Remanent_parameters.get_logger parameters)
+        "%s.%i.%i.%i %s" a b c d string
+    in
+    let () =
+      Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    in
+    ()
+  )
+
+let print_newline ?force parameters =
+  if
+    local_trace
+    || (match force with
+       | Some true -> true
+       | _ -> false)
+    || Remanent_parameters.get_trace parameters
+    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
+  then (
+    let () =
+      Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    in
+    ()
+  )
+
 type ('rule, 'init, 'agent_sig) summary_file = {
   summary_rule_map: (int * 'rule) Mods.StringMap.t;
   summary_init_state_map: (int * 'init) Mods.StringMap.t;
@@ -29,6 +66,10 @@ type new_indexs = {
   next_nsites: Ckappa_sig.c_site_name;
   next_nr_predicates: Ckappa_sig.c_guard_parameter;
   next_agent: Ckappa_sig.c_agent_name;
+  next_site_per_agent:
+    Ckappa_sig.c_site_name
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t
+    option;
   former_dual:
     (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
     Ckappa_sig
@@ -43,6 +84,7 @@ let starting_new_elt =
     next_init = 0;
     next_nsites = Ckappa_sig.site_name_of_int 0;
     next_agent = Ckappa_sig.agent_name_of_int 0;
+    next_site_per_agent = None;
     next_nr_predicates = Ckappa_sig.guard_parameter_of_int 0;
     former_dual = None;
   }
@@ -705,12 +747,36 @@ let get_new_indexs parameters errors handler c_compil =
   let next_nr_predicates = Handler.get_nr_guard_parameters handler in
   let dual = handler.Cckappa_sig.dual in
   let next_agent = Handler.nagents parameters errors handler in
+  let errors, next_site_per_agent =
+    let errors, a =
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init parameters
+        errors
+        (Ckappa_sig.int_of_agent_name next_agent - 1)
+        (fun parameters error id ->
+          let () =
+            check __POS__ parameters
+              (Format.sprintf "init diff agent: %i"
+                 (Ckappa_sig.int_of_agent_name id))
+          in
+          let () = print_newline parameters in
+          let error, dic =
+            Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+              parameters error id handler.Cckappa_sig.sites
+          in
+          match dic with
+          | None -> error, Ckappa_sig.dummy_site_name
+          | Some dic ->
+            Ckappa_sig.Dictionary_of_sites.last_entry parameters error dic)
+    in
+    errors, Some a
+  in
   let new_indexs =
     {
       next_rule = Ckappa_sig.rule_id_of_int n;
       next_init = n';
       next_nsites;
       next_nr_predicates;
+      next_site_per_agent;
       former_dual = Some dual;
       next_agent;
     }

@@ -467,6 +467,7 @@ module Domain = struct
   (* We leave it as future works. *)
   (* This is sound, but it may lead less precise analysis result. *)
   let initialize ?patch static dynamic error =
+    let (_ : ('a * 'b * Diff.new_indexs) option) = patch in
     let parameters = Analyzer_headers.get_parameter static in
     let log_info = Analyzer_headers.get_log_info dynamic in
     let error, log_info =
@@ -518,7 +519,9 @@ module Domain = struct
         in
         error, init_global_static, init_global_dynamic, None
       | Some (static', local, new_elts) ->
-        let patch = static'.domain_static_information_covering_class in
+        let patch =
+          static'.domain_static_information_covering_class, new_elts
+        in
         let compil = Analyzer_headers.get_cc_code static in
         let handler_kappa = Analyzer_headers.get_kappa_handler static in
 
@@ -534,9 +537,14 @@ module Domain = struct
             domain_static_information_covering_class;
           },
           { global = dynamic; local },
-          Some new_elts.Diff.next_rule )
+          Some new_elts )
     in
     let error, init_static, init_dynamic =
+      let start =
+        match start with
+        | None -> None
+        | Some a -> Some a.Diff.next_rule
+      in
       scan_rule_set_static ?start init_global_static init_global_dynamic error
     in
     let error, static, dynamic =

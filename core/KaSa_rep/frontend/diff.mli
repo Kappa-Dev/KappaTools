@@ -28,6 +28,10 @@ type new_indexs = {
   next_nsites: Ckappa_sig.c_site_name;
   next_nr_predicates: Ckappa_sig.c_guard_parameter;
   next_agent: Ckappa_sig.c_agent_name;
+  next_site_per_agent:
+    Ckappa_sig.c_site_name
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t
+    option;
   former_dual:
     (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
     Ckappa_sig

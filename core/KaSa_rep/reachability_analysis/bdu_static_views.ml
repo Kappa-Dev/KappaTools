@@ -939,7 +939,8 @@ let scan_rule_set ?start parameters log_info handler_bdu error handler_kappa
   (*let error, init = init_bdu_analysis_static parameters error in*)
   let nsites = Handler.get_nsites handler_kappa in
   let error, (handler_bdu, log_info, store_results) =
-    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold parameters error
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold (*?start*) parameters
+      error
       (fun parameters error rule_id rule (handler_bdu, log_info, store_result) ->
         let error, log_info, handler_bdu, store_result =
           scan_rule_static parameters log_info error handler_bdu rule_id
