@@ -97,6 +97,7 @@ module type Storage = sig
   val fold_with_interruption : ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary
   val fold : ?start:key -> ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary
 
+  val fold_two_steps  : ?start:key -> ((key, 'a, 'b, 'b) ternary, (key, 'a, 'b, 'b) ternary,'a t, 'b, 'b) quaternary
   val fold2 :
     ( (key, 'a, 'c, 'c) ternary,
       (key, 'b, 'c, 'c) ternary,
@@ -293,6 +294,38 @@ module Int_storage_imperatif :
     in
     aux start (error, init)
 
+let fold_two_steps ?start parameter error f g t init =
+    let start =
+      match start with
+      | None -> 0
+      | Some i -> i
+    in
+    let size = t.size in
+    let array = t.array in
+    let rec aux k remanent =
+      if k >= start then
+        remanent
+      else (
+        match array.(k) with
+        | None -> aux (k + 1) remanent
+        | Some x ->
+          let error, sol = remanent in
+          aux (k + 1) (f parameter error k x sol)
+      )
+    in 
+    let remanent = aux 0 (error, init) in 
+     let rec aux k remanent =
+      if k > size then
+        remanent
+      else (
+        match array.(k) with
+        | None -> aux (k + 1) remanent
+        | Some x ->
+          let error, sol = remanent in
+          aux (k + 1) (g parameter error k x sol)
+      )
+        in aux start remanent 
+
   let for_all parameter error f t =
     let size = t.size in
     let array = t.array in
@@ -438,6 +471,7 @@ functor
       let fold_with_interruption = Basic.fold_with_interruption
       let fold2_common = Basic.fold2_common
       let for_all = Basic.for_all
+      let fold_two_steps = Basic.fold_two_steps
       let free_all = Basic.free_all
       let rename_pos = Basic.rename_pos
     end :
@@ -603,6 +637,25 @@ functor
           (Underlying.fold ?start:start_under)
           parameter error f a b
 
+    let fold_two_steps ?start parameter error f g a b =
+        let start_ext, start_under =
+          match start with
+          | None -> None, None
+          | Some (a, b) -> Some a, Some b
+        in
+         Extension.fold_two_steps ?start:start_ext parameter error
+          (fun parameter error k a b ->
+            Underlying.fold_two_steps ?start:start_under parameter error
+              (fun parameter error k' a' b -> f parameter error (k, k') a' b)
+               (fun parameter error k' a' b -> g parameter error (k, k') a' b)
+              a b)
+          (fun parameter error k a b ->
+            Underlying.fold parameter error
+              (fun parameter error k' a' b -> g parameter error (k, k') a' b)
+              a b)
+          a.matrix b
+       
+
       let fold_with_interruption parameter error f a b =
         fold_gen Extension.fold_with_interruption
           Underlying.fold_with_interruption parameter error f a b
@@ -750,6 +803,29 @@ functor
               match im with
               | None -> invalid_arg parameters error __POS__ Exit b
               | Some im -> f parameters error k im b
+            ))
+          (error, b) (List.rev list)
+
+
+      let fold_two_steps ?start parameters error f g a b =
+        let (start : key) =
+          match start with
+          | None -> init_key
+          | Some i -> i
+        in
+        let error, list = key_list parameters error a in
+        List.fold_left
+          (fun (error, b) k ->
+            if compare_key k start then
+              let error, im = get parameters error k a in
+              match im with
+              | None -> invalid_arg parameters error __POS__ Exit b
+              | Some im -> f parameters error k im b
+            else (
+              let error, im = get parameters error k a in
+              match im with
+              | None -> invalid_arg parameters error __POS__ Exit b
+              | Some im -> g parameters error k im b
             ))
           (error, b) (List.rev list)
 
