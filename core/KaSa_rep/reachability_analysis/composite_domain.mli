@@ -59,7 +59,12 @@ module type Composite_domain = sig
     Exception.exceptions_caught_and_uncaught * dynamic_information * 'd
 
   val next_rule : Ckappa_sig.c_rule_id option zeroary
-  val add_initial_state : (Analyzer_headers.initial_state, unit) unary
+
+  val add_initial_state :
+    new_init:bool ->
+    ?modified_agents:
+      bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t * bool ->
+    (Analyzer_headers.initial_state, unit) unary
 
   val is_enabled :
     (Ckappa_sig.c_rule_id, Communication.precondition option) unary

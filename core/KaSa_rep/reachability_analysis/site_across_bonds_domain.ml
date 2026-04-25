@@ -637,7 +637,7 @@ module Domain = struct
   (*INITIAL STATES*)
   (***************************************************************************)
 
-  let initialize ?patch static dynamic error =
+  let initialize ?patch ~modified_agents static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
     let log_info = Analyzer_headers.get_log_info dynamic in
     let error, log_info =
@@ -685,7 +685,7 @@ module Domain = struct
         (StoryProfiling.Domain_initialization domain_name) None log_info
     in
     let dynamic = set_log_info log_info dynamic in
-    error, static, dynamic, []
+    error, static, dynamic, modified_agents, []
 
   (***************************************************************************)
   (*IMPLEMENTATION*)
@@ -793,7 +793,9 @@ module Domain = struct
   (*ADD INTITIAL STATE*)
   (***************************************************************************)
 
-  let add_initial_state static dynamic error species =
+  let add_initial_state ~new_init ?modified_agents static dynamic error species
+      =
+    let _ = modified_agents, new_init in
     let parameters = get_parameter static in
     (*views in the initial state that has two agents and their sites are
       different*)

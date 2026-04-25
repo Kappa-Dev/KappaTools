@@ -180,7 +180,7 @@ module Domain = struct
   (**************************************************************************)
   (** [get_scan_rule_set static] *)
 
-  let initialize ?patch static dynamic error =
+  let initialize ?patch ~modified_agents static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
     let init_global_static_information =
       { global_static_information = static; domain_static_information = () }
@@ -244,11 +244,17 @@ module Domain = struct
         error, { local with rule_liveness = init_dead_rule_array }, dynamic
     in
     let init_global_dynamic_information = { global = dynamic; local } in
-    error, init_global_static_information, init_global_dynamic_information, []
+    ( error,
+      init_global_static_information,
+      init_global_dynamic_information,
+      modified_agents,
+      [] )
 
   let complete_wake_up_relation _static error wake_up = error, wake_up
 
-  let add_initial_state _static dynamic error _species =
+  let add_initial_state ~new_init ?modified_agents _static dynamic error
+      _species =
+    let _ = modified_agents, new_init in
     let event_list = [] in
     error, dynamic, event_list
 

@@ -174,14 +174,15 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
         log_info
     in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
-    let patch_domain =
+    let error, patch_domain =
       match patch with
-      | None -> None
+      | None -> error, None
       | Some (static, dynamicd, _) ->
-        Some
-          ( snd static,
-            Domain.set_global_dynamic_information dynamic dynamicd,
-            new_elts )
+        ( error,
+          Some
+            ( snd static,
+              Domain.set_global_dynamic_information dynamic dynamicd,
+              new_elts ) )
     in
     let error, static, dynamic, _new_elts =
       let error, static, dynamic =
@@ -208,12 +209,19 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
               if b then
                 error, dynamic
               else (
+                let new_init =
+                  if compare i new_elts.Diff.next_init >= 0 then
+                    true
+                  else
+                    false
+                in
                 let error, dynamic =
                   add_event parameters error (StoryProfiling.Initial_state i)
                     None dynamic
                 in
                 let error, dynamic, () =
-                  Domain.add_initial_state static dynamic error chemical_species
+                  Domain.add_initial_state ~new_init static dynamic error
+                    chemical_species
                 in
                 let error, dynamic =
                   close_event parameters error (StoryProfiling.Initial_state i)

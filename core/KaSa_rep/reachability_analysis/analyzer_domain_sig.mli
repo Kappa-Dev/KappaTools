@@ -35,12 +35,16 @@ module type Domain = sig
 
   val initialize :
     ?patch:static_information * local_dynamic_information * Diff.new_indexs ->
+    modified_agents:
+      bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t * bool ->
     Analyzer_headers.global_static_information ->
     Analyzer_headers.global_dynamic_information ->
     Exception.exceptions_caught_and_uncaught ->
     Exception.exceptions_caught_and_uncaught
     * static_information
     * dynamic_information
+    * (bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
+      * bool)
     * Communication.event list
 
   val complete_wake_up_relation :
@@ -80,6 +84,9 @@ module type Domain = sig
     Exception.exceptions_caught_and_uncaught * dynamic_information * 'd
 
   val add_initial_state :
+    new_init:bool ->
+    ?modified_agents:
+      bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t * bool ->
     (Analyzer_headers.initial_state, Communication.event list) unary
 
   val is_enabled :

@@ -95,8 +95,17 @@ module type Storage = sig
   val key_list : ('a t, key list) unary
   val iter : ((key, 'a) binary_no_output, 'a t) binary_no_output
   val fold_with_interruption : ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary
-  val fold : ?start:key -> ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary  
-  val fold_two_steps  : ?start:key -> ((key, 'a, 'b, 'b) ternary, (key, 'a, 'b, 'b) ternary,'a t, 'b, 'b) quaternary
+  val fold : ?start:key -> ((key, 'a, 'b, 'b) ternary, 'a t, 'b, 'b) ternary
+
+  val fold_two_steps :
+    ?start:key ->
+    ( (key, 'a, 'b, 'b) ternary,
+      (key, 'a, 'b, 'b) ternary,
+      'a t,
+      'b,
+      'b )
+    quaternary
+
   val fold2 :
     ( (key, 'a, 'c, 'c) ternary,
       (key, 'b, 'c, 'c) ternary,

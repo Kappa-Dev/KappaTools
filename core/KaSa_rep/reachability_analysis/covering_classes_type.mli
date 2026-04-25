@@ -162,3 +162,5 @@ type predicate_covering_classes = {
     Cv_id_nearly_Inf_Int_storage_Imperatif.t
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
 }
+
+val next_cv_id : cv_id -> cv_id

@@ -62,8 +62,8 @@ module Product
       New_domain.local = global_dynamic.local.new_domain;
     }
 
-  let initialize ?patch global_static_information global_dynamic_information
-      error =
+  let initialize ?patch ~modified_agents global_static_information
+      global_dynamic_information error =
     let patch_under, patch_new =
       match patch with
       | None -> None, None
@@ -74,15 +74,18 @@ module Product
     let ( error,
           underlying_domain_static_information,
           underlying_domain_dynamic_information,
+          modified_agents,
           event_list ) =
-      Underlying_domain.initialize ?patch:patch_under global_static_information
-        global_dynamic_information error
+      Underlying_domain.initialize ?patch:patch_under ~modified_agents
+        global_static_information global_dynamic_information error
     in
     let ( error,
           new_domain_static_information,
           new_domain_dynamic_information,
+          modified_agents,
           event_list' ) =
-      New_domain.initialize ?patch:patch_new global_static_information
+      New_domain.initialize ?patch:patch_new ~modified_agents
+        global_static_information
         underlying_domain_dynamic_information.Underlying_domain.global error
     in
     ( error,
@@ -92,6 +95,7 @@ module Product
       },
       smash_dynamic underlying_domain_dynamic_information
         new_domain_dynamic_information,
+      modified_agents,
       List.fold_left (fun list a -> a :: list) event_list event_list' )
 
   let complete_wake_up_relation static error wake_up =
@@ -131,14 +135,16 @@ module Product
     'c ->
     Exception.exceptions_caught_and_uncaught * dynamic_information * 'd
 
-  let add_initial_state static dynamic error initial_state =
+  let add_initial_state ~new_init ?modified_agents static dynamic error
+      initial_state =
     let error, underlying_domain_dynamic, event_list =
-      Underlying_domain.add_initial_state static.underlying_domain
+      Underlying_domain.add_initial_state ~new_init ?modified_agents
+        static.underlying_domain
         (underlying_domain_dynamic_information dynamic)
         error initial_state
     in
     let error, new_domain_dynamic, event_list' =
-      New_domain.add_initial_state static.new_domain
+      New_domain.add_initial_state ~new_init ?modified_agents static.new_domain
         (new_domain_dynamic_information underlying_domain_dynamic dynamic)
         error initial_state
     in

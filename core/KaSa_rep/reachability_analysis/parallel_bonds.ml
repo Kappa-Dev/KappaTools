@@ -579,7 +579,7 @@ module Domain = struct
     let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, result_restriction_bdu
 
-  let initialize ?patch static dynamic error =
+  let initialize ?patch ~modified_agents static dynamic error =
     let ( error,
           init_global_static_information,
           init_global_dynamic_information,
@@ -620,7 +620,7 @@ module Domain = struct
       scan_rules ?start init_global_static_information
         init_global_dynamic_information error
     in
-    error, static, dynamic, []
+    error, static, dynamic, modified_agents, []
 
   let add_rules_tuples_into_wake_up_relation parameters error rule_tuples
       wake_up =
@@ -723,7 +723,8 @@ module Domain = struct
     is empty then returns false, if it has parallel bonds, returns
     true.*)
 
-  let compute_value_init static dynamic error init_state =
+  let compute_value_init ~new_init static dynamic error init_state =
+    let _ = new_init in
     let parameters = get_parameter static in
     let tuples_of_interest = get_tuples_of_interest static in
     let kappa_handler = get_kappa_handler static in
@@ -742,10 +743,14 @@ module Domain = struct
 
   (*************************************************************)
 
-  let add_initial_state static dynamic error species =
+  let add_initial_state ~new_init ?modified_agents static dynamic error species
+      =
+    let _ = modified_agents in
     let event_list = [] in
     (*parallel bonds in the initial states*)
-    let error, dynamic = compute_value_init static dynamic error species in
+    let error, dynamic =
+      compute_value_init ~new_init static dynamic error species
+    in
     error, dynamic, event_list
 
   (*************************************************************)

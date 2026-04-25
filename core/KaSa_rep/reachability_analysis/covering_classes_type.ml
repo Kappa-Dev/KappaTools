@@ -187,3 +187,5 @@ type predicate_covering_classes = {
     Cv_id_nearly_Inf_Int_storage_Imperatif.t
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
 }
+
+let next_cv_id a = a + 1

@@ -167,7 +167,7 @@ functor
     (*rules*)
     (****************************************************************)
 
-    let initialize ?patch static dynamic error =
+    let initialize ?patch ~modified_agents static dynamic error =
       let parameters = Analyzer_headers.get_parameter static in
       let (error, local), patch_static =
         match patch with
@@ -187,7 +187,7 @@ functor
       let error, static =
         compute_local_static_information ?patch static dynamic error
       in
-      error, static, dynamic, []
+      error, static, dynamic, modified_agents, []
 
     (* fold over all the rules, all the tuples of interest, all the sites in
        these tuples, and apply the function Common_static.add_dependency_site_rule
@@ -407,7 +407,9 @@ functor
       in
       error, prod
 
-    let add_initial_state static dynamic error species =
+    let add_initial_state ~new_init ?modified_agents static dynamic error
+        species =
+      let _ = modified_agents, new_init in
       let parameters = get_parameter static in
       let compil = get_compil static in
       let kappa_handler = get_kappa_handler static in

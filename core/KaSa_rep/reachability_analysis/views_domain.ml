@@ -105,7 +105,14 @@ module Domain = struct
       Bdu_static_views.bdu_analysis_static_pattern;
     domain_static_information_covering_class:
       Covering_classes_type.predicate_covering_classes;
+    start_cv:
+      Covering_classes_type.cv_id
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t
+      option;
   }
+
+  let set_start_cv start_cv static = { static with start_cv }
+  let get_start_cv static = static.start_cv
 
   (*--------------------------------------------------------------------*)
   (* put here the type of the struct that contains the rest of the
@@ -412,7 +419,8 @@ module Domain = struct
   (**************************************************************************)
   (** [scan_rule_set static] *)
 
-  let scan_rule_set_static ?start ?start_cv static dynamic error =
+  let scan_rule_set_static ?start ?start_cv ~(modified_agents : 'a * bool)
+      static dynamic error =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let compiled = get_compil static in
@@ -423,9 +431,10 @@ module Domain = struct
     let guard_mvbdus = get_guard_mvbdus static in
     let restriction_bdu = get_restriction_mvbdu static in
     let error, (handler_bdu, log_info, result) =
-      Bdu_static_views.scan_rule_set ?start ?start_cv parameters log_info handler_bdu
-        error kappa_handler compiled potential_side_effects remanent_triple
-        guard_mvbdus restriction_bdu (get_domain_static static)
+      Bdu_static_views.scan_rule_set ?start ?start_cv ~modified_agents
+        parameters log_info handler_bdu error kappa_handler compiled
+        potential_side_effects remanent_triple guard_mvbdus restriction_bdu
+        (get_domain_static static)
     in
     let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
@@ -434,8 +443,8 @@ module Domain = struct
     (*pattern*)
     (*-----------------------------------------------------------------------*)
     let error, result =
-      Bdu_static_views.scan_rule_set_pattern ?start ?start_cv parameters error
-        remanent_triple compiled
+      Bdu_static_views.scan_rule_set_pattern ?start ?start_cv ~modified_agents
+        parameters error remanent_triple compiled
         (get_domain_static_pattern static)
     in
     let static = set_domain_static_pattern result static in
@@ -466,7 +475,7 @@ module Domain = struct
   (* We do not allow to add new covering classes, during incremental analysis.  *)
   (* We leave it as future works. *)
   (* This is sound, but it may lead less precise analysis result. *)
-  let initialize ?patch static dynamic error =
+  let initialize ?patch ~modified_agents static dynamic error =
     let (_ : ('a * 'b * Diff.new_indexs) option) = patch in
     let parameters = Analyzer_headers.get_parameter static in
     let log_info = Analyzer_headers.get_log_info dynamic in
@@ -475,7 +484,12 @@ module Domain = struct
         (StoryProfiling.Domain_initialization domain_name) None log_info
     in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
-    let error, init_global_static, init_global_dynamic, start, start_cv =
+    let ( error,
+          init_global_static,
+          init_global_dynamic,
+          start,
+          start_cv,
+          modified_agents ) =
       match patch with
       | None ->
         let compil = Analyzer_headers.get_cc_code static in
@@ -486,9 +500,9 @@ module Domain = struct
         let init_bdu_analysis_static_pattern =
           Bdu_static_views.init_bdu_analysis_static_pattern
         in
-        let error, init_covering_class, _start_cv =
-          Covering_classes_main.scan_predicate_covering_classes parameters error
-            handler_kappa compil
+        let error, init_covering_class, modified_agents, _start_cv =
+          Covering_classes_main.scan_predicate_covering_classes ~modified_agents
+            parameters error handler_kappa compil
         in
         let init_global_static =
           {
@@ -496,6 +510,7 @@ module Domain = struct
             domain_static_information = init_bdu_analysis_static;
             domain_static_information_pattern = init_bdu_analysis_static_pattern;
             domain_static_information_covering_class = init_covering_class;
+            start_cv = None;
           }
         in
         let init_fixpoint = AgentCV_map_and_set.Map.empty in
@@ -517,16 +532,24 @@ module Domain = struct
               };
           }
         in
-        error, init_global_static, init_global_dynamic, None, None 
+        ( error,
+          init_global_static,
+          init_global_dynamic,
+          None,
+          None,
+          modified_agents )
       | Some (static', local, new_elts) ->
         let patch =
           static'.domain_static_information_covering_class, new_elts
         in
         let compil = Analyzer_headers.get_cc_code static in
         let handler_kappa = Analyzer_headers.get_kappa_handler static in
-        let error, domain_static_information_covering_class, start_cv =
+        let ( error,
+              domain_static_information_covering_class,
+              modified_agents,
+              start_cv ) =
           Covering_classes_main.scan_predicate_covering_classes ~patch
-            parameters error handler_kappa compil 
+            ~modified_agents parameters error handler_kappa compil
         in
 
         ( error,
@@ -536,7 +559,9 @@ module Domain = struct
             domain_static_information_covering_class;
           },
           { global = dynamic; local },
-          Some new_elts, start_cv )
+          Some new_elts,
+          start_cv,
+          modified_agents )
     in
     let error, init_static, init_dynamic =
       let start =
@@ -544,7 +569,14 @@ module Domain = struct
         | None -> None
         | Some a -> Some a.Diff.next_rule
       in
-      scan_rule_set_static ?start ?start_cv init_global_static init_global_dynamic error
+      let (modified_agents
+            : bool
+              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
+              * bool) =
+        modified_agents
+      in
+      scan_rule_set_static ?start ?start_cv ~modified_agents init_global_static
+        init_global_dynamic error
     in
     let error, static, dynamic =
       scan_rule_set_dynamic ?start init_static init_dynamic error
@@ -555,7 +587,8 @@ module Domain = struct
         (StoryProfiling.Domain_initialization domain_name) None log_info
     in
     let dynamic = set_log_info log_info dynamic in
-    error, static, dynamic, []
+    let static = set_start_cv start_cv static in
+    error, static, dynamic, modified_agents, []
 
   let add_wake_up_common parameters error rule_id (agent_type, cv_id)
       store_list_of_site_type_in_covering_classes wake_up =
@@ -1054,7 +1087,8 @@ module Domain = struct
     Ckappa_sig.guard_to_bdu_opt parameters error bdu_handler guard
       restriction_bdu nsites
 
-  let build_init_restriction ?start_cv static dynamic error init_state =
+  let build_init_restriction ~new_init ?start_cv ?modified_agents static dynamic
+      error init_state =
     let parameters = get_parameter static in
     let store_remanent_triple = get_remanent_triple static in
     let error, (dynamic, event_list) =
@@ -1068,62 +1102,77 @@ module Domain = struct
             Exception.warn parameters error __POS__ Exit (dynamic, event_list)
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
-            let error, bool = Covering_classes_main.is_there_new_cv_in_agent parameters error agent_type in 
-             if not bool then error, (dynamic, event_list) 
-            else 
-              let error, cv_max = Covering_classes_main.compute_cv_max ?start_cv parameters error agent_type in 
-    
-            (*-------------------------------------------------------------*)
-            let error, (dynamic, event_list) =
-              match
-                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif
-                .unsafe_get parameters error agent_type store_remanent_triple
-              with
-              | error, Some triple_list ->
-                let error, get_pair_list =
-                  Bdu_static_views
-                  .get_pair_cv_map_with_missing_association_creation ~cv_max parameters
-                    error agent triple_list
-                in
-                let error, (dynamic, event_list) =
-                  List.fold_left
-                    (fun (error, (dynamic, event_list)) (cv_id, map_res) ->
-                      let error, pair_list =
-                        Ckappa_sig.MvbduVar_map_and_set.Map.fold
-                          (fun site' state (error, current_list) ->
-                            let pair_list =
-                              (site', (Some state, Some state)) :: current_list
-                            in
-                            error, pair_list)
-                          map_res (error, [])
-                      in
-                      let error, dynamic, bdu_init =
-                        bdu_build static dynamic error pair_list
-                      in
-                      let bdu_handler = get_mvbdu_handler dynamic in
-                      let error, bdu_handler, guard_bdu =
-                        build_init_guard_bdu parameters error bdu_handler
-                          init_state.Cckappa_sig.e_init_guard static
-                      in
-                      let error, bdu_handler, bdu_init_with_guard =
-                        Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler
-                          error guard_bdu bdu_init
-                      in
-                      let dynamic = set_mvbdu_handler bdu_handler dynamic in
-                      (*----------------------------------------------------*)
-                      let error, dynamic, event_list =
-                        add_link ~title:"Views in initial state:" error static
-                          dynamic (agent_type, cv_id) bdu_init_with_guard
-                          event_list
-                      in
-                      error, (dynamic, event_list))
-                    (error, (dynamic, event_list))
-                    get_pair_list
-                in
-                error, (dynamic, event_list)
-              | error, None -> error, (dynamic, event_list)
+            let error, bool =
+              match modified_agents with
+              | None -> error, true
+              | Some modified_agents ->
+                Covering_classes_main.is_there_new_cv_in_agent ~modified_agents
+                  parameters error agent_type
             in
-            error, (dynamic, event_list))
+            if not (bool || new_init) then
+              error, (dynamic, event_list)
+            else (
+              let error, cv_max =
+                if new_init then
+                  error, -1
+                else
+                  Covering_classes_main.compute_cv_max ?start_cv parameters
+                    error agent_type
+              in
+
+              (*-------------------------------------------------------------*)
+              let error, (dynamic, event_list) =
+                match
+                  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif
+                  .unsafe_get parameters error agent_type store_remanent_triple
+                with
+                | error, Some triple_list ->
+                  let error, get_pair_list =
+                    Bdu_static_views
+                    .get_pair_cv_map_with_missing_association_creation ~cv_max
+                      parameters error agent triple_list
+                  in
+                  let error, (dynamic, event_list) =
+                    List.fold_left
+                      (fun (error, (dynamic, event_list)) (cv_id, map_res) ->
+                        let error, pair_list =
+                          Ckappa_sig.MvbduVar_map_and_set.Map.fold
+                            (fun site' state (error, current_list) ->
+                              let pair_list =
+                                (site', (Some state, Some state))
+                                :: current_list
+                              in
+                              error, pair_list)
+                            map_res (error, [])
+                        in
+                        let error, dynamic, bdu_init =
+                          bdu_build static dynamic error pair_list
+                        in
+                        let bdu_handler = get_mvbdu_handler dynamic in
+                        let error, bdu_handler, guard_bdu =
+                          build_init_guard_bdu parameters error bdu_handler
+                            init_state.Cckappa_sig.e_init_guard static
+                        in
+                        let error, bdu_handler, bdu_init_with_guard =
+                          Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler
+                            error guard_bdu bdu_init
+                        in
+                        let dynamic = set_mvbdu_handler bdu_handler dynamic in
+                        (*----------------------------------------------------*)
+                        let error, dynamic, event_list =
+                          add_link ~title:"Views in initial state:" error static
+                            dynamic (agent_type, cv_id) bdu_init_with_guard
+                            event_list
+                        in
+                        error, (dynamic, event_list))
+                      (error, (dynamic, event_list))
+                      get_pair_list
+                  in
+                  error, (dynamic, event_list)
+                | error, None -> error, (dynamic, event_list)
+              in
+              error, (dynamic, event_list)
+            ))
         init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views (dynamic, [])
     in
     error, dynamic, event_list
@@ -1131,9 +1180,12 @@ module Domain = struct
   (**************************************************************)
   (**add initial state of kappa*)
 
-  let add_initial_state static dynamic error init_state =
+  let add_initial_state ~new_init ?modified_agents static dynamic error
+      init_state =
+    let start_cv = get_start_cv static in
     let error, dynamic, event_list =
-      build_init_restriction static dynamic error init_state
+      build_init_restriction ~new_init ?modified_agents ?start_cv static dynamic
+        error init_state
     in
     error, dynamic, event_list
 
@@ -2550,8 +2602,8 @@ module Domain = struct
 
   (************************************************************************)
 
-  let build_bdu_test_pattern ?start_cv parameters error pattern site_correspondence
-      dynamic =
+  let build_bdu_test_pattern ?start_cv ?modified_agents parameters error pattern
+      site_correspondence dynamic =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
       error
       (fun parameters error _agent_id agent (dynamic, current_list) ->
@@ -2561,48 +2613,60 @@ module Domain = struct
           Exception.warn parameters error __POS__ Exit (dynamic, current_list)
         | Cckappa_sig.Agent agent ->
           let agent_type = agent.Cckappa_sig.agent_name in
-         let error, bool = Covering_classes_main.is_there_new_cv_in_agent parameters error agent_type in 
-        if not bool then error, (dynamic, current_list)
-        else 
-        let error, cv_max = Covering_classes_main.compute_cv_max ?start_cv parameters error agent_type in 
-    
-          let error, get_pair_list =
-            Bdu_static_views.get_pair_cv_map_with_restriction_views ~cv_max parameters
-              error agent site_correspondence
+          let error, bool =
+            match modified_agents with
+            | None -> error, false
+            | Some modified_agents ->
+              Covering_classes_main.is_there_new_cv_in_agent ~modified_agents
+                parameters error agent_type
           in
-          (*build bdu_test*)
-          let error, (dynamic, list) =
-            List.fold_left
-              (fun (error, (dynamic, current_list)) (_cv_id, map_res) ->
-                if Ckappa_sig.MvbduVar_map_and_set.Map.is_empty map_res then
-                  error, (dynamic, current_list)
-                else (
-                  let error, pair_list =
-                    Ckappa_sig.MvbduVar_map_and_set.Map.fold
-                      (fun site' state (error, current_list) ->
-                        let pair_list =
-                          (site', (state.Cckappa_sig.min, state.Cckappa_sig.max))
-                          :: current_list
-                        in
-                        error, pair_list)
-                      map_res (error, [])
-                  in
-                  let bdu_handler =
-                    Analyzer_headers.get_mvbdu_handler dynamic
-                  in
-                  let error, bdu_handler, bdu_test =
-                    Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_range_list
-                      parameters bdu_handler error pair_list
-                  in
-                  let dynamic =
-                    Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
-                  in
-                  error, (dynamic, (agent_type, bdu_test) :: current_list)
-                ))
-              (error, (dynamic, current_list))
-              get_pair_list
-          in
-          error, (dynamic, list))
+          if not bool then
+            error, (dynamic, current_list)
+          else (
+            let error, cv_max =
+              Covering_classes_main.compute_cv_max ?start_cv parameters error
+                agent_type
+            in
+
+            let error, get_pair_list =
+              Bdu_static_views.get_pair_cv_map_with_restriction_views ~cv_max
+                parameters error agent site_correspondence
+            in
+            (*build bdu_test*)
+            let error, (dynamic, list) =
+              List.fold_left
+                (fun (error, (dynamic, current_list)) (_cv_id, map_res) ->
+                  if Ckappa_sig.MvbduVar_map_and_set.Map.is_empty map_res then
+                    error, (dynamic, current_list)
+                  else (
+                    let error, pair_list =
+                      Ckappa_sig.MvbduVar_map_and_set.Map.fold
+                        (fun site' state (error, current_list) ->
+                          let pair_list =
+                            ( site',
+                              (state.Cckappa_sig.min, state.Cckappa_sig.max) )
+                            :: current_list
+                          in
+                          error, pair_list)
+                        map_res (error, [])
+                    in
+                    let bdu_handler =
+                      Analyzer_headers.get_mvbdu_handler dynamic
+                    in
+                    let error, bdu_handler, bdu_test =
+                      Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_range_list
+                        parameters bdu_handler error pair_list
+                    in
+                    let dynamic =
+                      Analyzer_headers.set_mvbdu_handler bdu_handler dynamic
+                    in
+                    error, (dynamic, (agent_type, bdu_test) :: current_list)
+                  ))
+                (error, (dynamic, current_list))
+                get_pair_list
+            in
+            error, (dynamic, list)
+          ))
       pattern.Cckappa_sig.views (dynamic, [])
 
   let precondition_empty_aux parameters error path pattern dynamic bdu_false
@@ -2733,7 +2797,6 @@ module Domain = struct
 
   let maybe_reachable_aux static dynamic error (pattern : Cckappa_sig.mixture)
       precondition =
-    
     let parameters = get_parameter static in
     (*-----------------------------------------------------------*)
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
@@ -2761,7 +2824,10 @@ module Domain = struct
     (* Then, answer false *)
     (* Othewise keep on iterating *)
     try
-      let error, cv_max = Covering_classes_main.compute_cv_max parameters error Ckappa_sig.dummy_agent_name in 
+      let error, cv_max =
+        Covering_classes_main.compute_cv_max parameters error
+          Ckappa_sig.dummy_agent_name
+      in
       let error, (dynamic, result_bdu_guard) =
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
           parameters error
@@ -2786,8 +2852,8 @@ module Domain = struct
                   | error, Some l -> error, l
                 in
                 let error, get_pair_list =
-                  Bdu_static_views.get_pair_cv_map_with_restriction_views ~cv_max 
-                    parameters error agent site_correspondence
+                  Bdu_static_views.get_pair_cv_map_with_restriction_views
+                    ~cv_max parameters error agent site_correspondence
                 in
                 (*build bdu_test*)
                 let error, dynamic, result_bdu_guard =
@@ -3961,6 +4027,10 @@ module Domain = struct
         let error, dynamic, fixpoint_result =
           get_fixpoint_result_without_working_set_vars parameters error static
             dynamic
+        in
+        let () = check __POS__ parameters "After projection" in
+        let error, dynamic, () =
+          print_fixpoint_result static dynamic error fixpoint_result
         in
         let bdu_handler = get_mvbdu_handler dynamic in
         let error, bdu_handler, output =

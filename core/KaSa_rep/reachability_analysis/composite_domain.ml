@@ -57,7 +57,12 @@ module type Composite_domain = sig
     Exception.exceptions_caught_and_uncaught * dynamic_information * 'd
 
   val next_rule : Ckappa_sig.c_rule_id option zeroary
-  val add_initial_state : (Analyzer_headers.initial_state, unit) unary
+
+  val add_initial_state :
+    new_init:bool ->
+    ?modified_agents:
+      bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t * bool ->
+    (Analyzer_headers.initial_state, unit) unary
 
   val is_enabled :
     (Ckappa_sig.c_rule_id, Communication.precondition option) unary
@@ -297,8 +302,8 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
      type unary where the output of static information [a] is an initial state
      of analyzer header, and the dynamic output [a list of event] is unit. *)
 
-  let pre_add_initial_state static dynamic error a =
-    lift_unary Domain.add_initial_state static dynamic error a
+  let pre_add_initial_state ~new_init static dynamic error a =
+    lift_unary (Domain.add_initial_state ~new_init) static dynamic error a
 
   let lift_binary f static dynamic error a b =
     let error, domain_dynamic, output =
@@ -451,9 +456,21 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
       | None -> None
       | Some (a, b, c) -> Some (snd a, b.domain.local, c)
     in
-    let error, domain_static, domain_dynamic, event_list =
-      Domain.initialize ?patch:patch_domain static dynamic error
+    let parameters = Analyzer_headers.get_parameter static in
+    let kappa_handler = Analyzer_headers.get_kappa_handler static in
+    let nagents = Handler.nagents parameters error kappa_handler in
+    let error, modified_agents =
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.init
+        parameters error
+        (Ckappa_sig.int_of_agent_name nagents - 1)
+        (fun _ error _ -> error, false)
     in
+    let modified_agents = modified_agents, false in
+    let error, domain_static, domain_dynamic, _modified_agents, event_list =
+      Domain.initialize ?patch:patch_domain ~modified_agents static dynamic
+        error
+    in
+
     let parameters = get_parameter (static, domain_static) in
     let error, wake_up_tmp =
       Common_static.empty_site_to_rules parameters error
@@ -487,9 +504,11 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
   (** add initial state then apply a list of event starts from this new
       list*)
 
-  let add_initial_state static dynamic error initial_state =
+  let add_initial_state ~new_init ?modified_agents static dynamic error
+      initial_state =
+    let _ = modified_agents in
     let error, dynamic, event_list =
-      pre_add_initial_state static dynamic error initial_state
+      pre_add_initial_state ~new_init static dynamic error initial_state
     in
     apply_event_list static dynamic error event_list
 

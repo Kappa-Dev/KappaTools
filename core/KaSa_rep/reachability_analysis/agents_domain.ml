@@ -333,7 +333,7 @@ module Domain = struct
 
   (**************************************************************************)
 
-  let initialize ?patch static dynamic error =
+  let initialize ?patch ~modified_agents static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
     let init_global_static_information =
       match patch with
@@ -416,7 +416,7 @@ module Domain = struct
     let error, static, dynamic =
       scan_rule_set ?start init_global_static_information dynamic error
     in
-    error, static, dynamic, []
+    error, static, dynamic, modified_agents, []
 
   let complete_wake_up_relation _static error wake_up = error, wake_up
 
@@ -547,7 +547,9 @@ module Domain = struct
 
   (**************************************************************************)
 
-  let add_initial_state static dynamic error species =
+  let add_initial_state ~new_init ?modified_agents static dynamic error species
+      =
+    let _ = modified_agents, new_init in
     let event_list = [] in
     let error, (dynamic, event_list) =
       init_agents static dynamic error species event_list

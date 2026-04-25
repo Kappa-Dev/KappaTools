@@ -46,7 +46,7 @@ module Domain = struct
   (**************************************************************************)
   (*implementations*)
 
-  let initialize ?patch static dynamic error =
+  let initialize ?patch ~modified_agents static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
     let init_global_dynamic_information = { local = (); global = dynamic } in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
@@ -90,6 +90,7 @@ module Domain = struct
     ( error,
       init_global_static_information,
       init_global_dynamic_information,
+      modified_agents,
       event_list )
 
   let complete_wake_up_relation _static error wake_up = error, wake_up
@@ -129,7 +130,10 @@ module Domain = struct
   (**************************************************************************)
   (*Implementation*)
 
-  let add_initial_state _static dynamic error _species = error, dynamic, []
+  let add_initial_state ~new_init ?modified_agents _static dynamic error
+      _species =
+    let _ = modified_agents, new_init in
+    error, dynamic, []
 
   (**************************************************************************)
 

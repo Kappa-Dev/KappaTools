@@ -101,7 +101,7 @@ module Domain = struct
     in
     add_oriented_relation parameter error r_id site2 site1 map
 
-  let initialize ?patch static dynamic error =
+  let initialize ?patch ~modified_agents static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
     let bonds_lhs = Analyzer_headers.get_bonds_lhs static in
     let local, bonds_to_rules, start =
@@ -139,7 +139,11 @@ module Domain = struct
     let init_global_static_information =
       { global_static_information = static; bonds_to_rules }
     in
-    error, init_global_static_information, init_global_dynamic_information, []
+    ( error,
+      init_global_static_information,
+      init_global_dynamic_information,
+      modified_agents,
+      [] )
 
   let complete_wake_up_relation _static error wake_up = error, wake_up
 
@@ -325,8 +329,10 @@ module Domain = struct
         error, Communication.See_a_new_bond pair :: event_list)
       map_diff (error, event_list)
 
-  let add_initial_state static dynamic error species =
+  let add_initial_state ~new_init ?modified_agents static dynamic error species
+      =
     let parameter = get_parameter static in
+    let _ = modified_agents, new_init in
     let set_before = get_contact_map_dynamic dynamic in
     (*------------------------------------------------------*)
     let error, dynamic = collect_bonds_initial static dynamic error species in

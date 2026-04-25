@@ -709,3 +709,5 @@ let add_symmetric_tuple_pair f parameters error (x, y) remanent =
       f parameters error (get_id t, get_tuple t) remanent)
     (error, remanent)
     [ x, y; (*y,x;*) x', y' (*y',x'*) ]
+
+let next_cv_id a = a + 1
