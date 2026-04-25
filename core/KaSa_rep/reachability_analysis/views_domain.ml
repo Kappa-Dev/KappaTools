@@ -478,7 +478,6 @@ module Domain = struct
   (* We leave it as future works. *)
   (* This is sound, but it may lead less precise analysis result. *)
   let initialize ?patch ~modified_agents static dynamic error =
-    let (_ : ('a * 'b * Diff.new_indexs) option) = patch in
     let parameters = Analyzer_headers.get_parameter static in
     let log_info = Analyzer_headers.get_log_info dynamic in
     let error, log_info =

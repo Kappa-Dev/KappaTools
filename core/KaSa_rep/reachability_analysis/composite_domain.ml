@@ -286,6 +286,23 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
   (**[lift_unary f static dynamic] is a function lifted of unary type,
      returns information of dynamic information and its output*)
 
+  let scan_rule_patch ?start static dynamic error =
+    let parameters = get_parameter static in
+    let compil = get_compil static in
+    let rules = compil.Cckappa_sig.rules in
+    let error, dynamic =
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters
+        error
+        (fun _parameters error rule_id rule dynamic ->
+          let error, dynamic =
+            push_rule_creation static dynamic error rule_id
+              rule.Cckappa_sig.e_rule_c_rule
+          in
+          error, dynamic)
+        rules dynamic
+    in
+    error, dynamic
+
   let lift_zeroary f static dynamic error =
     let error, domain_dynamic, output =
       f (get_domain_static_information static) dynamic.domain error
@@ -455,10 +472,10 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     )
 
   let initialize ?patch static dynamic error =
-    let patch_domain =
+    let patch_domain, start =
       match patch with
-      | None -> None
-      | Some (a, b, c) -> Some (snd a, b.domain.local, c)
+      | None -> None, None
+      | Some (a, b, c) -> Some (snd a, b.domain.local, c), Some c.Diff.next_rule
     in
     let parameters = Analyzer_headers.get_parameter static in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
@@ -502,6 +519,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
       }
     in
     let error, dynamic = scan_rule_creation static dynamic error in
+    let error, dynamic = scan_rule_patch ?start static dynamic error in
     let error, dynamic, () = apply_event_list static dynamic error event_list in
     error, static, dynamic, modified_agents
 

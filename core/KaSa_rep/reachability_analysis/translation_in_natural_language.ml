@@ -292,8 +292,8 @@ let try_partitioning parameters bdu_handler error kappa_handler
     let rec aux l (error, bdu_handler) =
       match l with
       | [] -> error, bdu_handler, None
-    (*  | head :: tail when parallel = Some true  Ckappa_sig.int_of_mvbdu_var head = 0 ->
-        aux tail (error, bdu_handler) *)
+      (* | head :: tail when parallel = Some true  Ckappa_sig.int_of_mvbdu_var head = 0 ->
+         aux tail (error, bdu_handler) *)
       | head :: tail ->
         let error', bdu_handler, singleton =
           Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler error

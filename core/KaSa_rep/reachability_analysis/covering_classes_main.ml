@@ -114,7 +114,12 @@ let compute_cv_max ?start_cv parameters error agent_type =
     | error, Some i -> error, Covering_classes_type.int_of_cv_id i)
 
 let ignore_cv ~cv_max cv_id =
-  compare (Covering_classes_type.int_of_cv_id cv_id) cv_max <= 0
+  compare (Covering_classes_type.int_of_cv_id cv_id) cv_max < 0
+
+let is_new_rule ~start k =
+  match start with
+  | None -> true
+  | Some max_rule -> compare k max_rule > 0
 
 let see_agent ~modified_agents parameters error agent_type =
   let a, _ = modified_agents in
@@ -366,10 +371,16 @@ let scan_rule_set_covering_classes ?start parameters error kappa_handler rules =
       | None -> error, Ckappa_sig.site_name_of_int (-1)
       | Some a ->
         (match
-           Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameters
-             error ag a
+           Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
+             parameters error ag a
          with
-        | error, None -> error, Ckappa_sig.site_name_of_int (-1)
+        | error, None ->
+          if compare ag new_index.Diff.next_agent >= 0 then
+            error, Ckappa_sig.site_name_of_int (-1)
+          else
+            Exception.warn parameters error __POS__
+              ~message:"This agent should be in the data-structure" Exit
+              (Ckappa_sig.site_name_of_int (-1))
         | error, Some a -> error, a))
   in
   (*----------------------------------------------------------------------*)
@@ -922,15 +933,40 @@ let list_of_site_type_in_covering_class ?patch ?start_cv ~modified_agents
           is_there_new_cv_in_agent ~modified_agents parameters error
             agent_type_cv
         in
-        if not bool then
+        if not bool then (
+          let () =
+            check __POS__ parameters
+              (Format.sprintf "NO NEW CV %i"
+                 (Ckappa_sig.int_of_agent_name agent_type_cv))
+          in
           error, store_result
-        else (
+        ) else (
           let cv_dic = remenent.Covering_classes_type.store_dic in
           let error, cv_max =
             compute_cv_max ?start_cv parameters error agent_type_cv
           in
+          let () =
+            check __POS__ parameters (Format.sprintf "CV MAX %i" cv_max)
+          in
           Covering_classes_type.Dictionary_of_List_sites_or_guard.fold
             (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
+              let () =
+                check __POS__ parameters
+                  (Format.sprintf "CHECK LIST: %i -> %i"
+                     (Ckappa_sig.int_of_agent_name agent_type_cv)
+                     (Covering_classes_type.int_of_cv_id cv_id))
+              in
+              let () =
+                List.iter
+                  (fun a ->
+                    check __POS__ parameters
+                      (Format.sprintf "%i,"
+                         (match a with
+                         | Ckappa_sig.Site a -> Ckappa_sig.int_of_site_name a
+                         | Ckappa_sig.Guard_p _a -> 100000)))
+                  list_of_site_type
+              in
+
               if ignore_cv ~cv_max cv_id then
                 error, store_result
               else (
@@ -939,6 +975,16 @@ let list_of_site_type_in_covering_class ?patch ?start_cv ~modified_agents
                     (Format.sprintf "NEW LIST: %i -> %i"
                        (Ckappa_sig.int_of_agent_name agent_type_cv)
                        (Covering_classes_type.int_of_cv_id cv_id))
+                in
+                let () =
+                  List.iter
+                    (fun a ->
+                      check __POS__ parameters
+                        (Format.sprintf "%i,"
+                           (match a with
+                           | Ckappa_sig.Site a -> Ckappa_sig.int_of_site_name a
+                           | Ckappa_sig.Guard_p _a -> 100000)))
+                    list_of_site_type
                 in
                 let error, old =
                   Common_map.get_pair_agent_cv parameters error
