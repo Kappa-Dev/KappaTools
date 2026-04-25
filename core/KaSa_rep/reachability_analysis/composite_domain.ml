@@ -25,6 +25,8 @@ module type Composite_domain = sig
     Exception.exceptions_caught_and_uncaught
     * static_information
     * dynamic_information
+    * (bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
+      * bool)
 
   type 'a zeroary =
     static_information ->
@@ -302,8 +304,10 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
      type unary where the output of static information [a] is an initial state
      of analyzer header, and the dynamic output [a list of event] is unit. *)
 
-  let pre_add_initial_state ~new_init static dynamic error a =
-    lift_unary (Domain.add_initial_state ~new_init) static dynamic error a
+  let pre_add_initial_state ~new_init ?modified_agents static dynamic error a =
+    lift_unary
+      (Domain.add_initial_state ~new_init ?modified_agents)
+      static dynamic error a
 
   let lift_binary f static dynamic error a b =
     let error, domain_dynamic, output =
@@ -466,7 +470,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
         (fun _ error _ -> error, false)
     in
     let modified_agents = modified_agents, false in
-    let error, domain_static, domain_dynamic, _modified_agents, event_list =
+    let error, domain_static, domain_dynamic, modified_agents, event_list =
       Domain.initialize ?patch:patch_domain ~modified_agents static dynamic
         error
     in
@@ -499,7 +503,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     in
     let error, dynamic = scan_rule_creation static dynamic error in
     let error, dynamic, () = apply_event_list static dynamic error event_list in
-    error, static, dynamic
+    error, static, dynamic, modified_agents
 
   (** add initial state then apply a list of event starts from this new
       list*)
@@ -508,7 +512,8 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
       initial_state =
     let _ = modified_agents in
     let error, dynamic, event_list =
-      pre_add_initial_state ~new_init static dynamic error initial_state
+      pre_add_initial_state ~new_init ?modified_agents static dynamic error
+        initial_state
     in
     apply_event_list static dynamic error event_list
 

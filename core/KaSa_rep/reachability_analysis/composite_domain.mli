@@ -27,6 +27,8 @@ module type Composite_domain = sig
     Exception.exceptions_caught_and_uncaught
     * static_information
     * dynamic_information
+    * (bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
+      * bool)
 
   type 'a zeroary =
     static_information ->

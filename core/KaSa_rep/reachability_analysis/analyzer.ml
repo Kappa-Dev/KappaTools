@@ -184,11 +184,11 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
               Domain.set_global_dynamic_information dynamic dynamicd,
               new_elts ) )
     in
-    let error, static, dynamic, _new_elts =
-      let error, static, dynamic =
+    let error, static, dynamic, modified_agents =
+      let error, static, dynamic, modified_agents =
         Domain.initialize ?patch:patch_domain global_static dynamic error
       in
-      error, static, dynamic, new_elts
+      error, static, dynamic, Some modified_agents
     in
     let error, dynamic =
       close_event parameters error domain_event None dynamic
@@ -220,8 +220,8 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
                     None dynamic
                 in
                 let error, dynamic, () =
-                  Domain.add_initial_state ~new_init static dynamic error
-                    chemical_species
+                  Domain.add_initial_state ~new_init ?modified_agents static
+                    dynamic error chemical_species
                 in
                 let error, dynamic =
                   close_event parameters error (StoryProfiling.Initial_state i)

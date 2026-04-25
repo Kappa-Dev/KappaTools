@@ -17,6 +17,8 @@ module Product
     (New_domain : Analyzer_domain_sig.Domain)
     (Underlying_domain : Analyzer_domain_sig.Domain) :
   Analyzer_domain_sig.Domain = struct
+  let domain_name = Underlying_domain.domain_name
+
   type ('a, 'b) pair = { new_domain: 'a; underlying_domain: 'b }
 
   type static_information =

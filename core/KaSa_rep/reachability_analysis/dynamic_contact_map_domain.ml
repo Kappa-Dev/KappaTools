@@ -16,6 +16,8 @@
 let local_trace = false
 
 module Domain = struct
+  let domain_name = "dynamic_cm"
+
   type static_information = {
     global_static_information: Analyzer_headers.global_static_information;
     bonds_to_rules:

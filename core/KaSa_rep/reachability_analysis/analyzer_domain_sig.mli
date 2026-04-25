@@ -23,6 +23,7 @@ module type Domain = sig
     global: Analyzer_headers.global_dynamic_information;
   }
 
+  val domain_name : string
   val get_parameter : static_information -> Remanent_parameters_sig.parameters
 
   val get_global_dynamic_information :

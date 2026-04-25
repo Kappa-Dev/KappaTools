@@ -20,6 +20,8 @@ module Domain = struct
   (* the type of the struct that contains all static information as in the
      previous version of the analysis *)
 
+  let domain_name = "side_effects"
+
   type static_information = {
     global_static_information: Analyzer_headers.global_static_information;
     domain_static_information: unit; (* no domain-specific static information *)

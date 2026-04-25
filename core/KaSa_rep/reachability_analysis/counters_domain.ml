@@ -24,6 +24,8 @@ functor
   (MI : Mat_inter.Mat_inter with type var = Occu1.trans)
   ->
   struct
+    let domain_name = "counter"
+
     type static_information = {
       global_static_information: Analyzer_headers.global_static_information;
       local_static_information: Counters_domain_type.static;

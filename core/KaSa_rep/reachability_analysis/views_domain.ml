@@ -98,6 +98,8 @@ module Domain = struct
   (* the type of the struct that contains all static information as in the
      previous version of the analysis *)
 
+  let domain_name = domain_name
+
   type static_information = {
     global_static_information: Analyzer_headers.global_static_information;
     domain_static_information: Bdu_static_views.bdu_analysis_static;
@@ -665,7 +667,7 @@ module Domain = struct
   (**************************************************************************)
   (**get type bdu_analysis_dynamic*)
 
-  let get_store_covering_classes_modification_update_full dynamic error =
+  let _get_store_covering_classes_modification_update_full dynamic error =
     let result = get_domain_dynamic_information dynamic in
     error, result.Bdu_dynamic_views.store_update
 
@@ -795,7 +797,7 @@ module Domain = struct
 
   (**************************************************************************)
 
-  let discover_a_modify_sites parameters error covering_classes_modified_map
+  let _discover_a_modify_sites parameters error covering_classes_modified_map
       store_list_of_site_type_in_covering_classes modified_sites =
     (*in a covering classes of modified site, return the list of list*)
     Covering_classes_type.AgentCV_map_and_set.Map.fold
@@ -816,13 +818,33 @@ module Domain = struct
           (error, modified_sites) list_of_site_type)
       covering_classes_modified_map (error, modified_sites)
 
-  let updates_list2event_list ?title:(_title = "") static dynamic error
-      event_list =
+  let discover_a_modify_sites parameters error
+      store_list_of_site_type_in_covering_classes modified_sites list =
+    (*in a covering classes of modified site, return the list of list*)
+    List.fold_left
+      (fun (error, modified_sites) (agent_type, cv_id) ->
+        let error, list_of_site_type =
+          match
+            Covering_classes_type.AgentCV_map_and_set.Map
+            .find_option_without_logs parameters error (agent_type, cv_id)
+              store_list_of_site_type_in_covering_classes
+          with
+          | error, None -> error, []
+          | error, Some l -> error, Ckappa_sig.to_site_list l
+        in
+        List.fold_left
+          (fun (error, modified_sites) site ->
+            Communication.add_site parameters error agent_type site
+              modified_sites)
+          (error, modified_sites) list_of_site_type)
+      (error, modified_sites) list
+
+  let updates_list2event_list ?title:(_title = "") static _dynamic error
+      event_list sitelist =
     let parameters = get_parameter static in
+
     (*a covering classses that contains modified sites*)
-    let error, store_covering_classes_modification_update_full =
-      get_store_covering_classes_modification_update_full dynamic error
-    in
+
     (*a list of site_type in a covering classes*)
     let store_list_of_site_type_in_covering_classes =
       get_list_of_site_type_in_covering_classes static
@@ -832,12 +854,18 @@ module Domain = struct
     in
     let error, modified_sites =
       discover_a_modify_sites parameters error
-        store_covering_classes_modification_update_full
-        store_list_of_site_type_in_covering_classes modified_sites
+        store_list_of_site_type_in_covering_classes modified_sites sitelist
     in
+
     let error, event_list =
       Communication.fold_sites parameters error
         (fun _ error s _ event_list ->
+          let () =
+            check __POS__ parameters
+              (Format.sprintf "MODIFIED SITES %i.%i"
+                 (Ckappa_sig.int_of_agent_name (fst s))
+                 (Ckappa_sig.int_of_site_name (snd s)))
+          in
           error, Communication.Modified_sites s :: event_list)
         modified_sites event_list
     in
@@ -1016,7 +1044,7 @@ module Domain = struct
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     let updates_list = [] in
     (*-----------------------------------------------------------*)
-    let error, dynamic, _title, is_new_views, _updates_list =
+    let error, dynamic, _title, is_new_views, updates_list =
       if Ckappa_sig.Views_bdu.equal bdu_old bdu_union then
         error, dynamic, title, false, updates_list
       else (
@@ -1057,7 +1085,7 @@ module Domain = struct
     if is_new_views then (
       (*print*)
       let error, event_list =
-        updates_list2event_list static dynamic error event_list
+        updates_list2event_list static dynamic error event_list updates_list
       in
       error, dynamic, event_list
     ) else
@@ -1171,10 +1199,12 @@ module Domain = struct
                   error, (dynamic, event_list)
                 | error, None -> error, (dynamic, event_list)
               in
+
               error, (dynamic, event_list)
             ))
         init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views (dynamic, [])
     in
+
     error, dynamic, event_list
 
   (**************************************************************)

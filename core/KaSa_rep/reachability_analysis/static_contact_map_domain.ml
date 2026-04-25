@@ -21,6 +21,8 @@ module Domain = struct
     global_static_information: Analyzer_headers.global_static_information;
   }
 
+  let domain_name = "static_cm"
+
   type local_dynamic_information = unit
 
   type dynamic_information = {

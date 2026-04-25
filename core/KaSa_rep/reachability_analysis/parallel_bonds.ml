@@ -108,6 +108,7 @@ module Domain = struct
      - And a map (A,x,y,B,z,t) -> (Ag_id,Ag_id) list RuleIdMap to explain
      which rules can contain parallel bonds in their lhs *)
   (*************************************************************************)
+  let domain_name = "parallel"
 
   type static_information = {
     global_static_information: Analyzer_headers.global_static_information;

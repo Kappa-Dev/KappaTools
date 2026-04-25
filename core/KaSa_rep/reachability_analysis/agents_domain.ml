@@ -16,6 +16,8 @@
 let local_trace = false
 
 module Domain = struct
+  let domain_name = "agent domain"
+
   type static_information = {
     global_static_information: Analyzer_headers.global_static_information;
     domain_static_information:
@@ -514,7 +516,7 @@ module Domain = struct
   (** collect the agent type of the agents of the species and declare
       them seen *)
 
-  let init_agents static dynamic error init_state event_list =
+  let init_agents ?modified_agents static dynamic error init_state event_list =
     let parameters = get_parameter static in
     let restriction_bdu = get_restriction_mvbdu static in
     let nsites = get_nsites static in
@@ -535,9 +537,19 @@ module Domain = struct
                 init_state.Cckappa_sig.e_init_guard restriction_bdu nsites
             in
             let dynamic = set_mvbdu_handler bdu_handler dynamic in
+            let error, bool =
+              match modified_agents with
+              | None -> error, true
+              | Some modified_agents ->
+                Covering_classes_main.is_there_new_cv_in_agent ~modified_agents
+                  parameters error agent_type
+            in
             let error, (dynamic, event_list) =
-              add_event_list static dynamic error agent_type event_list
-                mvbdu_guard
+              if bool then
+                add_event_list static dynamic error agent_type event_list
+                  mvbdu_guard
+              else
+                error, (dynamic, event_list)
             in
             error, (dynamic, event_list))
         init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
@@ -552,7 +564,7 @@ module Domain = struct
     let _ = modified_agents, new_init in
     let event_list = [] in
     let error, (dynamic, event_list) =
-      init_agents static dynamic error species event_list
+      init_agents ?modified_agents static dynamic error species event_list
     in
     error, dynamic, event_list
 
