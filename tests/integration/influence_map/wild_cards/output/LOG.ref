@@ -150,6 +150,35 @@ Quarks:site_modif-:agent_type:2,site_type:0,state:1,rule:0->[0*]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Reachability analysis...
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.735.16.23 AGENT 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.632.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.633.40.47 -> 0,1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.589.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.590.42.49 -> 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.589.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.590.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.735.16.23 AGENT 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.632.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.633.40.47 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.735.16.23 AGENT 2
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.632.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.633.40.47 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs in 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs in 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs in 2
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.938.24.31 NEW LIST: 0 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.938.24.31 NEW LIST: 1 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.938.24.31 NEW LIST: 2 -> 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 0 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 2 2 0 0
 
 	Applying rule r1 (File "wild_cards.ka", line 5, characters 0-68:):
 		the precondition is not satisfied yet

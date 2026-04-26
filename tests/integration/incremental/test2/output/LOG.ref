@@ -4,28 +4,26 @@ Parsing essai.ka...
 done
 Compiling...
 Reachability analysis...
+
 ------------------------------------------------------------
-every rule may be applied
+* There are some non applyable rules
 ------------------------------------------------------------
-every agent may occur in the model
+rule r4 (File "essai2.ka", line 4, characters 0-22:) will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+C cannot occur in the model
+D cannot occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() =>
-   [
-	  A(x[x.A])
-	v A(x[.])
-   ]
+A(x) => [ A(x[.]) v A(x[x.A]) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-A() =>
-   [
-	  A(x[x.A])
-	v A(x[.])
-   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -39,29 +37,27 @@ A() =>
 execution finished without any exception
 Parsing essai_diff.ka...
 done
+
 ------------------------------------------------------------
-every rule may be applied
+* There are some non applyable rules
 ------------------------------------------------------------
-every agent may occur in the model
+rule r4 (File "essai2.ka", line 4, characters 0-22:) will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+B cannot occur in the model
+C cannot occur in the model
+D cannot occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() =>
-   [
-	  A(x[.])
-   ]
-A(x) => [ A(x{u}) v A(x{p}) ]
-A(y) => [ A(y{u}) v A(y{p}) ]
+A(x) => A(x[.])
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-A() =>
-   [
-	  A(x[.])
-   ]
-A(x{p}) <=> A(y{p})
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------

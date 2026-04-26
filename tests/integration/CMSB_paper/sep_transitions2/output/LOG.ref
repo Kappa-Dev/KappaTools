@@ -11,6 +11,23 @@ every rule may be applied
 every agent may occur in the model
 
 ------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+A(x?) => [ A(x~o?) v A(x~u?) v A(x~p?) ]
+A(y?) => [ A(y~o?) v A(y~u?) v A(y~p?) ]
+A(z?) => [ A(z~o?) v A(z~u?) v A(z~p?) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+A(x?,y~p?) => [ A(x~u?,y~p?) v A(x~p?,y~p?) ]
+A(y~p?,z?) => A(y~p?,z~p?)
+A(x?,y~u?) => [ A(x~u?,y~u?) v A(x~p?,y~u?) ]
+A(y~u?,z?) => [ A(y~u?,z~u?) v A(y~u?,z~p?) ]
+A(x?,y~o?) => A(x~o?,y~o?)
+A(y~o?,z?) => A(y~o?,z~o?)
+
+------------------------------------------------------------
 The following transitions are separating:
 
   * rule z (File "sep_transitions2.ka", line 6, characters 0-23:):
@@ -22,12 +39,7 @@ The following transitions are separating:
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() =>
-   [
-	  A(x~p?)
-	v A(x~u?)
-	v A(x~o?)
-   ]
+A(x?) => [ A(x~o?) v A(x~u?) v A(x~p?) ]
 A(y?) => [ A(y~o?) v A(y~u?) v A(y~p?) ]
 A(z?) => [ A(z~o?) v A(z~u?) v A(z~p?) ]
 

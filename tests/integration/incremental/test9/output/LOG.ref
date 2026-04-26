@@ -13,28 +13,15 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-EGF() =>
-   [
-	  EGF(r[l.EGFR])
-	v EGF(r[.])
-   ]
-EGFR() =>
-   [
-	  EGFR(l[r.EGF])
-	v EGFR(l[.])
-   ]
+EGF(r) => [ EGF(r[.]) v EGF(r[l.EGFR]) ]
 EGFR(c) => [ EGFR(c[.]) v EGFR(c[n.EGFR]) ]
+EGFR(l) => [ EGFR(l[.]) v EGFR(l[r.EGF]) ]
 EGFR(n) => [ EGFR(n[.]) v EGFR(n[c.EGFR]) ]
 EGFR(r) => [ EGFR(r[.]) v EGFR(r[r.EGFR]) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-EGF() =>
-   [
-	  EGF(r[l.EGFR])
-	v EGF(r[.])
-   ]
 EGFR(c[n.EGFR]) => EGFR(c[n.EGFR],r[r.EGFR])
 EGFR(n[c.EGFR]) => EGFR(n[c.EGFR],r[r.EGFR])
 EGFR(r[r.EGFR]) => EGFR(l[r.EGF],r[r.EGFR])
@@ -70,33 +57,18 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-EGF() =>
-   [
-	  EGF(r[l.EGFR])
-	v EGF(r[.])
-   ]
-EGFR() =>
-   [
-	  EGFR(l[r.EGF])
-	v EGFR(l[.])
-   ]
+EGF(r) => [ EGF(r[.]) v EGF(r[l.EGFR]) ]
 EGFR(c) => [ EGFR(c[.]) v EGFR(c[n.EGFR]) ]
+EGFR(l) => [ EGFR(l[.]) v EGFR(l[r.EGF]) ]
 EGFR(n) => [ EGFR(n[.]) v EGFR(n[c.EGFR]) ]
 EGFR(r) => [ EGFR(r[.]) v EGFR(r[r.EGFR]) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-EGF() =>
-   [
-	  EGF(r[l.EGFR])
-	v EGF(r[.])
-   ]
 EGFR(c[n.EGFR]) => EGFR(c[n.EGFR],r[r.EGFR])
 EGFR(n[c.EGFR]) => EGFR(n[c.EGFR],r[r.EGFR])
 EGFR(r[r.EGFR]) => EGFR(l[r.EGF],r[r.EGFR])
-EGFR(c,r[.]) => EGFR(c[.],r[.])
-EGFR(n,r[.]) => EGFR(n[.],r[.])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------

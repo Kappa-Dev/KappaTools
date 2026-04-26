@@ -103,6 +103,29 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'' .->A(x{u}) -> var(0):'Au' A(x{u})[0->0]
 Influence_map:Wake_up_map:rule(1):'' .->B(x{u}) -> var(1):'Bu' B(x{u})[0->0]
 Reachability analysis...
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.735.16.23 AGENT 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.632.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.633.40.47 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.735.16.23 AGENT 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.632.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.633.40.47 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs in 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs in 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.938.24.31 NEW LIST: 0 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.938.24.31 NEW LIST: 1 -> 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 0 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1064.14.21 0 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 0 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 0 1 1 0
 
 	Applying rule #[P1 && P2]. -> A(x{u}) (File "example_agents_params.ka", line 8, characters 0-28:):
 		the precondition is satisfied
@@ -112,15 +135,16 @@ Reachability analysis...
 
 		A(x{u}) => P1.and.P2
 
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.0
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 		Update information about potential double bindings
 
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 
 	Applying rule #[P1 || P2]. -> B(x{u}) (File "example_agents_params.ka", line 9, characters 0-28:):
@@ -131,41 +155,42 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
 
 		B(x{u}) => P1.or.P2
 
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 1.0
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 		Update information about potential double bindings
 
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 
 	Applying rule #[P1 && P2]. -> A(x{u}) (File "example_agents_params.ka", line 8, characters 0-28:):
 		the precondition is satisfied
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 		Update information about potential double bindings
 
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 
 	Applying rule #[P1 || P2]. -> B(x{u}) (File "example_agents_params.ka", line 9, characters 0-28:):
 		the precondition is satisfied
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1429.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1470.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1491.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1518.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 		Update information about potential double bindings
 
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1560.21.28 FOLD_bin
+core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 
 ------------------------------------------------------------
@@ -270,26 +295,12 @@ Id=21
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() =>
-   [
-	  A(x{u}) [ only if P1.and.P2 ]
-   ]
-B() =>
-   [
-	  B(x{u}) [ only if P1.or.P2 ]
-   ]
+A(x) => A(x{u}) [ only if P1.and.P2 ]
+B(x) => B(x{u}) [ only if P1.or.P2 ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-A() =>
-   [
-	  A(x{u}) [ only if P1.and.P2 ]
-   ]
-B() =>
-   [
-	  B(x{u}) [ only if P1.or.P2 ]
-   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -302,14 +313,12 @@ B() =>
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A()=> [A(x{u}) [ only if P1.and.P2 ]]
-B()=> [B(x{u}) [ only if P1.or.P2 ]]
+A(x)=> [A(x{u}) [ only if P1.and.P2 ]]
+B(x)=> [B(x{u}) [ only if P1.or.P2 ]]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-B()=> [B(x{u}) [ only if P1.or.P2 ]]
-A()=> [A(x{u}) [ only if P1.and.P2 ]]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

@@ -576,10 +576,11 @@ let get_triple_map parameters error pair_list triple_list =
           map_res current_list ))
     (error, []) triple_list
 
-let store_bdu_potential_restriction_map_aux parameters bdu_handler error
+let store_bdu_potential_restriction_map_aux ?start_cv ~modified_agents parameters bdu_handler error
     (*store_new_index_pair_map*) store_remanent_triple
     store_potential_side_effects store_result guard_mvbdus restriction_bdu =
-  let error, bdu_handler, bdu_false =
+  
+    let error, bdu_handler, bdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
   in
   (*-----------------------------------------------------------------*)
@@ -605,6 +606,14 @@ let store_bdu_potential_restriction_map_aux parameters bdu_handler error
     error
     (fun parameters error agent_type' triple_list (bdu_handler, store_result) ->
       (*map of potential partner side_effect with site is bond*)
+      let error, b = Covering_classes_main.is_there_new_cv_in_agent ~modified_agents parameters error agent_type' in 
+      (* TO DO *) if false && not b then (error, (bdu_handler, store_result))
+      else 
+        let error, cv_max  = 
+                    Covering_classes_main.compute_cv_max 
+                 ?start_cv parameters error agent_type' 
+      in 
+     
       Ckappa_sig.AgentRule_map_and_set.Map.fold
         (fun (agent_type, rule_id) pair_list (error, (bdu_handler, store_result)) ->
           if agent_type' = agent_type then (
@@ -615,7 +624,10 @@ let store_bdu_potential_restriction_map_aux parameters bdu_handler error
             let error, bdu_handler, store_result =
               List.fold_left
                 (fun (error, bdu_handler, store_result) (cv_id, site', map_res) ->
-                  let error, bdu_handler, bdu =
+                     let b = Covering_classes_main.ignore_cv ~cv_max cv_id in 
+                  (* TO DO *) if false && b then (error, bdu_handler, store_result)
+                  else 
+                   let error, bdu_handler, bdu =
                     List.fold_left
                       (fun (error, bdu_handler, bdu) state ->
                         (*-----------------------------------------------*)
@@ -665,11 +677,11 @@ let store_bdu_potential_restriction_map_aux parameters bdu_handler error
 (*************************************************************************)
 (*build bdu_potential in the case of binding*)
 
-let store_bdu_potential_effect_restriction_map parameters bdu_handler error
+let store_bdu_potential_effect_restriction_map ?start_cv ~modified_agents parameters bdu_handler error
     (*store_new_index_pair_map*) store_remanent_triple
     store_potential_side_effects store_result guard_mvbdus restriction_bdu =
   let error', (bdu_handler, store_result) =
-    store_bdu_potential_restriction_map_aux parameters bdu_handler
+    store_bdu_potential_restriction_map_aux ?start_cv ~modified_agents parameters bdu_handler
       error (*store_new_index_pair_map*)
       store_remanent_triple store_potential_side_effects store_result
       guard_mvbdus restriction_bdu
@@ -679,14 +691,25 @@ let store_bdu_potential_effect_restriction_map parameters bdu_handler error
   in
   error, (bdu_handler, store_result)
 
-let collect_site_to_renamed_site_list parameters error store_remanent_triple
+let collect_site_to_renamed_site_list ?start_cv ~modified_agents parameters error store_remanent_triple
     nsites output =
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
     error
     (fun parameters error agent_type' triple_list output ->
-      List.fold_left
+    let error, bool = 
+        Covering_classes_main.is_there_new_cv_in_agent ~modified_agents  parameters error agent_type' 
+      in 
+      if (* TO DO *) false && not bool then (error, output)
+      else 
+        let error, cv_max = Covering_classes_main.compute_cv_max ?start_cv 
+        parameters error agent_type' in 
+          List.fold_left
         (fun (error, output) (cv_id, list, _) ->
+            let b = Covering_classes_main.ignore_cv ~cv_max cv_id in 
+            if (* TO DO *) false && b then (error, output)
+            else 
           let rec aux error site list output =
+
             match list with
             | [] -> error, output
             | Ckappa_sig.Guard_p _ :: _ ->
@@ -722,7 +745,7 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
 (**************************************************************************)
 (*projection with rule_id*)
 
-let collect_proj_bdu_potential_restriction_map parameters bdu_handler error
+let collect_proj_bdu_potential_restriction_map ?start_cv ~modified_agents  parameters bdu_handler error
     (*store_new_index_pair_map*) store_remanent_triple
     store_potential_side_effects store_result guard_mvbdus restriction_bdu =
   let store_init_bdu_potential_restriction_map =
@@ -730,7 +753,7 @@ let collect_proj_bdu_potential_restriction_map parameters bdu_handler error
   in
   let error, (bdu_handler, store_bdu_potential_restriction_map) =
     (* this function should work directly on the partitioned map (store_result) *)
-    store_bdu_potential_effect_restriction_map parameters bdu_handler
+    store_bdu_potential_effect_restriction_map ?start_cv ~modified_agents  parameters bdu_handler
       error (*store_new_index_pair_map*)
       store_remanent_triple store_potential_side_effects
       store_init_bdu_potential_restriction_map guard_mvbdus restriction_bdu
@@ -823,6 +846,14 @@ let collect_bdu_test_restriction_map ?start_cv ~modified_agents parameters
         error, (bdu_handler, store_result)
       | Cckappa_sig.Dead_agent (agent, _, _, _) ->
         let agent_type = agent.Cckappa_sig.agent_name in
+         let error, bool =
+          Covering_classes_main.is_there_new_cv_in_agent ~modified_agents
+            parameters error agent_type 
+        in
+        if not bool then
+          error, (bdu_handler, store_result)
+        else (
+        let agent_type = agent.Cckappa_sig.agent_name in
         let error, triple_list =
           match
             Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif
@@ -840,7 +871,7 @@ let collect_bdu_test_restriction_map ?start_cv ~modified_agents parameters
                   bdu_false store_result ))
             (error, store_result) triple_list
         in
-        error, (bdu_handler, store_result)
+        error, (bdu_handler, store_result))
       | Cckappa_sig.Agent agent ->
         let agent_type = agent.Cckappa_sig.agent_name in
         let error, bool =
@@ -917,7 +948,7 @@ let collect_bdu_test_restriction_map ?start_cv ~modified_agents parameters
 
 (***************************************************************************)
 
-let collect_proj_bdu_test_restriction ~modified_agents parameters handler_kappa
+let collect_proj_bdu_test_restriction ?start_cv ~modified_agents parameters handler_kappa
     error rule_id rule (*store_new_index_pair_map*) store_remanent_triple
     store_result store_guard_bdu =
   let store_init_bdu_test_restriction_map =
@@ -925,7 +956,7 @@ let collect_proj_bdu_test_restriction ~modified_agents parameters handler_kappa
   in
   let error, (bdu_handler, store_bdu_test_restriction_map) =
     (* collect should work directly on the partitioned map (store_result) *)
-    collect_bdu_test_restriction_map ~modified_agents parameters handler_kappa
+    collect_bdu_test_restriction_map ?start_cv ~modified_agents parameters handler_kappa
       error rule_id rule (*store_new_index_pair_map*)
       store_remanent_triple store_init_bdu_test_restriction_map store_guard_bdu
   in
@@ -1058,7 +1089,7 @@ let scan_rule_static ?start_cv ~modified_agents parameters log_info error
   in
   (*-----------------------------------------------------------------------*)
   let (error, handler_bdu), store_proj_bdu_potential_restriction_map =
-    collect_proj_bdu_potential_restriction_map (*?start_cv*) parameters
+    collect_proj_bdu_potential_restriction_map ?start_cv ~modified_agents parameters
       handler_bdu error (*store_new_index_pair_map*)
       store_remanent_triple store_potential_side_effects
       store_result.store_proj_bdu_potential_restriction_map guard_mvbdus
@@ -1066,7 +1097,7 @@ let scan_rule_static ?start_cv ~modified_agents parameters log_info error
   in
   (*------------------------------------------------------------------------*)
   let (error, handler_bdu), store_proj_bdu_test_restriction =
-    collect_proj_bdu_test_restriction (*?start_cv*)
+    collect_proj_bdu_test_restriction ?start_cv
       ~modified_agents parameters handler_bdu error rule_id
       rule (*store_new_index_pair_map*)
       store_remanent_triple store_result.store_proj_bdu_test_restriction
@@ -1121,9 +1152,12 @@ let scan_rule_set ?start ?start_cv ~modified_agents parameters log_info
   let error, site_to_renamed_site_list =
     match start with
     | None ->
-      collect_site_to_renamed_site_list parameters error store_remanent_triple
+      collect_site_to_renamed_site_list ~modified_agents parameters error store_remanent_triple
         nsites store_results.site_to_renamed_site_list
-    | Some _ -> error, store_results.site_to_renamed_site_list
+    | Some _ -> 
+      (*error, store_results.site_to_renamed_site_list*) (* TO DO *)
+       collect_site_to_renamed_site_list ?start_cv ~modified_agents parameters error store_remanent_triple
+        nsites store_results.site_to_renamed_site_list
   in
   ( error,
     (handler_bdu, log_info, { store_results with site_to_renamed_site_list }) )

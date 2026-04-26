@@ -1138,9 +1138,10 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
       question_marks,
       delta,
       if
-        deadlink == dead_link_sites
+        true || (* We do not use dead agent any longer *)
+        (deadlink == dead_link_sites
         && deadstate == dead_state_sites
-        && deadsites == dead_sites
+        && deadsites == dead_sites)
       then
         Cckappa_sig.Agent
           {

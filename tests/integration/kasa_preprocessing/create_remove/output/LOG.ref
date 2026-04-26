@@ -96,6 +96,18 @@ Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'r0' .,A()->B(),. -> rule(1):'r1' .,B()->C(),.[0->1]
 Reachability analysis...
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.735.16.23 AGENT 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.735.16.23 AGENT 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 No new CVS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 No new CVS in 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 No new CVS in 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 No new CVS in 2
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
 
 	Applying rule r0 (File "create.ka", line 11, characters 0-23:):
 		the precondition is not satisfied yet

@@ -40,28 +40,15 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-EGF() =>
-   [
-	  EGF(r[l.EGFR])
-	v EGF(r[.])
-   ]
-EGFR() =>
-   [
-	  EGFR(l[r.EGF])
-	v EGFR(l[.])
-   ]
+EGF(r) => [ EGF(r[.]) v EGF(r[l.EGFR]) ]
 EGFR(c) => [ EGFR(c[.]) v EGFR(c[n.EGFR]) ]
+EGFR(l) => [ EGFR(l[.]) v EGFR(l[r.EGF]) ]
 EGFR(n) => [ EGFR(n[.]) v EGFR(n[c.EGFR]) ]
 EGFR(r) => [ EGFR(r[.]) v EGFR(r[r.EGFR]) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-EGF() =>
-   [
-	  EGF(r[l.EGFR])
-	v EGF(r[.])
-   ]
 EGFR(c[n.EGFR]) => EGFR(c[n.EGFR],r[r.EGFR])
 EGFR(n[c.EGFR]) => EGFR(n[c.EGFR],r[r.EGFR])
 EGFR(r[r.EGFR]) => EGFR(l[r.EGF],r[r.EGFR])
@@ -110,9 +97,6 @@ done
 	Applying rule #[@rule-3]EGFR(l[_] r[.]), EGFR(l[_] r[.]) -> EGFR(l[_] r[1]), EGFR(l[_] r[1]) (File "a_before.ka", line 6, characters 0-70:):
 		the precondition is satisfied
 
-	Applying rule #[@rule-4]EGFR(r[1] c[.]), EGFR(r[1] n[.]) -> EGFR(r[1] c[2]), EGFR(r[1] n[2]) (File "a_before.ka", line 7, characters 0-69:):
-		the precondition is satisfied
-
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
@@ -123,33 +107,18 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-EGF() =>
-   [
-	  EGF(r[l.EGFR])
-	v EGF(r[.])
-   ]
-EGFR() =>
-   [
-	  EGFR(l[r.EGF])
-	v EGFR(l[.])
-   ]
+EGF(r) => [ EGF(r[.]) v EGF(r[l.EGFR]) ]
 EGFR(c) => [ EGFR(c[.]) v EGFR(c[n.EGFR]) ]
+EGFR(l) => [ EGFR(l[.]) v EGFR(l[r.EGF]) ]
 EGFR(n) => [ EGFR(n[.]) v EGFR(n[c.EGFR]) ]
 EGFR(r) => [ EGFR(r[.]) v EGFR(r[r.EGFR]) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-EGF() =>
-   [
-	  EGF(r[l.EGFR])
-	v EGF(r[.])
-   ]
 EGFR(c[n.EGFR]) => EGFR(c[n.EGFR],r[r.EGFR])
 EGFR(n[c.EGFR]) => EGFR(n[c.EGFR],r[r.EGFR])
 EGFR(r[r.EGFR]) => EGFR(l[r.EGF],r[r.EGFR])
-EGFR(c,r[.]) => EGFR(c[.],r[.])
-EGFR(n,r[.]) => EGFR(n[.],r[.])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------

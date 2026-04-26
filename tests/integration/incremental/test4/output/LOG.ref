@@ -37,28 +37,34 @@ A cannot occur in the model
 execution finished without any exception
 Parsing essai_diff.ka...
 done
+130:1
+130:2
+130:3
+
 ------------------------------------------------------------
-every rule may be applied
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "essai2.ka", line 1, characters 0-31: will never be applied.
+rule r2 (File "essai.ka", line 7, characters 2-24:) will never be applied.
+rule r5 (File "essai.ka", line 8, characters 2-24:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 
 ------------------------------------------------------------
+A cannot occur in the model
+B cannot occur in the model
 C cannot occur in the model
+D cannot occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() =>
-   [
-	  A(x{p})
-	v A(x{u})
-   ]
-A(y) => [ A(y{u}) v A(y{p}) ]
+A(x) => A(x{u})
+A(y) => A(y{u})
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-A(x{p}) <=> A(y{p})
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -69,5 +75,8 @@ A(x{p}) <=> A(y{p})
 * Properties of counters
 ------------------------------------------------------------
 
-execution finished without any exception
+Some exceptions have been raised
+error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 206; exception:Exit
+error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 206; exception:Exit
+error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 206; exception:Exit
 > 

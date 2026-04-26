@@ -5,18 +5,29 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+
 ------------------------------------------------------------
-every rule may be applied
+* There are some non applyable rules
 ------------------------------------------------------------
-every agent may occur in the model
+rule E.R (File "../dimer.ka", line 7, characters 0-35:) will never be applied.
+rule E/R (File "../dimer.ka", line 8, characters 0-39:) will never be applied.
+rule R.R (File "../dimer.ka", line 9, characters 0-51:) will never be applied.
+rule R/R (File "../dimer.ka", line 10, characters 0-55:) will never be applied.
+rule R.int (File "../dimer.ka", line 11, characters 0-65:) will never be applied.
+rule R/int (File "../dimer.ka", line 12, characters 0-39:) will never be applied.
+rule obs (File "../dimer.ka", line 13, characters 0-39:) will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+E cannot occur in the model
+R cannot occur in the model
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-
-
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------

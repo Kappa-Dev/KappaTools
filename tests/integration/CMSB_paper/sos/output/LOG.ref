@@ -15,55 +15,29 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-EGF() =>
-   [
-	  EGF(r!L.EGFR)
-	v EGF(r)
-   ]
-EGFR() =>
-   [
-	  EGFR(Y1016~u?)
-   ]
+EGF(r?) => [ EGF(r) v EGF(r!L.EGFR) ]
 EGFR(C?) => [ EGFR(C) v EGFR(C!N.EGFR) ]
 EGFR(CR?) => [ EGFR(CR) v EGFR(CR!CR.EGFR) ]
 EGFR(L?) => [ EGFR(L) v EGFR(L!r.EGF) ]
 EGFR(N?) => [ EGFR(N) v EGFR(N!C.EGFR) ]
+EGFR(Y1016?) => EGFR(Y1016~u?)
 EGFR(Y1092?) => [ EGFR(Y1092~u?) v EGFR(Y1092~p?) ]
 EGFR(Y1092?) => [ EGFR(Y1092) v EGFR(Y1092!SH2.Grb2) ]
 EGFR(Y1172?) => [ EGFR(Y1172~u?) v EGFR(Y1172~p?) ]
 EGFR(Y1172?) => [ EGFR(Y1172) v EGFR(Y1172!PTB.Shc) ]
-Grb2() =>
-   [
-	  Grb2(SH2~u?)
-   ]
 Grb2(SH2?) => [ Grb2(SH2) v Grb2(SH2!Y.Shc) v Grb2(SH2!Y1092.EGFR) ]
+Grb2(SH2?) => Grb2(SH2~u?)
 Grb2(SH3n?) => [ Grb2(SH3n) v Grb2(SH3n!PR.SoS) ]
-Shc() =>
-   [
-	  Shc(Y~p?)
-	v Shc(Y~u?)
-   ]
 Shc(PTB?) => Shc(PTB~u?)
 Shc(PTB?) => [ Shc(PTB) v Shc(PTB!Y1172.EGFR) ]
 Shc(Y?) => [ Shc(Y) v Shc(Y!SH2.Grb2) ]
-SoS() =>
-   [
-	  SoS(S~u?)
-   ]
+Shc(Y?) => [ Shc(Y~u?) v Shc(Y~p?) ]
 SoS(PR?) => [ SoS(PR) v SoS(PR!SH3n.Grb2) ]
+SoS(S?) => SoS(S~u?)
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-EGF() =>
-   [
-	  EGF(r!L.EGFR)
-	v EGF(r)
-   ]
-EGFR() =>
-   [
-	  EGFR(Y1016~u?)
-   ]
 EGFR() =>
    [
 	  EGFR(C,CR,L!r.EGF,N)
@@ -74,15 +48,45 @@ EGFR() =>
    ]
 EGFR(Y1172!PTB.Shc) => EGFR(Y1172~p!PTB.Shc)
 EGFR(Y1092!SH2.Grb2) => EGFR(Y1092~p!SH2.Grb2)
-Grb2() =>
-   [
-	  Grb2(SH2~u?)
-   ]
 Shc(Y!SH2.Grb2) => Shc(Y~p!SH2.Grb2)
-SoS() =>
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+EGF(r?) => [ EGF(r) v EGF(r!L.EGFR) ]
+EGFR(C?) => [ EGFR(C) v EGFR(C!N.EGFR) ]
+EGFR(CR?) => [ EGFR(CR) v EGFR(CR!CR.EGFR) ]
+EGFR(L?) => [ EGFR(L) v EGFR(L!r.EGF) ]
+EGFR(N?) => [ EGFR(N) v EGFR(N!C.EGFR) ]
+EGFR(Y1016?) => EGFR(Y1016~u?)
+EGFR(Y1092?) => [ EGFR(Y1092~u?) v EGFR(Y1092~p?) ]
+EGFR(Y1092?) => [ EGFR(Y1092) v EGFR(Y1092!SH2.Grb2) ]
+EGFR(Y1172?) => [ EGFR(Y1172~u?) v EGFR(Y1172~p?) ]
+EGFR(Y1172?) => [ EGFR(Y1172) v EGFR(Y1172!PTB.Shc) ]
+Grb2(SH2?) => [ Grb2(SH2) v Grb2(SH2!Y.Shc) v Grb2(SH2!Y1092.EGFR) ]
+Grb2(SH2?) => Grb2(SH2~u?)
+Grb2(SH3n?) => [ Grb2(SH3n) v Grb2(SH3n!PR.SoS) ]
+Shc(PTB?) => Shc(PTB~u?)
+Shc(PTB?) => [ Shc(PTB) v Shc(PTB!Y1172.EGFR) ]
+Shc(Y?) => [ Shc(Y) v Shc(Y!SH2.Grb2) ]
+Shc(Y?) => [ Shc(Y~u?) v Shc(Y~p?) ]
+SoS(PR?) => [ SoS(PR) v SoS(PR!SH3n.Grb2) ]
+SoS(S?) => SoS(S~u?)
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+EGFR() =>
    [
-	  SoS(S~u?)
+	  EGFR(C,CR,L!r.EGF,N)
+	v EGFR(C,CR!CR.EGFR,L!r.EGF,N!C.EGFR)
+	v EGFR(C,CR!CR.EGFR,L!r.EGF,N)
+	v EGFR(C!N.EGFR,CR!CR.EGFR,L!r.EGF,N)
+	v EGFR(C,CR,L,N)
    ]
+EGFR(Y1172!PTB.Shc) => EGFR(Y1172~p!PTB.Shc)
+EGFR(Y1092!SH2.Grb2) => EGFR(Y1092~p!SH2.Grb2)
+Shc(Y!SH2.Grb2) => Shc(Y~p!SH2.Grb2)
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------

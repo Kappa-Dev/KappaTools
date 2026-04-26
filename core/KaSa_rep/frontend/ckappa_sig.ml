@@ -18,7 +18,7 @@ let hack_to_separate_sites_id_from_guard_id = 1000000
 
 (* It would be better to use a Sum type to distinguish them *)
 (* The hack is useless when nsites > hack_to_separate_sites_id_from_guard_id *)
-let local_trace = true
+let local_trace = false
 let _ = local_trace
 
 type position = Loc.t
