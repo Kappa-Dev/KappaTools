@@ -1140,6 +1140,11 @@ let translate_view parameters error handler (k : Ckappa_sig.c_agent_id)
       if
         true || (* We do not use dead agent any longer *)
         (deadlink == dead_link_sites
+        (* disable this feature for incremental analysis *)
+        (* The optimization for syntactic dead rules can be extended, *)
+        (* but it requires some materials *)
+        (* In the meantim, deal with them as other agents*)
+        && deadlink == dead_link_sites
         && deadstate == dead_state_sites
         && deadsites == dead_sites)
       then
