@@ -15,7 +15,7 @@
 
 let local_trace = false
 
-let check (a, b, c, d) parameters string =
+let _check (a, b, c, d) parameters string =
   if
     local_trace
     || Remanent_parameters.get_trace parameters
@@ -32,7 +32,7 @@ let check (a, b, c, d) parameters string =
     ()
   )
 
-let print_list f g p h e r =
+let _print_list f g p h e r =
   if
     local_trace
     || Remanent_parameters.get_trace p
@@ -653,21 +653,6 @@ and get_state_of_site error precondition static dynamic path =
         dynamic path.path
     in
     let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
-    let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    let () = check __POS__ parameters "STATE (LHS)" in
-    let error, bdu_handler =
-      print_list
-        (fun p h e c ->
-          let () =
-            Loggers.fprintf
-              (Remanent_parameters.get_logger p)
-              "%i"
-              (Ckappa_sig.int_of_state_index c)
-          in
-          e, h)
-        (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
-        parameters bdu_handler error range
-    in
     let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
     ( error,
       dynamic,
@@ -684,21 +669,6 @@ and get_state_of_site error precondition static dynamic path =
       post_condition error rule_id rule precondition static dynamic path.path
     in
     let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
-    let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    let () = check __POS__ parameters "STATE (RHS)" in
-    let error, bdu_handler =
-      print_list
-        (fun p h e c ->
-          let () =
-            Loggers.fprintf
-              (Remanent_parameters.get_logger p)
-              "%i"
-              (Ckappa_sig.int_of_state_index c)
-          in
-          e, h)
-        (fun p h e c -> Handler.print_guard_mvbdu p e kappa_handler h c)
-        parameters bdu_handler error range
-    in
     let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, precondition, range
 

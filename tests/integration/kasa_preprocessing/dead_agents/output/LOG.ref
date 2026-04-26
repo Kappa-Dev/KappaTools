@@ -1,47 +1,8 @@
 Parsing dead_agents.ka...
 done
-Signature:
-Signature:agents:
-Signature:agents:agent_type:0:A
-Signature:agents:agent_type:1:B
-Signature:agents:agent_type:2:D
-Signature:agents:agent_type:3:E
-Signature:sites:
-Signature:sites:0:
-Signature:sites:0:site_type:0->x(internal state)
-Signature:sites:0:site_type:1->x(binding state)
-Signature:sites:1:
-Signature:sites:1:site_type:0->x(internal state)
-Signature:sites:2:
-Signature:sites:3:
-Signature:sites:3:site_type:0->x(binding state)
-Signature:states: 
-Signature:states:0:
-Signature:states:0:0:
-Signature:states:0:0:state_id:0->u
-Signature:states:0:0:state_id:1->q
-Signature:states:0:0:state_id:2->p
-Signature:states:0:1:
-Signature:states:0:1:state_id:0->free
-Signature:states:1:
-Signature:states:1:0:
-Signature:states:1:0:state_id:0->u
-Signature:states:1:0:state_id:1->p
-Signature:states:3:
-Signature:states:3:0:
-Signature:states:3:0:state_id:0->free
-Signature:duals: 
-Signature: 
-Signature:agents info:0:
-A -> 15File "dead_agents.ka", line 20, characters 9-10:File "dead_agents.ka", line 10, characters 0-1:File "dead_agents.ka", line 10, characters 25-26:File "dead_agents.ka", line 12, characters 0-1:File "dead_agents.ka", line 12, characters 15-16:File "dead_agents.ka", line 12, characters 15-16:File "dead_agents.ka", line 12, characters 0-1:File "dead_agents.ka", line 13, characters 0-1:File "dead_agents.ka", line 13, characters 14-15:File "dead_agents.ka", line 14, characters 0-1:File "dead_agents.ka", line 14, characters 14-15:File "dead_agents.ka", line 15, characters 0-1:File "dead_agents.ka", line 15, characters 14-15:File "dead_agents.ka", line 17, characters 15-16:File "dead_agents.ka", line 18, characters 15-16:
-Signature:agents info:1:
-B -> 7File "dead_agents.ka", line 21, characters 9-10:File "dead_agents.ka", line 10, characters 11-12:File "dead_agents.ka", line 10, characters 36-37:File "dead_agents.ka", line 11, characters 0-1:File "dead_agents.ka", line 11, characters 15-16:File "dead_agents.ka", line 11, characters 15-16:File "dead_agents.ka", line 11, characters 0-1:
-Signature:agents info:2:
-D -> 1File "dead_agents.ka", line 17, characters 0-1:
-Signature:agents info:3:
-E -> 1File "dead_agents.ka", line 18, characters 0-1:
 Compiling...
 Generating the raw contact map...
+<<<<<<< HEAD
 Compilation:Compilation:agent definition:0:A:
 Compilation:agent definition:       File "dead_agents.ka", line 20, characters 9-10:
 Compilation:agent definition:       File "dead_agents.ka", line 10, characters 0-1:
@@ -841,6 +802,11 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
+=======
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 ------------------------------------------------------------
 * There are some non applyable rules
@@ -854,68 +820,6 @@ rule File "dead_agents.ka", line 18, characters 0-29: will never be applied.
 ------------------------------------------------------------
 D cannot occur in the model
 E cannot occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-agent_type:0:A:cv_id:0
-Id=23
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=22
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=21
-     Node(site_type:1<2)
-      Id=0
-       Leaf False 
-
-      Id=20
-       Node(site_type:1<3)
-        Id=5
-         Node(site_type:2<0)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-agent_type:1:B:cv_id:0
-Id=26
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -936,6 +840,7 @@ B(x) => [ B(x{u}) v B(x{p}) ]
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
+<<<<<<< HEAD
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
@@ -972,3 +877,6 @@ error: file_name: core/KaSa_rep/frontend/preprocess.ml; message: line 2050; exce
 error: file_name: core/KaSa_rep/frontend/preprocess.ml; message: line 2051; exception:Not_found
 error: file_name: core/KaSa_rep/reachability_analysis/counters_domain_static.ml; message: line 487; exception:Exit
 error: file_name: core/KaSa_rep/reachability_analysis/counters_domain_static.ml; message: line 487; exception:Exit
+=======
+execution finished without any exception
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)

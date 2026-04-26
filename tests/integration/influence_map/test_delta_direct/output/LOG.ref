@@ -478,6 +478,7 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 2.0
 		Updating the views for B(x{})
 
 		Updating the views for B(x{})
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -487,6 +488,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{u}[.]), ., ., C(x{u}[.]) -> A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . (File "test_delta.ka", line 1, characters 0-70:):
@@ -497,6 +502,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 		Updating the views for A(x{})
 
 		Updating the views for C(x{})
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -506,6 +512,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{u}[.]), C(x{p}[.]), ., . -> A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) (File "test_delta.ka", line 2, characters 0-70:):
@@ -516,6 +526,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 		Updating the views for A(x{})
 
 		Updating the views for C(x{})
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -525,6 +536,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) -> A(x{u}[.]), C(x{p}[.]), ., . (File "test_delta.ka", line 2, characters 0-70:):
@@ -537,6 +552,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 		Updating the views for B(x{})
 
 		Updating the views for B(x{})
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -546,6 +562,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 ------------------------------------------------------------
 every rule may be applied

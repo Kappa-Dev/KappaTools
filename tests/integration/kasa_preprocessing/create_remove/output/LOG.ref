@@ -1,100 +1,9 @@
 Parsing create.ka...
 done
-Signature:
-Signature:agents:
-Signature:agents:agent_type:0:A
-Signature:agents:agent_type:1:B
-Signature:agents:agent_type:2:C
-Signature:sites:
-Signature:sites:0:
-Signature:sites:1:
-Signature:sites:2:
-Signature:states: 
-Signature:duals: 
-Signature: 
-Signature:agents info:0:
-A -> 2File "create.ka", line 5, characters 8-9:File "create.ka", line 11, characters 7-8:
-Signature:agents info:1:
-B -> 3File "create.ka", line 6, characters 8-9:File "create.ka", line 11, characters 14-15:File "create.ka", line 12, characters 7-8:
-Signature:agents info:2:
-C -> 2File "create.ka", line 7, characters 8-9:File "create.ka", line 12, characters 14-15:
 Compiling...
 Generating the raw contact map...
-Compilation:Compilation:agent definition:0:A:
-Compilation:agent definition:       File "create.ka", line 5, characters 8-9:
-Compilation:agent definition:       File "create.ka", line 11, characters 7-8:
-Compilation:agent definition:1:B:
-Compilation:agent definition:       File "create.ka", line 6, characters 8-9:
-Compilation:agent definition:       File "create.ka", line 11, characters 14-15:
-Compilation:agent definition:       File "create.ka", line 12, characters 7-8:
-Compilation:agent definition:2:C:
-Compilation:agent definition:       File "create.ka", line 7, characters 8-9:
-Compilation:agent definition:       File "create.ka", line 12, characters 14-15:
-Compilation:rules:0:
-Compilation:rules:0:lhs:
-Compilation:rules:0:lhs:agent_id_0:
-Compilation:rules:0:lhs:agent_id_0:Ghost
-Compilation:rules:0:lhs:agent_id_1:
-Compilation:rules:0:rhs:
-Compilation:rules:0:rhs:agent_id_0:
-Compilation:rules:0:rhs:agent_id_1:
-Compilation:rules:0:rhs:agent_id_1:Ghost
-Compilation:rules:0:direct:
-Compilation:rules:0:direct:agent_id_0:
-Compilation:rules:0:reverse:
-Compilation:rules:0:reverse:agent_id_1:
-Compilation:rules:0:actions:deletion:(agent_id_1,agent_type_0)
-Compilation:rules:0:actions:creation:(agent_id_0,agent_type_1)
-Compilation:rules:1:
-Compilation:rules:1:lhs:
-Compilation:rules:1:lhs:agent_id_0:
-Compilation:rules:1:lhs:agent_id_0:Ghost
-Compilation:rules:1:lhs:agent_id_1:
-Compilation:rules:1:rhs:
-Compilation:rules:1:rhs:agent_id_0:
-Compilation:rules:1:rhs:agent_id_1:
-Compilation:rules:1:rhs:agent_id_1:Ghost
-Compilation:rules:1:direct:
-Compilation:rules:1:direct:agent_id_0:
-Compilation:rules:1:reverse:
-Compilation:rules:1:reverse:agent_id_1:
-Compilation:rules:1:actions:deletion:(agent_id_1,agent_type_1)
-Compilation:rules:1:actions:creation:(agent_id_0,agent_type_2)
 Generating the raw influence map...
-Quarks:Quarkify
-Quarks:Rule 0
-Quarks:TEST
-Quarks:rule_id:0,agent_type:0
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:rule_id:0,agent_type:1
-Quarks:REMOVAL
-Quarks:rule_id:0,agent_type:0
-Quarks:MODIFICATION+
-Quarks:MODIFICATION-
-Quarks:HALF BOND BREAKING
-Quarks:Rule 1
-Quarks:TEST
-Quarks:rule_id:1,agent_type:1
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:rule_id:1,agent_type:2
-Quarks:REMOVAL
-Quarks:rule_id:1,agent_type:1
-Quarks:MODIFICATION+
-Quarks:MODIFICATION-
-Quarks:HALF BOND BREAKING
-
-REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
-Quarks:agent_test**:agent_type:0,rule:0->[1]
-Quarks:agent_test**:agent_type:1,rule:1->[1]
-Quarks:agent_modif+:agent_type:1,rule:0->[0]
-Quarks:agent_modif+:agent_type:2,rule:1->[0]
-Quarks:agent_modif-:agent_type:0,rule:0->[1]
-Quarks:agent_modif-:agent_type:1,rule:1->[1]
 Refining the influence map...
-Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'r0' .,A()->B(),. -> rule(1):'r1' .,B()->C(),.[0->1]
 Reachability analysis...
 core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 0
 core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 1
@@ -109,12 +18,6 @@ core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
 
-	Applying rule r0 (File "create.ka", line 11, characters 0-23:):
-		the precondition is not satisfied yet
-
-	Applying rule r1 (File "create.ka", line 12, characters 0-23:):
-		the precondition is not satisfied yet
-
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
@@ -127,10 +30,6 @@ rule r1 (File "create.ka", line 12, characters 0-23:) will never be applied.
 A cannot occur in the model
 B cannot occur in the model
 C cannot occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -148,24 +47,4 @@ C cannot occur in the model
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-------------------------------------------------------------
-* Export Views domain - non relational properties to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Views domain - relational properties to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Connected agents to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Counters to JSon (internal constraints_list):
-------------------------------------------------------------
-
 execution finished without any exception

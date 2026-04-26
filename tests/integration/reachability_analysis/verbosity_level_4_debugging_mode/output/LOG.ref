@@ -471,6 +471,7 @@ core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 0 0 7 0
 
 		A(x{u},y{u},z{u})
 
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.0
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.1
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.2
@@ -483,6 +484,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 			(rule A(x{u}[.]) -> A(x{p}[.]) (File "../verbosity.ka", line 2, characters 0-28:)) should be investigated
 			(rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "../verbosity.ka", line 3, characters 0-44:)) should be investigated
@@ -502,6 +507,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 		A(x{p},y{u},z{u})
 
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.0
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.1
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.2
@@ -514,6 +520,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 			(rule A(x{u}[.]) -> A(x{p}[.]) (File "../verbosity.ka", line 2, characters 0-28:)) should be investigated
 
@@ -526,6 +536,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 		A(x{p},y{p},z{u})
 
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.0
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.1
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.2
@@ -538,6 +549,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 			(rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "../verbosity.ka", line 3, characters 0-44:)) should be investigated
 
@@ -550,6 +565,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 		A(x{o},y{p},z{q})
 
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.0
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.1
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.2
@@ -562,6 +578,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 			(rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{o}[.] y{p}[.] z{q}[.]) (File "../verbosity.ka", line 4, characters 0-60:)) should be investigated
 
@@ -574,6 +594,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 		A(x{q},y{u},z{u})
 
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.0
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.1
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.2
@@ -586,6 +607,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 			(rule A(x{u}[.]) -> A(x{q}[.]) (File "../verbosity.ka", line 5, characters 0-28:)) should be investigated
 
@@ -598,6 +623,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 		A(x{q},y{q},z{u})
 
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.0
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.1
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.2
@@ -610,6 +636,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 			(rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "../verbosity.ka", line 6, characters 0-44:)) should be investigated
 
@@ -622,6 +652,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 		A(x{q},y{q},z{q})
 
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.0
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.1
 core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.2
@@ -634,6 +665,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 			(rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:)) should be investigated
 
@@ -642,6 +677,7 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 
 	Applying rule . -> A(x{u}[.] y{u}[.] z{u}[.]) (File "../verbosity.ka", line 1, characters 0-35:):
 		the precondition is satisfied
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -651,12 +687,17 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "../verbosity.ka", line 2, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -666,12 +707,17 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "../verbosity.ka", line 3, characters 0-44:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -681,12 +727,17 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{o}[.] y{p}[.] z{q}[.]) (File "../verbosity.ka", line 4, characters 0-60:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -696,12 +747,17 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{u}[.]) -> A(x{q}[.]) (File "../verbosity.ka", line 5, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -711,12 +767,17 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{q}[.] y{u}[.]) -> A(x{q}[.] y{q}[.]) (File "../verbosity.ka", line 6, characters 0-44:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -726,12 +787,17 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(y{q}[.] z{u}[.]) -> A(y{q}[.] z{q}[.]) (File "../verbosity.ka", line 7, characters 0-44:):
 		the precondition is satisfied
 
 		Updating the views for A(x{},y{},z{})
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
@@ -741,6 +807,10 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
 core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
+=======
+		Update information about potential double bindings
+
+>>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 ------------------------------------------------------------

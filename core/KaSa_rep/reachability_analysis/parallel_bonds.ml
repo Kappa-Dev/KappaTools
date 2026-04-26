@@ -19,7 +19,7 @@
 
 let local_trace = false
 
-let check (a, b, c, d) parameters string =
+let _check (a, b, c, d) parameters string =
   if
     local_trace
     || Remanent_parameters.get_trace parameters
@@ -36,7 +36,7 @@ let check (a, b, c, d) parameters string =
     ()
   )
 
-let check_handler parameters handler error pos =
+let _check_handler parameters handler error pos =
   let error, handler, n =
     Ckappa_sig.Views_bdu.last_entry parameters handler error ()
   in
@@ -47,10 +47,8 @@ let check_handler parameters handler error pos =
             (Exception_without_parameter.get_caught_exception_list error)))
     Exit handler
 
-let _ = check_handler
-
-let print_parallel_constraint ?verbose ?sparse ?final_resul ?dump_any parameters
-    error kappa_handler x value bdu_handler restriction_mvbdu =
+let _print_parallel_constraint ?verbose ?sparse ?final_resul ?dump_any
+    parameters error kappa_handler x value bdu_handler restriction_mvbdu =
   if
     local_trace
     || Remanent_parameters.get_trace parameters
@@ -62,7 +60,7 @@ let print_parallel_constraint ?verbose ?sparse ?final_resul ?dump_any parameters
   else
     error, bdu_handler
 
-let print_guard_mvbdu parameters error kappa_handler handler g =
+let _print_guard_mvbdu parameters error kappa_handler handler g =
   if
     local_trace
     || Remanent_parameters.get_trace parameters
@@ -72,7 +70,7 @@ let print_guard_mvbdu parameters error kappa_handler handler g =
   else
     error, handler
 
-let print_guard_with_dummy_mvbdu parameters error kappa_handler handler data =
+let _print_guard_with_dummy_mvbdu parameters error kappa_handler handler data =
   if
     local_trace
     || Remanent_parameters.get_trace parameters
@@ -83,7 +81,7 @@ let print_guard_with_dummy_mvbdu parameters error kappa_handler handler data =
   else
     error, handler
 
-let print_newline parameters =
+let _print_newline parameters =
   if
     local_trace
     || Remanent_parameters.get_trace parameters
@@ -939,8 +937,6 @@ module Domain = struct
   let apply_gen pos parameters error static dynamic precondition rule_id rule =
     let closure = get_closure static in
     let store_value = get_value dynamic in
-    let kappa_handler = get_kappa_handler static in
-    let restriction_mvbdu = get_restriction_mvbdu static in
     let error, dynamic, mvbdu_false, mvbdu_true =
       let handler = get_mvbdu_handler dynamic in
       let error, handler, mvbdu_false =
@@ -1081,7 +1077,7 @@ module Domain = struct
                                 Ckappa_sig.Views_bdu.mvbdu_and parameters
                                   handler error g g'
                               in
-                              let tuple, tuple' =
+                              let tuple, _tuple' =
                                 match pos with
                                 | Fst ->
                                   ( ( ( agent_id,
@@ -1130,31 +1126,6 @@ module Domain = struct
                                         pre_state',
                                         state_specified' ) ) )
                               in
-                              let () =
-                                check __POS__ parameters
-                                  ("TEST PAIR OF STATES "
-                                  ^ Ckappa_sig.string_of_state_index pre_state
-                                  ^ " "
-                                  ^ Ckappa_sig.string_of_state_index pre_state'
-                                  )
-                              in
-                              let error, handler =
-                                print_parallel_constraint ~verbose:true
-                                  ~sparse:true ~final_resul:true ~dump_any:true
-                                  parameters error kappa_handler tuple' g_and
-                                  handler restriction_mvbdu
-                              in
-                              let error, handler =
-                                print_guard_mvbdu parameters error kappa_handler
-                                  handler g
-                              in
-                              let () = print_newline parameters in
-                              let error, handler =
-                                print_guard_mvbdu parameters error kappa_handler
-                                  handler g'
-                              in
-                              let () = print_newline parameters in
-
                               let potential_list =
                                 (tuple, g_and) :: current_list
                               in
@@ -1201,9 +1172,6 @@ module Domain = struct
                               precondition,
                               (*new_*) value )
                           else (
-                            let () =
-                              check __POS__ parameters "COMPATIBLE STATES"
-                            in
                             (* compatible states *)
                             let error, dynamic, precondition, update_value =
                               let error, closure_list =
@@ -1431,38 +1399,19 @@ module Domain = struct
         )
       in
       let bdu_handler = get_mvbdu_handler dynamic in
-
-      let () = check __POS__ parameters "FOLD_bin" in
       let error, (bdu_handler, store_value) =
         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold2
           parameters error
           (fun parameters error x value (bdu_handler, store_result) ->
-            let () = check __POS__ parameters "FOLD CAS 1" in
-            let error, bdu_handler =
-              print_parallel_constraint ~verbose:true ~sparse:true
-                ~final_resul:true ~dump_any:true parameters error kappa_handler
-                (snd x) value bdu_handler restriction_mvbdu
-            in
             Parallel_bonds_type.add_value_mvbdu_from_refined_tuple parameters
               error x bdu_handler store_result value restriction_mvbdu)
           (fun parameters error x value (bdu_handler, store_result) ->
-            let () = check __POS__ parameters "FOLD CAS 2" in
-            let error, bdu_handler =
-              print_parallel_constraint ~verbose:true ~sparse:true
-                ~final_resul:true ~dump_any:true parameters error kappa_handler
-                (snd x) value bdu_handler restriction_mvbdu
-            in
             Parallel_bonds_type.add_value_mvbdu_from_refined_tuple parameters
               error x bdu_handler store_result value restriction_mvbdu)
           (fun parameters error x value1 value2 (bdu_handler, store_result) ->
             let error, bdu_handler, new_value =
               Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler error value1
                 value2
-            in
-            let error, bdu_handler =
-              print_parallel_constraint ~verbose:true ~sparse:true
-                ~final_resul:true ~dump_any:true parameters error kappa_handler
-                (snd x) new_value bdu_handler restriction_mvbdu
             in
             Parallel_bonds_type.add_value_mvbdu_from_refined_tuple parameters
               error x bdu_handler store_result new_value restriction_mvbdu)
@@ -1473,7 +1422,6 @@ module Domain = struct
       (*--------------------------------------------------------------*)
       (*if it belongs to non parallel bonds then false*)
       (*deal with creation*)
-      let () = check __POS__ parameters "FOLD_bin" in
       let store_parallel_map =
         (*if can_we_prove_this_is_not_the_first_application precondition then*)
         (*it is not applied for the first time.
@@ -1494,7 +1442,6 @@ module Domain = struct
           error, Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
         | error, Some m -> error, m
       in
-      let () = check __POS__ parameters "FOLD_bin" in
       let error, bdu_handler, store_non_parallel =
         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
           (fun (_, y) b (error, bdu_handler, store_result) ->
@@ -1521,7 +1468,6 @@ module Domain = struct
       (*let dynamic = set_mvbdu_handler bdu_handler dynamic in*)
       (*--------------------------------------------------------------*)
       (*fold with store_value above*)
-      let () = check __POS__ parameters "FOLD_bin" in
       let error, map_value = error, store_value in
       let bool =
         if
@@ -1532,7 +1478,6 @@ module Domain = struct
         then
           bool
         else (
-          let () = dump_title () in
           let () = dump_title () in
           true
         )
@@ -1563,7 +1508,6 @@ module Domain = struct
             Parallel_bonds_type.PairAgentSite_map_and_set.Set.empty,
             store_result )
       in
-      let () = check __POS__ parameters "FOLD_bin" in
       let dynamic = set_value store_result dynamic in
       (*---------------------------------------------------------------------*)
       (*check the new event*)
@@ -1584,13 +1528,6 @@ module Domain = struct
                   (Usual_domains.Val (true, precondition_mvbdu))
                   precondition_mvbdu
               in
-              let () = check __POS__ parameters "STORE PARALLEL BONDS" in
-              let error, bdu_handler =
-                print_guard_with_dummy_mvbdu parameters error kappa_handler
-                  bdu_handler data
-              in
-              let () = print_newline parameters in
-              let () = check __POS__ parameters "DONE" in
               let error, store_result =
                 Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map
                 .add_or_overwrite parameters error pair data store_result

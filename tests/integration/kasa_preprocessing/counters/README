@@ -1,4 +1,4 @@
 #Command-line:
-"${KAPPABIN}"KaSa ../../compiler/counters/counters.ka --debugging-mode --output-directory output -syntax 4 || exit 0
+"${KAPPABIN}"KaSa ../../compiler/counters/counters.ka --output-directory output -syntax 4 || exit 0
 
 #Test on counters
