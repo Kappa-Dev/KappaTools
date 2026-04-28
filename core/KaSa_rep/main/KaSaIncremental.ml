@@ -100,34 +100,35 @@ let main () =
   let log = Remanent_parameters.get_logger parameters in
   let rec loop ?command state start_time =
     let () =
-      match start_time with
-      | None -> ()
-      | Some start_time ->
-        let () =
-          if Remanent_parameters.get_print_efficiency parameters then
-            Loggers.fprintf log "execution took "
-        in
-        let () = KaSaUtil.print_only_timing parameters start_time in
-        Loggers.print_newline log
+      if Remanent_parameters.get_print_efficiency parameters then (
+        match start_time with
+        | None -> ()
+        | Some start_time ->
+          let () = Loggers.fprintf log "execution took " in
+          let () = KaSaUtil.print_only_timing parameters start_time in
+          Loggers.print_newline log
+      )
     in
     let state =
-      match state with
-      | None -> None
-      | Some (summary, state) ->
+      match state, start_time with
+      | None, _ -> None
+      | s, None -> s
+      | Some (summary, state), Some _ ->
         let state = print_and_reset_errors state in
         Some (summary, state)
     in
-    let s =
-      match command with
-      | Some s -> s
-      | None ->
-        let () = Loggers.fprintf log "> " in
-        let () = Loggers.flush_logger log in
-        String.trim (read_line ())
-    in
     try
+      let s =
+        match command with
+        | Some s -> s
+        | None ->
+          let () = Loggers.fprintf log "> " in
+          let () = Loggers.flush_logger log in
+          String.trim (read_line ())
+      in
       let start_time = Some (Sys.time ()) in
       match s, state with
+      | "", _ -> loop state None
       | ("quit" | "q"), _ -> ()
       | ("help" | "h"), _ ->
         let () = Loggers.fprintf log "%s" help_message in
@@ -250,7 +251,7 @@ let main () =
             Export_to_KaSa.set_errors error state
         in
         loop (Some (summary, state)) start_time
-    with End_of_file -> ()
+    with End_of_file -> print_newline ()
   in
   loop ~command:"restart" None None
 
