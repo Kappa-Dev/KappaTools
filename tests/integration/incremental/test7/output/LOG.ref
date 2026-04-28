@@ -32,7 +32,6 @@ A(a{p}) => A(a{p},x[y.A])
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > Disabling initial states or rules at index 0...
 
@@ -67,7 +66,6 @@ B(b) => B(b{u})
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > Enabling initial states or rules at index 0...
 ------------------------------------------------------------
@@ -100,7 +98,6 @@ A(a{p}) => A(a{p},x[y.A])
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > Disabling initial states or rules at index 1...
 ------------------------------------------------------------
@@ -133,7 +130,6 @@ A(a{p}) => A(a{p},x[y.A])
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > Enabling initial states or rules at index 1...
 ------------------------------------------------------------
@@ -166,6 +162,5 @@ A(a{p}) => A(a{p},x[y.A])
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > 

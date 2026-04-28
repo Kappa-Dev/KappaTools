@@ -24,7 +24,6 @@ A(u) => A(u{u})
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 Parsing a_after.ka...
 done
@@ -53,6 +52,5 @@ A(u) => A(u{u})
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > 

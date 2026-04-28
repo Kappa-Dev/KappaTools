@@ -23,7 +23,6 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 Parsing a_after.ka...
 done
@@ -48,7 +47,6 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 Parsing a_before.ka...
 done
@@ -73,6 +71,5 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > 

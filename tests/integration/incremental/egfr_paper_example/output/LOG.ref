@@ -69,7 +69,6 @@ EGFR(n[c.EGFR],r[r.EGFR]) => EGFR(n[2],r[1]),EGFR(c[2],r[1])
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 Parsing a_after.ka...
 done
@@ -136,6 +135,5 @@ EGFR(n[c.EGFR],r[r.EGFR]) => EGFR(n[2],r[1]),EGFR(c[2],r[1])
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > 

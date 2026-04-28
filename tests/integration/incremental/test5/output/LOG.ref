@@ -32,7 +32,6 @@ B(y) => [ B(y[.]) v B(y[y.A]) ]
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 Parsing essai_diff.ka...
 done
@@ -76,6 +75,5 @@ B(x[x.A],y[y.A]) => B(x[1],y[2]),A(x[1],y[2])
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > 

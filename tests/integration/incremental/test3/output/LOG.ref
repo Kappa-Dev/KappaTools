@@ -27,7 +27,6 @@ A(y) => [ A(y{u}) v A(y{p}) ]
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 Parsing essai_diff.ka...
 done
@@ -58,6 +57,5 @@ A(x{p}) <=> A(y{p})
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > 

@@ -33,7 +33,6 @@ A(x) => [ A(x[.]) v A(x[x.A]) ]
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 Parsing essai_diff.ka...
 done
@@ -69,6 +68,5 @@ D cannot occur in the model
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-
 execution finished without any exception
 > 
