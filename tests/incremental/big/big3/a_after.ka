@@ -1,0 +1,8 @@
+'MAPK14_phospho_phosphorylation_TP73_phospho_2' MAPK14(T180~p?,phospho~p?),TP73(phospho~u) -> MAPK14(T180~p?,phospho~p?),TP73(phospho~p) @ 'kf_m_t_phosphorylation_11'
+'MAPK14_phospho_phosphorylation_TP73_phospho_3' MAPK14(Y~p?,phospho~p?),TP73(phospho~u) -> MAPK14(Y~p?,phospho~p?),TP73(phospho~p) @ 'kf_m_t_phosphorylation_11'
+'MAPK14_phosphoT180_phosphoY182_phosphorylation_CREB1_S133_1' MAPK14(T180~p?,Y182~p?),CREB1(S133~u) -> MAPK14(T180~p?,Y182~p?),CREB1(S133~p) @ 'kf_m_c_phosphorylation_2'
+'MAPK14_phosphoT180_phosphoY182_phosphorylation_CREB1_S133_2' MAPK14(T180~p?,Y182~p?),CREB1(S133~u) -> MAPK14(T180~p?,Y182~p?),CREB1(S133~p) @ 'kf_m_c_phosphorylation_2'
+'MAPK14_phosphoT180_phosphoY182_phosphorylation_CREB1_S133_3' MAPK14(T180~p?,Y182~p?,Y~p?),CREB1(S133~u) -> MAPK14(T180~p?,Y182~p?,Y~p?),CREB1(S133~p) @ 'kf_m_c_phosphorylation_2'
+'MAPK14_phosphoT180_phosphoY182_phosphorylation_ESR1_T311_1' MAPK14(T180~p?,Y182~p?),ESR1(T311~u) -> MAPK14(T180~p?,Y182~p?),ESR1(T311~p) @ 'kf_m_e_phosphorylation_7'
+'MAPK14_phosphoT180_phosphoY182_phosphorylation_ESR1_T311_2' MAPK14(T180~p?,Y182~p?),ESR1(T311~u) -> MAPK14(T180~p?,Y182~p?),ESR1(T311~p) @ 'kf_m_e_phosphorylation_7'
+'MAPK14_phosphoT180_phosphoY182_phosphorylation_ESR1_T311_3' MAPK14(T180~p?,Y182~p?,Y~p?),ESR1(T311~u) -> MAPK14(T180~p?,Y182~p?,Y~p?),ESR1(T311~p) @ 'kf_m_e_phosphorylation_7'
