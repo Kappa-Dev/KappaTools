@@ -180,6 +180,222 @@ core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 6 1 1 0
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 6 3 4 0
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 7 5 1 0
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 7 7 4 0
+=======
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 2
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 3
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 4
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 2
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 3
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 4
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 5
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 6
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 7
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 2
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 3
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 4
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 5
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 6
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 7
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 0 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 0 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 1 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 1 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 2 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 2 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 3 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 3 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 4 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 4 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 5 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 5 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 6 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 6 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 7 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 7 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 0 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 1 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 0 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 1 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 2 1 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 3 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 0 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 1 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 4 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 5 0 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 6 1 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 7 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 0 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 1 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 2 1 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 3 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 4 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 5 0 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 6 1 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 7 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 0 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 1 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 4 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 5 0 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 6 1 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 7 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 0 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 1 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 2 1 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 3 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 4 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 5 0 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 6 1 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 7 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 0 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 0 4 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 2 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 1 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 3 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 5 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 4 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 5 0 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 6 1 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 7 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 0 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 0 4 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 1 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 1 2 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 2 1 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 2 3 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 3 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 3 5 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 4 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 5 0 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 6 1 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 7 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 0 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 0 4 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 2 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 1 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 3 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 4 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 5 3 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 4 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 4 6 4 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 5 0 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 5 2 4 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 6 1 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 6 3 4 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 7 5 1 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 7 7 4 0
+>>>>>>> 6b44bc530 (remove Boolean parameters from Views signatures)
 
 	Applying rule ., ., ., . -> C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]) (File "site_accross_bonds_domain.ka", line 9, characters 0-56:):
 		the precondition is satisfied

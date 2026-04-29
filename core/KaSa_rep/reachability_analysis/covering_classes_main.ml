@@ -467,14 +467,14 @@ let length_sorted (l : Ckappa_sig.c_site_name list list) :
 (******************************************************************************)
 (*CLEANING*)
 let store_remanent parameters error covering_class _modified_map remanent
-    nr_guard_parameters =
+    _nr_guard_parameters =
   (*add each variable that occurs in a guard to each covering class*)
-  let guard_p_list =
+  (*let guard_p_list =
     Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
-  in
+  in*)
   let covering_class_with_guard_p =
-    List.map (fun x -> Ckappa_sig.Site x) covering_class
-    @ List.map (fun x -> Ckappa_sig.Guard_p x) guard_p_list
+    List.rev_map (fun x -> Ckappa_sig.Site x) (List.rev covering_class)
+    (*@ List.map (fun x -> Ckappa_sig.Guard_p x) guard_p_list*)
   in
   (*-------------------------------------------------------------------------*)
   (* current state of remanent*)

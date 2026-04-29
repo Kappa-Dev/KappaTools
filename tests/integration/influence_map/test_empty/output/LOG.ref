@@ -24,6 +24,28 @@ core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
+=======
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 2
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 3
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 2
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 No new CVS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 No new CVS in 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 No new CVS in 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 No new CVS in 2
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.938.18.25 NO NEW CV 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.938.18.25 NO NEW CV 2
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
+>>>>>>> 6b44bc530 (remove Boolean parameters from Views signatures)
 
 	Applying rule A(), B(), B(), . -> A(), ., ., C() (File "test_empty.ka", line 1, characters 0-35:):
 		the precondition is not satisfied yet

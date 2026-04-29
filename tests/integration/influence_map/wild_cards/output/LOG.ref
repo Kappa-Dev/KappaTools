@@ -5,6 +5,7 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+<<<<<<< HEAD
 core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 0
 core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 1
 core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 0
@@ -34,6 +35,51 @@ core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 0 0 0 0
 core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 2 2 0 0
+=======
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 2
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 2
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 0 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 0 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 1,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 1 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 1 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 2 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 2 -> 0
+core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 0 0 0 0
+core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 2 0 0
+>>>>>>> 6b44bc530 (remove Boolean parameters from Views signatures)
 
 ------------------------------------------------------------
 * There are some non applyable rules
