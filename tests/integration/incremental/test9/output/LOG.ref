@@ -68,6 +68,8 @@ EGFR(r) => [ EGFR(r[.]) v EGFR(r[r.EGFR]) ]
 EGFR(c[n.EGFR]) => EGFR(c[n.EGFR],r[r.EGFR])
 EGFR(n[c.EGFR]) => EGFR(n[c.EGFR],r[r.EGFR])
 EGFR(r[r.EGFR]) => EGFR(l[r.EGF],r[r.EGFR])
+EGFR(c,r[.]) => EGFR(c[.],r[.])
+EGFR(n,r[.]) => EGFR(n[.],r[.])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------

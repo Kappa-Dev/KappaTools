@@ -36,9 +36,6 @@ A cannot occur in the model
 execution finished without any exception
 Parsing essai_diff.ka...
 done
-130:1
-130:2
-130:3
 
 ------------------------------------------------------------
 * There are some non applyable rules
@@ -73,13 +70,5 @@ A(y) => A(y{u})
 ------------------------------------------------------------
 * Properties of counters
 ------------------------------------------------------------
-<<<<<<< HEAD
-
-Some exceptions have been raised
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 206; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 206; exception:Exit
-error: file_name: core/KaSa_rep/more_datastructures/int_storage.ml; message: line 206; exception:Exit
-=======
 execution finished without any exception
->>>>>>> f167503d0 (update integration tests)
 > 

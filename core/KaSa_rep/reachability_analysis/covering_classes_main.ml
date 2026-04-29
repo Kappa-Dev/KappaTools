@@ -51,7 +51,6 @@ let is_there_new_cv_in_agent ~modified_agents parameters error agent =
   | error, None -> error, false
   | error, Some a -> error, a
 
-
 (*******************************************************************************)
 let compare_unit_covering_class_id _ _ = Covering_classes_type.dummy_cv_id
 
@@ -440,8 +439,7 @@ let clean_classes ?patch parameters error covering_classes modified_map
           Covering_classes_type.store_pointer_backward = init_pointer;
           Covering_classes_type.store_dic = init_store_dic;
         } )
-    | Some a ->
-      error, a
+    | Some a -> error, a
   in
   (*------------------------------------------------------------------------*)
   (*cleaning*)
@@ -470,8 +468,7 @@ let clean_classes ?patch parameters error covering_classes modified_map
         in
         let rec aux to_visit potential_supersets =
           match to_visit with
-          | [] ->
-              error, bool, remanent
+          | [] -> error, bool, remanent
           | t' :: tl' ->
             (* get the set of list(id) containing t' *)
             let error, potential_supersets' =
@@ -497,7 +494,7 @@ let clean_classes ?patch parameters error covering_classes modified_map
               Covering_classes_type.CV_map_and_set.Set.is_empty
                 potential_superset
             then (
-                let error, result_covering_dic =
+              let error, result_covering_dic =
                 store_remanent parameters error covering_class modified_map
                   remanent nr_guard_parameters
               in
@@ -509,7 +506,7 @@ let clean_classes ?patch parameters error covering_classes modified_map
         (*check the beginning state of a superset*)
         if Covering_classes_type.CV_map_and_set.Set.is_empty potential_supersets
         then (
-           (*if it is empty then store it to remanent*)
+          (*if it is empty then store it to remanent*)
           let error, result_covering_dic =
             store_remanent parameters error covering_class modified_map remanent
               nr_guard_parameters
@@ -553,15 +550,14 @@ let scan_rule_set_remanent ?patch ~modified_agents parameters error
               Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif
               .unsafe_get parameters error id init_result
             with
-            | error, None ->
-              error, Covering_classes_type.dummy_cv_id
+            | error, None -> error, Covering_classes_type.dummy_cv_id
             | error, Some a ->
               let error, a =
                 Covering_classes_type.Dictionary_of_List_sites_or_guard
                 .last_entry parameters error a.Covering_classes_type.store_dic
               in
               let a = Covering_classes_type.next_cv_id a in
-                error, a)
+              error, a)
       in
       error, Some a
     )
@@ -779,9 +775,9 @@ let list_of_site_type_in_covering_class ?patch ?start_cv ~modified_agents
           is_there_new_cv_in_agent ~modified_agents parameters error
             agent_type_cv
         in
-        if not bool then (
-               error, store_result
-        ) else (
+        if not bool then
+          error, store_result
+        else (
           let cv_dic = remenent.Covering_classes_type.store_dic in
           let error, cv_max =
             compute_cv_max ?start_cv parameters error agent_type_cv
@@ -791,7 +787,7 @@ let list_of_site_type_in_covering_class ?patch ?start_cv ~modified_agents
               if ignore_cv ~cv_max cv_id then
                 error, store_result
               else (
-                  let error, old =
+                let error, old =
                   Common_map.get_pair_agent_cv parameters error
                     (agent_type_cv, cv_id) store_result
                 in

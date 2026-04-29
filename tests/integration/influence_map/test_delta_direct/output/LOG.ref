@@ -370,185 +370,30 @@ Influence_map:Inhibition_map:rule(2):'' A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,
 Influence_map:Inhibition_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,. -> rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,.[2->3];[3->2]
 Influence_map:Inhibition_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,. -> var(0):'qb' B()[2->0];[3->0]
 Reachability analysis...
-<<<<<<< HEAD
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.394.24.31 ADD SINGLE 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 1
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 2
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.435.16.23 SCAN RULE 3
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.735.16.23 AGENT 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.632.25.32 STORE NEW CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.633.40.47 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.735.16.23 AGENT 1
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.632.25.32 STORE NEW CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.633.40.47 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.589.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.590.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.589.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.590.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.589.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.590.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.589.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.590.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.735.16.23 AGENT 2
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.632.25.32 STORE NEW CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.633.40.47 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.589.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.590.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.589.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.590.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs in 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs in 1
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.822.46.53 New CVs in 2
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.938.24.31 NEW LIST: 0 -> 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.938.24.31 NEW LIST: 1 -> 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.938.24.31 NEW LIST: 2 -> 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1064.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 1 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 2 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1064.14.21 1 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1064.14.21 2 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1064.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 1 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 2 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 2 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 3 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1060.17.24 BEFORE
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1064.14.21 1 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1064.14.21 2 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1064.14.21 2 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1064.14.21 3 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1064.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1078.17.24 AFTER
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 1 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 1 2 3 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 2 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 2 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 3 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1082.14.21 3 2 0 0
-=======
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.405.24.31 ADD SINGLE 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 1
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 2
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.446.16.23 SCAN RULE 3
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 1
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.746.16.23 AGENT 2
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.643.25.32 STORE NEW CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.644.40.47 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.600.27.34 DISCARD CLASS
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.601.42.49 -> 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 1
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.833.46.53 New CVs in 2
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 0 -> 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 0 -> 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 1 -> 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 1 -> 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.949.18.25 CV MAX -1
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.954.22.29 CHECK LIST: 2 -> 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.962.26.33 0,
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.974.24.31 NEW LIST: 2 -> 0
-core/KaSa_rep/reachability_analysis/covering_classes_main.ml.982.28.35 0,
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 1 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 2 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1091.17.24 BEFORE
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 1 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 2 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 2 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 3 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1095.14.21 3 2 0 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1109.17.24 AFTER
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 1 2 3 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 1 1 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 2 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 1 2 0
-core/KaSa_rep/reachability_analysis/bdu_static_views.ml.1113.14.21 3 2 0 0
->>>>>>> 6b44bc530 (remove Boolean parameters from Views signatures)
 	Views in initial state:
 
 		A(x{u})
 
-core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.0
 	Views in initial state:
 
 		A(x{p})
 
-core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 0.0
 	Views in initial state:
 
 		B(x{u})
 
-core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 1.0
 	Views in initial state:
 
 		B(x{p})
 
-core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 1.0
 	Views in initial state:
 
 		C(x{u})
 
-core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 2.0
 	Views in initial state:
 
 		C(x{p})
 
-core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 2.0
 
 	Applying rule A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . -> A(x{u}[.]), ., ., C(x{u}[.]) (File "test_delta.ka", line 1, characters 0-70:):
 		the precondition is satisfied
@@ -560,20 +405,8 @@ core/KaSa_rep/reachability_analysis/views_domain.ml.864.18.25 MODIFIED SITES 2.0
 		Updating the views for B(x{})
 
 		Updating the views for B(x{})
-<<<<<<< HEAD
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
-		Update information about potential double bindings
-
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
-=======
-		Update information about potential double bindings
-
->>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{u}[.]), ., ., C(x{u}[.]) -> A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . (File "test_delta.ka", line 1, characters 0-70:):
@@ -584,20 +417,8 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 		Updating the views for A(x{})
 
 		Updating the views for C(x{})
-<<<<<<< HEAD
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
-		Update information about potential double bindings
-
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
-=======
-		Update information about potential double bindings
-
->>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{u}[.]), C(x{p}[.]), ., . -> A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) (File "test_delta.ka", line 2, characters 0-70:):
@@ -608,20 +429,8 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 		Updating the views for A(x{})
 
 		Updating the views for C(x{})
-<<<<<<< HEAD
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
-		Update information about potential double bindings
-
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
-=======
-		Update information about potential double bindings
-
->>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 
 	Applying rule A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) -> A(x{u}[.]), C(x{p}[.]), ., . (File "test_delta.ka", line 2, characters 0-70:):
@@ -634,20 +443,8 @@ core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
 		Updating the views for B(x{})
 
 		Updating the views for B(x{})
-<<<<<<< HEAD
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1435.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1476.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1497.21.28 FOLD_bin
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1524.21.28 FOLD_bin
 		Update information about potential double bindings
 
-		Update information about potential double bindings
-
-core/KaSa_rep/reachability_analysis/parallel_bonds.ml.1566.21.28 FOLD_bin
-=======
-		Update information about potential double bindings
-
->>>>>>> 8a96f1a66 (ligher logs for lower continuous intergration payload)
 
 ------------------------------------------------------------
 every rule may be applied
