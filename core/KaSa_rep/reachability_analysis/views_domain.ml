@@ -3094,15 +3094,6 @@ module Domain = struct
   (**************************************************************************)
   (*apply rules in different cases*)
 
-  let can_we_prove_this_is_the_first_application precondition =
-    match Communication.is_the_rule_applied_for_the_first_time precondition with
-    | Usual_domains.Sure_value b ->
-      if b then
-        true
-      else
-        false
-    | Usual_domains.Maybe -> false
-
   let compute_views_enabled static dynamic error rule_id precondition =
     (* get information about guard parameters from precondition *)
     let parameters = get_parameter static in
@@ -3117,21 +3108,13 @@ module Domain = struct
     in
     (*-----------------------------------------------------------------------*)
     (*deal with creation*)
-    let error, dynamic, event_list =
-      let b = can_we_prove_this_is_the_first_application precondition in
-      if b then (
-        (*if Sure_value is true then compute creation_enabled*)
         let error, dynamic, event_list =
           compute_views_creation_enabled static dynamic error rule_id event_list
             precondition_guard_bdu
         in
         error, dynamic, event_list
-      ) else
-        (*Sure_value is false*)
-        error, dynamic, event_list
-    in
-    error, dynamic, event_list
-
+      
+   
   (**************************************************************)
 
   let apply_rule static dynamic error rule_id precondition =
