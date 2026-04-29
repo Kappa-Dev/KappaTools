@@ -15,53 +15,6 @@
 
 let local_trace = false
 
-let check ?force (a, b, c, d) parameters string =
-  if
-    local_trace
-    || (match force with
-       | Some true -> true
-       | _ -> false)
-    || Remanent_parameters.get_trace parameters
-    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
-  then (
-    let () =
-      Loggers.fprintf
-        (Remanent_parameters.get_logger parameters)
-        "%s.%i.%i.%i %s" a b c d string
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-    ()
-  )
-
-let print_newline ?force parameters =
-  if
-    local_trace
-    || (match force with
-       | Some true -> true
-       | _ -> false)
-    || Remanent_parameters.get_trace parameters
-    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
-  then (
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-    ()
-  )
-
-let print_list ?force f g p h e r =
-  if
-    local_trace
-    || (match force with
-       | Some true -> true
-       | _ -> false)
-    || Remanent_parameters.get_trace p
-    || Remanent_parameters.get_dump_reachability_analysis_diff p
-  then
-    Usual_domains.print_list f g p h e r
-  else
-    e, h
 (***************************************************************************)
 (*TYPE of pattern*)
 (***************************************************************************)
@@ -1083,48 +1036,20 @@ let scan_rule_static ?start_cv ~modified_agents parameters log_info error
   (*------------------------------------------------------------------------*)
   let (error, handler_bdu), store_proj_bdu_creation_restriction_map =
     collect_proj_bdu_creation_restriction_map ?start_cv ~modified_agents
-      parameters handler_bdu error rule_id rule (*store_new_index_pair_map*)
+      parameters handler_bdu error rule_id rule 
       store_remanent_triple store_result.store_proj_bdu_creation_restriction_map
       guard_mvbdus restriction_bdu
   in
-  (*-----------------------------------------------------------------------*)
-  
-  
-  let () = check __POS__ parameters (Format.sprintf "BEFORE") in
-  let () =
-    Covering_classes_type.AgentsRuleCV_map_and_set.Map.iter
-      (fun (a, b, c, d) _ ->
-        check __POS__ parameters
-          (Format.sprintf "%i %i %i %i"
-             (Ckappa_sig.int_of_agent_id a)
-             (Ckappa_sig.int_of_agent_name b)
-             (Ckappa_sig.int_of_rule_id c)
-             (Covering_classes_type.int_of_cv_id d)))
-      store_result.store_modif_list_restriction_map
-  in  
+  (*-----------------------------------------------------------------------*) 
   let error, (handler_bdu, store_modif_list_restriction_map) =
     collect_modif_list_restriction_map ?start_cv ~modified_agents parameters
       handler_bdu error rule_id rule
-      (*store_new_index_pair_map*)
       store_remanent_triple store_result.store_modif_list_restriction_map
   in
-  let () = check __POS__ parameters (Format.sprintf "AFTER") in
-  let () =
-    Covering_classes_type.AgentsRuleCV_map_and_set.Map.iter
-      (fun (a, b, c, d) _ ->
-        check __POS__ parameters
-          (Format.sprintf "%i %i %i %i"
-             (Ckappa_sig.int_of_agent_id a)
-             (Ckappa_sig.int_of_agent_name b)
-             (Ckappa_sig.int_of_rule_id c)
-             (Covering_classes_type.int_of_cv_id d)))
-      store_modif_list_restriction_map
-  in
-  (*-----------------------------------------------------------------------*)
-   (*------------------------------------------------------------------------*)
+  (*------------------------------------------------------------------------*)
   let (error, handler_bdu), store_proj_bdu_test_restriction =
     collect_proj_bdu_test_restriction ?start_cv ~modified_agents parameters
-      handler_bdu error rule_id rule (*store_new_index_pair_map*)
+      handler_bdu error rule_id rule 
       store_remanent_triple store_result.store_proj_bdu_test_restriction
       guard_mvbdus
   in
@@ -1151,19 +1076,15 @@ let scan_rule_set ?start ?start_cv ~modified_agents parameters log_info
     store_remanent_triple guard_mvbdus restriction_bdu init =
   (*let error, init = init_bdu_analysis_static parameters error in*)
   let nsites = Handler.get_nsites handler_kappa in
-  (*let error, init' = 
+  let error, init' = 
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create 
                   parameters error 0 
             in 
   let error, store_remanent_triple' = 
     match start_cv with 
     | None -> 
-        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "DO NOT COMPRESS"  in 
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)  in
-    error, store_remanent_triple 
+         error, store_remanent_triple 
     | Some _ -> 
-      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "COMPRESS STORE REMANENT TRIPLE"  in 
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)  in       
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold 
       parameters error 
          (fun parameters error ag_id l store_remanent_triple -> 
@@ -1174,8 +1095,7 @@ let scan_rule_set ?start ?start_cv ~modified_agents parameters log_info
           error, store_remanent_triple 
          else 
           let error, cv_max = Covering_classes_main.compute_cv_max ?start_cv parameters error ag_id in 
-          let n = List.length l in 
-          let l = 
+           let l = 
             List.fold_left 
               (fun l (a,c,d) -> 
                 let b = Covering_classes_main.ignore_cv ~cv_max  a in 
@@ -1183,12 +1103,11 @@ let scan_rule_set ?start ?start_cv ~modified_agents parameters log_info
                 (a,c,d)::l)
               [] (List.rev l)
           in 
-          let n' = List.length l in 
           if l = [] then error, store_remanent_triple 
           else Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
               parameters error ag_id l store_remanent_triple)             
         store_remanent_triple init'
-    in *)
+    in 
   let (error, handler_bdu), 
   
   store_proj_bdu_potential_restriction_map =
@@ -1196,7 +1115,7 @@ let scan_rule_set ?start ?start_cv ~modified_agents parameters log_info
       parameters handler_bdu error (*store_new_index_pair_map*)
       store_remanent_triple store_potential_side_effects
   init.store_proj_bdu_potential_restriction_map guard_mvbdus
-      restriction_bdu (* WHAT ??? *) 
+      restriction_bdu  
   in
   let init = {init with store_proj_bdu_potential_restriction_map} in 
 
@@ -1207,7 +1126,7 @@ let scan_rule_set ?start ?start_cv ~modified_agents parameters log_info
         let error, log_info, handler_bdu, store_result =
           scan_rule_static ?start_cv ~modified_agents parameters log_info
             error handler_bdu rule_id rule.Cckappa_sig.e_rule_c_rule
-            store_remanent_triple(*'*) store_potential_side_effects compiled
+            store_remanent_triple' store_potential_side_effects compiled
             store_result guard_mvbdus restriction_bdu
         in
         error, (handler_bdu, log_info, store_result))

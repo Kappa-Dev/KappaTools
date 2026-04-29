@@ -19,54 +19,6 @@
 let domain_name = "View domain"
 let local_trace = false
 
-let _check ?force (a, b, c, d) parameters string =
-  if
-    local_trace
-    || (match force with
-       | Some true -> true
-       | _ -> false)
-    || Remanent_parameters.get_trace parameters
-    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
-  then (
-    let () =
-      Loggers.fprintf
-        (Remanent_parameters.get_logger parameters)
-        "%s.%i.%i.%i %s" a b c d string
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-    ()
-  )
-
-let _print_newline ?force parameters =
-  if
-    local_trace
-    || (match force with
-       | Some true -> true
-       | _ -> false)
-    || Remanent_parameters.get_trace parameters
-    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
-  then (
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-    ()
-  )
-
-let _print_list ?force f g p h e r =
-  if
-    local_trace
-    || (match force with
-       | Some true -> true
-       | _ -> false)
-    || Remanent_parameters.get_trace p
-    || Remanent_parameters.get_dump_reachability_analysis_diff p
-  then
-    Usual_domains.print_list f g p h e r
-  else
-    e, h
-
 let print_composite_bdu ?force ~threshold parameters kappa_handler bdu_handler
     error bdu =
   if
@@ -859,12 +811,6 @@ module Domain = struct
     let error, event_list =
       Communication.fold_sites parameters error
         (fun _ error s _ event_list ->
-          let () =
-            check __POS__ parameters
-              (Format.sprintf "MODIFIED SITES %i.%i"
-                 (Ckappa_sig.int_of_agent_name (fst s))
-                 (Ckappa_sig.int_of_site_name (snd s)))
-          in
           error, Communication.Modified_sites s :: event_list)
         modified_sites event_list
     in
@@ -1518,7 +1464,6 @@ module Domain = struct
     in
     let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
     let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
-
     error, dynamic, new_answer
 
   (***************************************************************)
@@ -3757,7 +3702,6 @@ module Domain = struct
           get_fixpoint_result_without_working_set_vars parameters error static
             dynamic
         in
-        let () = check __POS__ parameters "After projection" in
         let error, dynamic, () =
           print_fixpoint_result static dynamic error fixpoint_result
         in

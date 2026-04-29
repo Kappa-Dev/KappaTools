@@ -14,94 +14,6 @@
 
 let trace = false
 
-let check ?force (a, b, c, d) parameters string =
-  if
-    trace
-    || (match force with
-       | Some true -> true
-       | _ -> false)
-    || Remanent_parameters.get_trace parameters
-    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
-  then (
-    let () =
-      Loggers.fprintf
-        (Remanent_parameters.get_logger parameters)
-        "%s.%i.%i.%i %s" a b c d string
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-    ()
-  )
-
-let print_newline ?force parameters =
-  if
-    trace
-    || (match force with
-       | Some true -> true
-       | _ -> false)
-    || Remanent_parameters.get_trace parameters
-    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
-  then (
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-    ()
-  )
-
-let print_covering_class ?force (a, b, c, d) parameters l =
-  if
-    trace
-    || (match force with
-       | Some true -> true
-       | _ -> false)
-    || Remanent_parameters.get_trace parameters
-    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
-  then (
-    let () =
-      Loggers.fprintf
-        (Remanent_parameters.get_logger parameters)
-        "%s.%i.%i.%i -> " a b c d
-    in
-    let () =
-      List.iter
-        (fun i ->
-          Loggers.fprintf
-            (Remanent_parameters.get_logger parameters)
-            "%i,"
-            (Ckappa_sig.int_of_site_name i))
-        l
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-    ()
-  )
-
-let print_cv_set ?force __POS__ parameters set =
-  if
-    trace
-    || (match force with
-       | Some true -> true
-       | _ -> false)
-    || Remanent_parameters.get_trace parameters
-    || Remanent_parameters.get_dump_reachability_analysis_diff parameters
-  then (
-    let () =
-      Covering_classes_type.CV_map_and_set.Set.iter
-        (fun i ->
-          Loggers.fprintf
-            (Remanent_parameters.get_logger parameters)
-            "%i,"
-            (Covering_classes_type.int_of_cv_id i))
-        set
-    in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameters)
-    in
-    ()
-  )
-
 let compute_cv_max ?start_cv parameters error agent_type =
   match start_cv with
   | None -> error, -1
@@ -139,33 +51,6 @@ let is_there_new_cv_in_agent ~modified_agents parameters error agent =
   | error, None -> error, false
   | error, Some a -> error, a
 
-let print_start_cv ~modified_agents pos parameters error =
-  let a, b = modified_agents in
-  let () =
-    check pos parameters
-      (Format.sprintf "%s"
-         (if b then
-            "New CVs"
-          else
-            "No new CVS"))
-  in
-  let error =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.iter parameters
-      error
-      (fun parameters error ag b ->
-        let () =
-          check pos parameters
-            (Format.sprintf "%s in %i"
-               (if b then
-                  "New CVs"
-                else
-                  "No new CVS")
-               (Ckappa_sig.int_of_agent_name ag))
-        in
-        error)
-      a
-  in
-  error
 
 (*******************************************************************************)
 let compare_unit_covering_class_id _ _ = Covering_classes_type.dummy_cv_id
@@ -401,12 +286,6 @@ let scan_rule_set_covering_classes ?start parameters error kappa_handler rules =
               if bool then
                 error, init_class
               else (
-                let () =
-                  check __POS__ parameters
-                    (Format.sprintf "ADD SINGLE %i"
-                       (Ckappa_sig.int_of_site_name b))
-                in
-
                 (* we could avoid this step, if we know that the site was already present *)
                 let error, l' =
                   match
@@ -441,11 +320,7 @@ let scan_rule_set_covering_classes ?start parameters error kappa_handler rules =
   let error, store_covering_classes =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters
       error
-      (fun parameters error rule_id rule classes ->
-        let () =
-          check __POS__ parameters
-            (Format.sprintf "SCAN RULE %i" (Ckappa_sig.int_of_rule_id rule_id))
-        in
+      (fun parameters error _rule_id rule classes ->
         let error, result =
           scan_rule_covering_classes parameters error kappa_handler
             rule.Cckappa_sig.e_rule_c_rule classes
@@ -470,8 +345,8 @@ let store_remanent parameters error covering_class _modified_map remanent
     _nr_guard_parameters =
   (*add each variable that occurs in a guard to each covering class*)
   (*let guard_p_list =
-    Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
-  in*)
+      Ckappa_sig.get_list_of_guard_parameters nr_guard_parameters
+    in*)
   let covering_class_with_guard_p =
     List.rev_map (fun x -> Ckappa_sig.Site x) (List.rev covering_class)
     (*@ List.map (fun x -> Ckappa_sig.Guard_p x) guard_p_list*)
@@ -566,7 +441,6 @@ let clean_classes ?patch parameters error covering_classes modified_map
           Covering_classes_type.store_dic = init_store_dic;
         } )
     | Some a ->
-      let () = check __POS__ parameters "CLEAN CLASSES (inc)" in
       error, a
   in
   (*------------------------------------------------------------------------*)
@@ -597,9 +471,7 @@ let clean_classes ?patch parameters error covering_classes modified_map
         let rec aux to_visit potential_supersets =
           match to_visit with
           | [] ->
-            let () = check __POS__ parameters "DISCARD CLASS" in
-            let () = print_covering_class __POS__ parameters covering_class in
-            error, bool, remanent
+              error, bool, remanent
           | t' :: tl' ->
             (* get the set of list(id) containing t' *)
             let error, potential_supersets' =
@@ -617,7 +489,6 @@ let clean_classes ?patch parameters error covering_classes modified_map
               Covering_classes_type.CV_map_and_set.Set.inter parameters error
                 potential_supersets potential_supersets'
             in
-            let () = print_cv_set __POS__ parameters potential_superset in
             let error =
               Exception.check_point Exception.warn parameters error error'
                 __POS__ Exit
@@ -626,9 +497,7 @@ let clean_classes ?patch parameters error covering_classes modified_map
               Covering_classes_type.CV_map_and_set.Set.is_empty
                 potential_superset
             then (
-              let () = check __POS__ parameters "STORE NEW CLASS" in
-              let () = print_covering_class __POS__ parameters covering_class in
-              let error, result_covering_dic =
+                let error, result_covering_dic =
                 store_remanent parameters error covering_class modified_map
                   remanent nr_guard_parameters
               in
@@ -640,9 +509,7 @@ let clean_classes ?patch parameters error covering_classes modified_map
         (*check the beginning state of a superset*)
         if Covering_classes_type.CV_map_and_set.Set.is_empty potential_supersets
         then (
-          let () = check __POS__ parameters "STORE NEW CLASS" in
-          let () = print_covering_class __POS__ parameters covering_class in
-          (*if it is empty then store it to remanent*)
+           (*if it is empty then store it to remanent*)
           let error, result_covering_dic =
             store_remanent parameters error covering_class modified_map remanent
               nr_guard_parameters
@@ -687,14 +554,6 @@ let scan_rule_set_remanent ?patch ~modified_agents parameters error
               .unsafe_get parameters error id init_result
             with
             | error, None ->
-              let () =
-                check __POS__ parameters
-                  (Format.sprintf "init diff agent: %i -> %i"
-                     (Ckappa_sig.int_of_agent_name id)
-                     (Covering_classes_type.int_of_cv_id
-                        Covering_classes_type.dummy_cv_id))
-              in
-              let () = print_newline parameters in
               error, Covering_classes_type.dummy_cv_id
             | error, Some a ->
               let error, a =
@@ -702,14 +561,7 @@ let scan_rule_set_remanent ?patch ~modified_agents parameters error
                 .last_entry parameters error a.Covering_classes_type.store_dic
               in
               let a = Covering_classes_type.next_cv_id a in
-              let () =
-                check __POS__ parameters
-                  (Format.sprintf "init diff agent: %i -> %i"
-                     (Ckappa_sig.int_of_agent_name id)
-                     (Covering_classes_type.int_of_cv_id a))
-              in
-              let () = print_newline parameters in
-              error, a)
+                error, a)
       in
       error, Some a
     )
@@ -742,11 +594,6 @@ let scan_rule_set_remanent ?patch ~modified_agents parameters error
         in
         (*-----------------------------------------------------------------*)
         (*clean the covering classes, removed duplicate of covering classes*)
-        let () =
-          check __POS__ parameters
-            (Format.sprintf "AGENT %i"
-               (Ckappa_sig.int_of_agent_name agent_type))
-        in
         let error, bool, store_remanent_dic =
           clean_classes ?patch parameters error covering_class modified_map
             (Handler.get_nr_guard_parameters kappa_handler)
@@ -830,7 +677,6 @@ let scan_rule_set_remanent ?patch ~modified_agents parameters error
       result_covering_classes
       (start_cv, modified_agents, init_result)
   in
-  let error = print_start_cv ~modified_agents __POS__ parameters error in
   error, remanent_dictionary, modified_agents, start_cv
 
 (**************************************************************************)
@@ -934,59 +780,18 @@ let list_of_site_type_in_covering_class ?patch ?start_cv ~modified_agents
             agent_type_cv
         in
         if not bool then (
-          let () =
-            check __POS__ parameters
-              (Format.sprintf "NO NEW CV %i"
-                 (Ckappa_sig.int_of_agent_name agent_type_cv))
-          in
-          error, store_result
+               error, store_result
         ) else (
           let cv_dic = remenent.Covering_classes_type.store_dic in
           let error, cv_max =
             compute_cv_max ?start_cv parameters error agent_type_cv
           in
-          let () =
-            check __POS__ parameters (Format.sprintf "CV MAX %i" cv_max)
-          in
           Covering_classes_type.Dictionary_of_List_sites_or_guard.fold
             (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
-              let () =
-                check __POS__ parameters
-                  (Format.sprintf "CHECK LIST: %i -> %i"
-                     (Ckappa_sig.int_of_agent_name agent_type_cv)
-                     (Covering_classes_type.int_of_cv_id cv_id))
-              in
-              let () =
-                List.iter
-                  (fun a ->
-                    check __POS__ parameters
-                      (Format.sprintf "%i,"
-                         (match a with
-                         | Ckappa_sig.Site a -> Ckappa_sig.int_of_site_name a
-                         | Ckappa_sig.Guard_p _a -> 100000)))
-                  list_of_site_type
-              in
-
               if ignore_cv ~cv_max cv_id then
                 error, store_result
               else (
-                let () =
-                  check __POS__ parameters
-                    (Format.sprintf "NEW LIST: %i -> %i"
-                       (Ckappa_sig.int_of_agent_name agent_type_cv)
-                       (Covering_classes_type.int_of_cv_id cv_id))
-                in
-                let () =
-                  List.iter
-                    (fun a ->
-                      check __POS__ parameters
-                        (Format.sprintf "%i,"
-                           (match a with
-                           | Ckappa_sig.Site a -> Ckappa_sig.int_of_site_name a
-                           | Ckappa_sig.Guard_p _a -> 100000)))
-                    list_of_site_type
-                in
-                let error, old =
+                  let error, old =
                   Common_map.get_pair_agent_cv parameters error
                     (agent_type_cv, cv_id) store_result
                 in
