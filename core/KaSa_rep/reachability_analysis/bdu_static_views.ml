@@ -1024,7 +1024,7 @@ let scan_rule_static ?start_cv ~new_rule ~modified_agents parameters log_info er
       store_result.store_proj_bdu_creation_restriction_map guard_mvbdus
       restriction_bdu
   in
-  (*-----------------------------------------------------------------------*) 
+  (*-----------------------------------------------------------------------*)
   let error, (handler_bdu, store_modif_list_restriction_map) =
     collect_modif_list_restriction_map ?start_cv ~new_rule ~modified_agents parameters
       handler_bdu error rule_id rule store_remanent_triple
