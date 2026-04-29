@@ -796,6 +796,8 @@ let collect_proj_bdu_potential_restriction_map ?start ?start_cv ~modified_agents
   let store_result =
     Ckappa_sig.Rule_setmap.Map.fold
       (fun k m m' ->
+        if Covering_classes_type.AgentSiteCV_setmap.Map.is_empty m 
+        then m' else 
         if Covering_classes_main.is_new_rule ~start k then
           Ckappa_sig.Rule_setmap.Map.add k m m'
         else (
@@ -1065,17 +1067,15 @@ let collect_proj_bdu_test_restriction_pattern ?start_cv ~modified_agents
       pattern.Cckappa_sig.views store_result
   in
   error, store_result
-
 (***************************************************************************)
-
-let scan_rule_static ?start ?start_cv ~modified_agents parameters log_info error
+let scan_rule_static ?start_cv ~modified_agents parameters log_info error
     handler_bdu (rule_id : Ckappa_sig.c_rule_id) rule
     (*store_new_index_pair_map*)
-      store_remanent_triple store_potential_side_effects _compil store_result
+      store_remanent_triple _store_remanent_side_effects _compil store_result
     guard_mvbdus restriction_bdu =
   (*-----------------------------------------------------------------------*)
   (*pre_static*)
-  let error, log_info =
+ let error, log_info =
     StoryProfiling.StoryStats.add_event parameters error
       (StoryProfiling.Scan_rule_static (Ckappa_sig.int_of_rule_id rule_id))
       None log_info
@@ -1088,6 +1088,8 @@ let scan_rule_static ?start ?start_cv ~modified_agents parameters log_info error
       guard_mvbdus restriction_bdu
   in
   (*-----------------------------------------------------------------------*)
+  
+  
   let () = check __POS__ parameters (Format.sprintf "BEFORE") in
   let () =
     Covering_classes_type.AgentsRuleCV_map_and_set.Map.iter
@@ -1099,7 +1101,7 @@ let scan_rule_static ?start ?start_cv ~modified_agents parameters log_info error
              (Ckappa_sig.int_of_rule_id c)
              (Covering_classes_type.int_of_cv_id d)))
       store_result.store_modif_list_restriction_map
-  in
+  in  
   let error, (handler_bdu, store_modif_list_restriction_map) =
     collect_modif_list_restriction_map ?start_cv ~modified_agents parameters
       handler_bdu error rule_id rule
@@ -1119,14 +1121,7 @@ let scan_rule_static ?start ?start_cv ~modified_agents parameters log_info error
       store_modif_list_restriction_map
   in
   (*-----------------------------------------------------------------------*)
-  let (error, handler_bdu), store_proj_bdu_potential_restriction_map =
-    collect_proj_bdu_potential_restriction_map ?start ?start_cv ~modified_agents
-      parameters handler_bdu error (*store_new_index_pair_map*)
-      store_remanent_triple store_potential_side_effects
-      store_result.store_proj_bdu_potential_restriction_map guard_mvbdus
-      restriction_bdu
-  in
-  (*------------------------------------------------------------------------*)
+   (*------------------------------------------------------------------------*)
   let (error, handler_bdu), store_proj_bdu_test_restriction =
     collect_proj_bdu_test_restriction ?start_cv ~modified_agents parameters
       handler_bdu error rule_id rule (*store_new_index_pair_map*)
@@ -1146,7 +1141,6 @@ let scan_rule_static ?start ?start_cv ~modified_agents parameters log_info error
       store_result with
       store_proj_bdu_creation_restriction_map;
       store_modif_list_restriction_map;
-      store_proj_bdu_potential_restriction_map;
       store_proj_bdu_test_restriction;
     } )
 
@@ -1157,14 +1151,63 @@ let scan_rule_set ?start ?start_cv ~modified_agents parameters log_info
     store_remanent_triple guard_mvbdus restriction_bdu init =
   (*let error, init = init_bdu_analysis_static parameters error in*)
   let nsites = Handler.get_nsites handler_kappa in
+  (*let error, init' = 
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create 
+                  parameters error 0 
+            in 
+  let error, store_remanent_triple' = 
+    match start_cv with 
+    | None -> 
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "DO NOT COMPRESS"  in 
+          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)  in
+    error, store_remanent_triple 
+    | Some _ -> 
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "COMPRESS STORE REMANENT TRIPLE"  in 
+          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)  in       
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold 
+      parameters error 
+         (fun parameters error ag_id l store_remanent_triple -> 
+          let error, b = 
+            Covering_classes_main.is_there_new_cv_in_agent ~modified_agents parameters error ag_id 
+         in     
+         if not b then 
+          error, store_remanent_triple 
+         else 
+          let error, cv_max = Covering_classes_main.compute_cv_max ?start_cv parameters error ag_id in 
+          let n = List.length l in 
+          let l = 
+            List.fold_left 
+              (fun l (a,c,d) -> 
+                let b = Covering_classes_main.ignore_cv ~cv_max  a in 
+                if b then l else 
+                (a,c,d)::l)
+              [] (List.rev l)
+          in 
+          let n' = List.length l in 
+          if l = [] then error, store_remanent_triple 
+          else Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
+              parameters error ag_id l store_remanent_triple)             
+        store_remanent_triple init'
+    in *)
+  let (error, handler_bdu), 
+  
+  store_proj_bdu_potential_restriction_map =
+    collect_proj_bdu_potential_restriction_map ?start ?start_cv ~modified_agents
+      parameters handler_bdu error (*store_new_index_pair_map*)
+      store_remanent_triple store_potential_side_effects
+  init.store_proj_bdu_potential_restriction_map guard_mvbdus
+      restriction_bdu (* WHAT ??? *) 
+  in
+  let init = {init with store_proj_bdu_potential_restriction_map} in 
+
   let error, (handler_bdu, log_info, store_results) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold_two_steps ?start
       parameters error
       (fun parameters error rule_id rule (handler_bdu, log_info, store_result) ->
         let error, log_info, handler_bdu, store_result =
-          scan_rule_static ?start ?start_cv ~modified_agents parameters log_info
+          scan_rule_static ?start_cv ~modified_agents parameters log_info
             error handler_bdu rule_id rule.Cckappa_sig.e_rule_c_rule
-            store_remanent_triple store_potential_side_effects compiled
+            store_remanent_triple(*'*) store_potential_side_effects compiled
             store_result guard_mvbdus restriction_bdu
         in
         error, (handler_bdu, log_info, store_result))
