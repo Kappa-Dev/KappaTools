@@ -407,7 +407,8 @@ let store_remanent parameters error covering_class _modified_map remanent
     {
       Covering_classes_type.store_pointer_backward = pointer_backward;
       Covering_classes_type.store_dic;
-    } )
+    },
+    (cv_id, covering_class_with_guard_p) )
 
 (*--------------------------------------------------------------------------*)
 (*CLEAN: In a covering class, it will store the old result of the previous
@@ -445,9 +446,9 @@ let clean_classes ?patch parameters error covering_classes modified_map
   (*cleaning*)
   let current_covering_classes = length_sorted covering_classes in
   List.fold_left
-    (fun (error, bool, remanent) covering_class ->
+    (fun (error, bool, remanent, contrib) covering_class ->
       match covering_class with
-      | [] -> error, bool, remanent
+      | [] -> error, bool, remanent, contrib
       | t :: tl ->
         let pointer_backward =
           remanent.Covering_classes_type.store_pointer_backward
@@ -468,7 +469,7 @@ let clean_classes ?patch parameters error covering_classes modified_map
         in
         let rec aux to_visit potential_supersets =
           match to_visit with
-          | [] -> error, bool, remanent
+          | [] -> error, bool, remanent, contrib
           | t' :: tl' ->
             (* get the set of list(id) containing t' *)
             let error, potential_supersets' =
@@ -494,11 +495,11 @@ let clean_classes ?patch parameters error covering_classes modified_map
               Covering_classes_type.CV_map_and_set.Set.is_empty
                 potential_superset
             then (
-              let error, result_covering_dic =
+              let error, result_covering_dic, covering_class =
                 store_remanent parameters error covering_class modified_map
                   remanent nr_guard_parameters
               in
-              error, true, result_covering_dic
+              error, true, result_covering_dic, covering_class :: contrib
             ) else
               aux tl' potential_superset
         in
@@ -507,14 +508,14 @@ let clean_classes ?patch parameters error covering_classes modified_map
         if Covering_classes_type.CV_map_and_set.Set.is_empty potential_supersets
         then (
           (*if it is empty then store it to remanent*)
-          let error, result_covering_dic =
+          let error, result_covering_dic, contrib_elt =
             store_remanent parameters error covering_class modified_map remanent
               nr_guard_parameters
           in
-          error, true, result_covering_dic
+          error, true, result_covering_dic, contrib_elt :: contrib
         ) else
           aux tl potential_supersets)
-    (error, false, init_remanent)
+    (error, false, init_remanent, [])
     current_covering_classes
 
 (*-------------------------------------------------------------------------*)
@@ -536,6 +537,10 @@ let scan_rule_set_remanent ?patch ~modified_agents parameters error
         init_result.Covering_classes_type.store_covering_classes_predicate,
         Some nr,
         nr.Diff.next_agent )
+  in
+  let error, patch_remanent =
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+      parameters error 0
   in
   let error, start_cv =
     if Ckappa_sig.int_of_agent_name next_agent = 0 then
@@ -568,11 +573,11 @@ let scan_rule_set_remanent ?patch ~modified_agents parameters error
   let result_covering_classes =
     store_covering_classes.Covering_classes_type.store_covering_classes
   in
-  let error, (start_cv, modified_agents, remanent_dictionary) =
+  let error, (start_cv, modified_agents, remanent_dictionary, patch_remanent) =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
       error
       (fun parameters error agent_type covering_class
-           (start_cv, modified_agents, init_remanent) ->
+           (start_cv, modified_agents, init_remanent, patch_remanent) ->
         (*----------------------------------------------------------------*)
         (*get modified site*)
         let error, modified_map =
@@ -590,7 +595,7 @@ let scan_rule_set_remanent ?patch ~modified_agents parameters error
         in
         (*-----------------------------------------------------------------*)
         (*clean the covering classes, removed duplicate of covering classes*)
-        let error, bool, store_remanent_dic =
+        let error, bool, store_remanent_dic, new_cv_list =
           clean_classes ?patch parameters error covering_class modified_map
             (Handler.get_nr_guard_parameters kappa_handler)
         in
@@ -667,13 +672,17 @@ let scan_rule_set_remanent ?patch ~modified_agents parameters error
           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
             parameters error agent_type store_remanent_dic init_remanent
         in
+        let error, patch_remanent =
+          Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
+            parameters error agent_type new_cv_list patch_remanent
+        in
         (*----------------------------------------------------------------*)
         (*result*)
-        error, (start_cv, modified_agents, store_remanent))
+        error, (start_cv, modified_agents, store_remanent, patch_remanent))
       result_covering_classes
-      (start_cv, modified_agents, init_result)
+      (start_cv, modified_agents, init_result, patch_remanent)
   in
-  error, remanent_dictionary, modified_agents, start_cv
+  error, remanent_dictionary, modified_agents, start_cv, patch_remanent
 
 (**************************************************************************)
 (*MAIN*)
@@ -708,8 +717,8 @@ let init_predicate_covering_classes parameters error =
       Covering_classes_type.site_correspondence = init_site_correspondence;
     } )
 
-let site_covering_classes ?patch ?start_cv ~modified_agents parameters error
-    covering_classes =
+let site_covering_classes ?patch ~patch_remanent  parameters error
+    (*covering_classes*) =
   let store_result =
     match patch with
     | None -> Ckappa_sig.AgentSiteOrGuard_map_and_set.Map.empty
@@ -720,28 +729,13 @@ let site_covering_classes ?patch ?start_cv ~modified_agents parameters error
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
       error
       (fun parameters error agent_type_cv remanent store_result ->
-        let error, bool =
-          is_there_new_cv_in_agent ~modified_agents parameters error
-            agent_type_cv
-        in
-        if not bool then
-          error, store_result
-        else (
-          let error, cv_max =
-            compute_cv_max ?start_cv parameters error agent_type_cv
-          in
           (*get a list of covering_class_id from remanent*)
-          let cv_dic = remanent.Covering_classes_type.store_dic in
-          (*fold a dictionary*)
           let error, store_result =
-            Covering_classes_type.Dictionary_of_List_sites_or_guard.fold
-              (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
+          List.fold_left 
+              (fun (error, store_result) (cv_id,list_of_site_type)  -> 
                 (*get site_cv in value*)
-                if ignore_cv ~cv_max cv_id then
-                  error, store_result
-                else
                   List.fold_left
-                    (fun (_error, store_result) site_type_cv ->
+                    (fun (error, store_result) site_type_cv ->
                       let error, store_result =
                         Common_map.add_dependency_pair_sites_cv parameters error
                           (agent_type_cv, site_type_cv)
@@ -749,18 +743,18 @@ let site_covering_classes ?patch ?start_cv ~modified_agents parameters error
                       in
                       error, store_result)
                     (error, store_result) list_of_site_type)
-              cv_dic (error, store_result)
+               (error, store_result) remanent 
           in
           error, store_result
         )
         (*REMARK: when it is folding inside a list, start with empty result,
-          because the add_link function has already called the old result.*))
-      covering_classes store_result
+          because the add_link function has already called the old result.*)
+      patch_remanent store_result
   in
   error, store_result
 
-let list_of_site_type_in_covering_class ?patch ?start_cv ~modified_agents
-    parameters error covering_classes =
+let list_of_site_type_in_covering_class ?patch ~patch_remanent parameters error
+    _covering_classes =
   let store_result =
     match patch with
     | None -> Covering_classes_type.AgentCV_map_and_set.Map.empty
@@ -770,43 +764,25 @@ let list_of_site_type_in_covering_class ?patch ?start_cv ~modified_agents
   let error, store_result =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
       error
-      (fun parameters error agent_type_cv remenent store_result ->
-        let error, bool =
-          is_there_new_cv_in_agent ~modified_agents parameters error
-            agent_type_cv
-        in
-        if not bool then
-          error, store_result
-        else (
-          let cv_dic = remenent.Covering_classes_type.store_dic in
-          let error, cv_max =
-            compute_cv_max ?start_cv parameters error agent_type_cv
-          in
-          Covering_classes_type.Dictionary_of_List_sites_or_guard.fold
-            (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
-              if ignore_cv ~cv_max cv_id then
-                error, store_result
-              else (
-                let error, old =
-                  Common_map.get_pair_agent_cv parameters error
-                    (agent_type_cv, cv_id) store_result
-                in
-                let new_list = List.append list_of_site_type old in
-                let error, store_result =
-                  Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
-                    parameters error (agent_type_cv, cv_id) new_list
-                    store_result
-                in
-                error, store_result
-              ))
-            cv_dic (error, store_result)
-        ))
-      covering_classes store_result
+      (fun parameters error agent_type_cv l store_result ->
+        List.fold_left
+          (fun (error, store_result) (cv_id, list_of_site_type) ->
+            let error, old =
+              Common_map.get_pair_agent_cv parameters error
+                (agent_type_cv, cv_id) store_result
+            in
+            let new_list = List.append list_of_site_type old in
+            let error, store_result =
+              Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
+                parameters error (agent_type_cv, cv_id) new_list store_result
+            in
+            error, store_result)
+          (error, store_result) l)
+      patch_remanent store_result
   in
   error, store_result
 
-let collect_remanent_triple ?patch ?start_cv ~modified_agents parameters error
-    store_remanent =
+let collect_remanent_triple ?patch ~patch_remanent  parameters error =
   let error, store_result =
     match patch with
     | None ->
@@ -814,19 +790,13 @@ let collect_remanent_triple ?patch ?start_cv ~modified_agents parameters error
         parameters error 0
     | Some (a, _) -> error, a.Covering_classes_type.store_remanent_triple
   in
+  let error, patch_store_result = 
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+        parameters error 0
+  in 
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
     error
-    (fun parameters error agent_type remanent store_result ->
-      let error, bool =
-        is_there_new_cv_in_agent ~modified_agents parameters error agent_type
-      in
-      if not bool then
-        error, store_result
-      else (
-        let error, cv_max =
-          compute_cv_max ?start_cv parameters error agent_type
-        in
-        let store_dic = remanent.Covering_classes_type.store_dic in
+    (fun parameters error agent_type remanent (store_result, patch_store_result) ->
         let error, old =
           match patch with
           | None -> error, []
@@ -840,49 +810,56 @@ let collect_remanent_triple ?patch ?start_cv ~modified_agents parameters error
         in
 
         (*-----------------------------------------------------------------*)
-        let error, triple_list =
-          Covering_classes_type.Dictionary_of_List_sites_or_guard.fold
-            (fun list _ cv_id (error, current_list) ->
-              if ignore_cv ~cv_max cv_id then
+        let error, triple_list, patch_triple_list =
+        List.fold_left 
+          (fun (error, current_list, patch_triple_list) (cv_id,list) -> 
+(*              if ignore_cv ~cv_max cv_id then
                 error, current_list
-              else (
+              else ( *)
                 let error, set = Common_map.list2set parameters error list in
-                let triple_list = (cv_id, list, set) :: current_list in
-                error, triple_list
-              ))
-            store_dic (error, old)
+                
+                error, 
+                (cv_id, list, set)::current_list, (cv_id, list, set)::patch_triple_list 
+
+              ) (error, old, []) 
+            remanent 
         in
         (*--------------------------------------------------------*)
         let error, store_result =
           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
-            parameters error agent_type (*List.rev*) triple_list store_result
+            parameters error agent_type triple_list store_result
         in
-        error, store_result
-      ))
-    store_remanent store_result
+         let error, patch_store_result =
+          Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
+            parameters error agent_type patch_triple_list patch_store_result
+        in
+        error, (store_result, patch_store_result)
+      )
+    patch_remanent (store_result, patch_store_result) 
 
 let scan_predicate_covering_classes ?patch ~modified_agents parameters error
     handler_kappa compil =
-  let error, store_covering_classes, modified_agents, start_cv =
+  let error, store_covering_classes, modified_agents, start_cv, patch_remanent =
     covering_classes ?patch ~modified_agents parameters error handler_kappa
       compil
   in
   (*-----------------------------------------------------------------------*)
   let error, store_list_of_site_type_in_covering_classes =
-    list_of_site_type_in_covering_class ?patch ?start_cv ~modified_agents
-      parameters error store_covering_classes
+    list_of_site_type_in_covering_class ?patch ~patch_remanent parameters error
+      store_covering_classes
   in
   (*-----------------------------------------------------------------------*)
   (*static information of covering classes: from sites -> covering_class id
     list*)
   let error, store_covering_classes_id =
-    site_covering_classes ?patch ?start_cv ~modified_agents parameters error
-      store_covering_classes
+    site_covering_classes 
+      ?patch ~patch_remanent parameters error
+      
   in
   (*------------------------------------------------------------------------*)
-  let error, store_remanent_triple =
-    collect_remanent_triple ?patch ?start_cv ~modified_agents parameters error
-      store_covering_classes
+  let error, (store_remanent_triple, patch_store_remanent_triple) =
+    collect_remanent_triple 
+      ?patch ~patch_remanent  parameters error
   in
   let error, init_array =
     match patch with
@@ -895,13 +872,7 @@ let scan_predicate_covering_classes ?patch ~modified_agents parameters error
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
       error
       (fun parameters error ag list map ->
-        let error, bool =
-          is_there_new_cv_in_agent ~modified_agents parameters error ag
-        in
-        if not bool then
-          error, map
-        else (
-          let error, cv_max = compute_cv_max ?start_cv parameters error ag in
+        (
           let error, last_site =
             Handler.last_site_of_agent parameters error handler_kappa ag
           in
@@ -925,9 +896,6 @@ let scan_predicate_covering_classes ?patch ~modified_agents parameters error
           let error, array =
             List.fold_left
               (fun (error, array) (cv_id, list, _) ->
-                if ignore_cv ~cv_max cv_id then
-                  error, array
-                else (
                   let rec aux acc k map1 map2 error =
                     match acc with
                     | [] -> error, (map1, map2)
@@ -961,13 +929,13 @@ let scan_predicate_covering_classes ?patch ~modified_agents parameters error
                   in
                   Covering_classes_type.Cv_id_nearly_Inf_Int_storage_Imperatif
                   .set parameters error cv_id (map1, map2) array
-                ))
+                )
               array list
           in
           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
             parameters error ag array map
         ))
-      store_remanent_triple init_array
+      patch_store_remanent_triple init_array
   in
   ( error,
     {
@@ -979,4 +947,5 @@ let scan_predicate_covering_classes ?patch ~modified_agents parameters error
       Covering_classes_type.site_correspondence;
     },
     modified_agents,
-    start_cv )
+    start_cv, 
+    patch_store_remanent_triple )

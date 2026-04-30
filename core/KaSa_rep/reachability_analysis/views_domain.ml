@@ -373,7 +373,7 @@ module Domain = struct
   (**************************************************************************)
   (** [scan_rule_set static] *)
 
-  let scan_rule_set_static ?start ?start_cv ~(modified_agents : 'a * bool)
+  let scan_rule_set_static ?start ?start_cv ~(modified_agents : 'a * bool) ~patch_store_remanent_triple
       static dynamic error =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
@@ -385,7 +385,7 @@ module Domain = struct
     let guard_mvbdus = get_guard_mvbdus static in
     let restriction_bdu = get_restriction_mvbdu static in
     let error, (handler_bdu, log_info, result) =
-      Bdu_static_views.scan_rule_set ?start ?start_cv ~modified_agents
+      Bdu_static_views.scan_rule_set ?start ?start_cv ~modified_agents ~patch_store_remanent_triple 
         parameters log_info handler_bdu error kappa_handler compiled
         potential_side_effects remanent_triple guard_mvbdus restriction_bdu
         (get_domain_static static)
@@ -442,7 +442,8 @@ module Domain = struct
           init_global_dynamic,
           start,
           start_cv,
-          modified_agents ) =
+          modified_agents, 
+          patch_store_remanent_triple ) =
       match patch with
       | None ->
         let compil = Analyzer_headers.get_cc_code static in
@@ -453,7 +454,7 @@ module Domain = struct
         let init_bdu_analysis_static_pattern =
           Bdu_static_views.init_bdu_analysis_static_pattern
         in
-        let error, init_covering_class, modified_agents, _start_cv =
+        let error, init_covering_class, modified_agents, _start_cv, patch_store_remanent_triple =
           Covering_classes_main.scan_predicate_covering_classes ~modified_agents
             parameters error handler_kappa compil
         in
@@ -490,7 +491,8 @@ module Domain = struct
           init_global_dynamic,
           None,
           None,
-          modified_agents )
+          modified_agents, 
+          patch_store_remanent_triple)
       | Some (static', local, new_elts) ->
         let patch =
           static'.domain_static_information_covering_class, new_elts
@@ -500,7 +502,8 @@ module Domain = struct
         let ( error,
               domain_static_information_covering_class,
               modified_agents,
-              start_cv ) =
+              start_cv, 
+              patch_store_remanent_triple) =
           Covering_classes_main.scan_predicate_covering_classes ~patch
             ~modified_agents parameters error handler_kappa compil
         in
@@ -514,7 +517,7 @@ module Domain = struct
           { global = dynamic; local },
           Some new_elts,
           start_cv,
-          modified_agents )
+          modified_agents,patch_store_remanent_triple )
     in
     let error, init_static, init_dynamic =
       let start =
@@ -528,7 +531,7 @@ module Domain = struct
               * bool) =
         modified_agents
       in
-      scan_rule_set_static ?start ?start_cv ~modified_agents init_global_static
+      scan_rule_set_static ?start ~patch_store_remanent_triple ?start_cv ~modified_agents init_global_static
         init_global_dynamic error
     in
     let error, static, dynamic =
