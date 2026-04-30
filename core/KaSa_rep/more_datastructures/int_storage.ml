@@ -152,7 +152,7 @@ module Int_storage_imperatif :
     aux size []
 
   let rec create parameters error size =
-    if size < 0 then (
+    if size < -1 then (
       let error, array = create parameters error 0 in
       invalid_arg parameters error __POS__ Exit array
     ) else

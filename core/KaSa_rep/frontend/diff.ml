@@ -748,27 +748,45 @@ let get_new_indexs parameters errors handler c_compil =
   let dual = handler.Cckappa_sig.dual in
   let next_agent = Handler.nagents parameters errors handler in
   let errors, next_site_per_agent =
-    let errors, a =
-      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init parameters
-        errors
-        (Ckappa_sig.int_of_agent_name next_agent - 1)
-        (fun parameters error id ->
-          let () =
-            check __POS__ parameters
-              (Format.sprintf "init diff agent: %i"
-                 (Ckappa_sig.int_of_agent_name id))
-          in
-          let () = print_newline parameters in
-          let error, dic =
-            Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
-              parameters error id handler.Cckappa_sig.sites
-          in
-          match dic with
-          | None -> error, Ckappa_sig.dummy_site_name
-          | Some dic ->
-            Ckappa_sig.Dictionary_of_sites.last_entry parameters error dic)
-    in
-    errors, Some a
+    if Ckappa_sig.int_of_agent_name next_agent = 0 then
+      errors, None
+    else (
+      let errors, a =
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init parameters
+          errors
+          (*(max 0*) (Ckappa_sig.int_of_agent_name next_agent - 1)
+          (fun parameters error id ->
+            let () =
+              check __POS__ parameters
+                (Format.sprintf "init diff agent: %i"
+                   (Ckappa_sig.int_of_agent_name id))
+            in
+            let () = print_newline parameters in
+            let error, dic =
+              Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+                parameters error id handler.Cckappa_sig.sites
+            in
+            match dic with
+            | None ->
+              let () =
+                check __POS__ parameters
+                  (Format.sprintf "init last site %i"
+                     (Ckappa_sig.int_of_site_name Ckappa_sig.dummy_site_name))
+              in
+              error, Ckappa_sig.dummy_site_name
+            | Some dic ->
+              let error, a =
+                Ckappa_sig.Dictionary_of_sites.last_entry parameters error dic
+              in
+              let () =
+                check __POS__ parameters
+                  (Format.sprintf "init last site %i"
+                     (Ckappa_sig.int_of_site_name a))
+              in
+              error, a)
+      in
+      errors, Some a
+    )
   in
   let new_indexs =
     {

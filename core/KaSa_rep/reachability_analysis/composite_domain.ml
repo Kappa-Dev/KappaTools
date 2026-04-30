@@ -477,14 +477,19 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
       | None -> None, None
       | Some (a, b, c) -> Some (snd a, b.domain.local, c), Some c.Diff.next_rule
     in
+
     let parameters = Analyzer_headers.get_parameter static in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
     let nagents = Handler.nagents parameters error kappa_handler in
     let error, modified_agents =
-      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.init
-        parameters error
-        (Ckappa_sig.int_of_agent_name nagents - 1)
-        (fun _ error _ -> error, false)
+      if Ckappa_sig.int_of_agent_name nagents = 0 then
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+          parameters error 0
+      else
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.init
+          parameters error
+          (Ckappa_sig.int_of_agent_name nagents - 1)
+          (fun _ error _ -> error, false)
     in
     let modified_agents = modified_agents, false in
     let error, domain_static, domain_dynamic, modified_agents, event_list =
