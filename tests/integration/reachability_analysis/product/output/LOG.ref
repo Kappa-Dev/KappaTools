@@ -12,11 +12,8 @@ Reachability analysis...
 rule r0 (File "product.ka", line 7, characters 0-75:) will never be applied.
 rule r1 (File "product.ka", line 8, characters 0-75:) will never be applied.
 rule r8 (File "product.ka", line 15, characters 0-75:) will never be applied.
-
 ------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-B cannot occur in the model
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:

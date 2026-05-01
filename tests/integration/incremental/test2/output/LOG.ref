@@ -4,17 +4,10 @@ Parsing essai.ka...
 done
 Compiling...
 Reachability analysis...
-
 ------------------------------------------------------------
-* There are some non applyable rules
+every rule may be applied
 ------------------------------------------------------------
-rule r4 (File "essai2.ka", line 4, characters 0-22:) will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-C cannot occur in the model
-D cannot occur in the model
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -36,18 +29,10 @@ A(x) => [ A(x[.]) v A(x[x.A]) ]
 execution finished without any exception
 Parsing essai_diff.ka...
 done
-
 ------------------------------------------------------------
-* There are some non applyable rules
+every rule may be applied
 ------------------------------------------------------------
-rule r4 (File "essai2.ka", line 4, characters 0-22:) will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-B cannot occur in the model
-C cannot occur in the model
-D cannot occur in the model
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:

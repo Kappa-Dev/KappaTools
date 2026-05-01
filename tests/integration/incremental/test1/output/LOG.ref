@@ -4,17 +4,10 @@ Parsing essai.ka...
 done
 Compiling...
 Reachability analysis...
-
 ------------------------------------------------------------
-* There are some non applyable rules
+every rule may be applied
 ------------------------------------------------------------
-rule r4 (File "essai2.ka", line 4, characters 0-22:) will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-C cannot occur in the model
-D cannot occur in the model
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -40,7 +33,6 @@ done
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r4 (File "essai2.ka", line 4, characters 0-22:) will never be applied.
 rule r2 (File "essai.ka", line 6, characters 2-24:) will never be applied.
 rule r5 (File "essai.ka", line 7, characters 2-24:) will never be applied.
 
@@ -48,9 +40,6 @@ rule r5 (File "essai.ka", line 7, characters 2-24:) will never be applied.
 * There are some non creatable agents 
 ------------------------------------------------------------
 A cannot occur in the model
-B cannot occur in the model
-C cannot occur in the model
-D cannot occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:

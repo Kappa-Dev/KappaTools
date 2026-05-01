@@ -29,11 +29,8 @@ Parsing a_after.ka...
 done
 ------------------------------------------------------------
 every rule may be applied
-
 ------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:

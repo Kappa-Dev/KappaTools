@@ -36,31 +36,24 @@ A cannot occur in the model
 execution finished without any exception
 Parsing essai_diff.ka...
 done
-
 ------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule File "essai2.ka", line 1, characters 0-31: will never be applied.
-rule r2 (File "essai.ka", line 7, characters 2-24:) will never be applied.
-rule r5 (File "essai.ka", line 8, characters 2-24:) will never be applied.
+every rule may be applied
 
 ------------------------------------------------------------
 * There are some non creatable agents 
 ------------------------------------------------------------
-A cannot occur in the model
-B cannot occur in the model
 C cannot occur in the model
-D cannot occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A(x) => A(x{u})
-A(y) => A(y{u})
+A(x) => [ A(x{u}) v A(x{p}) ]
+A(y) => [ A(y{u}) v A(y{p}) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
+A(x{p}) <=> A(y{p})
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------

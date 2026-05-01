@@ -5,21 +5,10 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-
 ------------------------------------------------------------
-* There are some non applyable rules
+every rule may be applied
 ------------------------------------------------------------
-rule File "test_empty.ka", line 1, characters 0-35: will never be applied.
-rule File "test_empty.ka", line 1, characters 0-35: will never be applied.
-rule File "test_empty.ka", line 2, characters 0-35: will never be applied.
-rule File "test_empty.ka", line 2, characters 0-35: will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
-B cannot occur in the model
-C cannot occur in the model
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:

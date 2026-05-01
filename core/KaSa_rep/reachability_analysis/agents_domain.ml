@@ -516,7 +516,8 @@ module Domain = struct
   (** collect the agent type of the agents of the species and declare
       them seen *)
 
-  let init_agents ~new_init ?modified_agents static dynamic error init_state event_list =
+  let init_agents ~new_init ?modified_agents static dynamic error init_state
+      event_list =
     let parameters = get_parameter static in
     let restriction_bdu = get_restriction_mvbdu static in
     let nsites = get_nsites static in
@@ -538,12 +539,15 @@ module Domain = struct
             in
             let dynamic = set_mvbdu_handler bdu_handler dynamic in
             let error, bool =
-            if new_init then error, true else 
-              match modified_agents with
-              | None -> error, true
-              | Some modified_agents ->
-                Covering_classes_main.is_there_new_cv_in_agent ~modified_agents
-                  parameters error agent_type
+              if new_init then
+                error, true
+              else (
+                match modified_agents with
+                | None -> error, true
+                | Some modified_agents ->
+                  Covering_classes_main.is_there_new_cv_in_agent
+                    ~modified_agents parameters error agent_type
+              )
             in
             let error, (dynamic, event_list) =
               if bool then
@@ -565,7 +569,8 @@ module Domain = struct
     let _ = modified_agents, new_init in
     let event_list = [] in
     let error, (dynamic, event_list) =
-      init_agents ~new_init ?modified_agents static dynamic error species event_list
+      init_agents ~new_init ?modified_agents static dynamic error species
+        event_list
     in
     error, dynamic, event_list
 
