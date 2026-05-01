@@ -53,16 +53,15 @@ build/site/external: build/site
 
 build/site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist: external_deps_versions.mk
 	mkdir -p build/site/external
-	FILE=$$(mktemp -t bootstrapXXXX); \
-	curl -LsS -o $$FILE https://github.com/twbs/bootstrap/releases/download/v$(BOOTSTRAP_VERSION)/bootstrap-$(BOOTSTRAP_VERSION)-dist.zip && \
-	rm -rf $@ && unzip -d $(dir $@) $$FILE && rm $$FILE
+	rm -rf tmp; \
+	curl -LsS -o tmp https://github.com/twbs/bootstrap/releases/download/v$(BOOTSTRAP_VERSION)/bootstrap-$(BOOTSTRAP_VERSION)-dist.zip && \
+	rm -rf $@ && unzip -d $(dir $@) tmp && rm tmp
 	touch $@
 
 build/site/external/codemirror-$(CODEMIRROR_VERSION): external_deps_versions.mk
 	mkdir -p build/site/external
-	FILE=$$(mktemp -t codemirrorXXXX); \
-	curl -LsS -o $$FILE http://codemirror.net/codemirror-$(CODEMIRROR_VERSION).zip &&\
-	rm -rf $@ && unzip -d $(dir $@) $$FILE && rm $$FILE
+	curl -LsS -o tmpp http://codemirror.net/codemirror-$(CODEMIRROR_VERSION).zip && \
+	rm -rf $@ && unzip -d $(dir $@) tmpp && rm tmpp 
 	touch $@
 
 build/site/external/d3: external_deps_versions.mk
@@ -187,9 +186,8 @@ build/KappappWin:
 	mkdir -p build/KappappWin
 	+$(MAKE) APP_EXT=local build/site/index.html
 	dune build --only-packages kappa-library,kappa-binaries,kappa-agents
-	FILE=$$(mktemp -t electronXXXX); \
-	wget -o $$FILE https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-win32-x64.zip && \
-	unzip $$FILE -d build/KappappWin
+	curl -LsS  -o tmppp https://github.com/electron/electron/releases/download/v$(ELECTRON_VERSION)/electron-v$(ELECTRON_VERSION)-win32-x64.zip && \
+	unzip tmppp -d build/KappappWin
 	mv build/site build/KappappWin/resources/app
 	mv build/KappappWin/electron.exe build/KappappWin/Kappapp.exe
 	mkdir build/KappappWin/resources/bin
