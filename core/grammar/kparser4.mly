@@ -503,10 +503,13 @@ let check_port_sig (e:Loc.t) a =
      let () = 
      match rule.Ast.rewrite with 
         | Ast.Edit _ -> () (* TO DO *)
-        | Ast.Arrow rule  -> 
-          let () = check_rule_hs pos rule.Ast.lhs rule.Ast.rhs in 
-          let () = check_binding_labels pos rule.Ast.lhs in 
-          let () = check_binding_labels pos rule.Ast.rhs in 
+        | Ast.Arrow rule'  -> 
+          let () = check_rule_hs pos rule'.Ast.lhs rule'.Ast.rhs in 
+          let () = 
+           if rule.Ast.bidirectional then 
+            check_rule_hs pos rule'.Ast.rhs rule'.Ast.lhs in
+          let () = check_binding_labels pos rule'.Ast.lhs in 
+          let () = check_binding_labels pos rule'.Ast.rhs in 
           ()
     in () 
 let check_mixture e a = 
