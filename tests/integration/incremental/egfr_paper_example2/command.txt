@@ -1,0 +1,4 @@
+update file a_before.ka as empty.ka 
+update file empty.ka 
+update file a_before.ka as empty.ka 
+quit 
