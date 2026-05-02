@@ -1,0 +1,1 @@
+cat command.txt|"${KAPPABIN}"KaSaIncremental empty.ka 
