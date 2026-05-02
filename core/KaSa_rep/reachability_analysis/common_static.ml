@@ -1243,14 +1243,11 @@ let collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters error
   in
   error, mvbdu_handler, guard_mvbdus
 
-let compute_working_set_mvbdu parameters error
-    mvbdu_handler compilation nsites =
+let compute_working_set_mvbdu parameters error mvbdu_handler compilation nsites
+    =
   let pair_list =
     Ckappa_sig.Ws_index_map_and_set.Map.fold
       (fun _ (guard, bool) pair_list ->
-        (* if Ckappa_sig.compare_guard_parameter guard starting_g < 0 then
-             pair_list
-           else*)
         ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
           match bool with
           | None | Some false -> Ckappa_sig.dummy_state_index_false
@@ -1262,11 +1259,7 @@ let compute_working_set_mvbdu parameters error
     Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters mvbdu_handler
       error (List.rev pair_list)
   in
-  (*match starting_mvbdu with
-    | None ->*)
   error, mvbdu_handler, mvbdu
-(*| Some a ->
-  Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error a mvbdu*)
 
 (******************************************************************)
 (******************************************************************)

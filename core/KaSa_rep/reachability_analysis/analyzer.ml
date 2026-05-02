@@ -136,38 +136,41 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       | Some true -> false
     in
 
-    let domain_event, global_event, init_event, analysis_event, new_elts =
+    let ( domain_event,
+          global_event,
+          init_event,
+          analysis_event,
+          new_elts,
+          patch_global ) =
       match patch with
       | None ->
         ( StoryProfiling.Domains_initialization,
           StoryProfiling.Global_initialization,
           StoryProfiling.Initial_states,
           StoryProfiling.Reachability_analysis,
-          Diff.starting_new_elt )
-      | Some (_, _, a) ->
+          Diff.starting_new_elt,
+          None )
+      | Some (static, _, a) ->
         ( StoryProfiling.Domains_initialization_update,
           StoryProfiling.Global_initialization_update,
           StoryProfiling.Initial_state_updates,
           StoryProfiling.Incremental_reachability_analysis,
-          a )
+          a,
+          Some (fst static, a) )
     in
     let error, log_info =
       StoryProfiling.StoryStats.add_event parameters error global_event None
         log_info
     in
-    let patch_global =
-      match patch with
-      | None -> None
-      | Some (static, _, _) -> Some (fst static, new_elts)
-    in
+
     let error, global_static, dynamic =
       Analyzer_headers.initialize_global_information ?patch:patch_global
         parameters log_info error mvbdu_handler compil kappa_handler
     in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
-    let error, init =
-      Analyzer_headers.compute_initial_state error global_static
-    in
+    (*let error, init =
+        Analyzer_headers.compute_initial_state ?patch:patch_global error global_static
+      in*)
     let log_info = Analyzer_headers.get_log_info dynamic in
     let error, log_info =
       StoryProfiling.StoryStats.add_event parameters error domain_event None
@@ -198,9 +201,10 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     in
     if do_increment then (
       let error, dynamic = add_event parameters error init_event None dynamic in
-      let error, dynamic, _ =
-        List.fold_left
-          (fun (error, dynamic, i) chemical_species ->
+      let error, dynamic =
+        Int_storage.Nearly_inf_Imperatif.fold_two_steps
+          ~start:new_elts.Diff.next_init parameters error
+          (fun parameters error i chemical_species dynamic ->
             let error, b =
               Cckappa_sig.init_is_permanently_disabled_in_current_working_set
                 parameters error i compil
@@ -209,19 +213,13 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
               if b then
                 error, dynamic
               else (
-                let new_init =
-                  if compare i new_elts.Diff.next_init >= 0 then
-                    true
-                  else
-                    false
-                in
                 let error, dynamic =
                   add_event parameters error (StoryProfiling.Initial_state i)
                     None dynamic
                 in
                 let error, dynamic, () =
-                  Domain.add_initial_state ~new_init ?modified_agents static
-                    dynamic error chemical_species
+                  Domain.add_initial_state ~new_init:false ?modified_agents
+                    static dynamic error chemical_species
                 in
                 let error, dynamic =
                   close_event parameters error (StoryProfiling.Initial_state i)
@@ -230,8 +228,22 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
                 error, dynamic
               )
             in
-            error, dynamic, i + 1)
-          (error, dynamic, 0) init
+            error, dynamic)
+          (fun parameters error i chemical_species dynamic ->
+            let error, dynamic =
+              add_event parameters error (StoryProfiling.Initial_state i) None
+                dynamic
+            in
+            let error, dynamic, () =
+              Domain.add_initial_state ~new_init:true static dynamic error
+                chemical_species
+            in
+            let error, dynamic =
+              close_event parameters error (StoryProfiling.Initial_state i) None
+                dynamic
+            in
+            error, dynamic)
+          compil.Cckappa_sig.init dynamic
       in
       let error, dynamic =
         close_event parameters error init_event None dynamic

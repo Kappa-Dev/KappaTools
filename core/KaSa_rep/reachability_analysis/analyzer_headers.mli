@@ -49,20 +49,6 @@ val initialize_global_information :
   * global_static_information
   * global_dynamic_information
 
-val update_global_information :
-  Remanent_parameters_sig.parameters ->
-  StoryProfiling.StoryStats.log_info ->
-  Exception.exceptions_caught_and_uncaught ->
-  Mvbdu_wrapper.Mvbdu.handler ->
-  Cckappa_sig.compil ->
-  Cckappa_sig.kappa_handler ->
-  Diff.new_indexs ->
-  global_static_information ->
-  global_dynamic_information ->
-  Exception.exceptions_caught_and_uncaught
-  * global_static_information
-  * global_dynamic_information
-
 val add_wake_up_relation :
   global_static_information ->
   Common_static.site_to_rules ->
@@ -235,17 +221,6 @@ val set_project_modified_map :
   Ckappa_sig.AgentSite_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t ->
   global_static_information ->
   global_static_information
-
-val compute_initial_state :
-  Exception.exceptions_caught_and_uncaught ->
-  global_static_information ->
-  Exception.exceptions_caught_and_uncaught * initial_state list
-
-val update_initial_state :
-  Exception.exceptions_caught_and_uncaught ->
-  global_static_information ->
-  Diff.new_indexs ->
-  Exception.exceptions_caught_and_uncaught * initial_state list
 
 val get_kappa_handler : global_static_information -> Cckappa_sig.kappa_handler
 val get_cc_code : global_static_information -> Cckappa_sig.compil
