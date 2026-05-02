@@ -566,7 +566,7 @@ module Domain = struct
 
   let add_initial_state ~new_init ?modified_agents static dynamic error species
       =
-    let _ = modified_agents, new_init in
+    let _ = new_init in
     let event_list = [] in
     let error, (dynamic, event_list) =
       init_agents ~new_init ?modified_agents static dynamic error species
