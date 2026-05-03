@@ -1123,8 +1123,6 @@ let scan_rule_set ?patch parameter error kappa_handler compil store_result =
         compil.Cckappa_sig.rules store_result
     in
     let error, potential_side_effects_per_rule' =
-      (* This is redone from scratch, it should be improved *)
-      (* TO DO *)
       Proj_agent_rule_to_rule.monadic_proj_map_i
         (fun _parameter error (_, rule_id) -> error, rule_id)
         parameter error []
@@ -1245,44 +1243,8 @@ let collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters error
   in
   error, mvbdu_handler, guard_mvbdus
 
-let compute_working_set_mvbdu ?patch_compute_working_set_mvbdu parameters error
+let compute_working_set_mvbdu parameters error
     mvbdu_handler compilation nsites =
-  let _ = patch_compute_working_set_mvbdu in
-  (*let starting_mvbdu, starting_g, starting_s =
-      match patch_compute_working_set_mvbdu with
-      | Some (diff, mvbdu) ->
-        Some mvbdu, diff.Diff.next_nr_predicates, diff.Diff.next_nsites
-      | None ->
-        None, Ckappa_sig.guard_parameter_of_int 0, Ckappa_sig.site_name_of_int 0
-    in
-    let error =
-      if
-        Ckappa_sig.compare_site_name
-          Ckappa_sig.hack_to_separate_sites_id_from_guard_id nsites
-        < 0
-        && not (nsites = starting_s)
-      then (
-        let error, () =
-          Exception.warn parameters error __POS__
-            ~message:
-              "Number of sites capacity has been exceeded in incremental analysis"
-            Exit ()
-        in
-        error
-      ) else
-        error
-    in*)
-  (*let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "WS MAP" in
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)in
-    let () =
-      Ckappa_sig.Ws_index_map_and_set.Map.iter
-        (fun i (_,j)  ->
-          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s %s"
-          (Ckappa_sig.string_of_working_set_index i)
-          (if j then "TRUE" else "FALSE") in
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)in ())
-      compilation.Cckappa_sig.working_set_valuations
-    in *)
   let pair_list =
     Ckappa_sig.Ws_index_map_and_set.Map.fold
       (fun _ (guard, bool) pair_list ->

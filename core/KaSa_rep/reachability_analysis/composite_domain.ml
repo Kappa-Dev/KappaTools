@@ -498,7 +498,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     in
 
     let parameters = get_parameter (static, domain_static) in
-    let error, wake_up_tmp =
+    let error, wake_up_tmp = 
       Common_static.empty_site_to_rules parameters error
     in
     let error, wake_up_tmp =

@@ -3,8 +3,10 @@
 
 # phase -> activated dimers
 # external dimers:
-'EGF_EGFR'  EGF(r), EGFR(L,CR) <-> EGF(r!1), EGFR(L!1,CR) @1
-'EGFR_EGFR' EGFR(L!_,CR), EGFR(L!_,CR) <-> EGFR(L!_,CR!1), EGFR(L!_,CR!1) @1
+'EGF_EGFR'  EGF(r), EGFR(L,CR) -> EGF(r!1), EGFR(L!1,CR) @1
+'EGF__EGFR' EGF(r!1), EGFR(L!1,CR) -> EGF(r), EGFR(L,CR) @1
+'EGFR_EGFR' EGFR(L!_,CR), EGFR(L!_,CR) -> EGFR(L!_,CR!1), EGFR(L!_,CR!1) @1
+'EGFR__EGFR' EGFR(L!_,CR!1), EGFR(L!_,CR!1) -> EGFR(L!_,CR), EGFR(L!_,CR)  @1
 # simplified phos (internal or external)
 'EGFR@992'  EGFR(CR!_,Y992~u) -> EGFR(CR!_,Y992~p) @1
 'EGFR@1068' EGFR(CR!_,Y1068~u) -> EGFR(CR!_,Y1068~p) @1
@@ -29,12 +31,16 @@
 'rec_EGFR'     EGFR(L,Y992~u,Y1068~u,Y1148~u) -> EGFR(L,Y992~u,Y1068~u,Y1148~u) @1
 
 # phase -> SoS and RasGAP recruitment
-'EGFR_RasGAP'  EGFR(Y992~p), RasGAP(SH2) <-> EGFR(Y992~p!1), RasGAP(SH2!1) @1
-'EGFR_Grb2'    EGFR(Y1068~p), Grb2(SH2) <-> EGFR(Y1068~p!1), Grb2(SH2!1) @1
+'EGFR_RasGAP'  EGFR(Y992~p), RasGAP(SH2) -> EGFR(Y992~p!1), RasGAP(SH2!1) @1
+EGFR(Y992~p!1), RasGAP(SH2!1) -> EGFR(Y992~p), RasGAP(SH2) @1 
+'EGFR_Grb2'    EGFR(Y1068~p), Grb2(SH2) -> EGFR(Y1068~p!1), Grb2(SH2!1) @1
+EGFR(Y1068~p!1), Grb2(SH2!1) -> EGFR(Y1068~p), Grb2(SH2) @1 
 'Grb2_SoS'     Grb2(SH3), SoS(a,SS~u) -> Grb2(SH3!1), SoS(a!1,SS~u) @1
 'Grb2_SoS_op'  Grb2(SH3!1), SoS(a!1) -> Grb2(SH3), SoS(a) @1
-'EGFR_Shc'     EGFR(Y1148~p), Shc(PTB) <-> EGFR(Y1148~p!1), Shc(PTB!1) @1
-'Shc_Grb2'     Shc(Y318~p), Grb2(SH2) <-> Shc(Y318~p!1), Grb2(SH2!1) @1
+'EGFR_Shc'     EGFR(Y1148~p), Shc(PTB) -> EGFR(Y1148~p!1), Shc(PTB!1) @1
+EGFR(Y1148~p!1), Shc(PTB!1) -> EGFR(Y1148~p), Shc(PTB) @1 
+'Shc_Grb2'     Shc(Y318~p), Grb2(SH2) -> Shc(Y318~p!1), Grb2(SH2!1) @1
+Shc(Y318~p!1), Grb2(SH2!1) -> Shc(Y318~p), Grb2(SH2) @1 
 'Shc@318'      EGFR(CR!_,Y1148~p!1), Shc(PTB!1,Y318~u) -> EGFR(CR!_,Y1148~p!1), Shc(PTB!1,Y318~p) @1
 'Shc@318_op'   Shc(Y318~p) -> Shc(Y318~u) @1
 
