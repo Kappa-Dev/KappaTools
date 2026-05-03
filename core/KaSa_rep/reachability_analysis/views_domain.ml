@@ -435,7 +435,7 @@ module Domain = struct
         let error, init_bdu_analysis_static =
           Bdu_static_views.init_bdu_analysis_static parameters error
         in
-       let ( error,
+        let ( error,
               init_covering_class,
               modified_agents,
               _start_cv,
