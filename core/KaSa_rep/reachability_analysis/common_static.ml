@@ -1123,8 +1123,6 @@ let scan_rule_set ?patch parameter error kappa_handler compil store_result =
         compil.Cckappa_sig.rules store_result
     in
     let error, potential_side_effects_per_rule' =
-      (* This is redone from scratch, it should be improved *)
-      (* TO DO *)
       Proj_agent_rule_to_rule.monadic_proj_map_i
         (fun _parameter error (_, rule_id) -> error, rule_id)
         parameter error []
@@ -1245,8 +1243,8 @@ let collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters error
   in
   error, mvbdu_handler, guard_mvbdus
 
-let compute_working_set_mvbdu parameters error mvbdu_handler compilation nsites
-    =
+let compute_working_set_mvbdu parameters error
+    mvbdu_handler compilation nsites =
   let pair_list =
     Ckappa_sig.Ws_index_map_and_set.Map.fold
       (fun _ (guard, bool) pair_list ->
