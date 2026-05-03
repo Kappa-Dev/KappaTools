@@ -495,8 +495,8 @@
 %obs:'BMP1_LTBP1-LAP-MMP2_Activ' |LAP_TGFB1(x!1,z!3),LTBP1(TB!1,x!2),BMP1(Cat!2),MMP2(Cat!3)| 
 %obs:'CD44_MMP9_cpt' |CD44(x),MMP9(a)| 
 %obs:'CD44_MMP9_LAP_TGFB1_LTBP1__FN1_FBN1_Activ' |LTBP1(TB!1,Nter!_,Cter!_),CD44(x!2),MMP9(a!2),LAP_TGFB1(x!1)|
-%obs:'CD44_MMP14_cpt' |CD44(x),MMP14(Cat)| 
-%obs:'CD44_MMP14-cleavage_cpt' |CD44(x!1),MMP14(Cat!1)| 
+%obs:'CD44_MMP14_cpt' |CD44(y),MMP14(Cat)| 
+%obs:'CD44_MMP14-cleavage_cpt' |CD44(y!1),MMP14(Cat!1)| 
 %obs:'FN1_COL1_cpt' |FN1(c),COL1(y)| 
 %obs:'ITGA2B1_COL1_cpt' |ITGA2B1(x),COL1(z)| 
 %obs:'COL1_MMP2_ITG_Alpha2Beta1_Activ_MMP2' |ITGA2B1(x!1),COL1(z!1,c),MMP2(etat~x,CBD)| 
@@ -508,8 +508,8 @@
 %obs:'TGFB1(b)_DCN_cpt' |TGFB1(b),DCN(c)|
 %obs:'DCN_MMP2_cpt' |DCN(z),MMP2(Cat)| 
 %obs:'Relase of TGFB1 from DCN_TGFB1_MMP2_Activ' |TGFB1(a!1),DCN(x!1,y!2),MMP2(Cat!2)|
-%obs:'DCN_MAGP1_cpt' |DCN(a),MAGP1(x)|
-%obs:'DCN_FBN1_MGAP1_cpt' |DCN(a!1),MAGP1(x!1,Cter),FBN1(Nter,Hyb1)| 
+%obs:'DCN_MAGP1_cpt' |DCN(core),MAGP1(x)|
+%obs:'DCN_FBN1_MGAP1_cpt' |DCN(core!1),MAGP1(x!1,Cter),FBN1(Nter,Hyb1)| 
 %obs:'FN1(a)_DCN_cpt' |FN1(a),DCN(core)| 
 %obs:'FN1(b)_DCN_cpt' |FN1(b),DCN(core)| 
 %obs:'THBS1_LAP_TGFB1_cpt' |THBS1(WxxW,KRFK),LAP_TGFB1(VLAL,LSKL)| 
@@ -531,8 +531,8 @@
 %obs:'TIMP1_MMP2_cpt' |TIMP1(Nter),MMP2(etat~y,Cat)| 
 %obs:'TIMP1_MMP9_cpt' |TIMP1(Nter),MMP9(Cat)| 
 %obs:'ADAMTS4_TIMP3_cpt' |ADAMTS4(Cat), TIMP3(Nter)| 
-%obs:'MMP14_COL1_cpt' |MMP14(etat~y,Cat),COL1(z)| 
-%obs:'Degradation of COL1 by MMP14_cpt' |MMP14(etat~y,Cat!1),COL1(z!1)| 
+%obs:'MMP14_COL1_cpt' |MMP14(etat~y,Cat),COL1(d)| 
+%obs:'Degradation of COL1 by MMP14_cpt' |MMP14(etat~y,Cat!1),COL1(d!1)| 
 %obs:'MMP9_COL1_cpt' |MMP9(Cat),COL1(c)|  
 %obs:'Degradation of COL1 by MMP9_cpt' |MMP9(Cat!1),COL1(c!1)| 
 %obs:'MMP9_FN1_cpt' |MMP9(Cat),FN1(e)| 

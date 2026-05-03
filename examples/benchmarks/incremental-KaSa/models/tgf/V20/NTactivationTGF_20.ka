@@ -346,8 +346,8 @@
 %obs:'BMP1_LTBP1-LAP-MMP2 Activ' |LAP_TGFB1(x!1,z!3),LTBP1(TB!1,x!2),BMP1(Cat!2),MMP2(Cat!3)|
 %obs:'CD44_MMP9_cpt' |CD44(x),MMP9(a)|
 %obs:'CD44_MMP9_LAP_TGFB1_LTBP1__FN1_FBN1 Activ' |LTBP1(TB!1,Nter!_,Cter!_),CD44(x!2),MMP9(a!2),LAP_TGFB1(x!1)|
-%obs:'CD44_MMP14_cpt' |CD44(x),MMP14(Cat)|
-%obs:'CD44_MMP14-cleavage_cpt' |CD44(x!1),MMP14(Cat!1)|
+%obs:'CD44_MMP14_cpt' |CD44(y),MMP14(Cat)|
+%obs:'CD44_MMP14-cleavage_cpt' |CD44(y!1),MMP14(Cat!1)|
 %obs:'FN1_COL1_cpt' |FN1(c),COL1(y)|
 %obs:'ITGA2B1_COL1_cpt' |ITGA2B1(x),COL1(z)|
 %obs:'COL1_MMP2_ITG_Alpha2Beta1 Activ MMP2' |ITGA2B1(x!1),COL1(z!1,c),MMP2(etat~x,CBD)|
@@ -381,8 +381,8 @@
 %obs:'TIMP1_MMP2_cpt' |TIMP1(Nter),MMP2(etat~y,Cat)|
 %obs:'TIMP1_MMP9_cpt' |TIMP1(Nter),MMP9(Cat)|
 %obs:'ADAMTS4_TIMP3_cpt' |ADAMTS4(Cat), TIMP3(Nter)|
-%obs:'MMP14_COL1_cpt' |MMP14(etat~y,Cat),COL1(z)|
-%obs:'Degradation of COL1 by MMP14_cpt' |MMP14(etat~y,Cat!1),COL1(z!1)|
+%obs:'MMP14_COL1_cpt' |MMP14(etat~y,Cat),COL1(d)|
+%obs:'Degradation of COL1 by MMP14_cpt' |MMP14(etat~y,Cat!1),COL1(d!1)|
 %obs:'MMP9_COL1_cpt' |MMP9(CBD),COL1(c)|
 %obs:'MMP2_COL1_cpt' |MMP2(etat~x,CBD),COL1(c)|
 %obs:'Degradation of COL1 by MMP9_cpt' |MMP9(CBD!1),COL1(c!1)|
