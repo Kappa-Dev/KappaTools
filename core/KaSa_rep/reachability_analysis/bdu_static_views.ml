@@ -907,58 +907,6 @@ let collect_proj_bdu_test_restriction ?start_cv ~new_rule ~modified_agents
   (error, bdu_handler), store_result
 
 (***************************************************************************)
-
-(*Pattern*)
-
-let collect_proj_bdu_test_restriction_pattern ?start_cv ~new_rule
-    ~modified_agents parameters error (pattern : Cckappa_sig.mixture)
-    (*store_new_index_pair_map*)
-      store_remanent_triple store_result =
-  (*let (map_new_index_forward, _) = store_new_index_pair_map in*)
-  let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
-      error
-      (fun parameters error _agent_id agent store_result ->
-        match agent with
-        | Cckappa_sig.Unknown_agent _ | Cckappa_sig.Ghost
-        | Cckappa_sig.Dead_agent (_, _, _, _) ->
-          error, store_result (*CHECK ME: SHOULD I RAISE A WARNING HERE?*)
-        (*Exception.warn parameters error __POS__
-          ~message:"Dead_agent"
-          Exit store_result*)
-        (*----------------------------------------------------------*)
-        | Cckappa_sig.Agent agent ->
-          let agent_type = agent.Cckappa_sig.agent_name in
-          let error, bool =
-            Covering_classes_main.is_there_new_cv_in_agent ~modified_agents
-              parameters error agent_type
-          in
-          if not (bool || new_rule) then
-            error, store_result
-          else (
-            let error, cv_max =
-              Covering_classes_main.compute_cv_max ?start_cv parameters error
-                agent_type
-            in
-            let error, triple_list =
-              match
-                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif
-                .unsafe_get parameters error agent_type store_remanent_triple
-              with
-              | error, None -> error, []
-              | error, Some l -> error, l
-            in
-            let error, get_pair_list =
-              get_pair_cv_map_with_restriction_views ~cv_max parameters error
-                agent triple_list
-            in
-            error, get_pair_list
-          ))
-      pattern.Cckappa_sig.views store_result
-  in
-  error, store_result
-
-(***************************************************************************)
 let scan_rule_static ?start_cv ~new_rule ~modified_agents parameters log_info
     error handler_bdu (rule_id : Ckappa_sig.c_rule_id) rule
     (*store_new_index_pair_map*)
@@ -1055,50 +1003,3 @@ let scan_rule_set ?start ?start_cv ~patch_store_remanent_triple ~modified_agents
   in
   ( error,
     (handler_bdu, log_info, { store_results with site_to_renamed_site_list }) )
-
-(***************************************************************************)
-(*PATTERN*)
-(***************************************************************************)
-
-let scan_rule_static_pattern ?start_cv ~new_rule ~modified_agents parameters
-    (*store_new_index_pair_map*)
-      store_remanent_triple error rule store_result =
-  let error, store_proj_bdu_test_restriction_pattern =
-    collect_proj_bdu_test_restriction_pattern ?start_cv ~new_rule
-      ~modified_agents parameters error rule.Cckappa_sig.rule_lhs (*pattern*)
-      (*store_new_index_pair_map*)
-      store_remanent_triple store_result.store_proj_bdu_test_restriction_pattern
-  in
-  error, { store_proj_bdu_test_restriction_pattern }
-
-let scan_rule_set_pattern ?start ?start_cv ~modified_agents parameters error
-    (*store_new_index_pair_map*)
-      store_remanent_triple compiled init =
-  (*let init = init_bdu_analysis_static_pattern in *)
-  let error, store_results =
-    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold_two_steps ?start
-      parameters error
-      (fun parameters error _ rule store_result ->
-        let b = Covering_classes_main.is_there_new_cv ~modified_agents in
-        if not b then
-          error, store_result
-        else (
-          let error, store_result =
-            scan_rule_static_pattern ~new_rule:false ?start_cv ~modified_agents
-              parameters (*store_new_index_pair_map*)
-              store_remanent_triple error rule.Cckappa_sig.e_rule_c_rule
-              store_result
-          in
-          error, store_result
-        ))
-      (fun parameters error _ rule store_result ->
-        let error, store_result =
-          scan_rule_static_pattern ~new_rule:true ~modified_agents parameters
-            (*store_new_index_pair_map*)
-            store_remanent_triple error rule.Cckappa_sig.e_rule_c_rule
-            store_result
-        in
-        error, store_result)
-      compiled.Cckappa_sig.rules init
-  in
-  error, store_results

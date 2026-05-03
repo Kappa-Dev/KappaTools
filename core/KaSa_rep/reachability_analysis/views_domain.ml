@@ -11,7 +11,7 @@
    * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
-   * under the terms of the GNU Library General Public License *)
+   * under xthe terms of the GNU Library General Public License *)
 
 (* Before properly achieving separation of concepts. We introduce one
    monolithic domain that collect everything (as in the previous analyzer).*)
@@ -55,8 +55,6 @@ module Domain = struct
   type static_information = {
     global_static_information: Analyzer_headers.global_static_information;
     domain_static_information: Bdu_static_views.bdu_analysis_static;
-    domain_static_information_pattern:
-      Bdu_static_views.bdu_analysis_static_pattern;
     domain_static_information_covering_class:
       Covering_classes_type.predicate_covering_classes;
     patch_store_remanent_triple:
@@ -66,16 +64,13 @@ module Domain = struct
       list
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
       option;
-        (* start_cv:
-           Covering_classes_type.cv_id
-           Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t
-           option;*)
   }
 
-  let set_start_cv patch_store_remanent_triple static =
+  let set_patch_store_remanent_triple patch_store_remanent_triple static =
     { static with patch_store_remanent_triple }
 
-  let get_start_cv static = static.patch_store_remanent_triple
+  let get_patch_store_remanent_triple static =
+    static.patch_store_remanent_triple
 
   (*--------------------------------------------------------------------*)
   (* put here the type of the struct that contains the rest of the
@@ -116,17 +111,6 @@ module Domain = struct
     { static with domain_static_information = domain }
 
   let get_domain_static static = static.domain_static_information
-
-  let set_domain_static_pattern domain static =
-    { static with domain_static_information_pattern = domain }
-
-  let get_domain_static_pattern static =
-    static.domain_static_information_pattern
-
-  let _get_store_proj_bdu_test_restriction_pattern static =
-    (get_domain_static_pattern static)
-      .Bdu_static_views.store_proj_bdu_test_restriction_pattern
-
   let lift f x = f (get_global_static_information x)
   let get_parameter static = lift Analyzer_headers.get_parameter static
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
@@ -402,15 +386,6 @@ module Domain = struct
     let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
     let static = set_domain_static result static in
-    (*-----------------------------------------------------------------------*)
-    (*pattern*)
-    (*-----------------------------------------------------------------------*)
-    let error, result =
-      Bdu_static_views.scan_rule_set_pattern ?start ?start_cv ~modified_agents
-        parameters error remanent_triple compiled
-        (get_domain_static_pattern static)
-    in
-    let static = set_domain_static_pattern result static in
     error, static, dynamic
 
   let scan_rule_set_dynamic ?start static dynamic error =
@@ -460,10 +435,7 @@ module Domain = struct
         let error, init_bdu_analysis_static =
           Bdu_static_views.init_bdu_analysis_static parameters error
         in
-        let init_bdu_analysis_static_pattern =
-          Bdu_static_views.init_bdu_analysis_static_pattern
-        in
-        let ( error,
+       let ( error,
               init_covering_class,
               modified_agents,
               _start_cv,
@@ -475,7 +447,6 @@ module Domain = struct
           {
             global_static_information = static;
             domain_static_information = init_bdu_analysis_static;
-            domain_static_information_pattern = init_bdu_analysis_static_pattern;
             domain_static_information_covering_class = init_covering_class;
             patch_store_remanent_triple = None;
           }
@@ -557,7 +528,9 @@ module Domain = struct
         (StoryProfiling.Domain_initialization domain_name) None log_info
     in
     let dynamic = set_log_info log_info dynamic in
-    let static = set_start_cv (Some patch_store_remanent_triple) static in
+    let static =
+      set_patch_store_remanent_triple (Some patch_store_remanent_triple) static
+    in
     error, static, dynamic, modified_agents, []
 
   let add_wake_up_common parameters error rule_id (agent_type, cv_id)
@@ -583,9 +556,11 @@ module Domain = struct
   let complete_wake_up_relation static error wake_up =
     let parameters = get_parameter static in
     let store_list_of_site_type_in_covering_classes =
+      (* TO DO *)
       get_list_of_site_type_in_covering_classes static
     in
     let store_modif_list_restriction_map =
+      (* TO DO *)
       get_store_modif_list_restriction_map static
     in
     let error, wake_up =
@@ -1080,7 +1055,7 @@ module Domain = struct
   let build_init_restriction ~new_init static dynamic error init_state =
     let parameters = get_parameter static in
     let store_remanent_triple =
-      match new_init, get_start_cv static with
+      match new_init, get_patch_store_remanent_triple static with
       | true, _ | _, None -> get_remanent_triple static
       | _, Some a -> a
     in
@@ -1157,7 +1132,7 @@ module Domain = struct
 
   let add_initial_state ~new_init ?modified_agents static dynamic error
       init_state =
-    let _ = new_init, modified_agents in
+    let _ = modified_agents in
     let error, dynamic, event_list =
       build_init_restriction ~new_init static dynamic error init_state
     in
