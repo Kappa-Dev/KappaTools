@@ -409,65 +409,71 @@ functor
       in
       error, prod
 
-    let add_initial_state ~new_init ?modified_agents static dynamic error
+    let add_initial_state ~new_init ?patch ?modified_agents static dynamic error
         species =
-      let _ = modified_agents, new_init in
-      let parameters = get_parameter static in
-      let compil = get_compil static in
-      let kappa_handler = get_kappa_handler static in
-      let packs = get_packs static in
-      let event_list = [] in
-      let dump_title () =
-        if
-          local_trace
-          || Remanent_parameters.get_dump_reachability_analysis_diff parameters
-        then (
-          let () =
-            Loggers.fprintf
-              (Remanent_parameters.get_logger parameters)
-              "%sUpdate information about counters"
-              (Remanent_parameters.get_prefix parameters)
-          in
-          let () =
+      if not new_init then
+        error, dynamic, []
+      else (
+        let _ = modified_agents, new_init, patch in
+        let parameters = get_parameter static in
+        let compil = get_compil static in
+        let kappa_handler = get_kappa_handler static in
+        let packs = get_packs static in
+        let event_list = [] in
+        let dump_title () =
+          if
+            local_trace
+            || Remanent_parameters.get_dump_reachability_analysis_diff
+                 parameters
+          then (
+            let () =
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameters)
+                "%sUpdate information about counters"
+                (Remanent_parameters.get_prefix parameters)
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
             Loggers.print_newline (Remanent_parameters.get_logger parameters)
-          in
-          Loggers.print_newline (Remanent_parameters.get_logger parameters)
-        ) else
-          ()
-      in
-      (*parallel bonds in the initial states*)
-      let error, (dynamic, event_list) =
-        let enriched_init = species.Cckappa_sig.e_init_c_mixture in
-        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-          parameters error
-          (fun parameters error _ag_id ag (dynamic, event_list) ->
-            match ag with
-            | Cckappa_sig.Ghost | Cckappa_sig.Unknown_agent _
-            | Cckappa_sig.Dead_agent _ ->
-              Exception.warn parameters error __POS__ Exit (dynamic, event_list)
-            | Cckappa_sig.Agent ag ->
-              let agent_type = ag.Cckappa_sig.agent_name in
-              let error, assignements =
-                Counters_domain_static.convert_view parameters error
-                  kappa_handler compil packs agent_type
-                  (Some (Cckappa_sig.Agent ag))
-              in
-              let error, dynamic, event_list =
-                List.fold_left
-                  (fun (error, dynamic, event_list)
-                       ((agent_type, counter), assignement) ->
-                    let error, prod =
-                      prod_of_assignement parameters error assignement
-                    in
-                    new_union static dynamic error dump_title agent_type counter
-                      prod event_list)
-                  (error, dynamic, event_list)
-                  assignements
-              in
-              error, (dynamic, event_list))
-          enriched_init.Cckappa_sig.views (dynamic, event_list)
-      in
-      error, dynamic, event_list
+          ) else
+            ()
+        in
+        (*parallel bonds in the initial states*)
+        let error, (dynamic, event_list) =
+          let enriched_init = species.Cckappa_sig.e_init_c_mixture in
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+            parameters error
+            (fun parameters error _ag_id ag (dynamic, event_list) ->
+              match ag with
+              | Cckappa_sig.Ghost | Cckappa_sig.Unknown_agent _
+              | Cckappa_sig.Dead_agent _ ->
+                Exception.warn parameters error __POS__ Exit
+                  (dynamic, event_list)
+              | Cckappa_sig.Agent ag ->
+                let agent_type = ag.Cckappa_sig.agent_name in
+                let error, assignements =
+                  Counters_domain_static.convert_view parameters error
+                    kappa_handler compil packs agent_type
+                    (Some (Cckappa_sig.Agent ag))
+                in
+                let error, dynamic, event_list =
+                  List.fold_left
+                    (fun (error, dynamic, event_list)
+                         ((agent_type, counter), assignement) ->
+                      let error, prod =
+                        prod_of_assignement parameters error assignement
+                      in
+                      new_union static dynamic error dump_title agent_type
+                        counter prod event_list)
+                    (error, dynamic, event_list)
+                    assignements
+                in
+                error, (dynamic, event_list))
+            enriched_init.Cckappa_sig.views (dynamic, event_list)
+        in
+        error, dynamic, event_list
+      )
 
     (*************************************************************)
     (* if a parallel bound occurs on the lhs, check that this is possible *)

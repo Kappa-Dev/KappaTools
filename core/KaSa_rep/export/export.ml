@@ -2729,8 +2729,9 @@ functor
       let state, cc_compil = get_c_compilation state in
       let state = Remanent_state.store_patch cc_compil state in
       let errors = get_errors state in
-      let errors, handler, cc_compil =
+      let errors, handler, cc_compil, new_indexs =
         Diff.fuse parameters errors handler cc_compil handler' cc_compil'
+          new_indexs
       in
       let state = set_errors errors state in
       let state = Remanent_state.set_c_compil cc_compil state in
@@ -2785,7 +2786,32 @@ functor
           let () = Loggers.fprintf log "KAPPA HANDLER" in
           let () = Loggers.print_newline log in
           let errors = Print_handler.print_handler parameters errors handler in
-
+          let () =
+            match new_indexs.Diff.there_are_new_sites_in_former_agent_types with
+            | None -> Loggers.fprintf log "some agents have new sites: UNKNOWN"
+            | Some true -> Loggers.fprintf log "some agents have new sites"
+            | Some false -> Loggers.fprintf log "No agent has new sites"
+          in
+          let () = Loggers.print_newline log in
+          let errors =
+            match new_indexs.Diff.this_agent_has_new_sites with
+            | None -> errors
+            | Some a ->
+              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.iter
+                parameters errors
+                (fun _p errors i b ->
+                  let () =
+                    Loggers.fprintf log "Agent: %i %s"
+                      (Ckappa_sig.int_of_agent_name i)
+                      (if b then
+                         "true"
+                       else
+                         "false")
+                  in
+                  let () = Loggers.print_newline log in
+                  errors)
+                a
+          in
           set_errors errors state
         ) else
           state

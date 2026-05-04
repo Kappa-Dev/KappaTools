@@ -388,8 +388,8 @@ let initialize_global_information ?patch parameters log_info error mvbdu_handler
       error mvbdu_handler compilation restriction_mvbdu nsites
   in
   let error, mvbdu_handler, working_set_mvbdu =
-    Common_static.compute_working_set_mvbdu 
-      parameters error mvbdu_handler compilation nsites
+    Common_static.compute_working_set_mvbdu parameters error mvbdu_handler
+      compilation nsites
   in
   let init_global_static =
     {

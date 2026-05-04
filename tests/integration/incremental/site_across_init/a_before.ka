@@ -1,0 +1,6 @@
+%agent: C(x y{u p}) 
+%init: 10 A(x[1]),B(x[1]) 
+
+
+
+%init: 10 C(x[1],y{p}[.]),D(x[1]) 

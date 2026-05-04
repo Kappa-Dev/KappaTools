@@ -66,6 +66,9 @@ type new_indexs = {
   next_nsites: Ckappa_sig.c_site_name;
   next_nr_predicates: Ckappa_sig.c_guard_parameter;
   next_agent: Ckappa_sig.c_agent_name;
+  this_agent_has_new_sites:
+    bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t option;
+  there_are_new_sites_in_former_agent_types: bool option;
   next_site_per_agent:
     Ckappa_sig.c_site_name
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t
@@ -78,6 +81,8 @@ type new_indexs = {
     option;
 }
 
+type pre_new_indexs = new_indexs
+
 let starting_new_elt =
   {
     next_rule = Ckappa_sig.rule_id_of_int 0;
@@ -87,6 +92,8 @@ let starting_new_elt =
     next_site_per_agent = None;
     next_nr_predicates = Ckappa_sig.guard_parameter_of_int 0;
     former_dual = None;
+    this_agent_has_new_sites = None;
+    there_are_new_sites_in_former_agent_types = None;
   }
 
 let empty_summary_file =
@@ -788,6 +795,22 @@ let get_new_indexs parameters errors handler c_compil =
       errors, Some a
     )
   in
+  (*let error, this_agent_has_new_sites, there_are_new_sites_in_former_agent_types =
+      if c_compil'.Ast.signatures = []
+      then errors, None, Some false
+      else
+        let errors, a = Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init parameters errors
+        (Ckappa_sig.int_of_agent_name next_agent -1)
+        (fun _ error _ -> error,false)
+      in
+      let errors, a =
+        List.fold_left
+          (fun (errors, a) _elt ->
+            errors, a
+            ) (errors, a) c_compil'.Ast.signatures
+          in
+        errors, None, Some true
+    in *)
   let new_indexs =
     {
       next_rule = Ckappa_sig.rule_id_of_int n;
@@ -797,11 +820,13 @@ let get_new_indexs parameters errors handler c_compil =
       next_site_per_agent;
       former_dual = Some dual;
       next_agent;
+      this_agent_has_new_sites = None;
+      there_are_new_sites_in_former_agent_types = None;
     }
   in
   errors, new_indexs
 
-let fuse parameters errors handler c_compil handler' c_compil' =
+let fuse parameters errors handler c_compil handler' c_compil' diff =
   let n = Handler.nrules parameters errors handler in
   let n' = Handler.ninit parameters errors handler in
   let errors, n'' =
@@ -830,18 +855,63 @@ let fuse parameters errors handler c_compil handler' c_compil' =
       c_compil'.Cckappa_sig.init c_compil.Cckappa_sig.init
   in
   let ninits = n' + Handler.ninit parameters errors handler' in
-  let errors, (signatures, _n_sig_pred) =
+  let nagents = Handler.nagents parameters errors handler' in
+  let errors, this_agent_has_new_sites =
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+      parameters errors
+      (Ckappa_sig.int_of_agent_name nagents)
+  in
+  let ( errors,
+        ( signatures,
+          _n_sig_pred
+          (*,
+            there_are_new_sites_in_former_agent_types,
+            this_agent_has_new_sites ) *) ) ) =
     Int_storage.Nearly_inf_Imperatif.fold parameters errors
-      (fun parameters errors i init' (inits, _) ->
+      (fun parameters errors i init' (inits, _ (*, _, this_agent_has_new_sites*)) ->
         let id = i + n'' in
         let errors, inits =
           Int_storage.Nearly_inf_Imperatif.set parameters errors (i + n'') init'
             inits
         in
-        errors, (inits, id))
+        errors, (inits, id (*, true, this_agent_has_new_sites*)))
       c_compil'.Cckappa_sig.signatures
-      (c_compil.Cckappa_sig.signatures, n'' - 1)
+      ( c_compil.Cckappa_sig.signatures,
+        n'' - 1 (*, false, this_agent_has_new_sites*) )
   in
+  let ( errors,
+        (there_are_new_sites_in_former_agent_types, this_agent_has_new_sites) )
+      =
+    match diff.next_site_per_agent with
+    | None -> errors, (false, this_agent_has_new_sites)
+    | Some map ->
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
+        errors
+        (fun p e a b (bool, m) ->
+          let e, i = Ckappa_sig.Dictionary_of_sites.last_entry p e b in
+          let e, j =
+            match
+              Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
+                p e a map
+            with
+            | e, None -> e, Ckappa_sig.site_name_of_int (-1)
+            | e, Some a -> e, a
+          in
+          if i <> j then (
+            let e, m =
+              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set p
+                e a true m
+            in
+            e, (true, m)
+          ) else
+            e, (bool, m))
+        handler'.Cckappa_sig.sites
+        (false, this_agent_has_new_sites)
+  in
+  let there_are_new_sites_in_former_agent_types =
+    Some there_are_new_sites_in_former_agent_types
+  in
+  let this_agent_has_new_sites = Some this_agent_has_new_sites in
   ( errors,
     { handler' with Cckappa_sig.nrules; Cckappa_sig.ninits },
     {
@@ -851,7 +921,13 @@ let fuse parameters errors handler c_compil handler' c_compil' =
       Cckappa_sig.signatures;
       Cckappa_sig.working_set_valuations =
         c_compil'.Cckappa_sig.working_set_valuations;
-    } )
+    },
+    ({
+       diff with
+       this_agent_has_new_sites;
+       there_are_new_sites_in_former_agent_types;
+     }
+      : new_indexs) )
 
 let update_ast added_elements_compil old_compil =
   let updated_compil, renamed_rules, renamed_init =

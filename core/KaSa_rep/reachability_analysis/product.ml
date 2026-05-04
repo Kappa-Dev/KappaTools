@@ -137,16 +137,17 @@ module Product
     'c ->
     Exception.exceptions_caught_and_uncaught * dynamic_information * 'd
 
-  let add_initial_state ~new_init ?modified_agents static dynamic error
+  let add_initial_state ~new_init ?patch ?modified_agents static dynamic error
       initial_state =
     let error, underlying_domain_dynamic, event_list =
-      Underlying_domain.add_initial_state ~new_init ?modified_agents
+      Underlying_domain.add_initial_state ~new_init ?modified_agents ?patch
         static.underlying_domain
         (underlying_domain_dynamic_information dynamic)
         error initial_state
     in
     let error, new_domain_dynamic, event_list' =
-      New_domain.add_initial_state ~new_init ?modified_agents static.new_domain
+      New_domain.add_initial_state ~new_init ?modified_agents ?patch
+        static.new_domain
         (new_domain_dynamic_information underlying_domain_dynamic dynamic)
         error initial_state
     in

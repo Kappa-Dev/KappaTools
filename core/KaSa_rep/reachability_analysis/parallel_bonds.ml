@@ -742,15 +742,19 @@ module Domain = struct
 
   (*************************************************************)
 
-  let add_initial_state ~new_init ?modified_agents static dynamic error species
-      =
-    let _ = modified_agents in
-    let event_list = [] in
-    (*parallel bonds in the initial states*)
-    let error, dynamic =
-      compute_value_init ~new_init static dynamic error species
-    in
-    error, dynamic, event_list
+  let add_initial_state ~new_init ?patch ?modified_agents static dynamic error
+      species =
+    if not new_init then
+      error, dynamic, []
+    else (
+      let _ = modified_agents, patch in
+      let event_list = [] in
+      (*parallel bonds in the initial states*)
+      let error, dynamic =
+        compute_value_init ~new_init static dynamic error species
+      in
+      error, dynamic, event_list
+    )
 
   (*************************************************************)
   (* if a parallel bound occurs on the lhs, check that this is possible *)
