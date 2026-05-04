@@ -564,15 +564,19 @@ module Domain = struct
 
   (**************************************************************************)
 
-  let add_initial_state ~new_init ?modified_agents static dynamic error species
-      =
-    let _ = new_init in
-    let event_list = [] in
-    let error, (dynamic, event_list) =
-      init_agents ~new_init ?modified_agents static dynamic error species
-        event_list
-    in
-    error, dynamic, event_list
+  let add_initial_state ~new_init ?patch ?modified_agents static dynamic error
+      species =
+    if not new_init then
+      error, dynamic, []
+    else (
+      let _ = new_init, patch in
+      let event_list = [] in
+      let error, (dynamic, event_list) =
+        init_agents ~new_init ?modified_agents static dynamic error species
+          event_list
+      in
+      error, dynamic, event_list
+    )
 
   (************************************************************************************)
   (** check that the type of each agent in the lhs has been already seen

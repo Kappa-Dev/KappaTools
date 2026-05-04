@@ -132,9 +132,9 @@ module Domain = struct
   (**************************************************************************)
   (*Implementation*)
 
-  let add_initial_state ~new_init ?modified_agents _static dynamic error
+  let add_initial_state ~new_init ?patch ?modified_agents _static dynamic error
       _species =
-    let _ = modified_agents, new_init in
+    let _ = modified_agents, new_init, patch in
     error, dynamic, []
 
   (**************************************************************************)

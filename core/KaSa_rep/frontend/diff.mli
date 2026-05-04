@@ -22,12 +22,17 @@ type diff = {
   diff_agent_sig: diff_elt;
 }
 
+type pre_new_indexs
+
 type new_indexs = {
   next_rule: Ckappa_sig.c_rule_id;
   next_init: int;
   next_nsites: Ckappa_sig.c_site_name;
   next_nr_predicates: Ckappa_sig.c_guard_parameter;
   next_agent: Ckappa_sig.c_agent_name;
+  this_agent_has_new_sites:
+    bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t option;
+  there_are_new_sites_in_former_agent_types: bool option;
   next_site_per_agent:
     Ckappa_sig.c_site_name
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t
@@ -144,7 +149,7 @@ val get_new_indexs :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Cckappa_sig.kappa_handler ->
   Cckappa_sig.compil ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * new_indexs
+  Exception_without_parameter.exceptions_caught_and_uncaught * pre_new_indexs
 
 val fuse :
   Remanent_parameters_sig.parameters ->
@@ -153,9 +158,11 @@ val fuse :
   Cckappa_sig.compil ->
   Cckappa_sig.kappa_handler ->
   Cckappa_sig.compil ->
+  pre_new_indexs ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Cckappa_sig.kappa_handler
   * Cckappa_sig.compil
+  * new_indexs
 
 val update_ast :
   Ast.parsing_compil ->

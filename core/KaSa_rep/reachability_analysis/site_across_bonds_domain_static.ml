@@ -186,16 +186,47 @@ let collect_tuples parameters error kappa_handler
       site_map (error, current_list)
   )
 
-let store_set parameters error fst_list snd_list store_result =
+let store_set ?patch parameters error fst_list snd_list store_result =
   List.fold_left
     (fun (error, store_result) x ->
+      let agx, sx, sx', _, _ = x in
+      let error, lastsx =
+        match patch with
+        | None -> error, Ckappa_sig.site_name_of_int (-1)
+        | Some (_, map) ->
+          (match
+             Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+               parameters error agx map
+           with
+          | error, None -> error, Ckappa_sig.site_name_of_int (-1)
+          | error, Some a -> error, a)
+      in
+      let b1 = compare lastsx sx < 0 || compare lastsx sx' < 0 in
       List.fold_left
         (fun (error, store_result) y ->
-          let error, store_result =
-            Site_across_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set
-            .add_when_not_in parameters error (x, y) store_result
+          let agy, sy, sy', _, _ = y in
+          let error, b1 =
+            if not b1 then (
+              let error, lastsy =
+                match patch with
+                | None -> error, Ckappa_sig.site_name_of_int (-1)
+                | Some (_, map) ->
+                  (match
+                     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+                       parameters error agy map
+                   with
+                  | error, None -> error, Ckappa_sig.site_name_of_int (-1)
+                  | error, Some a -> error, a)
+              in
+              error, compare lastsy sy < 0 || compare lastsy sy' < 0
+            ) else
+              error, b1
           in
-          error, store_result)
+          if not b1 then
+            error, store_result
+          else
+            Site_across_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set
+            .add_when_not_in parameters error (x, y) store_result)
         (error, store_result) snd_list)
     (error, store_result) fst_list
 
@@ -243,8 +274,8 @@ let collect_potential_tuple_pair_rule_rhs parameters error rule_id
   Ckappa_sig.Rule_map_and_set.Map.add parameters error rule_id
     store_potential_tuple_pair_rhs store_result
 
-let build_potential_tuple_pair_set parameters error kappa_handler bonds_set
-    views_map =
+let build_potential_tuple_pair_set ?patch parameters error kappa_handler
+    bonds_set views_map =
   let error, tuple_set =
     Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
       (fun (x, y) (error, store_result) ->
@@ -255,7 +286,7 @@ let build_potential_tuple_pair_set parameters error kappa_handler bonds_set
           collect_tuples parameters error kappa_handler y views_map []
         in
         let error, store_result =
-          store_set parameters error fst_list snd_list store_result
+          store_set ?patch parameters error fst_list snd_list store_result
         in
         error, store_result)
       bonds_set

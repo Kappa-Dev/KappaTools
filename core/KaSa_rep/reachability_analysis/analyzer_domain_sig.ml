@@ -85,6 +85,7 @@ module type Domain = sig
 
   val add_initial_state :
     new_init:bool ->
+    ?patch:Diff.new_indexs ->
     ?modified_agents:
       bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t * bool ->
     (Analyzer_headers.initial_state, Communication.event list) unary

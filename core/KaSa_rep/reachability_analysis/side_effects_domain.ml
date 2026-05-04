@@ -145,10 +145,10 @@ module Domain = struct
 
   let complete_wake_up_relation _static error wake_up = error, wake_up
 
-  let add_initial_state ~new_init ?modified_agents _static dynamic error
+  let add_initial_state ~new_init ?patch ?modified_agents _static dynamic error
       _species =
     let event_list = [] in
-    let _ = modified_agents, new_init in
+    let _ = modified_agents, new_init, patch in
     error, dynamic, event_list
 
   let is_enabled _static dynamic error _rule_id precondition =

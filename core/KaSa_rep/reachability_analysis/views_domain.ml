@@ -1130,9 +1130,9 @@ module Domain = struct
   (**************************************************************)
   (**add initial state of kappa*)
 
-  let add_initial_state ~new_init ?modified_agents static dynamic error
+  let add_initial_state ~new_init ?patch ?modified_agents static dynamic error
       init_state =
-    let _ = modified_agents in
+    let _ = modified_agents, patch in
     let error, dynamic, event_list =
       build_init_restriction ~new_init static dynamic error init_state
     in

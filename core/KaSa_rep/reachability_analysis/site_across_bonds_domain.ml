@@ -793,49 +793,110 @@ module Domain = struct
   (*ADD INTITIAL STATE*)
   (***************************************************************************)
 
-  let add_initial_state ~new_init ?modified_agents static dynamic error species
-      =
-    let _ = modified_agents, new_init in
-    let parameters = get_parameter static in
-    (*views in the initial state that has two agents and their sites are
-      different*)
-    let kappa_handler = get_kappa_handler static in
-    let views = species.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views in
-    let init = true in
-    let error, store_views_init =
-      Common_static.collect_views_pattern_aux ~init parameters kappa_handler
-        error views Ckappa_sig.Agent_id_map_and_set.Map.empty
-    in
-    let error, store_bonds_init =
-      Common_static.collect_bonds_pattern parameters error views
-        species.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds
-        Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
-    in
-    (*collect the first site bound, and the second site different than the
-      first site, return the information of its state, result*)
-    let store_result = get_value dynamic in
-    let kappa_handler = get_kappa_handler static in
-    let nsites = Handler.get_nsites kappa_handler in
-    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
-    let bdu_handler = get_mvbdu_handler dynamic in
-    let restriction_bdu = get_restriction_mvbdu static in
-    let error, bdu_handler, mvbdu_guard =
-      Ckappa_sig.guard_to_bdu_opt parameters error bdu_handler
-        species.Cckappa_sig.e_init_guard restriction_bdu nsites
-    in
-    let error, tuple_init =
-      Site_across_bonds_domain_static.build_potential_tuple_pair_set parameters
-        error kappa_handler store_bonds_init store_views_init
-    in
-    let error, bdu_handler, store_result =
-      Site_across_bonds_domain_static.collect_potential_tuple_pair_init
-        parameters error bdu_false bdu_handler kappa_handler tuple_init
-        store_result restriction_bdu mvbdu_guard
-    in
-    let dynamic = set_mvbdu_handler bdu_handler dynamic in
-    let dynamic = set_value store_result dynamic in
-    let event_list = [] in
-    error, dynamic, event_list
+  let has_a_modified_agent parameters error ?patch views =
+    match patch with
+    | None -> error, true
+    | Some (map, _) ->
+      let error, b =
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.for_all
+          parameters error
+          (fun _ error _ view ->
+            match view with
+            | Cckappa_sig.Ghost -> error, false
+            | Cckappa_sig.Agent agent ->
+              (match
+                 Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif
+                 .unsafe_get parameters error agent.Cckappa_sig.agent_name map
+               with
+              | error, None -> error, true
+              | error, Some a -> error, not a)
+            | Cckappa_sig.Dead_agent _ | Cckappa_sig.Unknown_agent _ ->
+              Exception.warn parameters error __POS__
+                ~message:"dead/unknown agent should not occur in initial states"
+                Exit true)
+            (* agent with a site or state that never occur in the rhs or an initial
+               state, set of the undefined sites, map of sites with undefined
+               internal states, map of sites with undefined binding states*)
+          views
+      in
+      error, not b
+
+  let add_initial_state ~new_init ?patch ?modified_agents static dynamic error
+      species =
+    let _ = modified_agents in
+    if
+      not
+        (new_init
+        ||
+        match patch with
+        | None -> assert false
+        | Some a ->
+          (match a.Diff.there_are_new_sites_in_former_agent_types with
+          | None -> true
+          | Some a -> a))
+      (* Even former init instruction has be scanned when the signature is changed *)
+      (* This is to account for the potential new implicit sites *)
+    then
+      error, dynamic, []
+    else (
+      let views = species.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views in
+      let parameters = get_parameter static in
+      let patch =
+        match new_init, patch with
+        | false, None -> assert false
+        | false, Some a ->
+          (match
+             a.Diff.this_agent_has_new_sites, a.Diff.next_site_per_agent
+           with
+          | Some a, Some b -> Some (a, b)
+          | None, _ | _, None -> None)
+        | true, _ -> None
+      in
+      let error, b2 = has_a_modified_agent parameters error ?patch views in
+
+      if not b2 then
+        error, dynamic, []
+      else (
+        (*views in the initial state that has two agents and their sites are
+          different*)
+        let kappa_handler = get_kappa_handler static in
+        let init = true in
+        let error, store_views_init =
+          Common_static.collect_views_pattern_aux ~init parameters kappa_handler
+            error views Ckappa_sig.Agent_id_map_and_set.Map.empty
+        in
+        let error, store_bonds_init =
+          Common_static.collect_bonds_pattern parameters error views
+            species.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds
+            Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
+        in
+        (*collect the first site bound, and the second site different than the
+          first site, return the information of its state, result*)
+        let store_result = get_value dynamic in
+        let kappa_handler = get_kappa_handler static in
+        let nsites = Handler.get_nsites kappa_handler in
+        let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+        let bdu_handler = get_mvbdu_handler dynamic in
+        let restriction_bdu = get_restriction_mvbdu static in
+        let error, bdu_handler, mvbdu_guard =
+          Ckappa_sig.guard_to_bdu_opt parameters error bdu_handler
+            species.Cckappa_sig.e_init_guard restriction_bdu nsites
+        in
+        let error, tuple_init =
+          Site_across_bonds_domain_static.build_potential_tuple_pair_set ?patch
+            parameters error kappa_handler store_bonds_init store_views_init
+        in
+        let error, bdu_handler, store_result =
+          Site_across_bonds_domain_static.collect_potential_tuple_pair_init
+            parameters error bdu_false bdu_handler kappa_handler tuple_init
+            store_result restriction_bdu mvbdu_guard
+        in
+        let dynamic = set_mvbdu_handler bdu_handler dynamic in
+        let dynamic = set_value store_result dynamic in
+        let event_list = [] in
+        error, dynamic, event_list
+      )
+    )
 
   (* check for each bond that occur in the lhs, whether
      the constraints in the lhs are consistent *)

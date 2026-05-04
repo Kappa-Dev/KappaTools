@@ -331,21 +331,25 @@ module Domain = struct
         error, Communication.See_a_new_bond pair :: event_list)
       map_diff (error, event_list)
 
-  let add_initial_state ~new_init ?modified_agents static dynamic error species
-      =
-    let parameter = get_parameter static in
-    let _ = modified_agents, new_init in
-    let set_before = get_contact_map_dynamic dynamic in
-    (*------------------------------------------------------*)
-    let error, dynamic = collect_bonds_initial static dynamic error species in
-    let set_after = get_contact_map_dynamic dynamic in
-    (*------------------------------------------------------*)
-    let error, set_diff =
-      Ckappa_sig.PairAgentSiteState_map_and_set.Set.diff parameter error
-        set_after set_before
-    in
-    let error, event_list = collect_events static error set_diff [] in
-    error, dynamic, event_list
+  let add_initial_state ~new_init ?patch ?modified_agents static dynamic error
+      species =
+    if not new_init then
+      error, dynamic, []
+    else (
+      let parameter = get_parameter static in
+      let _ = modified_agents, new_init, patch in
+      let set_before = get_contact_map_dynamic dynamic in
+      (*------------------------------------------------------*)
+      let error, dynamic = collect_bonds_initial static dynamic error species in
+      let set_after = get_contact_map_dynamic dynamic in
+      (*------------------------------------------------------*)
+      let error, set_diff =
+        Ckappa_sig.PairAgentSiteState_map_and_set.Set.diff parameter error
+          set_after set_before
+      in
+      let error, event_list = collect_events static error set_diff [] in
+      error, dynamic, event_list
+    )
 
   (**************************************************************************)
 

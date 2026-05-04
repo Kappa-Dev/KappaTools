@@ -62,6 +62,7 @@ module type Composite_domain = sig
 
   val add_initial_state :
     new_init:bool ->
+    ?patch:Diff.new_indexs ->
     ?modified_agents:
       bool Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t * bool ->
     (Analyzer_headers.initial_state, unit) unary
@@ -321,9 +322,10 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
      type unary where the output of static information [a] is an initial state
      of analyzer header, and the dynamic output [a list of event] is unit. *)
 
-  let pre_add_initial_state ~new_init ?modified_agents static dynamic error a =
+  let pre_add_initial_state ~new_init ?patch ?modified_agents static dynamic
+      error a =
     lift_unary
-      (Domain.add_initial_state ~new_init ?modified_agents)
+      (Domain.add_initial_state ~new_init ?patch ?modified_agents)
       static dynamic error a
 
   let lift_binary f static dynamic error a b =
@@ -531,12 +533,12 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
   (** add initial state then apply a list of event starts from this new
       list*)
 
-  let add_initial_state ~new_init ?modified_agents static dynamic error
+  let add_initial_state ~new_init ?patch ?modified_agents static dynamic error
       initial_state =
     let _ = modified_agents in
     let error, dynamic, event_list =
-      pre_add_initial_state ~new_init ?modified_agents static dynamic error
-        initial_state
+      pre_add_initial_state ~new_init ?patch ?modified_agents static dynamic
+        error initial_state
     in
     apply_event_list static dynamic error event_list
 

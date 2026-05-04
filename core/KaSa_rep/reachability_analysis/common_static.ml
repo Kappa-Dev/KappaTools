@@ -636,6 +636,16 @@ let collect_bonds_pattern parameters error views bonds store_result =
             collect_fingerprint_of_bond parameters error site_add agent_id
               site_type_source views
           in
+
+          (* let b =
+               match patch with
+               | None -> true
+               | Some (a,b) -> true, b
+
+                 , b
+             in
+             if not b then error, store_result
+             else *)
           let error, new_set =
             Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
               parameters error
