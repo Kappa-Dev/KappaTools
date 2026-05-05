@@ -170,6 +170,17 @@ type ('bool, 'b, 'blist, 'rlist, 'vlist, 'c, 'memo_tables, 'e) reset = {
         'memo_tables,
         'e )
       unary_memoized_fun;
+  keep_false_and_remove:
+    Exception.exceptions_caught_and_uncaught
+    * ( 'bool,
+        'b,
+        'blist,
+        'rlist,
+        'vlist,
+        'c,
+        'memo_tables,
+        'e )
+      unary_memoized_fun;
   height:
     Exception.exceptions_caught_and_uncaught
     * ( bool,

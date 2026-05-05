@@ -152,6 +152,8 @@ module type Mvbdu = sig
   val mvbdu_project_abstract_away :
     (mvbdu, hconsed_variables_list, mvbdu) binary
 
+  val mvbdu_definitely_remove : (mvbdu, hconsed_variables_list, mvbdu) binary
+
   val mvbdu_cartesian_decomposition_depth :
     (mvbdu, int, mvbdu option * mvbdu list) binary
 
@@ -358,6 +360,7 @@ module type Internalized_mvbdu = sig
   val mvbdu_rename : mvbdu -> hconsed_renaming_list -> mvbdu
   val mvbdu_project_abstract_away : mvbdu -> hconsed_variables_list -> mvbdu
   val mvbdu_project_keep_only : mvbdu -> hconsed_variables_list -> mvbdu
+  val mvbdu_definitely_remove : mvbdu -> hconsed_variables_list -> mvbdu
   val mvbdu_cartesian_abstraction : mvbdu -> mvbdu list
 
   val mvbdu_cartesian_decomposition_depth :

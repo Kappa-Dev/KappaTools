@@ -267,6 +267,17 @@ type ('mvbdu_leave_data,
         'memo_tables,
         'int )
       unary_memoized_fun;
+  keep_false_and_remove:
+    Exception.exceptions_caught_and_uncaught
+    * ( 'mvbdu_leave_data,
+        'mvbdu_dic,
+        'blist,
+        'rlist,
+        'vlist,
+        'c,
+        'memo_tables,
+        'int )
+      unary_memoized_fun;
   height:
     Exception.exceptions_caught_and_uncaught
     * ( bool,

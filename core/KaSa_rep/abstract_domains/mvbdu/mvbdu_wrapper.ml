@@ -150,6 +150,8 @@ module type Mvbdu = sig
   val mvbdu_project_abstract_away :
     (mvbdu, hconsed_variables_list, mvbdu) binary
 
+  val mvbdu_definitely_remove : (mvbdu, hconsed_variables_list, mvbdu) binary
+
   val mvbdu_cartesian_decomposition_depth :
     (mvbdu, int, mvbdu option * mvbdu list) binary
 
@@ -356,6 +358,7 @@ module type Internalized_mvbdu = sig
   val mvbdu_rename : mvbdu -> hconsed_renaming_list -> mvbdu
   val mvbdu_project_abstract_away : mvbdu -> hconsed_variables_list -> mvbdu
   val mvbdu_project_keep_only : mvbdu -> hconsed_variables_list -> mvbdu
+  val mvbdu_definitely_remove : mvbdu -> hconsed_variables_list -> mvbdu
   val mvbdu_cartesian_abstraction : mvbdu -> mvbdu list
 
   val mvbdu_cartesian_decomposition_depth :
@@ -746,6 +749,7 @@ module Make (_ : Nul) : Mvbdu with type key = int and type value = int = struct
   let mvbdu_redefine = lift2bis __POS__ Boolean_mvbdu.redefine
   let mvbdu_redefine_range = lift2bis __POS__ Boolean_mvbdu.redefine_range
   let mvbdu_rename = lift2bis __POS__ Boolean_mvbdu.monotonicaly_rename
+  let mvbdu_definitely_remove = lift2ter __POS__ Boolean_mvbdu.definitely_remove
   let mvbdu_project_keep_only = lift2ter __POS__ Boolean_mvbdu.project_keep_only
 
   let mvbdu_project_keep_only_with_threshold parameters handler error ~threshold
@@ -1180,6 +1184,7 @@ module Internalize (M : Mvbdu with type key = int and type value = int) :
   let mvbdu_redefine = lift_binary __POS__ M.mvbdu_redefine
   let mvbdu_redefine_range = lift_binary __POS__ M.mvbdu_redefine_range
   let mvbdu_rename = lift_binary __POS__ Mvbdu.mvbdu_rename
+  let mvbdu_definitely_remove = lift_binary __POS__ M.mvbdu_definitely_remove
   let mvbdu_project_keep_only = lift_binary __POS__ M.mvbdu_project_keep_only
 
   let mvbdu_project_abstract_away =
@@ -1434,6 +1439,7 @@ module Optimize_internalized
   let mvbdu_rename = M.mvbdu_rename
   let mvbdu_project_keep_only = M.mvbdu_project_keep_only
   let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
+  let mvbdu_definitely_remove = M.mvbdu_project_abstract_away
   let build_variables_list = M.build_variables_list
   let build_sorted_variables_list = M.build_sorted_variables_list
 

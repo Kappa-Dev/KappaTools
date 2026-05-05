@@ -100,10 +100,12 @@ type memo_tables = {
   boolean_mvbdu_snd: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_nsnd: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_clean_head: bool Mvbdu_sig.mvbdu Hash_1.t;
+  boolean_mvbdu_keep_false_and_remove: bool Mvbdu_sig.mvbdu Hash_1.t;
   boolean_mvbdu_height: int Hash_1.t;
   boolean_mvbdu_width: int Hash_1.t;
   boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
   boolean_mvbdu_keep_head_only_with_threshold: bool Mvbdu_sig.mvbdu Hash_2.t;
+  boolean_mvbdu_definitely_remove: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_redefine: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_redefine_range: bool Mvbdu_sig.mvbdu Hash_2.t;
   boolean_mvbdu_monotonicaly_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
@@ -177,6 +179,7 @@ let split_memo error handler =
       "not:", x.boolean_mvbdu_not;
       "clean_head:", x.boolean_mvbdu_clean_head;
       "keep_head_only:", x.boolean_mvbdu_keep_head_only;
+      "keep_false_and_remove", x.boolean_mvbdu_keep_false_and_remove;
     ],
     [
       (* _ -> _ -> mvbdu *)
@@ -318,6 +321,7 @@ let init_data parameters error =
   let error, id = Hash_1.create parameters error 0 in
   let error, not = Hash_1.create parameters error 0 in
   let error, mvbdu_clean_head = Hash_1.create parameters error 0 in
+  let error, mvbdu_kaeep_false_and_remove = Hash_1.create parameters error 0 in
   let error, mvbdu_keep_head_only = Hash_1.create parameters error 0 in
   let error, mvbdu_keep_head_only_with_threshold =
     Hash_2.create parameters error (0, 0)
@@ -338,6 +342,7 @@ let init_data parameters error =
   let error, mvbdu_is_implied = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_nimply = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_nis_implied = Hash_2.create parameters error (0, 0) in
+  let error, mvbdu_definitely_remove = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_redefine = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_redefine_range = Hash_2.create parameters error (0, 0) in
   let error, mvbdu_project_keep_only = Hash_2.create parameters error (0, 0) in
@@ -373,6 +378,7 @@ let init_data parameters error =
   ( error,
     {
       boolean_mvbdu_clean_head = mvbdu_clean_head;
+      boolean_mvbdu_keep_false_and_remove = mvbdu_kaeep_false_and_remove;
       boolean_mvbdu_keep_head_only = mvbdu_keep_head_only;
       boolean_mvbdu_keep_head_only_with_threshold =
         mvbdu_keep_head_only_with_threshold;
@@ -394,6 +400,7 @@ let init_data parameters error =
       boolean_mvbdu_imply = mvbdu_imply;
       boolean_mvbdu_nis_implied = mvbdu_nis_implied;
       boolean_mvbdu_nimply = mvbdu_nimply;
+      boolean_mvbdu_definitely_remove = mvbdu_definitely_remove;
       boolean_mvbdu_redefine = mvbdu_redefine;
       boolean_mvbdu_redefine_range = mvbdu_redefine_range;
       boolean_mvbdu_monotonicaly_rename = mvbdu_rename;
@@ -936,6 +943,46 @@ let memo_clean_head =
     (fun parameters error _h mvbdu ->
       Hash_1.set parameters error (Mvbdu_core.id_of_mvbdu mvbdu))
 
+let memo_keep_false_and_remove =
+  Mvbdu_algebra.memoize_no_fun
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_keep_false_and_remove)
+    (fun x h ->
+      {
+        h with
+        Memo_sig.data =
+          { h.Memo_sig.data with boolean_mvbdu_keep_false_and_remove = x };
+      })
+    (fun parameters error handler mvbdu d ->
+      let a, b =
+        Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d
+      in
+      a, (handler, b))
+    (fun parameters error _h mvbdu ->
+      Hash_1.set parameters error (Mvbdu_core.id_of_mvbdu mvbdu))
+
+let keep_false_and_remove parameters error handler =
+  Mvbdu_algebra.keep_false_and_remove
+    (mvbdu_allocate parameters)
+    memo_keep_false_and_remove boolean_mvbdu_false handler error parameters
+
+let memo_keep_false_and_remove =
+  Mvbdu_algebra.memoize_no_fun
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_keep_false_and_remove)
+    (fun x h ->
+      {
+        h with
+        Memo_sig.data =
+          { h.Memo_sig.data with boolean_mvbdu_keep_false_and_remove = x };
+      })
+    (fun parameters error handler mvbdu d ->
+      match
+        Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d
+      with
+      | error, None -> keep_false_and_remove parameters error handler mvbdu
+      | error, Some x -> error, (handler, Some x))
+    (fun parameters error _h mvbdu ->
+      Hash_1.set parameters error (Mvbdu_core.id_of_mvbdu mvbdu))
+
 let memo_keep_head_only =
   Mvbdu_algebra.memoize_no_fun
     (fun x -> x.Memo_sig.data.boolean_mvbdu_keep_head_only)
@@ -1115,6 +1162,7 @@ let reset_handler error =
     Memo_sig.empty_variables_list = error, memo_identity;
     Memo_sig.leaf = (fun bool -> error, fun error -> error, Mvbdu_sig.Leaf bool);
     Memo_sig.clean_head = error, memo_clean_head;
+    Memo_sig.keep_false_and_remove = error, memo_keep_false_and_remove;
     Memo_sig.height = error, memo_height;
     Memo_sig.width = error, memo_width;
     Memo_sig.build_false =
@@ -1332,6 +1380,17 @@ let project_abstract_away parameters error handler mvbdu_input list_input =
         h with
         Memo_sig.data =
           { h.Memo_sig.data with boolean_mvbdu_project_abstract_away = x };
+      })
+    parameters error handler mvbdu_input list_input
+
+let definitely_remove parameters error handler mvbdu_input list_input =
+  gen_bin_mvbdu_list Mvbdu_algebra.definitely_remove
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_definitely_remove)
+    (fun x h ->
+      {
+        h with
+        Memo_sig.data =
+          { h.Memo_sig.data with boolean_mvbdu_definitely_remove = x };
       })
     parameters error handler mvbdu_input list_input
 

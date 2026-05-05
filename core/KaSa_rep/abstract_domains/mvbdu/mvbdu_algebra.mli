@@ -138,6 +138,32 @@ val clean_head :
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (('h, 'c, 'd, 'e, 'f, 'b, 'i) Memo_sig.handler * 'b Mvbdu_sig.mvbdu option)
 
+val keep_false_and_remove :
+  'a ->
+  ( 'b,
+    'c,
+    'd,
+    'e,
+    'f,
+    'g,
+    'b Mvbdu_sig.mvbdu,
+    'h,
+    'i,
+    'b Mvbdu_sig.mvbdu )
+  Memo_sig.memoized_fun ->
+  (Remanent_parameters_sig.parameters ->
+  ('h, 'c, 'd, 'e, 'f, 'b, 'i) Memo_sig.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('h, 'c, 'd, 'e, 'f, 'b, 'i) Memo_sig.handler * 'b Mvbdu_sig.mvbdu option)) ->
+  ('h, 'c, 'd, 'e, 'f, 'b, 'i) Memo_sig.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  'b Mvbdu_sig.mvbdu ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('h, 'c, 'd, 'e, 'f, 'b, 'i) Memo_sig.handler * 'b Mvbdu_sig.mvbdu option)
+
 val keep_head_only :
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
@@ -251,6 +277,46 @@ val redefine_range :
   ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
   'c Mvbdu_sig.mvbdu ->
   (int option * int option) List_sig.list ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
+
+val definitely_remove :
+  (Exception_without_parameter.exceptions_caught_and_uncaught ->
+  ('a -> 'a -> int) ->
+  ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
+  'c Mvbdu_sig.cell ->
+  (int -> 'c Mvbdu_sig.mvbdu) ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (int
+    * 'c Mvbdu_sig.cell
+    * 'c Mvbdu_sig.mvbdu
+    * ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler)
+    option) ->
+  ( 'c,
+    'e,
+    'f,
+    'g,
+    'h,
+    ( 'c,
+      'e,
+      'f,
+      'g,
+      'h,
+      (('c Mvbdu_sig.mvbdu, 'c) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu,
+      'd,
+      'i )
+    Memo_sig.reset,
+    'c Mvbdu_sig.mvbdu * 'j List_sig.list,
+    'd,
+    'i,
+    'c Mvbdu_sig.mvbdu )
+  Memo_sig.memoized_fun ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Remanent_parameters_sig.parameters ->
+  ('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler ->
+  'c Mvbdu_sig.mvbdu ->
+  'j List_sig.list ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
