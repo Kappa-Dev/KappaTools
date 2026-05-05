@@ -59,39 +59,56 @@ def main(inp_path, out_path):
 
             data[test_instance][step_name] = time_val
 
+    # sort by number of rules in the current chapter
+    sorted_data = sorted(data.keys())
+
     all_steps = data["0"].keys()
     total_step_count = len(all_steps)
-    col_spec = "c " + " ".join(["c"] * total_step_count)
+    # col_spec = "c " + " ".join(["c"] * total_step_count)
 
     # Build LaTeX
-    lines = []
-    lines.append(r"\centering")
-    lines.append(r"\small")
-    lines.append(r"\begin{tabular}{" + col_spec + "}")
-    lines.append(r"\toprule")
-    header = r"\bfseries\shortstack{Nr. of rules\\in working set} "
-    for step in all_steps:
-        header += r"& \texttt{" + latex_escape(step) + "} "
-    header += r"\\"
-    lines.append(header)
-    lines.append(r"\midrule")
+    # lines = []
+    # lines.append(r"\centering")
+    # lines.append(r"\small")
+    # lines.append(r"\begin{tabular}{" + col_spec + "}")
+    # lines.append(r"\toprule")
+    # header = r"\bfseries\shortstack{Nr. of rules\\in working set} "
+    # for step in all_steps:
+    #     header += r"& \texttt{" + latex_escape(step) + "} "
+    # header += r"\\"
+    # lines.append(header)
+    # lines.append(r"\midrule")
 
-    for test_instance in sorted(data.keys()):
+    # for test_instance in sorted_data:
+    #     row_elems = []
+    #     row_elems.append(latex_escape(test_instance))
+    #     analysis_items = all_steps
+    #     for s in analysis_items:
+    #         val = data[test_instance].get(s, "")
+    #         if val == "":
+    #             row_elems.append("")  # empty cell if missing
+    #         else:
+    #             row_elems.append(format_time(val))
+    #     lines.append(" & ".join(row_elems) + r" \\")
+    # lines.append(r"\bottomrule")
+    # lines.append(r"\end{tabular}")
+    # write the alternative text for the plot
+    alternative_description = []
+    alternative_description.append(r"\AltTextCMSB{")
+    alternative_description.append(r"The plot shows the runtimes of the evaluation for " + str(len(all_steps)) + " models from the literature with different sizes of the current chapter. ")
+    for model in sorted_data:
         row_elems = []
-        row_elems.append(latex_escape(test_instance))
+        row_elems.append(r"The runtimes of the models with " + latex_escape(model) + " rules in the current chapter are: ")
         analysis_items = all_steps
         for s in analysis_items:
             val = data[test_instance].get(s, "")
-            if val == "":
-                row_elems.append("")  # empty cell if missing
-            else:
-                row_elems.append(format_time(val))
-        lines.append(" & ".join(row_elems) + r" \\")
-    lines.append(r"\bottomrule")
-    lines.append(r"\end{tabular}")
+            row_elems.append("The model "+ s + " took " + val + " seconds. ")
+        alternative_description.append("".join(row_elems))
+    alternative_description.append(r"}")
+
     # write output
     with open(out_path, "w") as outf:
-        outf.write("\n".join(lines))
+        outf.write("\n".join(alternative_description))
 
     # Build HTML
     lines = []
@@ -102,7 +119,7 @@ def main(inp_path, out_path):
         lines.append("    <th>" + step + "</th>")
     lines.append("  </tr>")
 
-    for test_instance in sorted(data.keys()):
+    for test_instance in sorted_data:
         row_elems = []
         row_elems.append(latex_escape(test_instance))
         analysis_items = all_steps

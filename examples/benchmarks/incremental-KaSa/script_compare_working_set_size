@@ -99,7 +99,7 @@ OPTIONS="--reset-all --compute-reachability-analysis --enable-every-domain --pri
 # models
 MODELS_DIRECTORY="${SCRIPT_DIR}/models/"
 
-egfr_net="${MODELS_DIRECTORY}egfr_net.ka"
+egfr_net="${MODELS_DIRECTORY}pathways/egfr_net.ka"
 
 korkut_20170206="${MODELS_DIRECTORY}korkut/20170206/korkut_model.ka"
 korkut_20170113="${MODELS_DIRECTORY}korkut/20170113/prior_model.ka"
@@ -267,7 +267,6 @@ if $VERBOSE; then
 fi
 { ${cmd[@]}; }
 
-echo "📊 The latex table of the runtimes can be found in: $OUTPUT_LATEX_RUNTIMES"
 echo "🕸️ The html table of the runtimes can be found in: $OUTPUT_HTML_RUNTIMES"
 
 cmd=(python3 
@@ -279,5 +278,6 @@ if $VERBOSE; then
 fi
 { ${cmd[@]}; }
 echo "📈 The png plot of the runtimes can be found in: ${OUTPUT_DIR}runtimes.png"
+echo "📊 The latex alternative description of the plot can be found in: $OUTPUT_LATEX_RUNTIMES"
 
 deactivate

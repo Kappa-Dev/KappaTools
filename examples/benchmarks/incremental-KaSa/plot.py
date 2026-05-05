@@ -35,7 +35,7 @@ def main(input_file, output_file):
     for i, (model, runtimes) in enumerate(data.items()):
         ax.plot(rules, runtimes, marker="o", label=model, color=colors[i+1])
 
-    ax.set_xlabel("Number of rules in working set")
+    ax.set_xlabel("Number of rules in the current chapter")
     ax.set_ylabel("Runtime (s)")
     ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.6)
 

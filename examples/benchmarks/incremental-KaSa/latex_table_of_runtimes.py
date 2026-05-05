@@ -81,6 +81,7 @@ def main(inp_path, out_path):
     sorted_data = sorted(data.keys(), key=lambda k: int(model_nr_rules.get(k, "0")))
 
     step_names = [r"analysis", r"initial\\analysis", r"disable\\rules", r"add\\a rule"]
+    step_names_alt_text = [r"The non-incremental analysis", r"The incremental initial analysis", r"Disabling 10 rules", r"Adding a rule"]
     analysis_items = [("1_full",["1_init"]), ("2_decremental",["1_init", "4_disable"]), ("3_incremental",["1_init"])]
 
     total_step_count = len(step_names)
@@ -115,9 +116,30 @@ def main(inp_path, out_path):
         lines.append(" & ".join(row_elems) + r" \\")
     lines.append(r"\bottomrule")
     lines.append(r"\end{tabular}")
-    # write output
+    
+
+    # write the alternative text for the table
+    alternative_description = []
+    alternative_description.append(r"\AltTextCMSB{")
+    alternative_description.append(r"The table shows the number of rules and the runtimes of the evaluation for " + str(len(sorted_data)) + " models from the literature. ")
+    for model in sorted_data:
+        row_elems = []
+        row_elems.append(r"The model " + latex_escape(model) + " has ")
+        row_elems.append(latex_escape(model_nr_rules.get(model, "")) + " rules. ")
+        i = 0
+        for a, steps in analysis_items:
+            for s in steps:
+                name = step_names_alt_text[i]
+                i += 1
+                row_elems.append(name + " took ")
+                val = data[model].get(a, {}).get(s, "")
+                row_elems.append(format_time(val) + " seconds. ")             
+        alternative_description.append("".join(row_elems))
+    alternative_description.append(r"}")
+    
+    # write output to latex
     with open(out_path, "w") as outf:
-        outf.write("\n".join(lines))
+        outf.write("\n".join(lines + alternative_description))
 
     # Build HTML
     lines = []
