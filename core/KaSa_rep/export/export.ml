@@ -2545,39 +2545,39 @@ functor
       let state = set_errors errors state in
       state, id_opt
 
-    let permanently_disable_rule_c_id_list list state =
-      let state, l =
+    let permanently_disable_rule_c_id_list list state acc =
+      let state, l, l' =
         List.fold_left
-          (fun (state, l) index ->
+          (fun (state, l, l') index ->
             let state, id_opt = working_set_id_of_rule_id index state in
             match id_opt with
-            | None -> state, l
-            | Some i -> state, i :: l)
-          (state, []) (List.rev list)
+            | None -> state, l, l'
+            | Some i -> state, i :: l, i::l')
+          (state, acc, []) (List.rev list)
       in
       let error = get_errors state in
       let error, state, _ =
-        toggle_working_set_boolean_parameters_in_compilation error false state l
+        toggle_working_set_boolean_parameters_in_compilation error false state l'
           true
       in
-      set_errors error state
+      set_errors error state, l 
 
-    let permanently_disable_init_c_id_list list state =
-      let state, l =
+    let permanently_disable_init_c_id_list list state acc =
+      let state, l, l' =
         List.fold_left
-          (fun (state, l) index ->
+          (fun (state, l, l') index ->
             let state, id_opt = working_set_id_of_init_id index state in
             match id_opt with
-            | None -> state, l
-            | Some i -> state, i :: l)
-          (state, []) (List.rev list)
+            | None -> state, l, l'
+            | Some i -> state, i :: l, i::l')
+          (state, acc,[]) (List.rev list)
       in
       let error = get_errors state in
       let error, state, _ =
-        toggle_working_set_boolean_parameters_in_compilation error false state l
+        toggle_working_set_boolean_parameters_in_compilation error false state l'
           true
       in
-      set_errors error state
+      set_errors error state, l 
 
     (* Incremental analysis *)
     let summarize_from_ast state =
@@ -2621,6 +2621,118 @@ functor
       ( Remanent_state.set_errors errors
           (Remanent_state.set_handler handler state),
         state' )
+
+
+        (*  let state, c_compil = get_c_compilation state in
+      let rec toggle_parameters = function
+        | [] ->
+          ( error,
+            compilation.Ast.working_set_values,
+            c_compil.Cckappa_sig.working_set_valuations,
+            false )
+        | working_set_index :: indexes ->
+          let error, working_set_values, working_set_valuations, changed =
+            toggle_parameters indexes
+          in
+          let guard_int =
+            Ckappa_sig.int_of_working_set_index working_set_index
+          in
+          (match Mods.IntMap.find_option guard_int working_set_values with
+          | None ->
+            if permanently_disable then
+              error, working_set_values, working_set_valuations, changed
+            else (
+              let error, () =
+                Exception.warn parameters error __POS__
+                  ~message:
+                    ("Index out of bounds: there is no rule with index "
+                    ^ Ckappa_sig.string_of_working_set_index working_set_index
+                    ^ " in the working set. Or it may already have been \
+                       permanently disabled.")
+                  Exit ()
+              in
+              error, working_set_values, working_set_valuations, false
+            )
+          | Some old_bool ->
+            if old_bool = bool && not permanently_disable then
+              error, working_set_values, working_set_valuations, changed
+            else (
+              let working_set_values =
+                if permanently_disable then
+                  Mods.IntMap.add guard_int None working_set_values
+                else
+                  Mods.IntMap.add guard_int bool working_set_values
+              in
+              let error, (guard_id, _) =
+                Ckappa_sig.Ws_index_map_and_set.Map.find_default parameters
+                  error
+                  (Ckappa_sig.guard_parameter_of_int (-1), Some false)
+                  working_set_index working_set_valuations
+              in
+              let error, working_set_valuations =
+                Ckappa_sig.Ws_index_map_and_set.Map.add_or_overwrite parameters
+                  error working_set_index (guard_id, bool)
+                  working_set_valuations
+              in
+              error, working_set_values, working_set_valuations, true
+            ))
+      in
+      *)
+    let permanently_remove l state = 
+      let state, c_compil = get_c_compilation state in
+      let errors = get_errors state in 
+      let parameters = get_parameters state in 
+      let state, kappa_handler = get_handler state in 
+      let map = c_compil.Cckappa_sig.working_set_valuations in 
+      let errors, l = List.fold_left 
+                (fun (errors, l) elt -> 
+                  let errors, (id,_) = Ckappa_sig.Ws_index_map_and_set.Map.find_default parameters
+                  errors
+                  (Ckappa_sig.guard_parameter_of_int (-1), Some false)
+                  elt map in 
+                  errors, (Ckappa_sig.mvbdu_var_of_guard  id (Handler.get_nsites kappa_handler))::l)
+                   (errors, []) l 
+                in 
+      let l = List.sort compare l in   
+      let state =set_errors errors state in 
+      let state = 
+        match Remanent_state.get_reachability_result state with 
+        | None -> state
+        | Some x -> 
+          let bdu_handler = Remanent_state.get_bdu_handler state in 
+          let errors = get_errors state in 
+          let errors, bdu_handler, l = Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler errors  l in 
+          let state = Remanent_state.set_bdu_handler bdu_handler state in 
+          let state = set_errors errors state in 
+          let errors, (a,b)  = Reachability.map_mvbdu 
+          (fun parameters errors bdu_handler mvbdu -> Ckappa_sig.Views_bdu.mvbdu_definitely_remove parameters bdu_handler errors mvbdu l ) errors (snd (fst x)) (snd x) in 
+          let state = Remanent_state.set_reachability_result ((fst (fst x),a),b) state in 
+          set_errors errors state in 
+      state  
+
+(*  contact_map_int: Contact_map.t option option;
+  init_state: initial_state option;
+  quark_map: quark_map option;
+  reachability_state:
+    ('global_static, 'static, 'dynamic) reachability_result option;
+  is_reachability_result_available: bool;
+  subviews_info: subviews_info option;
+  dead_rules: dead_rules option;
+  conditionally_dead_rules: rule_deadness_conditions option;
+  dead_agents: dead_agents option;
+  conditionally_dead_agents: agent_deadness_conditions option;
+  ode_flow: Ode_fragmentation_type.ode_frag option;
+  ctmc_flow: flow option;
+  errors: Exception.exceptions_caught_and_uncaught;
+  internal_constraint_list: internal_constraint_list option;
+  constraint_list: constraint_list option;
+  symmetric_sites: symmetric_sites Public_data.AccuracyMap.t;
+  separating_transitions: separating_transitions option;
+  transition_system_length: int list option;
+  global_static_information: 'global_static option;
+  patch: Cckappa_sig.compil option;*)
+
+
 
     let patch ?debug ?do_not_restart_fixpoint_computation ?do_we_show_title
         ~called_from ?compil ?patch_file_name ~old_file_name ~summary state =
@@ -2689,15 +2801,16 @@ functor
       let state = set_errors errors state in
       let state = Remanent_state.set_handler kappa_handler state in
       let state = rename_pos (Diff.renaming_of_diff diff) state in
-      let state =
+      let state, acc  =
         permanently_disable_rule_c_id_list
           (List.rev_map Ckappa_sig.rule_id_of_int
              (List.rev diff.Diff.diff_rules.removed_elt))
-          state
+          state []
       in
-      let state =
-        permanently_disable_init_c_id_list diff.Diff.diff_init.removed_elt state
+      let state, acc =
+        permanently_disable_init_c_id_list diff.Diff.diff_init.removed_elt state acc
       in
+      let state = permanently_remove acc state in   
       let state, handler = get_handler state in
       let state, cc_compil = get_c_compilation state in
       let errors = get_errors state in

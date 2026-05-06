@@ -335,6 +335,14 @@ module type Map = sig
 
   val mapi : (elt -> 'a -> 'b) -> 'a t -> 'b t
   val map : ('a -> 'b) -> 'a t -> 'b t
+  val map_with_logs: 
+    ('parameters, 'exceptions_caught_and_uncaught, 
+    (
+      'parameters ->
+    'exceptions_caught_and_uncaught ->
+    'a ->
+    'exceptions_caught_and_uncaught * 'b) -> 'a t ->  'exceptions_caught_and_uncaught * 'b t) with_log_wrap
+
   val map2 : ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
   val for_all : (elt -> 'a -> bool) -> 'a t -> bool
   val filter_one : (elt -> 'a -> bool) -> 'a t -> (elt * 'a) option

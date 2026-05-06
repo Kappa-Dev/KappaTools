@@ -98,6 +98,16 @@ module type Composite_domain = sig
 
   val get_parameters : static_information -> Remanent_parameters_sig.parameters
   val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
+
+   val map_mvbdu: 
+     (Remanent_parameters_sig.parameters 
+ -> Exception.exceptions_caught_and_uncaught -> Ckappa_sig.Views_bdu.handler -> Ckappa_sig.Views_bdu.mvbdu -> Exception.exceptions_caught_and_uncaught * Ckappa_sig.Views_bdu.handler * Ckappa_sig.Views_bdu.mvbdu) ->
+   Exception.exceptions_caught_and_uncaught 
+     ->
+   static_information -> 
+     dynamic_information 
+     -> Exception.exceptions_caught_and_uncaught * (static_information*
+    dynamic_information)
 end
 
 (****************************************************************************)
@@ -678,4 +688,16 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     error, dynamic, (static_global, static_domain)
 
   let get_parameters (_, static_domain) = Domain.get_parameter static_domain
+
+
+let map_mvbdu f errors static dynamic = 
+  let errors, (dstatic, domain) =
+     Domain.map_mvbdu f errors 
+        (get_domain_static_information static)  
+        (
+         dynamic.domain) 
+in 
+  errors, ((fst static, dstatic), 
+          ({dynamic with domain}))
+          
 end

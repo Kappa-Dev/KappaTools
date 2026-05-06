@@ -159,4 +159,14 @@ module type Domain = sig
     Exception.exceptions_caught_and_uncaught * Ckappa_sig.side_effects option
 
   val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
+
+  val map_mvbdu: 
+      (Remanent_parameters_sig.parameters 
+ -> Exception.exceptions_caught_and_uncaught -> Ckappa_sig.Views_bdu.handler -> Ckappa_sig.Views_bdu.mvbdu -> Exception.exceptions_caught_and_uncaught * Ckappa_sig.Views_bdu.handler * Ckappa_sig.Views_bdu.mvbdu) ->
+   Exception.exceptions_caught_and_uncaught 
+     ->
+   static_information -> 
+     dynamic_information 
+     -> Exception.exceptions_caught_and_uncaught * (static_information*
+    dynamic_information)
 end

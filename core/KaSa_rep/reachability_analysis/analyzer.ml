@@ -86,6 +86,16 @@ module type Analyzer = sig
 
   val set_bdu_handler :
     Ckappa_sig.Views_bdu.handler -> dynamic_information -> dynamic_information
+
+     val map_mvbdu: 
+      (Remanent_parameters_sig.parameters 
+ -> Exception.exceptions_caught_and_uncaught -> Ckappa_sig.Views_bdu.handler -> Ckappa_sig.Views_bdu.mvbdu -> Exception.exceptions_caught_and_uncaught * Ckappa_sig.Views_bdu.handler * Ckappa_sig.Views_bdu.mvbdu) ->
+   Exception.exceptions_caught_and_uncaught 
+     ->
+   static_information -> 
+     dynamic_information 
+     -> Exception.exceptions_caught_and_uncaught * (static_information*
+    dynamic_information)
 end
 
 (***************************************************************************)
@@ -442,4 +452,10 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     let global = Domain.get_global_dynamic_information dynamic in
     let global = Analyzer_headers.set_mvbdu_handler h global in
     Domain.set_global_dynamic_information global dynamic
+
+
+  let map_mvbdu f errors static dynamic  = 
+    let error, (static, dynamic) = Domain.map_mvbdu f errors static dynamic in 
+    error, ((static), dynamic)
+
 end

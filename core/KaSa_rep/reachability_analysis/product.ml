@@ -361,4 +361,17 @@ module Product
       smash_dynamic underlying_domain_dynamic new_domain_dynamic,
       { new_domain = new_domain_static; underlying_domain = underlying_static }
     )
+
+ let map_mvbdu f errors static dynamic = 
+  let errors, (underlying_domain_static, underlying_domain_dynamic) = 
+    Underlying_domain.map_mvbdu f errors static.underlying_domain (underlying_domain_dynamic_information dynamic)
+ in 
+ let errors, (new_domain_static, new_domain_dynamic) = 
+    New_domain.map_mvbdu f errors static.new_domain 
+    (new_domain_dynamic_information underlying_domain_dynamic dynamic)
+in 
+errors, ({new_domain=new_domain_static; underlying_domain=underlying_domain_static},
+smash_dynamic underlying_domain_dynamic new_domain_dynamic)
+
+
 end

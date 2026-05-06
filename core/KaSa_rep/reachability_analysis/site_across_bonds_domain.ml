@@ -1992,4 +1992,33 @@ module Domain = struct
       }
     in
     error, dynamic, static
+
+    let map_store_value parameters error handler f store_value = 
+      let error, handler, store_value = 
+        Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.map_with_logs
+          parameters error handler f store_value 
+      in error, handler, store_value  
+
+ let _map_store_value_opt parameters error handler f store_value = 
+    match store_value with 
+      | None -> error, handler, store_value 
+      | Some store_value -> 
+          let error, handler, store_value = map_store_value parameters error handler f store_value in 
+          error, handler, Some store_value 
+
+  let map_mvbdu f errors static dynamic = 
+    let parameters = get_parameter static in 
+    let handler = get_mvbdu_handler dynamic in 
+    let local = get_local_dynamic_information dynamic in 
+    let errors, handler, store_value  = 
+        map_store_value parameters errors handler f local.store_value in 
+    (*let errors, handler, store_value_current_working_set = 
+        map_store_value_opt parameters errors handler f local.store_value_current_working_set
+    in*) (* should not be impacted by Boolean parameters *) 
+    let local = {local with store_value (*; store_value_current_working_set*)} in 
+    let dynamic = set_local_dynamic_information local dynamic in 
+    let dynamic= set_mvbdu_handler handler dynamic in 
+    errors, (static, dynamic)
+
+
 end

@@ -4053,4 +4053,38 @@ module Domain = struct
       }
     in
     error, dynamic, static
+
+(*type fixpoint_result = Ckappa_sig.Views_bdu.mvbdu AgentCV_map_and_set.Map.t
+
+  type local_dynamic_information = {
+    fixpoint_result: fixpoint_result;
+    fixpoint_result_current_working_set: fixpoint_result option;
+    domain_dynamic_information: Bdu_dynamic_views.bdu_analysis_dynamic;
+    subviews: unit option;
+    ranges:
+      Ckappa_sig.Views_bdu.mvbdu Wrapped_modules.LoggedIntMap.t
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
+      option;
+    separating_edges: (string * string) list Mods.IntMap.t option;
+    transition_system_length: int list option;
+  }*)
+
+  let map_mvbdu_fixpoint_result parameters errors handler f map = 
+      AgentCV_map_and_set.Map.map_with_logs 
+        parameters errors handler  
+        (fun p e h data  -> 
+          let e,h,data' = f p e h data in 
+          (e,h,data')) 
+        map 
+
+  let map_mvbdu f errors static dynamic = 
+    let parameters = get_parameter static in 
+    let handler = get_mvbdu_handler dynamic in 
+    let local = get_local_dynamic_information dynamic in 
+    let errors, handler, fixpoint_result = 
+        map_mvbdu_fixpoint_result parameters errors handler f local.fixpoint_result in 
+    let local = {local with fixpoint_result} in 
+    let dynamic = set_local_dynamic_information local dynamic in 
+    let dynamic= set_mvbdu_handler handler dynamic in 
+    errors, (static, dynamic)
 end

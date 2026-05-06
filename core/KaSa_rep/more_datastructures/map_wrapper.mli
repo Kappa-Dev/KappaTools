@@ -356,6 +356,15 @@ module type Map_with_logs = sig
   val fold : (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
   val mapi : (elt -> 'a -> 'b) -> 'a t -> 'b t
   val map : ('a -> 'b) -> 'a t -> 'b t
+  val map_with_logs: 
+    Remanent_parameters_sig.parameters -> Exception.exceptions_caught_and_uncaught -> 'rem -> 
+    (
+      Remanent_parameters_sig.parameters ->
+    Exception.exceptions_caught_and_uncaught -> 'rem -> 
+    'a ->
+    Exception.exceptions_caught_and_uncaught * 'rem * 'b) -> 'a t -> 
+       Exception.exceptions_caught_and_uncaught * 'rem * 'b t
+
   val for_all : (elt -> 'a -> bool) -> 'a t -> bool
   val filter_one : (elt -> 'a -> bool) -> 'a t -> (elt * 'a) option
   val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
