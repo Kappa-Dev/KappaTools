@@ -2678,13 +2678,13 @@ functor
             ))
       in
       *)
-    let permanently_remove l state = 
+    let permanently_remove l lrules state = 
       let state, c_compil = get_c_compilation state in
       let errors = get_errors state in 
       let parameters = get_parameters state in 
       let state, kappa_handler = get_handler state in 
       let map = c_compil.Cckappa_sig.working_set_valuations in 
-      let errors, l = List.fold_left 
+       let errors, l = List.fold_left 
                 (fun (errors, l) elt -> 
                   let errors, (id,_) = Ckappa_sig.Ws_index_map_and_set.Map.find_default parameters
                   errors
@@ -2693,8 +2693,9 @@ functor
                   errors, (Ckappa_sig.mvbdu_var_of_guard  id (Handler.get_nsites kappa_handler))::l)
                    (errors, []) l 
                 in 
-      let l = List.sort compare l in   
-      let state =set_errors errors state in 
+    
+                let l = List.sort compare l in   
+                let state =set_errors errors state in 
       let state = 
         match Remanent_state.get_reachability_result state with 
         | None -> state
@@ -2706,7 +2707,12 @@ functor
           let state = set_errors errors state in 
           let errors, (a,b)  = Reachability.map_mvbdu 
           (fun parameters errors bdu_handler mvbdu -> Ckappa_sig.Views_bdu.mvbdu_definitely_remove parameters bdu_handler errors mvbdu l ) errors (snd (fst x)) (snd x) in 
-          let state = Remanent_state.set_reachability_result ((fst (fst x),a),b) state in 
+          let lrules = List.rev_map Ckappa_sig.rule_id_of_int (List.rev lrules) in 
+       (*   let errors, (a,b) = Reachability.remove_rule_list errors a b lrules in *)
+          let gb = Reachability.get_global_dynamic_information b in 
+          let errors, (g,gb) = Analyzer_headers.remove_rule_list errors (fst (fst x)) gb lrules in 
+          let b = Reachability.set_global_dynamic_information gb b in 
+          let state = Remanent_state.set_reachability_result ((g,a),b) state in 
           set_errors errors state in 
       state  
 
@@ -2810,7 +2816,7 @@ functor
       let state, acc =
         permanently_disable_init_c_id_list diff.Diff.diff_init.removed_elt state acc
       in
-      let state = permanently_remove acc state in   
+      let state = permanently_remove acc diff.Diff.diff_rules.removed_elt  state in   
       let state, handler = get_handler state in
       let state, cc_compil = get_c_compilation state in
       let errors = get_errors state in

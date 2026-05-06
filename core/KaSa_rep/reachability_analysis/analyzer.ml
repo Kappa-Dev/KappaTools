@@ -96,6 +96,23 @@ module type Analyzer = sig
      dynamic_information 
      -> Exception.exceptions_caught_and_uncaught * (static_information*
     dynamic_information)
+
+    val remove_rule_list: 
+   Exception.exceptions_caught_and_uncaught 
+     ->
+   static_information -> 
+     dynamic_information -> Ckappa_sig.c_rule_id list -> 
+      Exception.exceptions_caught_and_uncaught * (static_information*
+    dynamic_information)
+
+    val get_global_dynamic_information :
+    dynamic_information -> Analyzer_headers.global_dynamic_information
+
+  val set_global_dynamic_information :
+    Analyzer_headers.global_dynamic_information ->
+    dynamic_information ->
+    dynamic_information
+   
 end
 
 (***************************************************************************)
@@ -455,7 +472,31 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
 
 
   let map_mvbdu f errors static dynamic  = 
-    let error, (static, dynamic) = Domain.map_mvbdu f errors static dynamic in 
-    error, ((static), dynamic)
+    let parameters = Domain.get_parameters static in 
+    let errors, (static, dynamic) = Domain.map_mvbdu f errors static dynamic in 
+    let handler = get_bdu_handler dynamic in 
+    let errors, handler, restriction_mvbdu = f parameters errors handler (Domain.get_restriction_mvbdu static) in 
+    let errors, handler, working_set_mvbdu = f parameters errors handler (Domain.get_working_set_mvbdu static) in 
+    let static = Domain.set_restriction_mvbdu restriction_mvbdu static in 
+    let static = Domain.set_working_set_mvbdu working_set_mvbdu static in 
+    let dynamic = set_bdu_handler handler dynamic in 
+    errors, (static, dynamic)
+
+let remove_rule_list  errors static dynamic l = 
+  let parameters = Domain.get_parameters static in 
+  let handler = get_bdu_handler dynamic in 
+  let errors, handler, mv_false = Ckappa_sig.Views_bdu.mvbdu_false parameters handler errors in 
+  let dynamic = set_bdu_handler handler dynamic in 
+  let map = Domain.get_guard_mvbdus static in 
+  let map = 
+  List.fold_left 
+    (fun map id -> 
+      Ckappa_sig.Rule_setmap.Map.add id mv_false map)
+     map l  in 
+  let static = Domain.set_guard_mvbdus map static in 
+  errors, (static, dynamic) 
+  
+ let get_global_dynamic_information = Domain.get_global_dynamic_information 
+let set_global_dynamic_information = Domain.set_global_dynamic_information 
 
 end

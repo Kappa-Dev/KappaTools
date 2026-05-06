@@ -101,6 +101,13 @@ module type Composite_domain = sig
   val get_parameters : static_information -> Remanent_parameters_sig.parameters
   val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
 
+  val get_restriction_mvbdu: static_information -> Ckappa_sig.Views_bdu.mvbdu  
+  val set_restriction_mvbdu: Ckappa_sig.Views_bdu.mvbdu -> static_information -> static_information 
+val get_working_set_mvbdu: static_information -> Ckappa_sig.Views_bdu.mvbdu  
+  val set_working_set_mvbdu: Ckappa_sig.Views_bdu.mvbdu -> static_information -> static_information 
+
+val get_guard_mvbdus: static_information -> Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t
+  val set_guard_mvbdus: Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t-> static_information -> static_information 
    val map_mvbdu: 
      (Remanent_parameters_sig.parameters 
  -> Exception.exceptions_caught_and_uncaught -> Ckappa_sig.Views_bdu.handler -> Ckappa_sig.Views_bdu.mvbdu -> Exception.exceptions_caught_and_uncaught * Ckappa_sig.Views_bdu.handler * Ckappa_sig.Views_bdu.mvbdu) ->
@@ -110,6 +117,7 @@ module type Composite_domain = sig
      dynamic_information 
      -> Exception.exceptions_caught_and_uncaught * (static_information*
     dynamic_information)
+    
 end
 
 

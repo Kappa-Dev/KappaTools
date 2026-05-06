@@ -229,14 +229,23 @@ val get_guard_mvbdus :
   global_static_information ->
   Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t
 
+val set_guard_mvbdus : 
+  Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t -> global_static_information -> global_static_information
+
 val get_restriction_mvbdu :
   global_static_information -> Ckappa_sig.Views_bdu.mvbdu
+
+val set_restriction_mvbdu : 
+  Ckappa_sig.Views_bdu.mvbdu -> global_static_information -> global_static_information
 
 val get_nr_guard_parameters :
   global_static_information -> Ckappa_sig.c_guard_parameter
 
 val get_working_set_mvbdu :
   global_static_information -> Ckappa_sig.Views_bdu.mvbdu
+
+val set_working_set_mvbdu : 
+ Ckappa_sig.Views_bdu.mvbdu -> global_static_information -> global_static_information
 
 val get_nsites : global_static_information -> Ckappa_sig.c_site_name
 
@@ -267,6 +276,14 @@ val dummy_side_effects :
   Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.c_rule_id ->
   Exception.exceptions_caught_and_uncaught * Ckappa_sig.side_effects option
+
+val remove_rule_list: 
+   Exception.exceptions_caught_and_uncaught 
+     ->
+   global_static_information -> 
+     global_dynamic_information -> Ckappa_sig.c_rule_id list -> 
+      Exception.exceptions_caught_and_uncaught * (global_static_information*
+    global_dynamic_information)
 
 module AbstractWS
     (IntStorageT : Int_storage.Storage with type dimension = int) : sig

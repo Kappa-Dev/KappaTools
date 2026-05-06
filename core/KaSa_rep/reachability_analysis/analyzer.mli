@@ -96,6 +96,22 @@ module type Analyzer = sig
      dynamic_information 
      -> Exception.exceptions_caught_and_uncaught * (static_information*
     dynamic_information)
+ 
+  val remove_rule_list: 
+   Exception.exceptions_caught_and_uncaught 
+     ->
+   static_information -> 
+     dynamic_information -> Ckappa_sig.c_rule_id list -> 
+      Exception.exceptions_caught_and_uncaught * (static_information*
+    dynamic_information)
+   
+    val get_global_dynamic_information :
+    dynamic_information -> Analyzer_headers.global_dynamic_information
+
+  val set_global_dynamic_information :
+    Analyzer_headers.global_dynamic_information ->
+    dynamic_information ->
+    dynamic_information
 
 end
 
