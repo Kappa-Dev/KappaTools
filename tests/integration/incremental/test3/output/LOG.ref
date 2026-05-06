@@ -30,11 +30,8 @@ A(y) => [ A(y{u}) v A(y{p}) ]
 execution finished without any exception
 Parsing essai_diff.ka...
 done
-
 ------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule File "essai.ka", line 1, characters 0-31: will never be applied.
+every rule may be applied
 ------------------------------------------------------------
 every agent may occur in the model
 

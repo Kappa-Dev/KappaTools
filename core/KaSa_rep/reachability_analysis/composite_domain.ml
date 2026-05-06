@@ -304,11 +304,8 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     let error, dynamic =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold ?start parameters
         error
-        (fun _parameters error rule_id rule dynamic ->
-          let error, dynamic =
-            push_rule_creation static dynamic error rule_id
-              rule.Cckappa_sig.e_rule_c_rule
-          in
+        (fun _parameters error rule_id _rule dynamic ->
+          let error, dynamic = push_rule static dynamic error rule_id in
           error, dynamic)
         rules dynamic
     in
@@ -535,8 +532,11 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
         bonds = Ckappa_sig.AgentSite_map_and_set.Map.empty;
       }
     in
-    let error, dynamic = scan_rule_creation static dynamic error in
-    let error, dynamic = scan_rule_patch ?start static dynamic error in
+    let error, dynamic =
+      match patch with
+      | None -> scan_rule_creation static dynamic error
+      | Some _ -> scan_rule_patch ?start static dynamic error
+    in
     let error, dynamic, () = apply_event_list static dynamic error event_list in
     error, static, dynamic, modified_agents
 

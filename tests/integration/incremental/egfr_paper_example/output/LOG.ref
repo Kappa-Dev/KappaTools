@@ -73,6 +73,9 @@ execution finished without any exception
 Parsing a_after.ka...
 done
 
+	Applying rule #[@rule-6]EGFR(r[1] c[.] n[.]), EGFR(r[1] c[.] n[.]) -> EGFR(r[.] c[.] n[.]), EGFR(r[.] c[.] n[.]) (File "a_before.ka", line 11, characters 0-90:):
+		the precondition is not satisfied yet
+
 	Applying rule #[@rule-3]EGFR(l[_] r[.]), EGFR(l[_] r[.]) -> EGFR(l[_] r[1]), EGFR(l[_] r[1]) (File "a_before.ka", line 6, characters 0-70:):
 		the precondition is satisfied
 
@@ -81,28 +84,19 @@ done
 
 	Applying rule #[@rule-5]EGFR(r[1]), EGFR(r[1] c[2]), EGFR(n[2]) -> EGFR(r[1]), EGFR(r[1] c[2]), EGFR(n[2]) (File "a_before.ka", line 9, characters 0-81:):
 		the precondition is not satisfied yet
+
+	Applying rule #[@rule-2]EGF(r[.]), EGFR(l[.]) -> EGF(r[1]), EGFR(l[1]) (File "a_before.ka", line 5, characters 0-48:):
+		the precondition is satisfied
+
+	Applying rule #[@rule-3]EGFR(l[_] r[.]), EGFR(l[_] r[.]) -> EGFR(l[_] r[1]), EGFR(l[_] r[1]) (File "a_before.ka", line 6, characters 0-70:):
+		the precondition is satisfied
 
 	Applying rule #[@rule-6]EGFR(r[1] c[.] n[.]), EGFR(r[1] c[.] n[.]) -> EGFR(r[.] c[.] n[.]), EGFR(r[.] c[.] n[.]) (File "a_before.ka", line 11, characters 0-90:):
 		the precondition is satisfied
 
 		rule #[@rule-6]EGFR(r[1] c[.] n[.]), EGFR(r[1] c[.] n[.]) -> EGFR(r[.] c[.] n[.]), EGFR(r[.] c[.] n[.]) (File "a_before.ka", line 11, characters 0-90:) is applied for the first time
 
-	Applying rule #[@rule-2]EGF(r[.]), EGFR(l[.]) -> EGF(r[1]), EGFR(l[1]) (File "a_before.ka", line 5, characters 0-48:):
-		the precondition is satisfied
-
-	Applying rule #[@rule-3]EGFR(l[_] r[.]), EGFR(l[_] r[.]) -> EGFR(l[_] r[1]), EGFR(l[_] r[1]) (File "a_before.ka", line 6, characters 0-70:):
-		the precondition is satisfied
-
 	Applying rule #[@rule-4]EGFR(r[1] c[.]), EGFR(r[1] n[.]) -> EGFR(r[1] c[2]), EGFR(r[1] n[2]) (File "a_before.ka", line 7, characters 0-69:):
-		the precondition is satisfied
-
-	Applying rule #[@rule-5]EGFR(r[1]), EGFR(r[1] c[2]), EGFR(n[2]) -> EGFR(r[1]), EGFR(r[1] c[2]), EGFR(n[2]) (File "a_before.ka", line 9, characters 0-81:):
-		the precondition is not satisfied yet
-
-	Applying rule #[@rule-6]EGFR(r[1] c[.] n[.]), EGFR(r[1] c[.] n[.]) -> EGFR(r[.] c[.] n[.]), EGFR(r[.] c[.] n[.]) (File "a_before.ka", line 11, characters 0-90:):
-		the precondition is satisfied
-
-	Applying rule #[@rule-2]EGF(r[.]), EGFR(l[.]) -> EGF(r[1]), EGFR(l[1]) (File "a_before.ka", line 5, characters 0-48:):
 		the precondition is satisfied
 
 ------------------------------------------------------------
