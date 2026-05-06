@@ -356,14 +356,18 @@ module type Map_with_logs = sig
   val fold : (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
   val mapi : (elt -> 'a -> 'b) -> 'a t -> 'b t
   val map : ('a -> 'b) -> 'a t -> 'b t
-  val map_with_logs: 
-    Remanent_parameters_sig.parameters -> Exception.exceptions_caught_and_uncaught -> 'rem
-    -> (
-      Remanent_parameters_sig.parameters ->
-    Exception.exceptions_caught_and_uncaught -> 'rem -> 
+
+  val map_with_logs :
+    Remanent_parameters_sig.parameters ->
+    Exception.exceptions_caught_and_uncaught ->
+    'rem ->
+    (Remanent_parameters_sig.parameters ->
+    Exception.exceptions_caught_and_uncaught ->
+    'rem ->
     'a ->
-    Exception.exceptions_caught_and_uncaught * 'rem * 'b) -> 'a t -> 
-       Exception.exceptions_caught_and_uncaught * 'rem * 'b t
+    Exception.exceptions_caught_and_uncaught * 'rem * 'b) ->
+    'a t ->
+    Exception.exceptions_caught_and_uncaught * 'rem * 'b t
 
   val for_all : (elt -> 'a -> bool) -> 'a t -> bool
   val filter_one : (elt -> 'a -> bool) -> 'a t -> (elt * 'a) option
@@ -463,7 +467,7 @@ module Make (S_both : SetMap.S) :
     let find_option_without_logs _a b c d = b, S_both.Map.find_option c d
     let find_default_without_logs _a b c d e = b, S_both.Map.find_default c d e
     let add a b c d = lift S_both.Map.add_with_logs a b c d
-    
+
     let overwrite parameter error c d e =
       let error, bool, map =
         lift S_both.Map.add_while_testing_freshness parameter error c d e
@@ -504,15 +508,26 @@ module Make (S_both : SetMap.S) :
            (fun a b c d e () -> h a b c d e, ())
            mapf mapg ())
 
-    let map_with_logs (parameter:Remanent_parameters_sig.parameters) 
-    (error:Exception_without_parameter.exceptions_caught_and_uncaught) handler f map 
-    = let ((error:Exception_without_parameter.exceptions_caught_and_uncaught),handler),map = 
-      S_both.Map.map_with_logs 
-      (fun (p:Remanent_parameters_sig.parameters) (a,b) s s_opt exn -> 
-          let a = Exception.wrap p a s s_opt exn in (a,b)) parameter (error,handler)  
-      (fun a (b,b') c -> 
-          let a,b,c = f a b b' c in (a,b),c)  map 
-    in  (error:Exception_without_parameter.exceptions_caught_and_uncaught), handler, map 
+    let map_with_logs (parameter : Remanent_parameters_sig.parameters)
+        (error : Exception_without_parameter.exceptions_caught_and_uncaught)
+        handler f map =
+      let ( ( (error :
+                Exception_without_parameter.exceptions_caught_and_uncaught),
+              handler ),
+            map ) =
+        S_both.Map.map_with_logs
+          (fun (p : Remanent_parameters_sig.parameters) (a, b) s s_opt exn ->
+            let a = Exception.wrap p a s s_opt exn in
+            a, b)
+          parameter (error, handler)
+          (fun a (b, b') c ->
+            let a, b, c = f a b b' c in
+            (a, b), c)
+          map
+      in
+      ( (error : Exception_without_parameter.exceptions_caught_and_uncaught),
+        handler,
+        map )
 
     let fold2_sparse a b c = lift S_both.Map.fold2_sparse_with_logs a b c
     let iter2_sparse a b c = lift S_both.Map.iter2_sparse_with_logs a b c

@@ -990,30 +990,30 @@ module Domain = struct
     in
     error, dynamic, static
 
-  let map_store_value parameters error handler f store_value = 
-      let error, (handler, store_value) = 
-        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold 
-          parameters error 
-          (fun p e k data (handler, store_value) -> 
-              let e, handler, data' = f p e handler data in 
-              let e, store_value = Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set p e k data' store_value in 
-              e, (handler, store_value)) 
-          store_value  
-          (handler, store_value) 
-      in error, handler, store_value  
+  let map_store_value parameters error handler f store_value =
+    let error, (handler, store_value) =
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
+        error
+        (fun p e k data (handler, store_value) ->
+          let e, handler, data' = f p e handler data in
+          let e, store_value =
+            Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set p e k
+              data' store_value
+          in
+          e, (handler, store_value))
+        store_value (handler, store_value)
+    in
+    error, handler, store_value
 
-  let map_mvbdu f errors static dynamic = 
-    let parameters = get_parameter static in 
-    let handler = get_mvbdu_handler dynamic in 
-    let local =  dynamic.local in 
-    let errors, handler, agents_liveness  = 
-        map_store_value parameters errors handler f local.agents_liveness in 
-    let local = {local with agents_liveness} in 
-    let dynamic = {dynamic with  local} in 
-    let dynamic= set_mvbdu_handler handler dynamic in 
+  let map_mvbdu f errors static dynamic =
+    let parameters = get_parameter static in
+    let handler = get_mvbdu_handler dynamic in
+    let local = dynamic.local in
+    let errors, handler, agents_liveness =
+      map_store_value parameters errors handler f local.agents_liveness
+    in
+    let local = { local with agents_liveness } in
+    let dynamic = { dynamic with local } in
+    let dynamic = set_mvbdu_handler handler dynamic in
     errors, (static, dynamic)
-
-  end
-
-
-
+end

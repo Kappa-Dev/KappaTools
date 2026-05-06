@@ -2003,11 +2003,12 @@ module Domain = struct
     in
     error, dynamic, static
 
-    let map_store_value parameters error handler f store_value = 
-      let error, handler, store_value = 
-        Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map.map_with_logs
-          parameters error handler f store_value 
-      in error, handler, store_value  
+  let map_store_value parameters error handler f store_value =
+    let error, handler, store_value =
+      Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Map
+      .map_with_logs parameters error handler f store_value
+    in
+    error, handler, store_value
 
   let _map_store_value_opt parameters error handler f store_value =
     match store_value with

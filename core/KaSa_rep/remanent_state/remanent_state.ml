@@ -955,4 +955,3 @@ let store_patch patch s =
   { s with patch }
 
 let get_patch s = s.patch
-

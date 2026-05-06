@@ -44,7 +44,10 @@ type ('static, 'dynamic) kasa_state =
 type initial_state = Cckappa_sig.enriched_init
 
 let get_wake_up_relation static = static.global_wake_up_relation
-let set_wake_up_relation global_wake_up_relation static = {static with global_wake_up_relation}
+
+let set_wake_up_relation global_wake_up_relation static =
+  { static with global_wake_up_relation }
+
 let get_parameter static = static.global_parameter
 let get_compilation_information static = static.global_compilation_result
 
@@ -285,14 +288,18 @@ let set_mvbdu_handler bdu_handler dynamic =
   { dynamic with mvbdu_handler = bdu_handler }
 
 let get_guard_mvbdus static = static.global_guard_mvbdus
-let set_guard_mvbdus global_guard_mvbdus static = {static with global_guard_mvbdus}
+
+let set_guard_mvbdus global_guard_mvbdus static =
+  { static with global_guard_mvbdus }
 
 let get_restriction_mvbdu static = static.global_restriction_mvbdu
 let get_working_set_mvbdu static = static.global_working_set_mvbdu
 
-let set_restriction_mvbdu global_restriction_mvbdu static = {static with global_restriction_mvbdu}
-let set_working_set_mvbdu global_working_set_mvbdu
- static = {static with global_working_set_mvbdu}
+let set_restriction_mvbdu global_restriction_mvbdu static =
+  { static with global_restriction_mvbdu }
+
+let set_working_set_mvbdu global_working_set_mvbdu static =
+  { static with global_working_set_mvbdu }
 
 let get_nr_guard_parameters static =
   Handler.get_nr_guard_parameters (get_kappa_handler static)
@@ -429,22 +436,24 @@ let abstract_away_working_set_vars parameters error bdu_handler mvbdu
   in
   error, bdu_handler, mvbdu
 
-let remove_rule_list  errors static dynamic l = 
-  let parameters = get_parameter static in 
-  let handler = get_mvbdu_handler dynamic in 
-  let errors, handler, mv_false = Ckappa_sig.Views_bdu.mvbdu_false parameters handler errors in 
-  let dynamic = set_mvbdu_handler handler dynamic in 
-  let map = get_guard_mvbdus static in 
-  let map = 
-  List.fold_left 
-    (fun map id -> 
-      Ckappa_sig.Rule_setmap.Map.add id mv_false map)
-     map l  in 
-  let static = set_guard_mvbdus map static in 
-  let map = get_wake_up_relation static in 
-  let errors, map = Common_static.remove_rule_list parameters errors map l in 
-  let static = set_wake_up_relation map static in 
-  errors, (static, dynamic) 
+let remove_rule_list errors static dynamic l =
+  let parameters = get_parameter static in
+  let handler = get_mvbdu_handler dynamic in
+  let errors, handler, mv_false =
+    Ckappa_sig.Views_bdu.mvbdu_false parameters handler errors
+  in
+  let dynamic = set_mvbdu_handler handler dynamic in
+  let map = get_guard_mvbdus static in
+  let map =
+    List.fold_left
+      (fun map id -> Ckappa_sig.Rule_setmap.Map.add id mv_false map)
+      map l
+  in
+  let static = set_guard_mvbdus map static in
+  let map = get_wake_up_relation static in
+  let errors, map = Common_static.remove_rule_list parameters errors map l in
+  let static = set_wake_up_relation map static in
+  errors, (static, dynamic)
 
 module AbstractWS (IntStorageT : Int_storage.Storage with type dimension = int) =
 struct
@@ -504,5 +513,3 @@ module AbstractWSMap (MapT : Map_wrapper.S_with_logs) = struct
     in
     error, bdu_handler, result
 end
-
-

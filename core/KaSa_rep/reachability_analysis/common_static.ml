@@ -1200,33 +1200,33 @@ let compute_restriction_mvbdu ?patch_compute_restriction_mvbdu parameters error
     Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters mvbdu_handler error
       pair_list
   in
-(*  let error, ws_list =
-    Ckappa_sig.Ws_index_map_and_set.Map.fold
-      (fun ws (guard, _) (error, pair_list) ->
-        let error, b =
-          Cckappa_sig.is_ws_permanently_disabled parameters error ws compilation
-        in
-        ( error,
-          if b then
-           (* ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
-              ( Some Ckappa_sig.dummy_state_index_false,
-                Some Ckappa_sig.dummy_state_index_false ) )
-            ::*) pair_list
-          else
-            pair_list ))
-      compilation.Cckappa_sig.working_set_valuations (error, [])
-  in
-  let error, mvbdu_handler, mvbdu_ws =
-    Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters mvbdu_handler error
-      (List.rev ws_list)
-  in*)
+  (* let error, ws_list =
+       Ckappa_sig.Ws_index_map_and_set.Map.fold
+         (fun ws (guard, _) (error, pair_list) ->
+           let error, b =
+             Cckappa_sig.is_ws_permanently_disabled parameters error ws compilation
+           in
+           ( error,
+             if b then
+              (* ( Ckappa_sig.mvbdu_var_of_guard guard nsites,
+                 ( Some Ckappa_sig.dummy_state_index_false,
+                   Some Ckappa_sig.dummy_state_index_false ) )
+               ::*) pair_list
+             else
+               pair_list ))
+         compilation.Cckappa_sig.working_set_valuations (error, [])
+     in
+     let error, mvbdu_handler, mvbdu_ws =
+       Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters mvbdu_handler error
+         (List.rev ws_list)
+     in*)
   (*let error, mvbdu_handler, mvbdu =*)
-    match starting_mvbdu with
-    | None -> error, mvbdu_handler, mvbdu
-    | Some a ->
-      Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error a mvbdu
-(*  in
-  Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error mvbdu_ws mvbdu*)
+  match starting_mvbdu with
+  | None -> error, mvbdu_handler, mvbdu
+  | Some a ->
+    Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error a mvbdu
+(* in
+   Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error mvbdu_ws mvbdu*)
 
 let collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters error
     mvbdu_handler compilation bdu_restriction nsites =
@@ -1328,22 +1328,20 @@ let get_tuple_of_interest parameters error agent site map =
   | error, None -> error, Ckappa_sig.PairAgentSitesState_map_and_set.Set.empty
   | error, Some s -> error, s
 
-let remove_rule_list parameters errors site_to_rules l' = 
-  let rec aux list l acc = 
-    match list, l with 
-      | [], _ -> List.rev acc 
-      | _, [] -> (List.rev acc) @ list 
-      | a::b,t::_ when compare a t < 0 -> aux b l (a::acc)
-      | a::b,t::q when compare a t = 0 -> aux b q acc 
-      | a::_,t::q when compare a t > 0 -> aux list q acc 
-      | _, _ -> assert false 
-  in 
-  let diff l l' = aux l l' [] in 
-  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold 
-    parameters errors  
-    (fun parameters errors i l m -> 
-       Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters errors 
-        i (diff l l') m)
-     site_to_rules 
-     site_to_rules 
-    
+let remove_rule_list parameters errors site_to_rules l' =
+  let rec aux list l acc =
+    match list, l with
+    | [], _ -> List.rev acc
+    | _, [] -> List.rev acc @ list
+    | a :: b, t :: _ when compare a t < 0 -> aux b l (a :: acc)
+    | a :: b, t :: q when compare a t = 0 -> aux b q acc
+    | a :: _, t :: q when compare a t > 0 -> aux list q acc
+    | _, _ -> assert false
+  in
+  let diff l l' = aux l l' [] in
+  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
+    parameters errors
+    (fun parameters errors i l m ->
+      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+      .set parameters errors i (diff l l') m)
+    site_to_rules site_to_rules

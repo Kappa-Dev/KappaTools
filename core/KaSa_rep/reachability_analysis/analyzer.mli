@@ -87,32 +87,35 @@ module type Analyzer = sig
   val set_bdu_handler :
     Ckappa_sig.Views_bdu.handler -> dynamic_information -> dynamic_information
 
-  val map_mvbdu: 
-      (Remanent_parameters_sig.parameters 
- -> Exception.exceptions_caught_and_uncaught -> Ckappa_sig.Views_bdu.handler -> Ckappa_sig.Views_bdu.mvbdu -> Exception.exceptions_caught_and_uncaught * Ckappa_sig.Views_bdu.handler * Ckappa_sig.Views_bdu.mvbdu) ->
-   Exception.exceptions_caught_and_uncaught 
-     ->
-   static_information -> 
-     dynamic_information 
-     -> Exception.exceptions_caught_and_uncaught * (static_information*
-    dynamic_information)
- 
-  val remove_rule_list: 
-   Exception.exceptions_caught_and_uncaught 
-     ->
-   static_information -> 
-     dynamic_information -> Ckappa_sig.c_rule_id list -> 
-      Exception.exceptions_caught_and_uncaught * (static_information*
-    dynamic_information)
-   
-    val get_global_dynamic_information :
+  val map_mvbdu :
+    (Remanent_parameters_sig.parameters ->
+    Exception.exceptions_caught_and_uncaught ->
+    Ckappa_sig.Views_bdu.handler ->
+    Ckappa_sig.Views_bdu.mvbdu ->
+    Exception.exceptions_caught_and_uncaught
+    * Ckappa_sig.Views_bdu.handler
+    * Ckappa_sig.Views_bdu.mvbdu) ->
+    Exception.exceptions_caught_and_uncaught ->
+    static_information ->
+    dynamic_information ->
+    Exception.exceptions_caught_and_uncaught
+    * (static_information * dynamic_information)
+
+  val remove_rule_list :
+    Exception.exceptions_caught_and_uncaught ->
+    static_information ->
+    dynamic_information ->
+    Ckappa_sig.c_rule_id list ->
+    Exception.exceptions_caught_and_uncaught
+    * (static_information * dynamic_information)
+
+  val get_global_dynamic_information :
     dynamic_information -> Analyzer_headers.global_dynamic_information
 
   val set_global_dynamic_information :
     Analyzer_headers.global_dynamic_information ->
     dynamic_information ->
     dynamic_information
-
 end
 
 module Make : functor (Domain : Composite_domain.Composite_domain) -> Analyzer

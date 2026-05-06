@@ -98,28 +98,39 @@ module type Composite_domain = sig
 
   val get_parameters : static_information -> Remanent_parameters_sig.parameters
   val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
+  val get_restriction_mvbdu : static_information -> Ckappa_sig.Views_bdu.mvbdu
 
-   
-   val get_restriction_mvbdu: static_information -> Ckappa_sig.Views_bdu.mvbdu  
-  val set_restriction_mvbdu: Ckappa_sig.Views_bdu.mvbdu -> static_information -> static_information 
-val get_working_set_mvbdu: static_information -> Ckappa_sig.Views_bdu.mvbdu  
-  val set_working_set_mvbdu: Ckappa_sig.Views_bdu.mvbdu -> static_information -> static_information 
+  val set_restriction_mvbdu :
+    Ckappa_sig.Views_bdu.mvbdu -> static_information -> static_information
 
-  val get_guard_mvbdus: static_information -> Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t
-  val set_guard_mvbdus: Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t-> static_information -> static_information 
-  val map_mvbdu: 
-     (Remanent_parameters_sig.parameters 
- -> Exception.exceptions_caught_and_uncaught -> Ckappa_sig.Views_bdu.handler -> Ckappa_sig.Views_bdu.mvbdu -> Exception.exceptions_caught_and_uncaught * Ckappa_sig.Views_bdu.handler * Ckappa_sig.Views_bdu.mvbdu) ->
-   Exception.exceptions_caught_and_uncaught 
-     ->
-   static_information -> 
-     dynamic_information 
-     -> Exception.exceptions_caught_and_uncaught * (static_information*
-    dynamic_information)
+  val get_working_set_mvbdu : static_information -> Ckappa_sig.Views_bdu.mvbdu
 
+  val set_working_set_mvbdu :
+    Ckappa_sig.Views_bdu.mvbdu -> static_information -> static_information
+
+  val get_guard_mvbdus :
+    static_information ->
+    Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t
+
+  val set_guard_mvbdus :
+    Ckappa_sig.Views_bdu.mvbdu Ckappa_sig.Rule_setmap.Map.t ->
+    static_information ->
+    static_information
+
+  val map_mvbdu :
+    (Remanent_parameters_sig.parameters ->
+    Exception.exceptions_caught_and_uncaught ->
+    Ckappa_sig.Views_bdu.handler ->
+    Ckappa_sig.Views_bdu.mvbdu ->
+    Exception.exceptions_caught_and_uncaught
+    * Ckappa_sig.Views_bdu.handler
+    * Ckappa_sig.Views_bdu.mvbdu) ->
+    Exception.exceptions_caught_and_uncaught ->
+    static_information ->
+    dynamic_information ->
+    Exception.exceptions_caught_and_uncaught
+    * (static_information * dynamic_information)
 end
-
-
 
 (****************************************************************************)
 (*Analyzer is a functor takes a module Domain as its parameters.*)
@@ -144,8 +155,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
   let set_bonds bonds dynamic = { dynamic with bonds }
   let get_global_static_information = fst
   let get_domain_static_information = snd
-
-  let set_global_static_information a (_,b) = (a,b)
+  let set_global_static_information a (_, b) = a, b
   let lift f x = f (get_global_static_information x)
   let get_parameter static = lift Analyzer_headers.get_parameter static
   let get_compil static = lift Analyzer_headers.get_cc_code static
@@ -545,10 +555,10 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
         bonds = Ckappa_sig.AgentSite_map_and_set.Map.empty;
       }
     in
-    let error, dynamic = scan_rule_creation static dynamic error in 
+    let error, dynamic = scan_rule_creation static dynamic error in
     let error, dynamic =
       match patch with
-      | None -> error, dynamic 
+      | None -> error, dynamic
       | Some _ -> scan_rule_patch ?start static dynamic error
     in
     let error, dynamic, () = apply_event_list static dynamic error event_list in
@@ -703,41 +713,37 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
 
   let get_parameters (_, static_domain) = Domain.get_parameter static_domain
 
+  let map_mvbdu f errors static dynamic =
+    let errors, (dstatic, domain) =
+      Domain.map_mvbdu f errors
+        (get_domain_static_information static)
+        dynamic.domain
+    in
+    errors, ((fst static, dstatic), { dynamic with domain })
 
-let map_mvbdu f errors static dynamic = 
-  let errors, (dstatic, domain) =
-     Domain.map_mvbdu f errors 
-        (get_domain_static_information static)  
-        (
-         dynamic.domain) 
-in 
-  errors, ((fst static, dstatic), 
-          ({dynamic with domain}))
- 
-let get_restriction_mvbdu static = 
-  Analyzer_headers.get_restriction_mvbdu (get_global_static_information static)
-let get_working_set_mvbdu static = 
-  Analyzer_headers.get_working_set_mvbdu (get_global_static_information static)
+  let get_restriction_mvbdu static =
+    Analyzer_headers.get_restriction_mvbdu
+      (get_global_static_information static)
 
-let get_guard_mvbdus static = 
-   Analyzer_headers.get_guard_mvbdus (get_global_static_information static)
+  let get_working_set_mvbdu static =
+    Analyzer_headers.get_working_set_mvbdu
+      (get_global_static_information static)
 
-let set_restriction_mvbdu bdu static = 
-  let global = get_global_static_information static in 
-  let global = Analyzer_headers.set_restriction_mvbdu bdu global in 
-  set_global_static_information global static 
+  let get_guard_mvbdus static =
+    Analyzer_headers.get_guard_mvbdus (get_global_static_information static)
 
-let set_working_set_mvbdu bdu static = 
-   let global = get_global_static_information static in 
-  let global = Analyzer_headers.set_working_set_mvbdu bdu global in 
-  set_global_static_information global static 
+  let set_restriction_mvbdu bdu static =
+    let global = get_global_static_information static in
+    let global = Analyzer_headers.set_restriction_mvbdu bdu global in
+    set_global_static_information global static
 
+  let set_working_set_mvbdu bdu static =
+    let global = get_global_static_information static in
+    let global = Analyzer_headers.set_working_set_mvbdu bdu global in
+    set_global_static_information global static
 
-
-  let set_guard_mvbdus bdu static = 
-    let global = get_global_static_information static in 
-  let global = Analyzer_headers.set_guard_mvbdus bdu global in 
-  set_global_static_information global static 
-
-
+  let set_guard_mvbdus bdu static =
+    let global = get_global_static_information static in
+    let global = Analyzer_headers.set_guard_mvbdus bdu global in
+    set_global_static_information global static
 end

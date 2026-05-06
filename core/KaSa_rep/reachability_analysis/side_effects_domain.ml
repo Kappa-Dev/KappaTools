@@ -230,7 +230,5 @@ module Domain = struct
     | error, Some b -> error, Some b
 
   let enable_or_disable_rule static dynamic error _ = error, dynamic, static
-
-   let map_mvbdu _f errors static dynamic = 
-    errors, (static, dynamic)
+  let map_mvbdu _f errors static dynamic = errors, (static, dynamic)
 end
