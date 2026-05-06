@@ -302,9 +302,9 @@ Print Hash_8:
 Print Hash_9:
 Print Hash_10:
 Some exceptions have been raised
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 1101; exception:Exit
+error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 1105; exception:Exit
 Some exceptions have been raised
-error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 1101; exception:Exit
+error: file_name: core/KaSa_rep/abstract_domains/mvbdu/mvbdu_wrapper.ml; message: line 1105; exception:Exit
 Mvbdu.001: ok
 Mvbdu.002: ok
 Mvbdu.003: ok
@@ -423,6 +423,8 @@ Mvbdu.115: ok
 Mvbdu.116: ok
 Mvbdu.117: ok
 Mvbdu.118: ok
+Mvbdu.119: ok
+Mvbdu.120: ok
 true00: ok
 true01: ok
 true02: ok
