@@ -40,7 +40,7 @@ type rename_sites =
 
 (****************************************************************************)
 
-let non_relational parameters bdu_handler error mvbdu =
+let non_relational parameters bdu_handler error mvbdu restriction_bdu =
   let error, bdu_handler, list =
     Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction parameters bdu_handler
       error mvbdu
@@ -56,10 +56,14 @@ let non_relational parameters bdu_handler error mvbdu =
       (error, bdu_handler, mvbdu_true)
       list
   in
-  error, bdu_handler, Ckappa_sig.Views_bdu.equal mvbdu recomposition
+  let error, bdu_handler, are_equal =
+    Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error mvbdu
+      recomposition restriction_bdu
+  in
+  error, bdu_handler, are_equal
 
 let non_relational_with_threshold parameters bdu_handler error ~threshold mvbdu
-    =
+    restriction_bdu =
   let error, bdu_handler, list =
     Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction_with_threshold parameters
       bdu_handler error ~threshold mvbdu
@@ -75,10 +79,14 @@ let non_relational_with_threshold parameters bdu_handler error ~threshold mvbdu
       (error, bdu_handler, mvbdu_true)
       list
   in
-  error, bdu_handler, Ckappa_sig.Views_bdu.equal mvbdu recomposition
+  let error, bdu_handler, are_equal =
+    Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error mvbdu
+      recomposition restriction_bdu
+  in
+  error, bdu_handler, are_equal
 
 let try_partitioning parameters bdu_handler error kappa_handler
-    (rename_site_inverse : rename_sites) mvbdu =
+    (rename_site_inverse : rename_sites) mvbdu restriction_bdu =
   let i =
     Ckappa_sig.int_of_guard_parameter
       (Handler.get_nr_guard_parameters kappa_handler)
@@ -176,7 +184,7 @@ let try_partitioning parameters bdu_handler error kappa_handler
                 __POS__ Exit
             in
             let error_9, bdu_handler, bool =
-              non_relational parameters bdu_handler error case
+              non_relational parameters bdu_handler error case restriction_bdu
             in
             let error =
               Exception.check_point Exception.warn parameters error error_9
@@ -191,7 +199,11 @@ let try_partitioning parameters bdu_handler error kappa_handler
                 Exception.check_point Exception.warn parameters error error_10
                   __POS__ Exit
               in
-              if Ckappa_sig.Views_bdu.equal away mvbdu_ref then
+              let error, bdu_handler, is_equal =
+                Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error
+                  away mvbdu_ref restriction_bdu
+              in
+              if is_equal then
                 aux3 t (error, bdu_handler, output)
               else (
                 let error_11, bdu_handler, list =
@@ -209,7 +221,11 @@ let try_partitioning parameters bdu_handler error kappa_handler
                         Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler
                           error mvbdu_ref elt
                       in
-                      if Ckappa_sig.Views_bdu.equal mvbdu_test mvbdu_ref then
+                      let error, bdu_handler, are_equal =
+                        Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler
+                          error mvbdu_test mvbdu_ref restriction_bdu
+                      in
+                      if are_equal then
                         error, bdu_handler, list
                       else (
                         let error_12, bdu_handler, elt =
@@ -403,7 +419,7 @@ let try_partitioning parameters bdu_handler error kappa_handler
             in
             let error_10, bdu_handler, bool =
               non_relational_with_threshold parameters bdu_handler error
-                ~threshold case_with_param
+                ~threshold case_with_param restriction_bdu
             in
             let error =
               Exception.check_point Exception.warn parameters error error_10
@@ -418,7 +434,11 @@ let try_partitioning parameters bdu_handler error kappa_handler
                 Exception.check_point Exception.warn parameters error error_11
                   __POS__ Exit
               in
-              if Ckappa_sig.Views_bdu.equal away mvbdu_ref then
+              let error, bdu_handler, are_equal =
+                Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error
+                  away mvbdu_ref restriction_bdu
+              in
+              if are_equal then
                 aux3 t (error, bdu_handler, output)
               else (
                 let error_12, bdu_handler, list =
@@ -437,7 +457,11 @@ let try_partitioning parameters bdu_handler error kappa_handler
                         Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler
                           error mvbdu_ref elt
                       in
-                      if Ckappa_sig.Views_bdu.equal mvbdu_test mvbdu_ref then
+                      let error, bdu_handler, are_equal =
+                        Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler
+                          error mvbdu_test mvbdu_ref restriction_bdu
+                      in
+                      if are_equal then
                         error, bdu_handler, list
                       else (
                         let error_13, bdu_handler, elt =
@@ -663,7 +687,7 @@ let translate parameters bdu_handler error kappa_handler
         in
         let error, bdu_handler, output =
           try_partitioning parameters bdu_handler error kappa_handler
-            rename_site_inverse mvbdu
+            rename_site_inverse mvbdu restriction_bdu
         in
         (match output with
         | None -> error, (bdu_handler, No_known_translation list_with_mvbdu)
@@ -680,7 +704,7 @@ let translate parameters bdu_handler error kappa_handler
       in
       let error, bdu_handler, output =
         try_partitioning parameters bdu_handler error kappa_handler
-          rename_site_inverse mvbdu
+          rename_site_inverse mvbdu restriction_bdu
       in
       (match output with
       | None -> error, (bdu_handler, No_known_translation list_with_mvbdu)

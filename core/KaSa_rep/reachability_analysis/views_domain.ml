@@ -978,11 +978,12 @@ module Domain = struct
       Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error bdu_old bdu
         restriction_bdu
     in
-    let dynamic = set_mvbdu_handler bdu_handler dynamic in
     let updates_list = [] in
     (*-----------------------------------------------------------*)
     let error, dynamic, _title, is_new_views, updates_list =
-      if Ckappa_sig.Views_bdu.equal bdu_old bdu_union then
+    let error, bdu_handler, are_equal = Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error bdu_old bdu_union restriction_bdu in
+        let dynamic = set_mvbdu_handler bdu_handler dynamic in
+      if are_equal then
         error, dynamic, title, false, updates_list
       else (
         (*print different views*)
@@ -1171,6 +1172,7 @@ module Domain = struct
       fixpoint_result proj_bdu_test_restriction precondition handler_kappa =
     let nr_guard_parameters = Handler.get_nr_guard_parameters handler_kappa in
     let nsites = get_nsites static in
+    let restriction_bdu = get_restriction_mvbdu static in
     let error, dynamic, state_guard_parameters =
       get_state_of_guard_parameters parameters dynamic error precondition
     in
@@ -1197,7 +1199,11 @@ module Domain = struct
               bdu_test bdu_X
           in
           let dynamic = set_mvbdu_handler bdu_handler dynamic in
-          if Ckappa_sig.Views_bdu.equal bdu_inter bdu_false then
+          let error, bdu_handler, are_equal =
+            Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error
+              bdu_inter bdu_false restriction_bdu 
+          in
+          if are_equal then
             raise (False (error, dynamic))
           else (
             let error, map =
@@ -2540,6 +2546,7 @@ module Domain = struct
     let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
     (*-----------------------------------------------------------*)
     let kappa_handler = get_kappa_handler static in
+    let restriction_bdu = get_restriction_mvbdu static in
     let error, dynamic, fixpoint_result =
       get_fixpoint_result_without_working_set_vars parameters error static
         dynamic
@@ -2634,9 +2641,13 @@ module Domain = struct
                           Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler
                             error bdu_test bdu_X
                         in
+                        let error, bdu_handler, are_equal =
+                          Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler
+                            error bdu_inter bdu_false restriction_bdu
+                        in 
                         let dynamic = set_mvbdu_handler bdu_handler dynamic in
                         (*check if it is overlap or not?*)
-                        if Ckappa_sig.Views_bdu.equal bdu_inter bdu_false then
+                        if are_equal then
                           raise (False (error, dynamic))
                         else (
                           (*continue to iterate*)

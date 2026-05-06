@@ -934,7 +934,7 @@ module Domain = struct
     error, dynamic, new_mvbdu
 
   let common_scan parameters error bdu_false dynamic store_value list guard_bdu
-      =
+      restriction_bdu =
     let rec scan list dynamic error precondition_bdu =
       match list with
       | [] -> error, true, dynamic, precondition_bdu
@@ -956,7 +956,13 @@ module Domain = struct
           build_mvbdu_range_list parameters error dynamic tuple
             mvbdu_value_with_guard
         in
-        if Ckappa_sig.Views_bdu.equal new_mvbdu bdu_false then
+        let bdu_handler = get_mvbdu_handler dynamic in
+        let error, bdu_handler, are_equal =
+          Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error
+            new_mvbdu bdu_false restriction_bdu
+        in
+        let dynamic = set_mvbdu_handler bdu_handler dynamic in
+        if are_equal then
           error, false, dynamic, bdu_false
         else (
           let bdu_handler = get_mvbdu_handler dynamic in
@@ -975,7 +981,7 @@ module Domain = struct
     scan list dynamic error guard_bdu
 
   let whether_or_not_it_has_precondition parameters error bdu_false tuple_set
-      static dynamic precondition guard_bdu current_ws =
+      static dynamic precondition guard_bdu current_ws restriction_bdu =
     let list =
       Site_across_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set
       .elements tuple_set
@@ -989,6 +995,7 @@ module Domain = struct
     (*check if this pattern belong to the set of the patterns in the result*)
     let error, bool, dynamic, precondition_bdu =
       common_scan parameters error bdu_false dynamic store_value list guard_bdu
+        restriction_bdu
     in
     let error, dynamic, precondition =
       update_state_of_guard_parameters parameters error dynamic precondition
@@ -1004,6 +1011,7 @@ module Domain = struct
     let parameters = get_parameter static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let guard_bdus = get_guard_mvbdus static in
+    let restriction_bdu = get_restriction_mvbdu static in
     let error, dynamic, guard_bdu =
       get_bdu_guard parameters dynamic error guard_bdus rule_id
     in
@@ -1016,7 +1024,7 @@ module Domain = struct
         .empty store_potential_tuple_pair_lhs
     in
     whether_or_not_it_has_precondition parameters error bdu_false tuple_set
-      static dynamic precondition guard_bdu false
+      static dynamic precondition guard_bdu false restriction_bdu
 
   (***************************************************************************)
   (*MAY BE REACHABLE*)
@@ -1030,6 +1038,7 @@ module Domain = struct
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
+    let restriction_bdu = get_restriction_mvbdu static in
     let error, bonds_lhs =
       Common_static.collect_bonds_pattern parameters error
         pattern.Cckappa_sig.views pattern.Cckappa_sig.bonds
@@ -1053,7 +1062,7 @@ module Domain = struct
         tuple_set
     in
     whether_or_not_it_has_precondition parameters error bdu_false tuple_set
-      static dynamic precondition bdu_true true
+      static dynamic precondition bdu_true true restriction_bdu
 
   (****************************************************************)
 
@@ -1069,7 +1078,8 @@ module Domain = struct
   (*APPLY RULE*)
   (***************************************************************************)
 
-  let check_association_list parameters error bdu_false pair check dynamic =
+  let check_association_list parameters error bdu_false pair check dynamic
+      restriction_bdu =
     let store_result = get_value dynamic in
     let bdu_handler = get_mvbdu_handler dynamic in
     let check, bdu_list =
@@ -1091,7 +1101,7 @@ module Domain = struct
     in
     let error, bdu_handler, bool =
       Site_across_bonds_domain_type.check parameters error bdu_false bdu_handler
-        pair mvbdu store_result
+        pair mvbdu store_result restriction_bdu
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, bool
@@ -1564,7 +1574,7 @@ module Domain = struct
                   in
                   let error, dynamic, unmodified_sites_ok =
                     check_association_list parameters error bdu_false pair check
-                      dynamic
+                      dynamic restriction_bdu
                   in
                   if unmodified_sites_ok then (
                     let error, bool, dynamic, modified_sites =
@@ -1855,7 +1865,7 @@ module Domain = struct
                 (*at the final result needs to check the non_relational
                   condition*)
                 Translation_in_natural_language.non_relational parameters
-                  bdu_handler error mvbdu
+                  bdu_handler error mvbdu restriction_bdu
               else
                 (*other cases will by pass this test*)
                 error, bdu_handler, false
@@ -1999,26 +2009,30 @@ module Domain = struct
           parameters error handler f store_value 
       in error, handler, store_value  
 
- let _map_store_value_opt parameters error handler f store_value = 
-    match store_value with 
-      | None -> error, handler, store_value 
-      | Some store_value -> 
-          let error, handler, store_value = map_store_value parameters error handler f store_value in 
-          error, handler, Some store_value 
+  let _map_store_value_opt parameters error handler f store_value =
+    match store_value with
+    | None -> error, handler, store_value
+    | Some store_value ->
+      let error, handler, store_value =
+        map_store_value parameters error handler f store_value
+      in
+      error, handler, Some store_value
 
-  let map_mvbdu f errors static dynamic = 
-    let parameters = get_parameter static in 
-    let handler = get_mvbdu_handler dynamic in 
-    let local = get_local_dynamic_information dynamic in 
-    let errors, handler, store_value  = 
-        map_store_value parameters errors handler f local.store_value in 
-    (*let errors, handler, store_value_current_working_set = 
-        map_store_value_opt parameters errors handler f local.store_value_current_working_set
-    in*) (* should not be impacted by Boolean parameters *) 
-    let local = {local with store_value (*; store_value_current_working_set*)} in 
-    let dynamic = set_local_dynamic_information local dynamic in 
-    let dynamic= set_mvbdu_handler handler dynamic in 
+  let map_mvbdu f errors static dynamic =
+    let parameters = get_parameter static in
+    let handler = get_mvbdu_handler dynamic in
+    let local = get_local_dynamic_information dynamic in
+    let errors, handler, store_value =
+      map_store_value parameters errors handler f local.store_value
+    in
+    (*let errors, handler, store_value_current_working_set =
+          map_store_value_opt parameters errors handler f local.store_value_current_working_set
+      in*)
+    (* should not be impacted by Boolean parameters *)
+    let local =
+      { local with store_value (*; store_value_current_working_set*) }
+    in
+    let dynamic = set_local_dynamic_information local dynamic in
+    let dynamic = set_mvbdu_handler handler dynamic in
     errors, (static, dynamic)
-
-
 end

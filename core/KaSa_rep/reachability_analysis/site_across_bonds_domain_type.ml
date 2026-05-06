@@ -493,7 +493,7 @@ let print_site_across_bonds_domain ?verbose:(_verbose = true) ?(sparse = false)
       if final_result then
         (*at the final result needs to check the non_relational condition*)
         Translation_in_natural_language.non_relational parameters bdu_handler
-          error mvbdu
+          error mvbdu restriction_bdu
       else
         (*other cases will by pass this test*)
         error, bdu_handler, false
@@ -595,14 +595,19 @@ let add_sites_from_tuples parameters error tuple modified_sites =
     (error, modified_sites)
     [ agent, site1; agent, site2; agent', site1'; agent', site2' ]
 
-let check parameters error bdu_false bdu_handler pair mvbdu store_result =
+let check parameters error bdu_false bdu_handler pair mvbdu store_result
+    restriction_bdu =
   let error, bdu_old =
     get_mvbdu_from_tuple_pair parameters error pair bdu_false store_result
   in
   let error, bdu_handler, new_bdu =
     Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu_old mvbdu
   in
-  if Ckappa_sig.Views_bdu.equal new_bdu bdu_false then
+  let error, bdu_handler, is_false =
+    Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error new_bdu
+      restriction_bdu
+  in
+  if is_false then
     error, bdu_handler, false
   else
     error, bdu_handler, true
@@ -620,7 +625,11 @@ let add_link_and_check parameter error bdu_false bdu_handler kappa_handler bool
   (*-----------------------------------------------------------*)
   (*check the freshness of the pair*)
   (*compare mvbdu and old mvbdu*)
-  if Ckappa_sig.Views_bdu.equal new_bdu bdu_old then
+  let error, bdu_handler, are_equal =
+    Ckappa_sig.mvbdu_equal_for_guards parameter bdu_handler error new_bdu
+      bdu_old restriction_mvbdu
+  in
+  if are_equal then
     error, bool, bdu_handler, modified_sites, store_result
   else (
     (*-----------------------------------------------------------*)

@@ -656,7 +656,11 @@ let add_value_and_event parameters error kappa_handler x value store_set
     Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error old_value
       value_mvbdu restriction_mvbdu
   in
-  if Ckappa_sig.Views_bdu.equal new_value old_value then
+  let error, bdu_handler, are_equal =
+    Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error new_value
+      old_value restriction_mvbdu
+  in
+  if are_equal then
     error, (bdu_handler, store_set, store_result)
   else (
     (*check whether or not if this is a fresh value*)

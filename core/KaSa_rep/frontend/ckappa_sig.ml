@@ -1463,6 +1463,18 @@ let mvbdu_is_false_for_guards parameters handler_bdu error mvbdu bdu_restriction
   in
   error, handler_bdu, Views_bdu.equal inter_mvbdu mvbdu_false
 
+let mvbdu_equal_for_guards parameters handler_bdu error mvbdu1 mvbdu2
+    bdu_restriction =
+  if Views_bdu.equal mvbdu1 mvbdu2 then
+    error, handler_bdu, true
+  else (
+    let error, handler_bdu, mvbdu_xor =
+      Views_bdu.mvbdu_xor parameters handler_bdu error mvbdu1 mvbdu2
+    in
+    mvbdu_is_false_for_guards parameters handler_bdu error mvbdu_xor
+      bdu_restriction
+  )
+
 (**Returns the bdu representation of the guard, and a bdu that maps each guard parameter of the guard to 1 or 0.
 This second bdu is used to restrict the bdus that are calculated by using "or" and "not"
 to valid bdus where the values of the guards can only be 0 and 1. *)
