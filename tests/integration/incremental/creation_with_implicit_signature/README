@@ -1,0 +1,2 @@
+cat command.txt|"${KAPPABIN}"KaSaIncremental essai.ka 
+
