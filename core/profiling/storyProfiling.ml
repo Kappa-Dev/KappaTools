@@ -60,6 +60,7 @@ type step_kind =
   | Merge_influences
   | KaSim_compilation
   | KaSa_precompilation
+  | KaSaIncremental_diff
   | KaSa_lexing
   | KaSa_linking
   | Influence_map of string
@@ -116,6 +117,7 @@ let string_of_step_kind x =
   | Merge_influences -> Printf.sprintf "Merging influences"
   | KaSim_compilation -> Printf.sprintf "KaSim frontend"
   | KaSa_precompilation -> Printf.sprintf "KaSa precompilation"
+  | KaSaIncremental_diff -> Printf.sprintf "IncrementalKaSa calculate diff"
   | KaSa_lexing -> Printf.sprintf "KaSa Lexing"
   | KaSa_linking -> Printf.sprintf "KaSa Linking"
   | Influence_map string -> Printf.sprintf "Influence map (%s)" string
@@ -322,7 +324,8 @@ module StoryStats : StoryStats = struct
     | Scan_rule_dynamic _ | Influence_map _ | Internal_influence_map _
     | Reachability_analysis | Print_reachability_result | Enable_or_disable_rule
     | Global_initialization_update | Domain_initialization_update _
-    | Initial_state_updates | Incremental_reachability_analysis ->
+    | Initial_state_updates | Incremental_reachability_analysis
+    | KaSaIncremental_diff ->
       false
 
   let add_event parameter error step_kind f log_info =

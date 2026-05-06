@@ -368,6 +368,7 @@ for MODEL in "${MODELS[@]}"; do
         store_runtime_from_profiling "Add new initial states computation" "$MODEL,$NR_RULES_MODEL,3_incremental,1_init,2_initial_state,$i,$NR_RULES"
         store_runtime_from_profiling "Restart fixpoint computation for the reachability analysis" "$MODEL,$NR_RULES_MODEL,3_incremental,1_init,3_fixpoint,$i,$NR_RULES"
         store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,3_incremental,1_init,5_print,$i,$NR_RULES"
+        store_runtime_from_profiling "IncrementalKaSa calculate diff" "$MODEL,$NR_RULES_MODEL,3_incremental,2_diff,6_diff,$i,$NR_RULES"
 
     done
 

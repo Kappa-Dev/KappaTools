@@ -2639,6 +2639,12 @@ functor
         | Some false | None -> false
       in
       let errors = get_errors state in
+      let log_info = Remanent_state.get_log_info state in
+      let errors, log_info =
+        StoryProfiling.StoryStats.add_event parameters errors
+          KaSaIncremental_diff None log_info
+      in
+      let state = Remanent_state.set_log_info log_info state in
       let state' = init ~called_from ?compil ?files ~is_a_patch:true () in
       let state' = set_errors errors state' in
       let state', _ = get_compilation state' in
@@ -2736,6 +2742,11 @@ functor
       let state = set_errors errors state in
       let state = Remanent_state.set_c_compil cc_compil state in
       let state = Remanent_state.set_handler handler state in
+      let errors, log_info =
+        StoryProfiling.StoryStats.close_event parameters errors
+          KaSaIncremental_diff None log_info
+      in
+      let state = Remanent_state.set_log_info log_info state in
       let state, _ =
         update_reachability_result ?do_not_restart_fixpoint_computation
           (compute_show_title (fun _ -> do_we_show_title) (Some "Apply patch"))
