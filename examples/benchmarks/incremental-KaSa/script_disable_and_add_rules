@@ -139,7 +139,7 @@ tgf_v21_nr_rules=211
 tgf_20170401_nr_rules=215 
 fgf_nr_rules=42
 sfb_nr_rules=71 
-ensemble_nr_rules=233 
+ensemble_nr_rules=232
 machine_nr_rules=220 
 
 # Array of models
