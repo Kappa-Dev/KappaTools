@@ -7,11 +7,38 @@
 \cmidrule(lr){4-6}
 & & \bfseries\shortstack{analysis} & \bfseries\shortstack{initial\\analysis} & \bfseries\shortstack{disable\\rules} & \bfseries\shortstack{add\\a rule}\\
 \midrule
-\texttt{tgf\_v19} & 96 & 0.077 & 0.135 & 0.0157 & 0.179 \\
-\texttt{tgf\_20180419} & 291 & 0.197 & 0.245 & 0.00738 & 0.188 \\
-\texttt{wnt\_20151228} & 355 & 0.891 & 0.617 & 0.0656 & 1.14 \\
-\texttt{wnt\_20170322} & 1469 & 3.49 & 3.65 & 0.0443 & 3.91 \\
-\texttt{korkut\_20170113} & 3915 & 3.23 & 3.15 & 0.0746 & 0.12 \\
-\texttt{korkut\_20170206} & 5749 & 13.4 & 13.1 & 0.194 & 1.44 \\
+\texttt{fgf} & 41 & 0.0174 & 0.0413 & 0.00546 & 0.0361 \\
+\texttt{sfb} & 70 & 0.0271 & 0.112 & 0.01 & 0.0998 \\
+\texttt{tgf\_v19} & 96 & 0.0779 & 0.132 & 0.0165 & 0.104 \\
+\texttt{tgf\_v20} & 98 & 0.0978 & 0.15 & 0.0176 & 0.132 \\
+\texttt{tgf\_v21} & 210 & 0.218 & 0.326 & 0.0144 & 0.173 \\
+\texttt{tgf\_20170401} & 214 & 0.195 & 0.269 & 0.0119 & 0.114 \\
+\texttt{machine} & 219 & 0.231 & 0.259 & 0.0137 & 0.168 \\
+\texttt{ensemble} & 232 & 0.125 & 0.157 & 0.0053 & 0.0781 \\
+\texttt{tgf\_20180419} & 291 & 0.211 & 0.254 & 0.00568 & 0.104 \\
+\texttt{wnt\_20151228} & 355 & 0.923 & 0.642 & 0.0759 & 0.467 \\
+\texttt{wnt\_20160928} & 1418 & 3.14 & 3.3 & 0.0315 & 1.5 \\
+\texttt{wnt\_20170322} & 1469 & 3.51 & 3.71 & 0.034 & 1.94 \\
+\texttt{korkut\_20170113} & 3915 & 3.25 & 3.2 & 0.0754 & 0.121 \\
+\texttt{korkut\_20170206} & 5749 & 13.5 & 13.4 & 0.197 & 1.19 \\
+\texttt{korkut\_20170117} & 12895 & 12.9 & 12.9 & 0.0212 & 0.139 \\
 \bottomrule
 \end{tabular}
+\AltTextCMSB{
+The table shows the number of rules and the runtimes of the evaluation for 15 models from the literature. 
+The model fgf has 41 rules. The non-incremental analysis took 0.0174 seconds. The incremental initial analysis took 0.0413 seconds. Disabling 10 rules took 0.00546 seconds. Adding a rule took 0.0361 seconds. 
+The model sfb has 70 rules. The non-incremental analysis took 0.0271 seconds. The incremental initial analysis took 0.112 seconds. Disabling 10 rules took 0.01 seconds. Adding a rule took 0.0998 seconds. 
+The model tgf\_v19 has 96 rules. The non-incremental analysis took 0.0779 seconds. The incremental initial analysis took 0.132 seconds. Disabling 10 rules took 0.0165 seconds. Adding a rule took 0.104 seconds. 
+The model tgf\_v20 has 98 rules. The non-incremental analysis took 0.0978 seconds. The incremental initial analysis took 0.15 seconds. Disabling 10 rules took 0.0176 seconds. Adding a rule took 0.132 seconds. 
+The model tgf\_v21 has 210 rules. The non-incremental analysis took 0.218 seconds. The incremental initial analysis took 0.326 seconds. Disabling 10 rules took 0.0144 seconds. Adding a rule took 0.173 seconds. 
+The model tgf\_20170401 has 214 rules. The non-incremental analysis took 0.195 seconds. The incremental initial analysis took 0.269 seconds. Disabling 10 rules took 0.0119 seconds. Adding a rule took 0.114 seconds. 
+The model machine has 219 rules. The non-incremental analysis took 0.231 seconds. The incremental initial analysis took 0.259 seconds. Disabling 10 rules took 0.0137 seconds. Adding a rule took 0.168 seconds. 
+The model ensemble has 232 rules. The non-incremental analysis took 0.125 seconds. The incremental initial analysis took 0.157 seconds. Disabling 10 rules took 0.0053 seconds. Adding a rule took 0.0781 seconds. 
+The model tgf\_20180419 has 291 rules. The non-incremental analysis took 0.211 seconds. The incremental initial analysis took 0.254 seconds. Disabling 10 rules took 0.00568 seconds. Adding a rule took 0.104 seconds. 
+The model wnt\_20151228 has 355 rules. The non-incremental analysis took 0.923 seconds. The incremental initial analysis took 0.642 seconds. Disabling 10 rules took 0.0759 seconds. Adding a rule took 0.467 seconds. 
+The model wnt\_20160928 has 1418 rules. The non-incremental analysis took 3.14 seconds. The incremental initial analysis took 3.3 seconds. Disabling 10 rules took 0.0315 seconds. Adding a rule took 1.5 seconds. 
+The model wnt\_20170322 has 1469 rules. The non-incremental analysis took 3.51 seconds. The incremental initial analysis took 3.71 seconds. Disabling 10 rules took 0.034 seconds. Adding a rule took 1.94 seconds. 
+The model korkut\_20170113 has 3915 rules. The non-incremental analysis took 3.25 seconds. The incremental initial analysis took 3.2 seconds. Disabling 10 rules took 0.0754 seconds. Adding a rule took 0.121 seconds. 
+The model korkut\_20170206 has 5749 rules. The non-incremental analysis took 13.5 seconds. The incremental initial analysis took 13.4 seconds. Disabling 10 rules took 0.197 seconds. Adding a rule took 1.19 seconds. 
+The model korkut\_20170117 has 12895 rules. The non-incremental analysis took 12.9 seconds. The incremental initial analysis took 12.9 seconds. Disabling 10 rules took 0.0212 seconds. Adding a rule took 0.139 seconds. 
+}

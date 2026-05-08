@@ -442,6 +442,11 @@ let init_remanent parameters error =
       Memo_sig.print_mvbdu;
     } )
 
+let hack_to_separate_sites_id_from_guard_id = 100000
+let boolean_predicate i = i >= hack_to_separate_sites_id_from_guard_id
+let leave = false
+let boolean_setting = leave, boolean_predicate, true
+
 let mvbdu_allocate parameters error b c d e
     (old_handler :
       ( 'a,
@@ -521,7 +526,9 @@ let memo_not =
       { h with Memo_sig.data = { h.Memo_sig.data with boolean_mvbdu_not = x } })
 
 let boolean_mvbdu_not parameters =
-  Mvbdu_algebra.generic_unary (mvbdu_allocate parameters) memo_not
+  Mvbdu_algebra.generic_unary ~boolean_setting
+    (mvbdu_allocate parameters)
+    memo_not
 
 let memo_constant_true =
   Mvbdu_algebra.not_recursive_not_memoize_unary
@@ -542,21 +549,25 @@ let memo_constant_false =
     mvbdu_allocate
 
 let boolean_mvbdu_true parameters handler =
-  Mvbdu_algebra.generic_zeroary (mvbdu_allocate parameters) handler
-    (fun error -> error, Mvbdu_sig.Leaf true)
+  Mvbdu_algebra.generic_zeroary ~boolean_setting (mvbdu_allocate parameters)
+    handler (fun error -> error, Mvbdu_sig.Leaf true)
 
 let boolean_mvbdu_false parameters handler =
-  Mvbdu_algebra.generic_zeroary (mvbdu_allocate parameters) handler
-    (fun error -> error, Mvbdu_sig.Leaf false)
+  Mvbdu_algebra.generic_zeroary ~boolean_setting (mvbdu_allocate parameters)
+    handler (fun error -> error, Mvbdu_sig.Leaf false)
 
 let boolean_mvbdu_constant_true parameters =
-  Mvbdu_algebra.generic_unary (mvbdu_allocate parameters) memo_constant_true
+  Mvbdu_algebra.generic_unary ~boolean_setting
+    (mvbdu_allocate parameters)
+    memo_constant_true
 
 let boolean_mvbdu_constant_false parameters =
-  Mvbdu_algebra.generic_unary (mvbdu_allocate parameters) memo_constant_false
+  Mvbdu_algebra.generic_unary ~boolean_setting
+    (mvbdu_allocate parameters)
+    memo_constant_false
 
 let boolean_mvbdu_and parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -591,10 +602,12 @@ let memo_or =
       { h with Memo_sig.data = { h.Memo_sig.data with boolean_mvbdu_or = x } })
 
 let boolean_mvbdu_or parameters =
-  Mvbdu_algebra.generic_binary (mvbdu_allocate parameters) memo_or
+  Mvbdu_algebra.generic_binary ~boolean_setting
+    (mvbdu_allocate parameters)
+    memo_or
 
 let boolean_mvbdu_xor parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -614,7 +627,7 @@ let boolean_mvbdu_xor parameters =
          }))
 
 let boolean_mvbdu_nand parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -634,7 +647,7 @@ let boolean_mvbdu_nand parameters =
          }))
 
 let boolean_mvbdu_equiv parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -654,7 +667,7 @@ let boolean_mvbdu_equiv parameters =
          }))
 
 let boolean_mvbdu_nor parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -674,7 +687,7 @@ let boolean_mvbdu_nor parameters =
          }))
 
 let boolean_mvbdu_imply parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -701,7 +714,7 @@ let boolean_mvbdu_imply parameters =
          }))
 
 let boolean_mvbdu_is_implied parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -728,7 +741,7 @@ let boolean_mvbdu_is_implied parameters =
          }))
 
 let boolean_mvbdu_nimply parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -755,7 +768,7 @@ let boolean_mvbdu_nimply parameters =
          }))
 
 let boolean_mvbdu_nis_implied parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -783,7 +796,7 @@ let boolean_mvbdu_nis_implied parameters =
          }))
 
 let boolean_constant_bi_true parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (Mvbdu_algebra.not_recursive_binary
        (fun error _ _ -> error, Mvbdu_sig.Leaf true, None)
@@ -795,7 +808,7 @@ let boolean_constant_bi_true parameters =
        (mvbdu_allocate parameters))
 
 let boolean_constant_bi_false parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (Mvbdu_algebra.not_recursive_binary
        (fun error _ _ -> error, Mvbdu_sig.Leaf false, None)
@@ -807,7 +820,7 @@ let boolean_constant_bi_false parameters =
        (mvbdu_allocate parameters))
 
 let boolean_mvbdu_fst parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (Mvbdu_algebra.not_recursive_binary
        (fun error x _ -> error, x.Mvbdu_sig.value, Some x)
@@ -819,7 +832,7 @@ let boolean_mvbdu_fst parameters =
        (mvbdu_allocate parameters))
 
 let boolean_mvbdu_snd parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (Mvbdu_algebra.not_recursive_binary
        (fun error x y -> error, x.Mvbdu_sig.value, Some y)
@@ -831,7 +844,7 @@ let boolean_mvbdu_snd parameters =
        (mvbdu_allocate parameters))
 
 let boolean_mvbdu_nfst parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -852,7 +865,7 @@ let boolean_mvbdu_nfst parameters =
          }))
 
 let boolean_mvbdu_nsnd parameters =
-  Mvbdu_algebra.generic_binary
+  Mvbdu_algebra.generic_binary ~boolean_setting
     (mvbdu_allocate parameters)
     (build_memoize_binary
        (fun _parameters error ->
@@ -1001,7 +1014,7 @@ let memo_keep_head_only =
       Hash_1.set parameters error (Mvbdu_core.id_of_mvbdu mvbdu))
 
 let keep_head_only parameters error handler =
-  Mvbdu_algebra.keep_head_only
+  Mvbdu_algebra.keep_head_only ~boolean_setting
     (mvbdu_allocate parameters)
     memo_keep_head_only boolean_mvbdu_true handler error parameters
 
@@ -1044,7 +1057,7 @@ let memo_keep_head_only_with_threshold =
       Hash_2.set parameters error (int, Mvbdu_core.id_of_mvbdu mvbdu'))
 
 let keep_head_only_with_threshold parameters error handler ~threshold mvbdu =
-  Mvbdu_algebra.keep_head_only_with_threshold
+  Mvbdu_algebra.keep_head_only_with_threshold ~boolean_setting
     (mvbdu_allocate parameters)
     memo_keep_head_only_with_threshold boolean_mvbdu_or handler error parameters
     (threshold, mvbdu)
@@ -1266,7 +1279,8 @@ let gen_bin_mvbdu_list_with_threshold
     ~threshold mvbdu_input list_input
 
 let redefine parameters error handler mvbdu_input list_input =
-  gen_bin_mvbdu_list Mvbdu_algebra.redefine
+  gen_bin_mvbdu_list
+    (Mvbdu_algebra.redefine ~boolean_setting)
     (fun x -> x.Memo_sig.data.boolean_mvbdu_redefine)
     (fun x h ->
       {
@@ -1276,7 +1290,8 @@ let redefine parameters error handler mvbdu_input list_input =
     parameters error handler mvbdu_input list_input
 
 let redefine_range parameters error handler mvbdu_input list_input =
-  gen_bin_mvbdu_list Mvbdu_algebra.redefine_range
+  gen_bin_mvbdu_list
+    (Mvbdu_algebra.redefine_range ~boolean_setting)
     (fun x -> x.Memo_sig.data.boolean_mvbdu_redefine_range)
     (fun x h ->
       {
@@ -1287,7 +1302,8 @@ let redefine_range parameters error handler mvbdu_input list_input =
     parameters error handler mvbdu_input list_input
 
 let monotonicaly_rename parameters error handler mvbdu_input list_input =
-  gen_bin_mvbdu_list Mvbdu_algebra.monotonicaly_rename
+  gen_bin_mvbdu_list
+    (Mvbdu_algebra.monotonicaly_rename ~boolean_setting)
     (fun x -> x.Memo_sig.data.boolean_mvbdu_monotonicaly_rename)
     (fun x h ->
       {
@@ -1299,7 +1315,8 @@ let monotonicaly_rename parameters error handler mvbdu_input list_input =
 
 let project_keep_only parameters error handler mvbdu_input list_input =
   gen_bin_mvbdu_list
-    (fun a b -> Mvbdu_algebra.project_keep_only a b boolean_mvbdu_true)
+    (fun a b ->
+      Mvbdu_algebra.project_keep_only ~boolean_setting a b boolean_mvbdu_true)
     (fun x -> x.Memo_sig.data.boolean_mvbdu_project_keep_only)
     (fun x h ->
       {
@@ -1359,7 +1376,8 @@ let project_keep_only_with_threshold parameters error handler ~threshold
              'm,
              'n )
            Memo_sig.memoized_fun) ->
-      Mvbdu_algebra.project_keep_only_with_threshold a b boolean_mvbdu_true)
+      Mvbdu_algebra.project_keep_only_with_threshold ~boolean_setting a b
+        boolean_mvbdu_true)
     (fun x -> x.Memo_sig.data.boolean_mvbdu_project_keep_only_with_threshold)
     (fun x h ->
       {
@@ -1373,7 +1391,8 @@ let project_keep_only_with_threshold parameters error handler ~threshold
     parameters error handler ~threshold mvbdu_input list_input
 
 let project_abstract_away parameters error handler mvbdu_input list_input =
-  gen_bin_mvbdu_list Mvbdu_algebra.project_abstract_away
+  gen_bin_mvbdu_list
+    (Mvbdu_algebra.project_abstract_away ~boolean_setting)
     (fun x -> x.Memo_sig.data.boolean_mvbdu_project_abstract_away)
     (fun x h ->
       {
@@ -1384,7 +1403,8 @@ let project_abstract_away parameters error handler mvbdu_input list_input =
     parameters error handler mvbdu_input list_input
 
 let definitely_remove parameters error handler mvbdu_input list_input =
-  gen_bin_mvbdu_list Mvbdu_algebra.definitely_remove
+  gen_bin_mvbdu_list
+    (Mvbdu_algebra.definitely_remove ~boolean_setting)
     (fun x -> x.Memo_sig.data.boolean_mvbdu_definitely_remove)
     (fun x h ->
       {

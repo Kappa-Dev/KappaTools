@@ -7,6 +7,7 @@ val get_skeleton :
   ((int, 'd) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu
 
 val compress_node :
+  boolean_setting:'d * (int -> bool) * bool ->
   ('a ->
   ('b -> 'b -> int) ->
   ((int, 'c) Mvbdu_sig.precell, 'd) Mvbdu_sig.premvbdu ->

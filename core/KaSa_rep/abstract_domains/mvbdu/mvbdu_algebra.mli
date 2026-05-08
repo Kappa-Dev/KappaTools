@@ -1,20 +1,24 @@
 val generic_zeroary :
-  ('a ->
+  boolean_setting:'d * (int -> bool) * bool ->
+  (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('b -> 'b -> int) ->
   ((int, 'c) Mvbdu_sig.precell, 'd) Mvbdu_sig.premvbdu ->
   'd Mvbdu_sig.cell ->
   (int -> 'd Mvbdu_sig.mvbdu) ->
   'e ->
   Exception_without_parameter.exceptions_caught_and_uncaught
-  * ('f * 'g * 'h * 'e) option) ->
+  * (int * 'd Mvbdu_sig.cell * 'd Mvbdu_sig.mvbdu * 'e) option) ->
   'e ->
-  ('i ->
-  'a * (('d Mvbdu_sig.mvbdu, 'd) Mvbdu_sig.precell, 'd) Mvbdu_sig.premvbdu) ->
-  'i ->
+  (Exception_without_parameter.exceptions_caught_and_uncaught ->
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * (('d Mvbdu_sig.mvbdu, 'd) Mvbdu_sig.precell, 'd) Mvbdu_sig.premvbdu) ->
+  Exception_without_parameter.exceptions_caught_and_uncaught ->
   Remanent_parameters_sig.parameters ->
-  Exception_without_parameter.exceptions_caught_and_uncaught * ('e * 'h option)
+  Exception_without_parameter.exceptions_caught_and_uncaught
+  * ('e * 'd Mvbdu_sig.mvbdu option)
 
 val generic_unary :
+  boolean_setting:'a * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('f -> 'f -> int) ->
   ((int, 'i) Mvbdu_sig.precell, 'a) Mvbdu_sig.premvbdu ->
@@ -44,6 +48,7 @@ val generic_unary :
   * (('g, 'b, 'c, 'd, 'e, 'a, 'h) Memo_sig.handler * 'a Mvbdu_sig.mvbdu option)
 
 val generic_binary :
+  boolean_setting:'a * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('f -> 'f -> int) ->
   ((int, 'i) Mvbdu_sig.precell, 'a) Mvbdu_sig.premvbdu ->
@@ -74,6 +79,7 @@ val generic_binary :
   * (('g, 'b, 'c, 'd, 'e, 'a, 'h) Memo_sig.handler * 'a Mvbdu_sig.mvbdu option)
 
 val generic_unary_other :
+  boolean_setting:'c * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
   ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
@@ -93,8 +99,8 @@ val generic_unary_other :
     'h,
     'j ->
     'j Mvbdu_sig.mvbdu ->
-    'k
-    * ('k ->
+    Exception_without_parameter.exceptions_caught_and_uncaught
+    * (Exception_without_parameter.exceptions_caught_and_uncaught ->
       Exception_without_parameter.exceptions_caught_and_uncaught
       * (('c Mvbdu_sig.mvbdu, 'c) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu),
     'j Mvbdu_sig.mvbdu * 'j Mvbdu_sig.mvbdu,
@@ -165,6 +171,7 @@ val keep_false_and_remove :
   * (('h, 'c, 'd, 'e, 'f, 'b, 'i) Memo_sig.handler * 'b Mvbdu_sig.mvbdu option)
 
 val keep_head_only :
+  boolean_setting:'c * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
   ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
@@ -202,6 +209,7 @@ val keep_head_only :
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
 val keep_head_only_with_threshold :
+  boolean_setting:'c * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
   ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
@@ -241,6 +249,7 @@ val keep_head_only_with_threshold :
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
 val redefine_range :
+  boolean_setting:'c * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
   ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
@@ -281,6 +290,7 @@ val redefine_range :
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
 val definitely_remove :
+  boolean_setting:'c * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
   ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
@@ -321,6 +331,7 @@ val definitely_remove :
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
 val redefine :
+  boolean_setting:'c * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
   ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
@@ -361,6 +372,7 @@ val redefine :
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
 val monotonicaly_rename :
+  boolean_setting:'c * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
   ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
@@ -393,6 +405,7 @@ val monotonicaly_rename :
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
 val project_keep_only :
+  boolean_setting:'c * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
   ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
@@ -439,6 +452,7 @@ val project_keep_only :
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
 val project_keep_only_with_threshold :
+  boolean_setting:'c * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
   ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->
@@ -486,6 +500,7 @@ val project_keep_only_with_threshold :
   * (('d, 'e, 'f, 'g, 'h, 'c, 'i) Memo_sig.handler * 'c Mvbdu_sig.mvbdu option)
 
 val project_abstract_away :
+  boolean_setting:'c * (int -> bool) * bool ->
   (Exception_without_parameter.exceptions_caught_and_uncaught ->
   ('a -> 'a -> int) ->
   ((int, 'b) Mvbdu_sig.precell, 'c) Mvbdu_sig.premvbdu ->

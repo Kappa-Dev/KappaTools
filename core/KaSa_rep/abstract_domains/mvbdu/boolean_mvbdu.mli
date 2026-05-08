@@ -9,6 +9,8 @@ val test_workbench : bool
 
     module Mvbdu_Skeleton: Sig_Mvbdu_Skeleton*)
 
+val boolean_setting : bool * (int -> bool) * bool
+
 module D_mvbdu_skeleton :
   Dictionary.Dictionary
     with type key = int
@@ -748,3 +750,5 @@ val print_boolean_mvbdu :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   bool Mvbdu_sig.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
+
+val hack_to_separate_sites_id_from_guard_id : int

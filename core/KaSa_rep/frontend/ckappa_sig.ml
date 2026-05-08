@@ -14,7 +14,8 @@
 
 module Int_Set_and_Map = Map_wrapper.Make (Mods.IntSetMap)
 
-let hack_to_separate_sites_id_from_guard_id = 1000000
+let hack_to_separate_sites_id_from_guard_id =
+  Boolean_mvbdu.hack_to_separate_sites_id_from_guard_id
 
 (* It would be better to use a Sum type to distinguish them *)
 (* The hack is useless when nsites > hack_to_separate_sites_id_from_guard_id *)

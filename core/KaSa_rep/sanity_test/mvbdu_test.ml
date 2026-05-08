@@ -25,7 +25,10 @@ let build_without_and_with_compressing
       error, handler, { Mvbdu_sig.id = -1; Mvbdu_sig.value = bdu_val }, -1
     | Some (a_id, _, a', handler) -> error, handler, a', a_id
   in
-  let error, output = Mvbdu_core.compress_node allocate error handler bdu_val in
+  let error, output =
+    Mvbdu_core.compress_node ~boolean_setting:Boolean_mvbdu.boolean_setting
+      allocate error handler bdu_val
+  in
   match output with
   | None ->
     ( error,
@@ -1841,6 +1844,40 @@ let bdu_test remanent parameters =
     Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_definitely_remove mvbdu_2 list_a_k_2
   in
 
+  let list_nanb = [ 10000000, 0; 10000001, 0 ] in
+  let list_nab = [ 10000000, 0; 10000001, 1 ] in
+  let list_anb = [ 10000000, 1; 10000001, 0 ] in
+  let list_ab = [ 10000000, 1; 10000001, 1 ] in
+
+  let list_nanb =
+    Mvbdu_wrapper.Optimized_IntMvbdu.build_association_list list_nanb
+  in
+  let list_anb =
+    Mvbdu_wrapper.Optimized_IntMvbdu.build_association_list list_anb
+  in
+  let list_nab =
+    Mvbdu_wrapper.Optimized_IntMvbdu.build_association_list list_nab
+  in
+  let list_ab =
+    Mvbdu_wrapper.Optimized_IntMvbdu.build_association_list list_ab
+  in
+  let mvbdu_nanb =
+    Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_redefine bmvbdu_true0'''' list_nanb
+  in
+  let mvbdu_anb =
+    Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_redefine bmvbdu_true0'''' list_anb
+  in
+  let mvbdu_nab =
+    Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_redefine bmvbdu_true0'''' list_nab
+  in
+  let mvbdu_ab =
+    Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_redefine bmvbdu_true0'''' list_ab
+  in
+  let mvbdu_na =
+    Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or mvbdu_nanb mvbdu_nab
+  in
+  let mvbdu_a = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or mvbdu_anb mvbdu_ab in
+  let _mvbdu_all = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or mvbdu_na mvbdu_a in
   ( {
       remanent with
       Sanity_test_sig.error;
@@ -1858,6 +1895,10 @@ let bdu_test remanent parameters =
          fun remanent ->
            let d = Mvbdu_core.mvbdu_equal mvbdu_a_2_0 mvbdu_a_2_0' in
            remanent, d, None )
+       (* :: ( "Mvbdu.0031",
+          fun remanent ->
+            let d = Mvbdu_core.mvbdu_equal mvbdu_all bmvbdu_true0''''  in
+            remanent, d, None )*)
     :: List.map
          (fun (a, b, c) -> a, fun remanent -> Mvbdu_sanity.test remanent c b)
          [

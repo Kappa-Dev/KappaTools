@@ -32,18 +32,30 @@ let downgrade parameters mh message value mvbdu =
   | Some x -> mh, x
   | None -> Exception.warn parameters mh message Exit (value ())
 
-let generic_zeroary allocate handler f error parameters =
-  let error, cell = f error in
-  let error, output =
-    Mvbdu_core.build_already_compressed_cell allocate error handler
-      (Mvbdu_core.get_skeleton cell)
-      cell
+let generic_zeroary ~boolean_setting allocate handler f
+    (error : Exception_without_parameter.exceptions_caught_and_uncaught)
+    (_parameters : Remanent_parameters_sig.parameters) =
+  let _ = boolean_setting in
+  let (error : Exception_without_parameter.exceptions_caught_and_uncaught), cell
+      =
+    f error
   in
+
+  (*let error, output =*)
+  (* Mv  bdu_core.build_already_compressed_cell allocate error handler
+     (Mvbdu_core.get_skeleton cell)
+     cell*)
+  match
+    Mvbdu_core.compress_node ~boolean_setting allocate error handler cell
+  with
+  | error, None -> error, (handler, None)
+  | error, Some (_id, _cell, mvbdu, handler) -> error, (handler, Some mvbdu)
+(*in
   match output with
   | None -> Exception.warn parameters error __POS__ Exit (handler, None)
-  | Some (_key, _cell, mvbdu, handler) -> error, (handler, Some mvbdu)
+  | Some (_key, _cell, mvbdu, handler) -> error, (handler, Some mvbdu)*)
 
-let rec generic_unary allocate
+let rec generic_unary ~boolean_setting allocate
     (memoized_fun :
       ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.unary_memoized_fun) handler
     error parameters mvbdu_input =
@@ -56,22 +68,23 @@ let rec generic_unary allocate
         let error, depreciated_fun =
           memoized_fun.Memo_sig.f parameters error a
         in
-        generic_zeroary allocate handler depreciated_fun error parameters
+        generic_zeroary ~boolean_setting allocate handler depreciated_fun error
+          parameters
       | Mvbdu_sig.Node x ->
         (match
-           generic_unary allocate memoized_fun handler error parameters
-             x.Mvbdu_sig.branch_true
+           generic_unary ~boolean_setting allocate memoized_fun handler error
+             parameters x.Mvbdu_sig.branch_true
          with
         | error, (handler, None) -> error, (handler, None)
         | error, (handler, Some mvbdu_true) ->
           (match
-             generic_unary allocate memoized_fun handler error parameters
-               x.Mvbdu_sig.branch_false
+             generic_unary ~boolean_setting allocate memoized_fun handler error
+               parameters x.Mvbdu_sig.branch_false
            with
           | error, (handler, None) -> error, (handler, None)
           | error, (handler, Some mvbdu_false) ->
             (match
-               Mvbdu_core.compress_node allocate error handler
+               Mvbdu_core.compress_node ~boolean_setting allocate error handler
                  (Mvbdu_sig.Node
                     {
                       x with
@@ -104,7 +117,7 @@ let cut x t1 =
     y.Mvbdu_sig.branch_true
   | Mvbdu_sig.Leaf _ | Mvbdu_sig.Node _ -> t1
 
-let rec generic_binary allocate
+let rec generic_binary ~boolean_setting allocate
     (memoized_fun :
       ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) Memo_sig.binary_memoized_fun) handler
     error parameters mvbdu_a mvbdu_b =
@@ -119,12 +132,14 @@ let rec generic_binary allocate
         let error, depreciated =
           fst (memoized_fun.Memo_sig.f parameters error) a
         in
-        generic_unary allocate depreciated handler error parameters mvbdu_b
+        generic_unary ~boolean_setting allocate depreciated handler error
+          parameters mvbdu_b
       | _, Mvbdu_sig.Leaf b ->
         let error, depreciated =
           snd (memoized_fun.Memo_sig.f parameters error) b
         in
-        generic_unary allocate depreciated handler error parameters mvbdu_a
+        generic_unary ~boolean_setting allocate depreciated handler error
+          parameters mvbdu_a
       | Mvbdu_sig.Node x, Mvbdu_sig.Node y ->
         let error, (cell, x_true, x_false, y_true, y_false) =
           let error, cmp = less parameters error x y in
@@ -150,19 +165,19 @@ let rec generic_binary allocate
                 y.Mvbdu_sig.branch_false ) )
         in
         (match
-           generic_binary allocate memoized_fun handler error parameters x_true
-             y_true
+           generic_binary ~boolean_setting allocate memoized_fun handler error
+             parameters x_true y_true
          with
         | error, (handler, None) -> error, (handler, None)
         | error, (handler, Some mvbdu_true) ->
           (match
-             generic_binary allocate memoized_fun handler error parameters
-               x_false y_false
+             generic_binary ~boolean_setting allocate memoized_fun handler error
+               parameters x_false y_false
            with
           | error, (handler, None) -> error, (handler, None)
           | error, (handler, Some mvbdu_false) ->
             (match
-               Mvbdu_core.compress_node allocate error handler
+               Mvbdu_core.compress_node ~boolean_setting allocate error handler
                  (Mvbdu_sig.Node
                     {
                       cell with
@@ -183,8 +198,8 @@ let rec generic_binary allocate
       in
       error, (handler, Some mvbdu_output))
 
-let rec generic_unary_other allocate memoized_fun handler error parameters other
-    mvbdu_input =
+let rec generic_unary_other ~boolean_setting allocate memoized_fun handler error
+    parameters other mvbdu_input =
   match
     memoized_fun.Memo_sig.get parameters error handler (other, mvbdu_input)
   with
@@ -196,22 +211,23 @@ let rec generic_unary_other allocate memoized_fun handler error parameters other
         let error, depreciated =
           memoized_fun.Memo_sig.f parameters error a other
         in
-        generic_zeroary allocate handler depreciated error parameters
+        generic_zeroary ~boolean_setting allocate handler depreciated error
+          parameters
       | Mvbdu_sig.Node x ->
         (match
-           generic_unary_other allocate memoized_fun handler error parameters
-             x.Mvbdu_sig.branch_true other
+           generic_unary_other ~boolean_setting allocate memoized_fun handler
+             error parameters x.Mvbdu_sig.branch_true other
          with
         | error, (handler, None) -> error, (handler, None)
         | error, (handler, Some mvbdu_true) ->
           (match
-             generic_unary_other allocate memoized_fun handler error parameters
-               x.Mvbdu_sig.branch_false other
+             generic_unary_other ~boolean_setting allocate memoized_fun handler
+               error parameters x.Mvbdu_sig.branch_false other
            with
           | error, (handler, None) -> error, (handler, None)
           | error, (handler, Some mvbdu_false) ->
             (match
-               Mvbdu_core.compress_node allocate error handler
+               Mvbdu_core.compress_node ~boolean_setting allocate error handler
                  (Mvbdu_sig.Node
                     {
                       x with
@@ -330,8 +346,8 @@ let keep_false_and_remove _allocate memoized_fun mvbdu_false handler error
       in
       error, (handler, Some (mvbdu_output : 'mvbdu)))
 
-let keep_head_only_with_threshold allocate memoized_fun union handler error
-    parameters ((threshold : int), (mvbdu_input : 'mvbdu)) =
+let keep_head_only_with_threshold ~boolean_setting allocate memoized_fun union
+    handler error parameters ((threshold : int), (mvbdu_input : 'mvbdu)) =
   match
     memoized_fun.Memo_sig.get parameters error handler (threshold, mvbdu_input)
   with
@@ -355,7 +371,7 @@ let keep_head_only_with_threshold allocate memoized_fun union handler error
           (match b_true, b_false with
           | Some b_true, Some b_false ->
             (match
-               Mvbdu_core.compress_node allocate error handler
+               Mvbdu_core.compress_node ~boolean_setting allocate error handler
                  (Mvbdu_sig.Node
                     {
                       x with
@@ -390,8 +406,8 @@ let keep_head_only_with_threshold allocate memoized_fun union handler error
       in
       aux handler error mvbdu_input)
 
-let keep_head_only allocate memoized_fun bdu_true handler error parameters
-    (mvbdu_input : 'mvbdu) =
+let keep_head_only ~boolean_setting allocate memoized_fun bdu_true handler error
+    parameters (mvbdu_input : 'mvbdu) =
   match memoized_fun.Memo_sig.get parameters error handler mvbdu_input with
   | error, (handler, Some output) -> error, (handler, Some output)
   | error, (handler, None) ->
@@ -411,7 +427,7 @@ let keep_head_only allocate memoized_fun bdu_true handler error parameters
           (match b_true, b_false with
           | Some b_true, Some b_false ->
             (match
-               Mvbdu_core.compress_node allocate error handler
+               Mvbdu_core.compress_node ~boolean_setting allocate error handler
                  (Mvbdu_sig.Node
                     {
                       x with
@@ -434,8 +450,8 @@ let keep_head_only allocate memoized_fun bdu_true handler error parameters
       in
       aux handler error mvbdu_input)
 
-let rec redefine_range allocate memoized_fun error parameters handler
-    mvbdu_input list_input =
+let rec redefine_range ~boolean_setting allocate memoized_fun error parameters
+    handler mvbdu_input list_input =
   match
     memoized_fun.Memo_sig.get parameters error handler (mvbdu_input, list_input)
   with
@@ -447,14 +463,15 @@ let rec redefine_range allocate memoized_fun error parameters handler
         let error, depreciated =
           (memoized_fun.Memo_sig.f parameters error).Memo_sig.empty_range_list
         in
-        generic_unary allocate depreciated handler error parameters mvbdu_input
+        generic_unary ~boolean_setting allocate depreciated handler error
+          parameters mvbdu_input
       | List_sig.Cons list ->
         (match mvbdu_input.Mvbdu_sig.value with
         | Mvbdu_sig.Node mvbdu
           when compare list.List_sig.variable mvbdu.Mvbdu_sig.variable > 0 ->
           let error, (handler, b_true) =
-            redefine_range allocate memoized_fun error parameters handler
-              mvbdu.Mvbdu_sig.branch_true list_input
+            redefine_range ~boolean_setting allocate memoized_fun error
+              parameters handler mvbdu.Mvbdu_sig.branch_true list_input
           in
           let error, mvbdu_true =
             downgrade parameters error __POS__
@@ -462,8 +479,8 @@ let rec redefine_range allocate memoized_fun error parameters handler
               b_true
           in
           let error, (handler, b_false) =
-            redefine_range allocate memoized_fun error parameters handler
-              mvbdu.Mvbdu_sig.branch_false list_input
+            redefine_range ~boolean_setting allocate memoized_fun error
+              parameters handler mvbdu.Mvbdu_sig.branch_false list_input
           in
           let error, mvbdu_false =
             downgrade parameters error __POS__
@@ -471,7 +488,7 @@ let rec redefine_range allocate memoized_fun error parameters handler
               b_false
           in
           (match
-             Mvbdu_core.compress_node allocate error handler
+             Mvbdu_core.compress_node ~boolean_setting allocate error handler
                (Mvbdu_sig.Node
                   {
                     mvbdu with
@@ -490,8 +507,8 @@ let rec redefine_range allocate memoized_fun error parameters handler
               let error, depreciated =
                 (memoized_fun.Memo_sig.f parameters error).Memo_sig.clean_head
               in
-              generic_unary allocate depreciated handler error parameters
-                mvbdu_input
+              generic_unary ~boolean_setting allocate depreciated handler error
+                parameters mvbdu_input
             | Mvbdu_sig.Node _ | Mvbdu_sig.Leaf _ ->
               error, (handler, Some mvbdu_input)
           in
@@ -508,7 +525,8 @@ let rec redefine_range allocate memoized_fun error parameters handler
                   list.List_sig.variable ub
               in
               let error, (handler, branch_false) =
-                generic_zeroary allocate handler depreciated error parameters
+                generic_zeroary ~boolean_setting allocate handler depreciated
+                  error parameters
               in
               let error, branch_false =
                 downgrade parameters error __POS__
@@ -520,7 +538,8 @@ let rec redefine_range allocate memoized_fun error parameters handler
                   list.List_sig.variable ub branch_false branch_true
               in
               let error, (handler, enriched_branch_true) =
-                generic_zeroary allocate handler depreciated error parameters
+                generic_zeroary ~boolean_setting allocate handler depreciated
+                  error parameters
               in
               let error, enriched_branch_true =
                 downgrade parameters error __POS__
@@ -538,7 +557,8 @@ let rec redefine_range allocate memoized_fun error parameters handler
                   list.List_sig.variable lb
               in
               let error, (handler, branch_false) =
-                generic_zeroary allocate handler depreciated error parameters
+                generic_zeroary ~boolean_setting allocate handler depreciated
+                  error parameters
               in
               let error, branch_false =
                 downgrade parameters error __POS__
@@ -551,7 +571,8 @@ let rec redefine_range allocate memoized_fun error parameters handler
                   branch_false
               in
               let error, (handler, rep) =
-                generic_zeroary allocate handler depreciated error parameters
+                generic_zeroary ~boolean_setting allocate handler depreciated
+                  error parameters
               in
               let error, rep =
                 downgrade parameters error __POS__ (fun () -> mvbdu_input) rep
@@ -559,8 +580,8 @@ let rec redefine_range allocate memoized_fun error parameters handler
               error, (handler, rep)
             | None -> error, (handler, enriched_branch_true)
           in
-          redefine_range allocate memoized_fun error parameters handler rep
-            list.List_sig.tail)
+          redefine_range ~boolean_setting allocate memoized_fun error parameters
+            handler rep list.List_sig.tail)
     in
     (match output with
     | None -> error, (handler, None)
@@ -571,8 +592,8 @@ let rec redefine_range allocate memoized_fun error parameters handler
       in
       error, (handler, Some (mvbdu_output : 'mvbdu)))
 
-let rec redefine allocate memoized_fun error parameters handler mvbdu_input
-    list_input =
+let rec redefine ~boolean_setting allocate memoized_fun error parameters handler
+    mvbdu_input list_input =
   match
     memoized_fun.Memo_sig.get parameters error handler (mvbdu_input, list_input)
   with
@@ -585,14 +606,15 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input
           (memoized_fun.Memo_sig.f parameters error)
             .Memo_sig.empty_association_list
         in
-        generic_unary allocate depreciated handler error parameters mvbdu_input
+        generic_unary ~boolean_setting allocate depreciated handler error
+          parameters mvbdu_input
       | List_sig.Cons list ->
         (match mvbdu_input.Mvbdu_sig.value with
         | Mvbdu_sig.Node mvbdu
           when compare list.List_sig.variable mvbdu.Mvbdu_sig.variable > 0 ->
           let error, (handler, b_true) =
-            redefine allocate memoized_fun error parameters handler
-              mvbdu.Mvbdu_sig.branch_true list_input
+            redefine ~boolean_setting allocate memoized_fun error parameters
+              handler mvbdu.Mvbdu_sig.branch_true list_input
           in
           let error, mvbdu_true =
             downgrade parameters error __POS__
@@ -600,8 +622,8 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input
               b_true
           in
           let error, (handler, b_false) =
-            redefine allocate memoized_fun error parameters handler
-              mvbdu.Mvbdu_sig.branch_false list_input
+            redefine ~boolean_setting allocate memoized_fun error parameters
+              handler mvbdu.Mvbdu_sig.branch_false list_input
           in
           let error, mvbdu_false =
             downgrade parameters error __POS__
@@ -609,7 +631,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input
               b_false
           in
           (match
-             Mvbdu_core.compress_node allocate error handler
+             Mvbdu_core.compress_node ~boolean_setting allocate error handler
                (Mvbdu_sig.Node
                   {
                     mvbdu with
@@ -628,8 +650,8 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input
               let error, depreciated =
                 (memoized_fun.Memo_sig.f parameters error).Memo_sig.clean_head
               in
-              generic_unary allocate depreciated handler error parameters
-                mvbdu_input
+              generic_unary ~boolean_setting allocate depreciated handler error
+                parameters mvbdu_input
             | Mvbdu_sig.Node _ | Mvbdu_sig.Leaf _ ->
               error, (handler, Some mvbdu_input)
           in
@@ -643,7 +665,8 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input
               list.List_sig.variable list.List_sig.association
           in
           let error, (handler, branch_false) =
-            generic_zeroary allocate handler depreciated error parameters
+            generic_zeroary ~boolean_setting allocate handler depreciated error
+              parameters
           in
           let error, branch_false =
             downgrade parameters error __POS__
@@ -656,7 +679,8 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input
               branch_true
           in
           let error, (handler, enriched_branch_true) =
-            generic_zeroary allocate handler depreciated error parameters
+            generic_zeroary ~boolean_setting allocate handler depreciated error
+              parameters
           in
           let error, enriched_branch_true =
             downgrade parameters error __POS__
@@ -670,13 +694,14 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input
               enriched_branch_true branch_false
           in
           let error, (handler, rep) =
-            generic_zeroary allocate handler depreciated error parameters
+            generic_zeroary ~boolean_setting allocate handler depreciated error
+              parameters
           in
           let error, rep =
             downgrade parameters error __POS__ (fun () -> mvbdu_input) rep
           in
-          redefine allocate memoized_fun error parameters handler rep
-            list.List_sig.tail)
+          redefine ~boolean_setting allocate memoized_fun error parameters
+            handler rep list.List_sig.tail)
     in
     (match output with
     | None -> error, (handler, None)
@@ -687,8 +712,8 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input
       in
       error, (handler, Some (mvbdu_output : 'mvbdu)))
 
-let rec definitely_remove allocate memoized_fun error parameters handler
-    mvbdu_input list_input =
+let rec definitely_remove ~boolean_setting allocate memoized_fun error
+    parameters handler mvbdu_input list_input =
   match
     memoized_fun.Memo_sig.get parameters error handler (mvbdu_input, list_input)
   with
@@ -701,7 +726,8 @@ let rec definitely_remove allocate memoized_fun error parameters handler
           (memoized_fun.Memo_sig.f parameters error)
             .Memo_sig.empty_association_list
         in
-        generic_unary allocate depreciated handler error parameters mvbdu_input
+        generic_unary ~boolean_setting allocate depreciated handler error
+          parameters mvbdu_input
       | List_sig.Cons list ->
         (match mvbdu_input.Mvbdu_sig.value with
         | Mvbdu_sig.Leaf _ -> error, (handler, Some mvbdu_input)
@@ -709,8 +735,8 @@ let rec definitely_remove allocate memoized_fun error parameters handler
           let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
           if cmp > 0 then (
             let error, (handler, b_true) =
-              definitely_remove allocate memoized_fun error parameters handler
-                mvbdu.Mvbdu_sig.branch_true list_input
+              definitely_remove ~boolean_setting allocate memoized_fun error
+                parameters handler mvbdu.Mvbdu_sig.branch_true list_input
             in
             let error, mvbdu_true =
               downgrade parameters error __POS__
@@ -718,8 +744,8 @@ let rec definitely_remove allocate memoized_fun error parameters handler
                 b_true
             in
             let error, (handler, b_false) =
-              definitely_remove allocate memoized_fun error parameters handler
-                mvbdu.Mvbdu_sig.branch_false list_input
+              definitely_remove ~boolean_setting allocate memoized_fun error
+                parameters handler mvbdu.Mvbdu_sig.branch_false list_input
             in
             let error, mvbdu_false =
               downgrade parameters error __POS__
@@ -727,7 +753,7 @@ let rec definitely_remove allocate memoized_fun error parameters handler
                 b_false
             in
             match
-              Mvbdu_core.compress_node allocate error handler
+              Mvbdu_core.compress_node ~boolean_setting allocate error handler
                 (Mvbdu_sig.Node
                    {
                      mvbdu with
@@ -744,17 +770,17 @@ let rec definitely_remove allocate memoized_fun error parameters handler
                 .Memo_sig.keep_false_and_remove
             in
             let error, (handler, output) =
-              generic_unary allocate depreciated handler error parameters
-                mvbdu_input
+              generic_unary ~boolean_setting allocate depreciated handler error
+                parameters mvbdu_input
             in
             let error, mvbdu =
               downgrade parameters error __POS__ (fun () -> mvbdu_input) output
             in
-            definitely_remove allocate memoized_fun error parameters handler
-              mvbdu list_input
+            definitely_remove ~boolean_setting allocate memoized_fun error
+              parameters handler mvbdu list_input
           ) else
-            definitely_remove allocate memoized_fun error parameters handler
-              mvbdu_input list.List_sig.tail)
+            definitely_remove ~boolean_setting allocate memoized_fun error
+              parameters handler mvbdu_input list.List_sig.tail)
     in
     (match output with
     | None -> error, (handler, None)
@@ -766,8 +792,8 @@ let rec definitely_remove allocate memoized_fun error parameters handler
       error, (handler, Some (mvbdu_output : 'mvbdu)))
 
 (* TO DO MAKE A WITH THRESHOLD VERSION *)
-let rec monotonicaly_rename allocate memoized_fun error parameters handler
-    mvbdu_input list_input =
+let rec monotonicaly_rename ~boolean_setting allocate memoized_fun error
+    parameters handler mvbdu_input list_input =
   match
     memoized_fun.Memo_sig.get parameters error handler (mvbdu_input, list_input)
   with
@@ -790,12 +816,12 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler
         | List_sig.Cons list ->
           let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
           if cmp < 0 then
-            monotonicaly_rename allocate memoized_fun error parameters handler
-              mvbdu_input list.List_sig.tail
+            monotonicaly_rename ~boolean_setting allocate memoized_fun error
+              parameters handler mvbdu_input list.List_sig.tail
           else if cmp = 0 then (
             let error, (handler, b_true) =
-              monotonicaly_rename allocate memoized_fun error parameters handler
-                mvbdu.Mvbdu_sig.branch_true list_input
+              monotonicaly_rename ~boolean_setting allocate memoized_fun error
+                parameters handler mvbdu.Mvbdu_sig.branch_true list_input
             in
             let error, mvbdu_true =
               downgrade parameters error __POS__
@@ -803,8 +829,8 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler
                 b_true
             in
             let error, (handler, b_false) =
-              monotonicaly_rename allocate memoized_fun error parameters handler
-                mvbdu.Mvbdu_sig.branch_false list_input
+              monotonicaly_rename ~boolean_setting allocate memoized_fun error
+                parameters handler mvbdu.Mvbdu_sig.branch_false list_input
             in
             let error, mvbdu_false =
               downgrade parameters error __POS__
@@ -812,7 +838,7 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler
                 b_false
             in
             match
-              Mvbdu_core.compress_node allocate error handler
+              Mvbdu_core.compress_node ~boolean_setting allocate error handler
                 (Mvbdu_sig.Node
                    {
                      mvbdu with
@@ -836,8 +862,8 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler
       in
       error, (handler, Some (mvbdu_output : 'mvbdu)))
 
-let rec project_keep_only allocate memoized_fun bdu_true error parameters
-    handler mvbdu_input list_input =
+let rec project_keep_only ~boolean_setting allocate memoized_fun bdu_true error
+    parameters handler mvbdu_input list_input =
   match
     memoized_fun.Memo_sig.get parameters error handler (mvbdu_input, list_input)
   with
@@ -863,18 +889,18 @@ let rec project_keep_only allocate memoized_fun bdu_true error parameters
               (memoized_fun.Memo_sig.f parameters error).Memo_sig.clean_head
             in
             let error, (handler, output) =
-              generic_unary allocate depreciated handler error parameters
-                mvbdu_input
+              generic_unary ~boolean_setting allocate depreciated handler error
+                parameters mvbdu_input
             in
             let error, mvbdu =
               downgrade parameters error __POS__ (fun () -> mvbdu_input) output
             in
-            project_keep_only allocate memoized_fun bdu_true error parameters
-              handler mvbdu list_input
+            project_keep_only ~boolean_setting allocate memoized_fun bdu_true
+              error parameters handler mvbdu list_input
           ) else if cmp = 0 then (
             let error, (handler, b_true) =
-              project_keep_only allocate memoized_fun bdu_true error parameters
-                handler mvbdu.Mvbdu_sig.branch_true list_input
+              project_keep_only ~boolean_setting allocate memoized_fun bdu_true
+                error parameters handler mvbdu.Mvbdu_sig.branch_true list_input
             in
             let error, mvbdu_true =
               downgrade parameters error __POS__
@@ -882,8 +908,8 @@ let rec project_keep_only allocate memoized_fun bdu_true error parameters
                 b_true
             in
             let error, (handler, b_false) =
-              project_keep_only allocate memoized_fun bdu_true error parameters
-                handler mvbdu.Mvbdu_sig.branch_false list_input
+              project_keep_only ~boolean_setting allocate memoized_fun bdu_true
+                error parameters handler mvbdu.Mvbdu_sig.branch_false list_input
             in
             let error, mvbdu_false =
               downgrade parameters error __POS__
@@ -891,7 +917,7 @@ let rec project_keep_only allocate memoized_fun bdu_true error parameters
                 b_false
             in
             match
-              Mvbdu_core.compress_node allocate error handler
+              Mvbdu_core.compress_node ~boolean_setting allocate error handler
                 (Mvbdu_sig.Node
                    {
                      mvbdu with
@@ -903,8 +929,8 @@ let rec project_keep_only allocate memoized_fun bdu_true error parameters
             | error, Some (_id, _cell, mvbdu, handler) ->
               error, (handler, Some mvbdu)
           ) else
-            project_keep_only allocate memoized_fun bdu_true error parameters
-              handler mvbdu_input list.List_sig.tail)
+            project_keep_only ~boolean_setting allocate memoized_fun bdu_true
+              error parameters handler mvbdu_input list.List_sig.tail)
     in
     (match output with
     | None -> error, (handler, None)
@@ -999,8 +1025,8 @@ let rec height allocate memoized_fun error parameters handler
       in
       error, (handler, Some (mvbdu_output : int)))
 
-let rec project_keep_only_with_threshold allocate memoized_fun bdu_true error
-    parameters handler ~threshold mvbdu_input list_input =
+let rec project_keep_only_with_threshold ~boolean_setting allocate memoized_fun
+    bdu_true error parameters handler ~threshold mvbdu_input list_input =
   match
     memoized_fun.Memo_sig.get parameters error handler
       (threshold, (mvbdu_input, list_input))
@@ -1021,14 +1047,15 @@ let rec project_keep_only_with_threshold allocate memoized_fun bdu_true error
               (memoized_fun.Memo_sig.f parameters error).Memo_sig.clean_head
             in
             let error, (handler, output) =
-              generic_unary allocate depreciated handler error parameters
-                mvbdu_input
+              generic_unary ~boolean_setting allocate depreciated handler error
+                parameters mvbdu_input
             in
             let error, mvbdu =
               downgrade parameters error __POS__ (fun () -> mvbdu_input) output
             in
-            project_keep_only_with_threshold allocate memoized_fun bdu_true
-              error parameters handler ~threshold mvbdu list_input
+            project_keep_only_with_threshold ~boolean_setting allocate
+              memoized_fun bdu_true error parameters handler ~threshold mvbdu
+              list_input
           ) else
             (* parameters to be kept *)
             error, (handler, Some mvbdu_input))
@@ -1045,20 +1072,21 @@ let rec project_keep_only_with_threshold allocate memoized_fun bdu_true error
                 (memoized_fun.Memo_sig.f parameters error).Memo_sig.clean_head
               in
               let error, (handler, output) =
-                generic_unary allocate depreciated handler error parameters
-                  mvbdu_input
+                generic_unary ~boolean_setting allocate depreciated handler
+                  error parameters mvbdu_input
               in
               let error, mvbdu =
                 downgrade parameters error __POS__
                   (fun () -> mvbdu_input)
                   output
               in
-              project_keep_only_with_threshold allocate memoized_fun bdu_true
-                error parameters handler ~threshold mvbdu list_input
+              project_keep_only_with_threshold ~boolean_setting allocate
+                memoized_fun bdu_true error parameters handler ~threshold mvbdu
+                list_input
             ) else if cmp = 0 then (
               let error, (handler, b_true) =
-                project_keep_only_with_threshold allocate memoized_fun bdu_true
-                  error parameters handler ~threshold
+                project_keep_only_with_threshold ~boolean_setting allocate
+                  memoized_fun bdu_true error parameters handler ~threshold
                   mvbdu.Mvbdu_sig.branch_true list_input
               in
               let error, mvbdu_true =
@@ -1067,8 +1095,8 @@ let rec project_keep_only_with_threshold allocate memoized_fun bdu_true error
                   b_true
               in
               let error, (handler, b_false) =
-                project_keep_only_with_threshold allocate memoized_fun bdu_true
-                  error parameters handler ~threshold
+                project_keep_only_with_threshold ~boolean_setting allocate
+                  memoized_fun bdu_true error parameters handler ~threshold
                   mvbdu.Mvbdu_sig.branch_false list_input
               in
               let error, mvbdu_false =
@@ -1077,7 +1105,7 @@ let rec project_keep_only_with_threshold allocate memoized_fun bdu_true error
                   b_false
               in
               match
-                Mvbdu_core.compress_node allocate error handler
+                Mvbdu_core.compress_node ~boolean_setting allocate error handler
                   (Mvbdu_sig.Node
                      {
                        mvbdu with
@@ -1089,9 +1117,9 @@ let rec project_keep_only_with_threshold allocate memoized_fun bdu_true error
               | error, Some (_id, _cell, mvbdu, handler) ->
                 error, (handler, Some mvbdu)
             ) else
-              project_keep_only_with_threshold allocate memoized_fun bdu_true
-                error parameters handler ~threshold mvbdu_input
-                list.List_sig.tail
+              project_keep_only_with_threshold ~boolean_setting allocate
+                memoized_fun bdu_true error parameters handler ~threshold
+                mvbdu_input list.List_sig.tail
           else
             (* parameters to be kept *)
             error, (handler, Some mvbdu_input))
@@ -1106,8 +1134,8 @@ let rec project_keep_only_with_threshold allocate memoized_fun bdu_true error
       in
       error, (handler, Some (mvbdu_output : 'mvbdu)))
 
-let rec project_abstract_away allocate memoized_fun error parameters handler
-    mvbdu_input list_input =
+let rec project_abstract_away ~boolean_setting allocate memoized_fun error
+    parameters handler mvbdu_input list_input =
   match
     memoized_fun.Memo_sig.get parameters error handler (mvbdu_input, list_input)
   with
@@ -1120,7 +1148,8 @@ let rec project_abstract_away allocate memoized_fun error parameters handler
           (memoized_fun.Memo_sig.f parameters error)
             .Memo_sig.empty_association_list
         in
-        generic_unary allocate depreciated handler error parameters mvbdu_input
+        generic_unary ~boolean_setting allocate depreciated handler error
+          parameters mvbdu_input
       | List_sig.Cons list ->
         (match mvbdu_input.Mvbdu_sig.value with
         | Mvbdu_sig.Leaf _ -> error, (handler, Some mvbdu_input)
@@ -1128,8 +1157,8 @@ let rec project_abstract_away allocate memoized_fun error parameters handler
           let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
           if cmp > 0 then (
             let error, (handler, b_true) =
-              project_abstract_away allocate memoized_fun error parameters
-                handler mvbdu.Mvbdu_sig.branch_true list_input
+              project_abstract_away ~boolean_setting allocate memoized_fun error
+                parameters handler mvbdu.Mvbdu_sig.branch_true list_input
             in
             let error, mvbdu_true =
               downgrade parameters error __POS__
@@ -1137,8 +1166,8 @@ let rec project_abstract_away allocate memoized_fun error parameters handler
                 b_true
             in
             let error, (handler, b_false) =
-              project_abstract_away allocate memoized_fun error parameters
-                handler mvbdu.Mvbdu_sig.branch_false list_input
+              project_abstract_away ~boolean_setting allocate memoized_fun error
+                parameters handler mvbdu.Mvbdu_sig.branch_false list_input
             in
             let error, mvbdu_false =
               downgrade parameters error __POS__
@@ -1146,7 +1175,7 @@ let rec project_abstract_away allocate memoized_fun error parameters handler
                 b_false
             in
             match
-              Mvbdu_core.compress_node allocate error handler
+              Mvbdu_core.compress_node ~boolean_setting allocate error handler
                 (Mvbdu_sig.Node
                    {
                      mvbdu with
@@ -1162,17 +1191,17 @@ let rec project_abstract_away allocate memoized_fun error parameters handler
               (memoized_fun.Memo_sig.f parameters error).Memo_sig.clean_head
             in
             let error, (handler, output) =
-              generic_unary allocate depreciated handler error parameters
-                mvbdu_input
+              generic_unary ~boolean_setting allocate depreciated handler error
+                parameters mvbdu_input
             in
             let error, mvbdu =
               downgrade parameters error __POS__ (fun () -> mvbdu_input) output
             in
-            project_abstract_away allocate memoized_fun error parameters handler
-              mvbdu list_input
+            project_abstract_away ~boolean_setting allocate memoized_fun error
+              parameters handler mvbdu list_input
           ) else
-            project_abstract_away allocate memoized_fun error parameters handler
-              mvbdu_input list.List_sig.tail)
+            project_abstract_away ~boolean_setting allocate memoized_fun error
+              parameters handler mvbdu_input list.List_sig.tail)
     in
     (match output with
     | None -> error, (handler, None)

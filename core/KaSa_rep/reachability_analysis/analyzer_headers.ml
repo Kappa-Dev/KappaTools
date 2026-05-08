@@ -397,6 +397,7 @@ let initialize_global_information ?patch parameters log_info error mvbdu_handler
     Common_static.compute_restriction_mvbdu ?patch_compute_restriction_mvbdu
       parameters error mvbdu_handler nr_guard_parameters nsites compilation
   in
+  (*let () = Ckappa_sig.Views_bdu.print parameters restriction_mvbdu in*)
   let error, mvbdu_handler, guard_mvbdus =
     Common_static.collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters
       error mvbdu_handler compilation restriction_mvbdu nsites
