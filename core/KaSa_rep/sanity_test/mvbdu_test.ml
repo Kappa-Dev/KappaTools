@@ -1861,23 +1861,48 @@ let bdu_test remanent parameters =
   let list_ab =
     Mvbdu_wrapper.Optimized_IntMvbdu.build_association_list list_ab
   in
+  (*let () = Format.printf "NANB" in *)
   let mvbdu_nanb =
     Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_redefine bmvbdu_true0'''' list_nanb
   in
+  (*let () = Mvbdu_wrapper.Optimized_IntMvbdu.print parameters mvbdu_nanb in
+    let () = Format.printf "ANB" in *)
   let mvbdu_anb =
     Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_redefine bmvbdu_true0'''' list_anb
   in
+  (*let () = Mvbdu_wrapper.Optimized_IntMvbdu.print parameters mvbdu_anb in
+    let () = Format.printf "NA OR B" in *)
+  let mvbdu_na_or_b = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_not mvbdu_anb in
+  (*let () = Mvbdu_wrapper.Optimized_IntMvbdu.print parameters mvbdu_na_or_b in
+    let () = Format.printf "ANB" in *)
+  let mvbdu_anb' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_not mvbdu_na_or_b in
+
+  (* let () = Mvbdu_wrapper.Optimized_IntMvbdu.print parameters mvbdu_anb' in
+     let () = Format.printf "NAB" in *)
   let mvbdu_nab =
     Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_redefine bmvbdu_true0'''' list_nab
   in
+
+  (*let () = Mvbdu_wrapper.Optimized_IntMvbdu.print parameters mvbdu_nab in *)
   let mvbdu_ab =
     Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_redefine bmvbdu_true0'''' list_ab
   in
+  (*  let () = Format.printf "NA" in *)
   let mvbdu_na =
     Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or mvbdu_nanb mvbdu_nab
   in
+
+  (*let () = Mvbdu_wrapper.Optimized_IntMvbdu.print parameters mvbdu_na in *)
+
+  (*let mvbdu_nb =
+      Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or mvbdu_anb mvbdu_nanb
+    in*)
+  let mvbdu_na_or_b' =
+    Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or mvbdu_na mvbdu_ab
+  in
   let mvbdu_a = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or mvbdu_anb mvbdu_ab in
-  let _mvbdu_all = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or mvbdu_na mvbdu_a in
+  let mvbdu_all = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or mvbdu_na mvbdu_a in
+
   ( {
       remanent with
       Sanity_test_sig.error;
@@ -1895,130 +1920,138 @@ let bdu_test remanent parameters =
          fun remanent ->
            let d = Mvbdu_core.mvbdu_equal mvbdu_a_2_0 mvbdu_a_2_0' in
            remanent, d, None )
-       (* :: ( "Mvbdu.0031",
-          fun remanent ->
-            let d = Mvbdu_core.mvbdu_equal mvbdu_all bmvbdu_true0''''  in
-            remanent, d, None )*)
+    :: ( "Mvbdu.004",
+         fun remanent ->
+           let d = Mvbdu_core.mvbdu_equal mvbdu_all bmvbdu_true0'''' in
+           remanent, d, None )
+    :: ( "Mvbdu.005",
+         fun remanent ->
+           let d = Mvbdu_core.mvbdu_equal mvbdu_na_or_b' mvbdu_na_or_b in
+           remanent, d, None )
+    :: ( "Mvbdu.006",
+         fun remanent ->
+           let d = Mvbdu_core.mvbdu_equal mvbdu_anb' mvbdu_anb in
+           remanent, d, None )
     :: List.map
          (fun (a, b, c) -> a, fun remanent -> Mvbdu_sanity.test remanent c b)
          [
-           "Mvbdu.004", a', (true, true, true);
-           "Mvbdu.005", b', (true, true, true);
-           "Mvbdu.006", c', (true, true, true);
-           "Mvbdu.007", d', (true, true, true);
-           "Mvbdu.008", e', (true, true, false);
-           "Mvbdu.009", f', (true, true, false);
-           "Mvbdu.010", g', (false, true, true);
-           "Mvbdu.011", h', (false, true, true);
-           "Mvbdu.012", i', (true, true, true);
-           "Mvbdu.013", j', (false, true, true);
-           "Mvbdu.014", k', (false, true, true);
-           "Mvbdu.015", l', (true, false, true);
-           "Mvbdu.016", a'', (true, true, true);
-           "Mvbdu.017", b'', (true, true, true);
-           "Mvbdu.018", c'', (true, true, true);
-           "Mvbdu.019", d'', (true, true, true);
-           "Mvbdu.020", e'', (true, true, true);
-           "Mvbdu.021", f'', (true, true, true);
-           "Mvbdu.022", g'', (false, true, true);
-           "Mvbdu.023", h'', (false, true, true);
-           "Mvbdu.024", i'', (true, true, true);
-           "Mvbdu.025", j'', (false, true, true);
-           "Mvbdu.026", k'', (false, true, true);
-           "Mvbdu.027", l'', (true, false, true);
-           "Mvbdu.028", copy a', (true, false, true);
-           "Mvbdu.029", copy b', (true, false, true);
-           "Mvbdu.030", copy c', (true, false, true);
-           "Mvbdu.031", copy d', (true, false, true);
-           "Mvbdu.032", copy e', (true, false, false);
-           "Mvbdu.033", copy f', (true, false, false);
-           "Mvbdu.034", copy g', (false, false, true);
-           "Mvbdu.035", copy h', (false, false, true);
-           "Mvbdu.036", copy i', (true, false, true);
-           "Mvbdu.037", copy j', (false, false, true);
-           "Mvbdu.038", copy k', (false, false, true);
-           "Mvbdu.039", copy l', (true, false, true);
-           "Mvbdu.040", copy a'', (true, false, true);
-           "Mvbdu.041", copy b'', (true, false, true);
-           "Mvbdu.042", copy c'', (true, false, true);
-           "Mvbdu.043", copy d'', (true, false, true);
-           "Mvbdu.044", copy e'', (true, false, true);
-           "Mvbdu.045", copy f'', (true, false, true);
-           "Mvbdu.046", copy g'', (false, false, true);
-           "Mvbdu.047", copy h'', (false, false, true);
-           "Mvbdu.048", copy i'', (true, false, true);
-           "Mvbdu.049", copy j'', (false, false, true);
-           "Mvbdu.050", copy k'', (false, false, true);
-           "Mvbdu.051", copy l'', (true, false, true);
-           "Mvbdu.052", copy_c, (true, false, true);
-           "Mvbdu.053", bmvbdu_true0, (true, true, true);
-           "Mvbdu.054", bmvbdu_true1, (true, true, true);
-           "Mvbdu.055", bmvbdu_true2, (true, true, true);
-           "Mvbdu.056", bmvbdu_true3, (true, true, true);
-           "Mvbdu.057", bmvbdu_true4, (true, true, true);
-           "Mvbdu.058", bmvbdu_true5, (true, true, true);
-           "Mvbdu.059", bmvbdu_true6, (true, true, true);
-           "Mvbdu.060", bmvbdu_true7, (true, true, true);
-           "Mvbdu.061", bmvbdu_true8, (true, true, true);
-           "Mvbdu.062", bmvbdu_true9, (true, true, true);
-           "Mvbdu.063", bmvbdu_true10, (true, true, true);
-           "Mvbdu.064", bmvbdu_true11, (true, true, true);
-           "Mvbdu.065", bmvbdu_true12, (true, true, true);
-           "Mvbdu.066", bmvbdu_true13, (true, true, true);
-           "Mvbdu.067", bmvbdu_true14, (true, true, true);
-           "Mvbdu.068", bmvbdu_true15, (true, true, true);
-           "Mvbdu.069", bmvbdu_true16, (true, true, true);
-           "Mvbdu.070", bmvbdu_true17, (true, true, true);
-           "Mvbdu.071", bmvbdu_true18, (true, true, true);
-           "Mvbdu.072", bmvbdu_true19, (true, true, true);
-           "Mvbdu.073", bmvbdu_true20, (true, true, true);
-           "Mvbdu.074", bmvbdu_true21, (true, true, true);
-           "Mvbdu.075", bmvbdu_true22, (true, true, true);
-           "Mvbdu.076", bmvbdu_true23, (true, true, true);
-           "Mvbdu.077", bmvbdu_true24, (true, true, true);
-           "Mvbdu.078", bmvbdu_true25, (true, true, true);
-           "Mvbdu.079", bmvbdu_true26, (true, true, true);
-           "Mvbdu.080", bmvbdu_true27, (true, true, true);
-           "Mvbdu.081", bmvbdu_true28, (true, true, true);
-           "Mvbdu.082", bmvbdu_true29, (true, true, true);
-           "Mvbdu.083", bmvbdu_true30, (true, true, true);
-           "Mvbdu.084", bmvbdu_true31, (true, true, true);
-           "Mvbdu.085", bmvbdu_true32, (true, true, true);
-           "Mvbdu.086", bmvbdu_false0, (true, true, true);
-           "Mvbdu.087", bmvbdu_false1, (true, true, true);
-           "Mvbdu.088", bmvbdu_false2, (true, true, true);
-           "Mvbdu.089", bmvbdu_false3, (true, true, true);
-           "Mvbdu.090", bmvbdu_false4, (true, true, true);
-           "Mvbdu.091", bmvbdu_false5, (true, true, true);
-           "Mvbdu.092", bmvbdu_false6, (true, true, true);
-           "Mvbdu.093", bmvbdu_false7, (true, true, true);
-           "Mvbdu.094", bmvbdu_false8, (true, true, true);
-           "Mvbdu.095", bmvbdu_false9, (true, true, true);
-           "Mvbdu.096", bmvbdu_false10, (true, true, true);
-           "Mvbdu.097", bmvbdu_false11, (true, true, true);
-           "Mvbdu.098", bmvbdu_false12, (true, true, true);
-           "Mvbdu.099", bmvbdu_false13, (true, true, true);
-           "Mvbdu.100", bmvbdu_false14, (true, true, true);
-           "Mvbdu.101", bmvbdu_false15, (true, true, true);
-           "Mvbdu.102", bmvbdu_false16, (true, true, true);
-           "Mvbdu.103", bmvbdu_false17, (true, true, true);
-           "Mvbdu.104", bmvbdu_false18, (true, true, true);
-           "Mvbdu.105", bmvbdu_false19, (true, true, true);
-           "Mvbdu.106", bmvbdu_false20, (true, true, true);
-           "Mvbdu.107", bmvbdu_false21, (true, true, true);
-           "Mvbdu.108", bmvbdu_false22, (true, true, true);
-           "Mvbdu.109", bmvbdu_false23, (true, true, true);
-           "Mvbdu.110", bmvbdu_false24, (true, true, true);
-           "Mvbdu.111", bmvbdu_false25, (true, true, true);
-           "Mvbdu.112", bmvbdu_false26, (true, true, true);
-           "Mvbdu.113", bmvbdu_false27, (true, true, true);
-           "Mvbdu.114", bmvbdu_false28, (true, true, true);
-           "Mvbdu.115", bmvbdu_false29, (true, true, true);
-           "Mvbdu.116", bmvbdu_false30, (true, true, true);
-           "Mvbdu.117", bmvbdu_false31, (true, true, true);
-           "Mvbdu.118", bmvbdu_false32, (true, true, true);
-           "Mvbdu.119", bmvbdu_true33, (true, true, true);
-           "Mvbdu.120", l''', (true, true, true);
+           "Mvbdu.007", a', (true, true, true);
+           "Mvbdu.008", b', (true, true, true);
+           "Mvbdu.009", c', (true, true, true);
+           "Mvbdu.010", d', (true, true, true);
+           "Mvbdu.011", e', (true, true, false);
+           "Mvbdu.012", f', (true, true, false);
+           "Mvbdu.013", g', (false, true, true);
+           "Mvbdu.014", h', (false, true, true);
+           "Mvbdu.015", i', (true, true, true);
+           "Mvbdu.016", j', (false, true, true);
+           "Mvbdu.017", k', (false, true, true);
+           "Mvbdu.018", l', (true, false, true);
+           "Mvbdu.019", a'', (true, true, true);
+           "Mvbdu.020", b'', (true, true, true);
+           "Mvbdu.021", c'', (true, true, true);
+           "Mvbdu.022", d'', (true, true, true);
+           "Mvbdu.023", e'', (true, true, true);
+           "Mvbdu.024", f'', (true, true, true);
+           "Mvbdu.025", g'', (false, true, true);
+           "Mvbdu.026", h'', (false, true, true);
+           "Mvbdu.027", i'', (true, true, true);
+           "Mvbdu.028", j'', (false, true, true);
+           "Mvbdu.029", k'', (false, true, true);
+           "Mvbdu.030", l'', (true, false, true);
+           "Mvbdu.031", copy a', (true, false, true);
+           "Mvbdu.032", copy b', (true, false, true);
+           "Mvbdu.033", copy c', (true, false, true);
+           "Mvbdu.034", copy d', (true, false, true);
+           "Mvbdu.035", copy e', (true, false, false);
+           "Mvbdu.036", copy f', (true, false, false);
+           "Mvbdu.037", copy g', (false, false, true);
+           "Mvbdu.038", copy h', (false, false, true);
+           "Mvbdu.039", copy i', (true, false, true);
+           "Mvbdu.040", copy j', (false, false, true);
+           "Mvbdu.041", copy k', (false, false, true);
+           "Mvbdu.042", copy l', (true, false, true);
+           "Mvbdu.043", copy a'', (true, false, true);
+           "Mvbdu.044", copy b'', (true, false, true);
+           "Mvbdu.045", copy c'', (true, false, true);
+           "Mvbdu.046", copy d'', (true, false, true);
+           "Mvbdu.047", copy e'', (true, false, true);
+           "Mvbdu.048", copy f'', (true, false, true);
+           "Mvbdu.049", copy g'', (false, false, true);
+           "Mvbdu.050", copy h'', (false, false, true);
+           "Mvbdu.051", copy i'', (true, false, true);
+           "Mvbdu.052", copy j'', (false, false, true);
+           "Mvbdu.053", copy k'', (false, false, true);
+           "Mvbdu.054", copy l'', (true, false, true);
+           "Mvbdu.055", copy_c, (true, false, true);
+           "Mvbdu.056", bmvbdu_true0, (true, true, true);
+           "Mvbdu.057", bmvbdu_true1, (true, true, true);
+           "Mvbdu.058", bmvbdu_true2, (true, true, true);
+           "Mvbdu.059", bmvbdu_true3, (true, true, true);
+           "Mvbdu.060", bmvbdu_true4, (true, true, true);
+           "Mvbdu.061", bmvbdu_true5, (true, true, true);
+           "Mvbdu.062", bmvbdu_true6, (true, true, true);
+           "Mvbdu.063", bmvbdu_true7, (true, true, true);
+           "Mvbdu.064", bmvbdu_true8, (true, true, true);
+           "Mvbdu.065", bmvbdu_true9, (true, true, true);
+           "Mvbdu.066", bmvbdu_true10, (true, true, true);
+           "Mvbdu.067", bmvbdu_true11, (true, true, true);
+           "Mvbdu.068", bmvbdu_true12, (true, true, true);
+           "Mvbdu.069", bmvbdu_true13, (true, true, true);
+           "Mvbdu.070", bmvbdu_true14, (true, true, true);
+           "Mvbdu.071", bmvbdu_true15, (true, true, true);
+           "Mvbdu.072", bmvbdu_true16, (true, true, true);
+           "Mvbdu.073", bmvbdu_true17, (true, true, true);
+           "Mvbdu.074", bmvbdu_true18, (true, true, true);
+           "Mvbdu.075", bmvbdu_true19, (true, true, true);
+           "Mvbdu.076", bmvbdu_true20, (true, true, true);
+           "Mvbdu.077", bmvbdu_true21, (true, true, true);
+           "Mvbdu.078", bmvbdu_true22, (true, true, true);
+           "Mvbdu.079", bmvbdu_true23, (true, true, true);
+           "Mvbdu.080", bmvbdu_true24, (true, true, true);
+           "Mvbdu.081", bmvbdu_true25, (true, true, true);
+           "Mvbdu.082", bmvbdu_true26, (true, true, true);
+           "Mvbdu.083", bmvbdu_true27, (true, true, true);
+           "Mvbdu.084", bmvbdu_true28, (true, true, true);
+           "Mvbdu.085", bmvbdu_true29, (true, true, true);
+           "Mvbdu.086", bmvbdu_true30, (true, true, true);
+           "Mvbdu.087", bmvbdu_true31, (true, true, true);
+           "Mvbdu.088", bmvbdu_true32, (true, true, true);
+           "Mvbdu.089", bmvbdu_false0, (true, true, true);
+           "Mvbdu.090", bmvbdu_false1, (true, true, true);
+           "Mvbdu.091", bmvbdu_false2, (true, true, true);
+           "Mvbdu.092", bmvbdu_false3, (true, true, true);
+           "Mvbdu.093", bmvbdu_false4, (true, true, true);
+           "Mvbdu.094", bmvbdu_false5, (true, true, true);
+           "Mvbdu.095", bmvbdu_false6, (true, true, true);
+           "Mvbdu.096", bmvbdu_false7, (true, true, true);
+           "Mvbdu.097", bmvbdu_false8, (true, true, true);
+           "Mvbdu.098", bmvbdu_false9, (true, true, true);
+           "Mvbdu.099", bmvbdu_false10, (true, true, true);
+           "Mvbdu.100", bmvbdu_false11, (true, true, true);
+           "Mvbdu.101", bmvbdu_false12, (true, true, true);
+           "Mvbdu.102", bmvbdu_false13, (true, true, true);
+           "Mvbdu.103", bmvbdu_false14, (true, true, true);
+           "Mvbdu.104", bmvbdu_false15, (true, true, true);
+           "Mvbdu.105", bmvbdu_false16, (true, true, true);
+           "Mvbdu.106", bmvbdu_false17, (true, true, true);
+           "Mvbdu.107", bmvbdu_false18, (true, true, true);
+           "Mvbdu.108", bmvbdu_false19, (true, true, true);
+           "Mvbdu.109", bmvbdu_false20, (true, true, true);
+           "Mvbdu.110", bmvbdu_false21, (true, true, true);
+           "Mvbdu.111", bmvbdu_false22, (true, true, true);
+           "Mvbdu.112", bmvbdu_false23, (true, true, true);
+           "Mvbdu.113", bmvbdu_false24, (true, true, true);
+           "Mvbdu.114", bmvbdu_false25, (true, true, true);
+           "Mvbdu.115", bmvbdu_false26, (true, true, true);
+           "Mvbdu.116", bmvbdu_false27, (true, true, true);
+           "Mvbdu.117", bmvbdu_false28, (true, true, true);
+           "Mvbdu.118", bmvbdu_false29, (true, true, true);
+           "Mvbdu.119", bmvbdu_false30, (true, true, true);
+           "Mvbdu.120", bmvbdu_false31, (true, true, true);
+            "Mvbdu.121", bmvbdu_false32, (true, true, true);
+              "Mvbdu.122", bmvbdu_true33, (true, true, true);
+              "Mvbdu.123", l''', (true, true, true);
          ]
     @ List.map
         (fun (a, b) -> a, fun remanent -> remanent, b == bmvbdu_true0, None)
