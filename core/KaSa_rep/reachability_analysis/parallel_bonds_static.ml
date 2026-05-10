@@ -63,12 +63,11 @@ type local_static_information = {
     Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t
     Parallel_bonds_type.AgentSite_map_and_set.Map.t;
       (*the same as the global restriction mvbdu, but it contains an additional "first variable" at the beginning.*)
-  restriction_mvbdu: Ckappa_sig.Views_bdu.mvbdu;
 }
 
 (*******************************************************************)
 
-let init_local_static restriction_mvbdu =
+let init_local_static =
   {
     store_tuples_of_interest =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty;
@@ -83,7 +82,6 @@ let init_local_static restriction_mvbdu =
     store_closure =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
     store_sites_to_tuple = Parallel_bonds_type.AgentSite_map_and_set.Map.empty;
-    restriction_mvbdu;
   }
 
 (*******************************************************************)
@@ -183,10 +181,10 @@ let project_away_ag_id_gen_bdu f parameters error big_store acc bdu_handler =
     (error, (bdu_handler, acc))
 
 let project_away_ag_id parameters _kappa_handler bdu_handler error big_store acc
-    mvbdu restriction_mvbdu =
+    mvbdu =
   let f parameters error tuple bool acc bdu_handler =
     Parallel_bonds_type.add_value_bool parameters error tuple bdu_handler bool
-      acc mvbdu restriction_mvbdu
+      acc mvbdu
   in
   project_away_ag_id_gen_bdu f parameters error big_store acc bdu_handler
 

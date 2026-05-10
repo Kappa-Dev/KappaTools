@@ -513,7 +513,7 @@ let collect_potential_tuple_pair_init parameters error bdu_false bdu_handler
           pair_list
       in
       let error, bdu_handler, mvbdu_with_guard =
-        Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+        Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error mvbdu
           guard_bdu
       in
       let error, bdu_handler, store_result =

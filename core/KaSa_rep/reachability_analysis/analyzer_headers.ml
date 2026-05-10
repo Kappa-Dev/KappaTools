@@ -408,7 +408,7 @@ let dummy_side_effects _ error _ = error, None
 let abstract_away_working_set_vars parameters error bdu_handler mvbdu
     working_set_mvbdu working_set_guards_hcons =
   let error, bdu_handler, mvbdu =
-    Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+    Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error mvbdu
       working_set_mvbdu
   in
   let error, bdu_handler, mvbdu =

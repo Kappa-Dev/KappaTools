@@ -21,7 +21,7 @@ let local_trace = true
 (******************************************************************)
 
 let collect_parallel_or_not_bonds_init parameters kappa_handler bdu_handler
-    error tuple_of_interest init_state store_result restriction_bdu =
+    error tuple_of_interest init_state store_result =
   let tuple_of_interest = Some tuple_of_interest in
   let nsites = Handler.get_nsites kappa_handler in
   let error, big_store =
@@ -33,4 +33,4 @@ let collect_parallel_or_not_bonds_init parameters kappa_handler bdu_handler
       init_state.Cckappa_sig.e_init_guard nsites
   in
   Parallel_bonds_static.project_away_ag_id parameters kappa_handler bdu_handler
-    error big_store store_result mvbdu_guard restriction_bdu
+    error big_store store_result mvbdu_guard

@@ -493,12 +493,12 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=100
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=99
+  Id=97
    Node(site_type:1<1)
     Id=9
      Node(site_type:2<0)
@@ -523,9 +523,9 @@ Id=100
         Id=0
          Leaf False 
 
-    Id=98
+    Id=96
      Node(site_type:1<2)
-      Id=45
+      Id=43
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -548,21 +548,21 @@ Id=100
           Id=0
            Leaf False 
 
-      Id=97
+      Id=95
        Node(site_type:1<3)
-        Id=56
+        Id=54
          Node(site_type:2<1)
           Id=0
            Leaf False 
 
-          Id=55
+          Id=53
            Node(site_type:2<2)
-            Id=54
+            Id=52
              Node(site_type:3<1)
               Id=0
                Leaf False 
 
-              Id=53
+              Id=51
                Node(site_type:3<2)
                 Id=1
                  Leaf True 
@@ -573,14 +573,14 @@ Id=100
             Id=0
              Leaf False 
 
-        Id=96
+        Id=94
          Node(site_type:1<4)
-          Id=95
+          Id=93
            Node(site_type:2<0)
             Id=0
              Leaf False 
 
-            Id=94
+            Id=92
              Node(site_type:2<1)
               Id=7
                Node(site_type:3<0)
@@ -595,19 +595,19 @@ Id=100
                   Id=0
                    Leaf False 
 
-              Id=93
+              Id=91
                Node(site_type:2<2)
                 Id=0
                  Leaf False 
 
-                Id=92
+                Id=90
                  Node(site_type:2<3)
-                  Id=91
+                  Id=89
                    Node(site_type:3<0)
                     Id=0
                      Leaf False 
 
-                    Id=53
+                    Id=51
                      Node(site_type:3<2)
                       Id=1
                        Leaf True 

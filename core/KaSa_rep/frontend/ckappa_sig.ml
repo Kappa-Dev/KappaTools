@@ -1421,63 +1421,6 @@ let empty_side_effects =
     seen = AgentSiteState_map_and_set.Set.empty;
   }
 
-(*****************************************************************************)
-(*MVBDU OF THE GUARDS*)
-(*****************************************************************************)
-
-(* bdu operations that restrict the values of the guard parameters to 0 and 1*)
-
-(** Returns the disjunction of the two mvbdus but the values of each variable are restricted to the values 0 and 1.
-Used for the boolean guard parameters. *)
-let mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
-    bdu_restriction =
-  let error, handler_bdu, or_bdu =
-    Views_bdu.mvbdu_or parameters handler_bdu error mvbdu1 mvbdu2
-  in
-  (*all guard parameters must have value 0 or 1*)
-  Views_bdu.mvbdu_and parameters handler_bdu error or_bdu bdu_restriction
-
-let mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2 =
-  Views_bdu.mvbdu_and parameters handler_bdu error mvbdu1 mvbdu2
-
-let mvbdu_not_for_guards parameters handler_bdu error mvbdu bdu_restriction =
-  let error, handler_bdu, not_bdu =
-    Views_bdu.mvbdu_not parameters handler_bdu error mvbdu
-  in
-  (*all guard parameters must have value 0 or 1*)
-  Views_bdu.mvbdu_and parameters handler_bdu error not_bdu bdu_restriction
-
-let mvbdu_is_true_for_guards parameters handler_bdu error mvbdu bdu_restriction
-    =
-  let error, handler_bdu, inter_mvbdu =
-    Views_bdu.mvbdu_and parameters handler_bdu error mvbdu bdu_restriction
-  in
-  error, handler_bdu, Views_bdu.equal inter_mvbdu bdu_restriction
-
-let mvbdu_is_false_for_guards parameters handler_bdu error mvbdu bdu_restriction
-    =
-  let error, handler_bdu, mvbdu_false =
-    Views_bdu.mvbdu_false parameters handler_bdu error
-  in
-  let error, handler_bdu, inter_mvbdu =
-    Views_bdu.mvbdu_and parameters handler_bdu error mvbdu bdu_restriction
-  in
-  error, handler_bdu, Views_bdu.equal inter_mvbdu mvbdu_false
-
-let mvbdu_equal_for_guards parameters handler_bdu error mvbdu1 mvbdu2
-    bdu_restriction =
-  if Views_bdu.equal mvbdu1 mvbdu2 then
-    error, handler_bdu, true
-  else (
-    let error, handler_bdu, inter_mvbdu1 =
-      Views_bdu.mvbdu_and parameters handler_bdu error mvbdu1 bdu_restriction
-    in
-    let error, handler_bdu, inter_mvbdu2 =
-      Views_bdu.mvbdu_and parameters handler_bdu error mvbdu2 bdu_restriction
-    in
-    error, handler_bdu, Views_bdu.equal inter_mvbdu1 inter_mvbdu2
-  )
-
 (**Returns the bdu representation of the guard, and a bdu that maps each guard parameter of the guard to 1 or 0.
 This second bdu is used to restrict the bdus that are calculated by using "or" and "not"
 to valid bdus where the values of the guards can only be 0 and 1. *)

@@ -455,7 +455,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=10
+Id=8
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -469,7 +469,7 @@ Id=10
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=10
+Id=8
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -483,7 +483,7 @@ Id=10
      Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=10
+Id=8
  Node(site_type:1<0)
   Id=0
    Leaf False 

@@ -603,7 +603,7 @@ module Domain = struct
       match mvbdu with
       | Some mvbdu ->
         let error, bdu_handler, bdu_inter =
-          Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+          Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error mvbdu
             new_mvbdu
         in
         error, bdu_handler, bdu_inter
@@ -633,7 +633,7 @@ module Domain = struct
       get_bdu_guard parameters dynamic error guard_mvbdus rule_id
     in
     let error, bdu_handler, guard_bdu_inter =
-      Ckappa_sig.mvbdu_and_for_guards parameters
+      Ckappa_sig.Views_bdu.mvbdu_and parameters
         (get_mvbdu_handler dynamic)
         error guard_bdu state_guard_parameters
     in

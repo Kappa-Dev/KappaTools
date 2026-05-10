@@ -944,7 +944,7 @@ module Domain = struct
         in
         let bdu_handler = get_mvbdu_handler dynamic in
         let error, bdu_handler, mvbdu_value_with_guard =
-          Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
+          Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error
             mvbdu_value guard_bdu
         in
         let dynamic = set_mvbdu_handler bdu_handler dynamic in
@@ -962,7 +962,7 @@ module Domain = struct
               parameters bdu_handler error new_mvbdu
           in
           let error, bdu_handler, bdu_inter =
-            Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
+            Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error
               precondition_bdu bdu_restricted_to_guards
           in
           let dynamic = set_mvbdu_handler bdu_handler dynamic in

@@ -1095,7 +1095,7 @@ module Domain = struct
                           init_state.Cckappa_sig.e_init_guard static
                       in
                       let error, bdu_handler, bdu_init_with_guard =
-                        Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler
+                        Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler
                           error guard_bdu bdu_init
                       in
                       let dynamic = set_mvbdu_handler bdu_handler dynamic in
@@ -1185,8 +1185,8 @@ module Domain = struct
           (*bdu intersection*)
           let bdu_handler = get_mvbdu_handler dynamic in
           let error, bdu_handler, bdu_inter =
-            Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
-              bdu_test bdu_X
+            Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu_test
+              bdu_X
           in
           let dynamic = set_mvbdu_handler bdu_handler dynamic in
           let are_equal = Ckappa_sig.Views_bdu.equal bdu_inter bdu_false in
@@ -1204,7 +1204,7 @@ module Domain = struct
             in
             (* intersect result with the current guard bdu*)
             let error, bdu_handler, result_bdu_guard =
-              Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
+              Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error
                 result_bdu_guard bdu_proj_guard
             in
             let dynamic = set_mvbdu_handler bdu_handler dynamic in
@@ -1294,7 +1294,7 @@ module Domain = struct
           in
           (*Bdu_X and Bdu_test*)
           let error, bdu_handler, bdu_test_X =
-            Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu_X
+            Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu_X
               bdu_test
           in
           (* compute the projection over new_site_name *)
@@ -1318,7 +1318,7 @@ module Domain = struct
           in
           (* conjunction between bdu and bdu'*)
           let error, bdu_handler, bdu =
-            Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu
+            Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu
               bdu_renamed
           in
           let dynamic =
@@ -1355,7 +1355,7 @@ module Domain = struct
                    pair_list
                  in
                  let error, bdu_handler, mvbdu_case =
-                   Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu mvbdu_case
+                   Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu mvbdu_case
                  in
                   let error, bdu_handler, singleton =
                  Ckappa_sig.Views_bdu.build_variables_list parameters bdu_handler
@@ -1676,7 +1676,7 @@ module Domain = struct
                         bdu_handler error
                         [ new_site_name_y, state ]
                     in
-                    Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
+                    Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error
                       bdu_X mvbdu_B_y
                   ) else
                     error, bdu_handler, bdu_X
@@ -1695,7 +1695,7 @@ module Domain = struct
                     bdu_proj new_site_name_1
                 in
                 let error, bdu_handler, bdu =
-                  Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
+                  Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error
                     bdu bdu_renamed
                 in
                 let dynamic =
@@ -2431,7 +2431,7 @@ module Domain = struct
               in
               let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
               let error, bdu_handler, bdu_test_X =
-                Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
+                Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error
                   bdu_X bdu_test
               in
               let error, bdu_handler, singleton =
@@ -2454,7 +2454,7 @@ module Domain = struct
               in
               (* conjunction between bdu and bdu'*)
               let error, bdu_handler, bdu =
-                Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu
+                Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu
                   bdu_renamed
               in
               let dynamic =
@@ -2646,7 +2646,7 @@ module Domain = struct
                           in
                           (* intersect result with the current guard bdu*)
                           let error, bdu_handler, result_bdu_guard =
-                            Ckappa_sig.mvbdu_and_for_guards parameters
+                            Ckappa_sig.Views_bdu.mvbdu_and parameters
                               bdu_handler error result_bdu_guard bdu_proj_guard
                           in
                           let dynamic = set_mvbdu_handler bdu_handler dynamic in
@@ -2844,7 +2844,7 @@ module Domain = struct
     in
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, bdu_inter =
-      Ckappa_sig.mvbdu_and_for_guards parameter_views bdu_handler error bdu_X
+      Ckappa_sig.Views_bdu.mvbdu_and parameter_views bdu_handler error bdu_X
         bdu_test
     in
     (*redefine with modification list*)
@@ -2854,7 +2854,7 @@ module Domain = struct
     in
     (* add guard information from the precondition*)
     let error, bdu_handler, bdu_with_guard =
-      Ckappa_sig.mvbdu_and_for_guards parameter_views bdu_handler error
+      Ckappa_sig.Views_bdu.mvbdu_and parameter_views bdu_handler error
         bdu_redefine precondition_guard_bdu
     in
     let error, bdu_handler, bdu_result =
@@ -2882,7 +2882,7 @@ module Domain = struct
     let bdu_handler = get_mvbdu_handler dynamic in
     (* add guard information from the precondition*)
     let error, bdu_handler, bdu_with_guard =
-      Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu_creation
+      Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu_creation
         precondition_guard_bdu
     in
     let error, bdu_handler, bdu_result =
@@ -2907,7 +2907,7 @@ module Domain = struct
     in
     let error, bdu_handler, bdu_inter =
       (* TO DO CHECK *)
-      Ckappa_sig.mvbdu_and_for_guards parameter_views bdu_handler error bdu
+      Ckappa_sig.Views_bdu.mvbdu_and parameter_views bdu_handler error bdu
         bdu_inter
     in
     (*redefine with modification list*)
@@ -3229,7 +3229,7 @@ module Domain = struct
               Ckappa_sig.Views_bdu.store_by_variables_list
                 Wrapped_modules.LoggedIntMap.find_default_without_logs
                 Wrapped_modules.LoggedIntMap.add_or_overwrite mvbdu_true
-                Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
+                Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error
                 hconsed_vars renamed_mvbdu cv_map
             in
             let error, output =

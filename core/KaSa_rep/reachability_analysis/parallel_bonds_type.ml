@@ -191,7 +191,7 @@ let add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu =
     Ckappa_sig.Views_bdu.mvbdu_of_association_list parameters bdu_handler error
       pair_list
   in
-  Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error mvbdu
+  Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error mvbdu
     is_parallel_bond_mvbdu
 
 let add_parallel_bond_lattice_variable_to_mvbdu parameters bdu_handler error
@@ -215,8 +215,14 @@ let mvbdu_project_abstract_away_first_variable parameters bdu_handler error
   Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameters bdu_handler error
     mvbdu variable_list
 
-let compute_mvbdus_and_parallel_constraints parameters bdu_handler error mvbdu
-    restriction_bdu =
+let compute_mvbdus_and_parallel_constraints parameters bdu_handler error mvbdu =
+  let error, bdu_handler, bdu_true =
+    Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+  in
+  let error, bdu_handler, bdu_false =
+    Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+  in
+
   let error, bdu_handler, parallel_bond_mvbdu =
     add_first_variable_to_mvbdu parameters bdu_handler error true mvbdu
   in
@@ -232,21 +238,17 @@ let compute_mvbdus_and_parallel_constraints parameters bdu_handler error mvbdu
       non_parallel_bond_mvbdu
   in
   (* does the analysis result depend on the value of the boolean parameters? *)
-  let error, bdu_handler, parallel_is_true =
-    Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-      parallel_bond_mvbdu restriction_bdu
+  let parallel_is_true =
+    Ckappa_sig.Views_bdu.equal bdu_true parallel_bond_mvbdu
   in
-  let error, bdu_handler, parallel_is_false =
-    Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
-      parallel_bond_mvbdu restriction_bdu
+  let parallel_is_false =
+    Ckappa_sig.Views_bdu.equal bdu_false parallel_bond_mvbdu
   in
-  let error, bdu_handler, non_parallel_is_true =
-    Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-      non_parallel_bond_mvbdu restriction_bdu
+  let non_parallel_is_true =
+    Ckappa_sig.Views_bdu.equal bdu_true non_parallel_bond_mvbdu
   in
-  let error, bdu_handler, non_parallel_is_false =
-    Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error
-      non_parallel_bond_mvbdu restriction_bdu
+  let non_parallel_is_false =
+    Ckappa_sig.Views_bdu.equal bdu_false non_parallel_bond_mvbdu
   in
   let depends_on_parameters =
     not
@@ -410,7 +412,7 @@ let print_any_bond parameters error prefix dump_any verbose string_agent
 
 let print_parallel_constraint ?(verbose = true) ?(sparse = false)
     ?final_resul:(final_result = false) ?(dump_any = false) parameters error
-    kappa_handler tuple value bdu_handler restriction_bdu =
+    kappa_handler tuple value bdu_handler =
   let modalite =
     if final_result then
       "are necessarily"
@@ -514,8 +516,8 @@ let print_parallel_constraint ?(verbose = true) ?(sparse = false)
           parallel_is_false,
           non_parallel_is_false ) =
       compute_mvbdus_and_parallel_constraints parameters bdu_handler error value
-        restriction_bdu
     in
+
     (* printing for which values of the guards all double bonds are parallel *)
     let error, bdu_handler =
       if depends_on_parameters then
@@ -599,8 +601,7 @@ let add_value_lattice parameters error x value store_result =
     error, store_result
   )
 
-let add_value_mvbdu parameters error x bdu_handler store_result mvbdu
-    restriction_mvbdu =
+let add_value_mvbdu parameters error x bdu_handler store_result mvbdu =
   let error, bdu_handler, mvbdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
   in
@@ -613,9 +614,9 @@ let add_value_mvbdu parameters error x bdu_handler store_result mvbdu
     | error, Some old_mvbdu -> error, old_mvbdu
   in
   let error, bdu_handler, new_mvbdu =
-    Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error old_mvbdu mvbdu
-      restriction_mvbdu
+    Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler error old_mvbdu mvbdu
   in
+
   let error, store_result =
     PairAgentSitesStates_map_and_set.Map.add_or_overwrite parameters error x
       new_mvbdu store_result
@@ -624,16 +625,14 @@ let add_value_mvbdu parameters error x bdu_handler store_result mvbdu
 (*use at apply_gen*)
 
 (* add value used in parallel_bonds_static.ml, project_away_ag_id *)
-let add_value_bool parameters error x bdu_handler bool store_result mvbdu
-    restriction_mvbdu =
+let add_value_bool parameters error x bdu_handler bool store_result mvbdu =
   let error, bdu_handler, mvbdu_refined =
     add_first_variable_to_mvbdu parameters bdu_handler error bool mvbdu
   in
   add_value_mvbdu parameters error x bdu_handler store_result mvbdu_refined
-    restriction_mvbdu
 
 let add_value_and_event parameters error kappa_handler x value store_set
-    store_result guard_mvbdu bdu_handler restriction_mvbdu =
+    store_result guard_mvbdu bdu_handler =
   let error, bdu_handler, value_mvbdu =
     Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error value
       guard_mvbdu
@@ -653,13 +652,10 @@ let add_value_and_event parameters error kappa_handler x value store_set
   let proj' (a, _, c, _, _) = a, c in
   let pair (x, y) = proj x, proj' x, proj y, proj' y in
   let error, bdu_handler, new_value =
-    Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error old_value
-      value_mvbdu restriction_mvbdu
+    Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler error old_value
+      value_mvbdu
   in
-  let error, bdu_handler, are_equal =
-    Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error new_value
-      old_value restriction_mvbdu
-  in
+  let are_equal = Ckappa_sig.Views_bdu.equal new_value old_value in
   if are_equal then
     error, (bdu_handler, store_set, store_result)
   else (
@@ -671,7 +667,7 @@ let add_value_and_event parameters error kappa_handler x value store_set
         || Remanent_parameters.get_dump_reachability_analysis_diff parameters
       then
         print_parallel_constraint ~verbose:false ~dump_any:true parameters error
-          kappa_handler x value_mvbdu bdu_handler restriction_mvbdu
+          kappa_handler x value_mvbdu bdu_handler
       else
         error, bdu_handler
     in
@@ -699,9 +695,9 @@ let add_value_from_refined_tuple parameters error x =
   add_value_lattice parameters error (project2 x)
 
 let add_value_mvbdu_from_refined_tuple parameters error x bdu_handler
-    store_result mvbdu_refined restriction_mvbdu =
+    store_result mvbdu_refined =
   add_value_mvbdu parameters error (project2 x) bdu_handler store_result
-    mvbdu_refined restriction_mvbdu
+    mvbdu_refined
 
 let swap_sites_in_tuple (a, b, s, s', st, st') = a, b, s', s, st', st
 
