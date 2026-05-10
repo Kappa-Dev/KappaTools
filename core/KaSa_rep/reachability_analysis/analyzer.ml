@@ -477,13 +477,9 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
     let parameters = Domain.get_parameters static in
     let errors, (static, dynamic) = Domain.map_mvbdu f errors static dynamic in
     let handler = get_bdu_handler dynamic in
-    let errors, handler, restriction_mvbdu =
-      f parameters errors handler (Domain.get_restriction_mvbdu static)
-    in
     let errors, handler, working_set_mvbdu =
       f parameters errors handler (Domain.get_working_set_mvbdu static)
     in
-    let static = Domain.set_restriction_mvbdu restriction_mvbdu static in
     let static = Domain.set_working_set_mvbdu working_set_mvbdu static in
     let dynamic = set_bdu_handler handler dynamic in
     errors, (static, dynamic)

@@ -98,11 +98,6 @@ module type Composite_domain = sig
 
   val get_parameters : static_information -> Remanent_parameters_sig.parameters
   val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
-  val get_restriction_mvbdu : static_information -> Ckappa_sig.Views_bdu.mvbdu
-
-  val set_restriction_mvbdu :
-    Ckappa_sig.Views_bdu.mvbdu -> static_information -> static_information
-
   val get_working_set_mvbdu : static_information -> Ckappa_sig.Views_bdu.mvbdu
 
   val set_working_set_mvbdu :
@@ -614,20 +609,23 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     let parameters =
       Analyzer_headers.get_parameter (get_global_static_information static)
     in
+    let bdu_handler =
+      Analyzer_headers.get_mvbdu_handler
+        (get_global_dynamic_information dynamic)
+    in
+    let error, bdu_handler, bdu_true =
+      Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+    in
+    let global =
+      Analyzer_headers.set_mvbdu_handler bdu_handler
+        (get_global_dynamic_information dynamic)
+    in
+    let dynamic = set_global_dynamic_information global dynamic in
     let error, side_effects =
       Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs parameters error
         [] r_id
         (Analyzer_headers.get_potential_side_effects_per_rule
            (get_global_static_information static))
-    in
-    let bdu = Analyzer_headers.get_restriction_mvbdu (fst static) in
-    let error, _ =
-      ( error,
-        bdu
-        (* TO DO
-           Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs parameters error
-           bdu r_id (Analyzer_headers.get_guard_mvbdus (get_global_static_information static)) *)
-      )
     in
     let error, rule_opt = get_rule parameters error static r_id in
     match rule_opt with
@@ -645,7 +643,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
               rule source target)
           (error, dynamic, (precondition, event_list))
           (List.rev_map
-             (fun (a, (b, c, d)) -> a, (b, c, (d, bdu)))
+             (fun (a, (b, c, d)) -> a, (b, c, (d, bdu_true)))
              (List.rev side_effects))
       | Some side_effects ->
         let error, dynamic, (precondition, event_list) =
@@ -654,7 +652,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
               apply_one_side_effect static dynamic error r_id
                 ( None,
                   let a, b, c = target in
-                  a, b, (c, bdu) )
+                  a, b, (c, bdu_true) )
                 precondition event_list)
             side_effects.Ckappa_sig.seen
             (error, dynamic, (precondition, event_list))
@@ -664,7 +662,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
             (fun source target (error, dynamic, (precondition, event_list)) ->
               let a, b, c = target in
               apply_one_side_effect static dynamic error r_id
-                (Some source, (a, b, (c, bdu)))
+                (Some source, (a, b, (c, bdu_true)))
                 precondition event_list)
             side_effects.Ckappa_sig.not_seen_yet
             (error, dynamic, (precondition, event_list))
@@ -721,21 +719,12 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     in
     errors, ((fst static, dstatic), { dynamic with domain })
 
-  let get_restriction_mvbdu static =
-    Analyzer_headers.get_restriction_mvbdu
-      (get_global_static_information static)
-
   let get_working_set_mvbdu static =
     Analyzer_headers.get_working_set_mvbdu
       (get_global_static_information static)
 
   let get_guard_mvbdus static =
     Analyzer_headers.get_guard_mvbdus (get_global_static_information static)
-
-  let set_restriction_mvbdu bdu static =
-    let global = get_global_static_information static in
-    let global = Analyzer_headers.set_restriction_mvbdu bdu global in
-    set_global_static_information global static
 
   let set_working_set_mvbdu bdu static =
     let global = get_global_static_information static in

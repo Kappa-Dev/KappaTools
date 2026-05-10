@@ -691,7 +691,17 @@ let get_state_of_site_in_pre_post_condition get_global_static_information
     dynamic agent_id site_type defined_in precondition =
   let static = get_global_static_information static in
   let parameter = Analyzer_headers.get_parameter static in
-  let bdu = Analyzer_headers.get_restriction_mvbdu static in
+  let bdu_handler =
+    Analyzer_headers.get_mvbdu_handler (get_global_dynamic_information dynamic)
+  in
+  let error, bdu_handler, bdu =
+    Ckappa_sig.Views_bdu.mvbdu_true parameter bdu_handler error
+  in
+  let global_dynamic =
+    Analyzer_headers.set_mvbdu_handler bdu_handler
+      (get_global_dynamic_information dynamic)
+  in
+  let dynamic = set_global_dynamic_information global_dynamic dynamic in
   let path_in_pattern = { agent_id; relative_address = []; site = site_type } in
   let path = { defined_in; path = path_in_pattern } in
   (*get a list of site_type2 state in the precondition*)

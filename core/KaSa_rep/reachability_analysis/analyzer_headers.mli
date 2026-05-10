@@ -234,14 +234,6 @@ val set_guard_mvbdus :
   global_static_information ->
   global_static_information
 
-val get_restriction_mvbdu :
-  global_static_information -> Ckappa_sig.Views_bdu.mvbdu
-
-val set_restriction_mvbdu :
-  Ckappa_sig.Views_bdu.mvbdu ->
-  global_static_information ->
-  global_static_information
-
 val get_nr_guard_parameters :
   global_static_information -> Ckappa_sig.c_guard_parameter
 

@@ -40,7 +40,6 @@ val non_relational :
   Ckappa_sig.Views_bdu.handler ->
   Exception.exceptions_caught_and_uncaught ->
   Ckappa_sig.Views_bdu.mvbdu ->
-  Ckappa_sig.Views_bdu.mvbdu ->
   Exception.exceptions_caught_and_uncaught * Ckappa_sig.Views_bdu.handler * bool
 
 val translate :
@@ -51,7 +50,6 @@ val translate :
   rename_sites ->
   Ckappa_sig.Views_bdu.mvbdu ->
   Ckappa_sig.c_site_name ->
-  Ckappa_sig.Views_bdu.mvbdu ->
   Exception.exceptions_caught_and_uncaught
   * (Ckappa_sig.Views_bdu.handler * token)
 
@@ -63,7 +61,6 @@ val print :
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
   Ckappa_sig.Views_bdu.handler ->
-  Ckappa_sig.Views_bdu.mvbdu ->
   Exception.exceptions_caught_and_uncaught ->
   string ->
   Ckappa_sig.c_agent_name ->

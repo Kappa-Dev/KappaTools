@@ -48,7 +48,6 @@ val internal_pair_list_to_list :
   ((Ckappa_sig.c_mvbdu_var * Ckappa_sig.c_state) list
   * Ckappa_sig.Views_bdu.mvbdu)
   list ->
-  Ckappa_sig.Views_bdu.mvbdu ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * (Ckappa_sig.Views_bdu.handler
     * (Site_graphs.KaSa_site_graph.t * string Logical_formulae.formula option)

@@ -558,7 +558,6 @@ module Domain = struct
   let init_restriction_bdu static dynamic error =
     let parameters = Analyzer_headers.get_parameter static in
     let bdu_handler = Analyzer_headers.get_mvbdu_handler dynamic in
-    let restriction_bdu = Analyzer_headers.get_restriction_mvbdu static in
     let first_variable = Parallel_bonds_type.first_variable in
     let pair_list =
       [
@@ -571,12 +570,8 @@ module Domain = struct
       Ckappa_sig.Views_bdu.mvbdu_of_range_list parameters bdu_handler error
         pair_list
     in
-    let error, bdu_handler, result_restriction_bdu =
-      Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
-        restriction_bdu additional_restriction_bdu
-    in
     let dynamic = Analyzer_headers.set_mvbdu_handler bdu_handler dynamic in
-    error, dynamic, result_restriction_bdu
+    error, dynamic, additional_restriction_bdu
 
   let initialize ?patch ~modified_agents static dynamic error =
     let ( error,

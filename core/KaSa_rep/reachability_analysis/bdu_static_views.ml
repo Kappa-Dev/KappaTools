@@ -108,10 +108,10 @@ let get_bdu_map_and_set error bdu_false (agent_type, rule_id, cv_id)
   error, bdu_value
 
 let add_dependency_triple_bdu parameters bdu_handler error
-    (agent_type, rule_id, cv_id) bdu store_result guard_bdu restriction_bdu =
+    (agent_type, rule_id, cv_id) bdu store_result guard_bdu =
   (*add guard information*)
   let error, bdu_handler, bdu =
-    Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu guard_bdu
+    Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu guard_bdu
   in
   let error, bdu_handler, bdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
@@ -123,9 +123,9 @@ let add_dependency_triple_bdu parameters bdu_handler error
   in
   (* In the case when the agent is created twice, we take the union *)
   let error, bdu_handler, bdu_new =
-    Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error old_bdu bdu
-      restriction_bdu
+    Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler error old_bdu bdu
   in
+
   let store_result =
     Covering_classes_type.AgentRuleCV_setmap.Map.add
       (agent_type, rule_id, cv_id)
@@ -204,7 +204,7 @@ let get_pair_cv_map_with_missing_association_creation parameters error agent
     (error, []) triple_list
 
 let collect_bdu_creation_restriction_map parameters bdu_handler error rule_id
-    rule store_remanent_triple store_result guard_mvbdus restriction_bdu =
+    rule store_remanent_triple store_result guard_mvbdus =
   (*-----------------------------------------------------------------*)
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
     error
@@ -254,7 +254,7 @@ let collect_bdu_creation_restriction_map parameters bdu_handler error rule_id
                     let error, bdu_handler, store_result =
                       add_dependency_triple_bdu parameters bdu_handler error
                         (agent_type, rule_id, cv_id)
-                        bdu_creation store_result guard_bdu restriction_bdu
+                        bdu_creation store_result guard_bdu
                     in
                     error, bdu_handler, store_result)
                   (error, bdu_handler, store_result)
@@ -279,8 +279,7 @@ let add_map k data m =
   Ckappa_sig.Rule_setmap.Map.add k new_data m
 
 let collect_proj_bdu_creation_restriction_map parameters handler_bdu error
-    rule_id rule store_remanent_triple store_result guard_mvbdus restriction_bdu
-    =
+    rule_id rule store_remanent_triple store_result guard_mvbdus =
   let store_init_bdu_creation_restriction_map =
     Covering_classes_type.AgentRuleCV_setmap.Map.empty
   in
@@ -288,7 +287,7 @@ let collect_proj_bdu_creation_restriction_map parameters handler_bdu error
     collect_bdu_creation_restriction_map
       (* collect should work directly on the partitioned map (store_result) *)
       parameters handler_bdu error rule_id rule store_remanent_triple
-      store_init_bdu_creation_restriction_map guard_mvbdus restriction_bdu
+      store_init_bdu_creation_restriction_map guard_mvbdus
   in
 
   let error, handler_bdu, bdu_true =
@@ -302,7 +301,7 @@ let collect_proj_bdu_creation_restriction_map parameters handler_bdu error
       bdu_true
       (fun parameters (error, handler_bdu) bdu bdu' ->
         let error, handler_bdu, bdu_union =
-          Ckappa_sig.mvbdu_and_for_guards parameters handler_bdu error bdu bdu'
+          Ckappa_sig.Views_bdu.mvbdu_and parameters handler_bdu error bdu bdu'
         in
         (error, handler_bdu), bdu_union)
       store_bdu_creation_restriction_map
@@ -509,7 +508,7 @@ let get_triple_map parameters error pair_list triple_list =
 
 let store_bdu_potential_restriction_map_aux parameters bdu_handler error
     ~patch_store_remanent_triple store_potential_side_effects store_result
-    guard_mvbdus restriction_bdu =
+    guard_mvbdus =
   let error, bdu_handler, bdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
   in
@@ -563,15 +562,15 @@ let store_bdu_potential_restriction_map_aux parameters bdu_handler error
                         in
                         let error, bdu_handler, bdu_potential_effect_with_guards
                             =
-                          Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler
+                          Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler
                             error guard_bdu bdu_potential_effect
                         in
                         (*union of bdu and bdu effect*)
                         let error, bdu_handler, bdu =
-                          Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler
+                          Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler
                             error bdu bdu_potential_effect_with_guards
-                            restriction_bdu
                         in
+
                         error, bdu_handler, bdu)
                       (error, bdu_handler, bdu_false)
                       map_res
@@ -598,11 +597,11 @@ let store_bdu_potential_restriction_map_aux parameters bdu_handler error
 
 let store_bdu_potential_effect_restriction_map ~patch_store_remanent_triple
     parameters bdu_handler error store_potential_side_effects store_result
-    guard_mvbdus restriction_bdu =
+    guard_mvbdus =
   let error', (bdu_handler, store_result) =
     store_bdu_potential_restriction_map_aux ~patch_store_remanent_triple
       parameters bdu_handler error store_potential_side_effects store_result
-      guard_mvbdus restriction_bdu
+      guard_mvbdus
   in
   let error =
     Exception.check_point Exception.warn parameters error error' __POS__ Exit
@@ -655,7 +654,7 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
 
 let collect_proj_bdu_potential_restriction_map ?start
     ~patch_store_remanent_triple parameters bdu_handler error
-    store_potential_side_effects store_result guard_mvbdus restriction_bdu =
+    store_potential_side_effects store_result guard_mvbdus =
   let store_init_bdu_potential_restriction_map =
     Covering_classes_type.AgentSiteRuleCV_setmap.Map.empty
   in
@@ -663,7 +662,7 @@ let collect_proj_bdu_potential_restriction_map ?start
     (* this function should work directly on the partitioned map (store_result) *)
     store_bdu_potential_effect_restriction_map ~patch_store_remanent_triple
       parameters bdu_handler error store_potential_side_effects
-      store_init_bdu_potential_restriction_map guard_mvbdus restriction_bdu
+      store_init_bdu_potential_restriction_map guard_mvbdus
   in
   let error, bdu_handler, bdu_true =
     Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
@@ -849,7 +848,7 @@ let collect_bdu_test_restriction_map ?start_cv ~new_rule ~modified_agents
                       error
                   in
                   let error, bdu_handler, bdu_test_with_guards =
-                    Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error
+                    Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error
                       guard_bdu bdu_test
                   in
                   let error, store_result =
@@ -895,7 +894,7 @@ let collect_proj_bdu_test_restriction ?start_cv ~new_rule ~modified_agents
       bdu_true
       (fun parameters (error, bdu_handler) bdu bdu' ->
         let error, bdu_handler, bdu_union =
-          Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu bdu'
+          Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu bdu'
         in
         (error, bdu_handler), bdu_union)
       store_bdu_test_restriction_map
@@ -911,7 +910,7 @@ let scan_rule_static ?start_cv ~new_rule ~modified_agents parameters log_info
     error handler_bdu (rule_id : Ckappa_sig.c_rule_id) rule
     (*store_new_index_pair_map*)
       store_remanent_triple _store_remanent_side_effects _compil store_result
-    guard_mvbdus restriction_bdu =
+    guard_mvbdus =
   (*-----------------------------------------------------------------------*)
   (*pre_static*)
   let error, log_info =
@@ -924,7 +923,6 @@ let scan_rule_static ?start_cv ~new_rule ~modified_agents parameters log_info
     collect_proj_bdu_creation_restriction_map parameters handler_bdu error
       rule_id rule store_remanent_triple
       store_result.store_proj_bdu_creation_restriction_map guard_mvbdus
-      restriction_bdu
   in
   (*-----------------------------------------------------------------------*)
   let error, (handler_bdu, store_modif_list_restriction_map) =
@@ -958,14 +956,13 @@ let scan_rule_static ?start_cv ~new_rule ~modified_agents parameters log_info
 
 let scan_rule_set ?start ?start_cv ~patch_store_remanent_triple ~modified_agents
     parameters log_info handler_bdu error handler_kappa compiled
-    store_potential_side_effects store_remanent_triple guard_mvbdus
-    restriction_bdu init =
+    store_potential_side_effects store_remanent_triple guard_mvbdus init =
   let nsites = Handler.get_nsites handler_kappa in
   let (error, handler_bdu), store_proj_bdu_potential_restriction_map =
     collect_proj_bdu_potential_restriction_map ?start
       ~patch_store_remanent_triple parameters handler_bdu error
       store_potential_side_effects init.store_proj_bdu_potential_restriction_map
-      guard_mvbdus restriction_bdu
+      guard_mvbdus
   in
   let init = { init with store_proj_bdu_potential_restriction_map } in
 
@@ -977,7 +974,7 @@ let scan_rule_set ?start ?start_cv ~patch_store_remanent_triple ~modified_agents
           scan_rule_static ?start_cv ~new_rule:false ~modified_agents parameters
             log_info error handler_bdu rule_id rule.Cckappa_sig.e_rule_c_rule
             patch_store_remanent_triple store_potential_side_effects compiled
-            store_result guard_mvbdus restriction_bdu
+            store_result guard_mvbdus
         in
         error, (handler_bdu, log_info, store_result))
       (fun parameters error rule_id rule (handler_bdu, log_info, store_result) ->
@@ -985,7 +982,7 @@ let scan_rule_set ?start ?start_cv ~patch_store_remanent_triple ~modified_agents
           scan_rule_static ~new_rule:true ~modified_agents parameters log_info
             error handler_bdu rule_id rule.Cckappa_sig.e_rule_c_rule
             store_remanent_triple store_potential_side_effects compiled
-            store_result guard_mvbdus restriction_bdu
+            store_result guard_mvbdus
         in
         error, (handler_bdu, log_info, store_result))
       compiled.Cckappa_sig.rules

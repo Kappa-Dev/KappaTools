@@ -40,7 +40,7 @@ type rename_sites =
 
 (****************************************************************************)
 
-let non_relational parameters bdu_handler error mvbdu restriction_bdu =
+let non_relational parameters bdu_handler error mvbdu =
   let error, bdu_handler, list =
     Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction parameters bdu_handler
       error mvbdu
@@ -56,14 +56,11 @@ let non_relational parameters bdu_handler error mvbdu restriction_bdu =
       (error, bdu_handler, mvbdu_true)
       list
   in
-  let error, bdu_handler, are_equal =
-    Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error mvbdu
-      recomposition restriction_bdu
-  in
+  let are_equal = Ckappa_sig.Views_bdu.equal mvbdu recomposition in
   error, bdu_handler, are_equal
 
 let non_relational_with_threshold parameters bdu_handler error ~threshold mvbdu
-    restriction_bdu =
+    =
   let error, bdu_handler, list =
     Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction_with_threshold parameters
       bdu_handler error ~threshold mvbdu
@@ -79,14 +76,11 @@ let non_relational_with_threshold parameters bdu_handler error ~threshold mvbdu
       (error, bdu_handler, mvbdu_true)
       list
   in
-  let error, bdu_handler, are_equal =
-    Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error mvbdu
-      recomposition restriction_bdu
-  in
+  let are_equal = Ckappa_sig.Views_bdu.equal mvbdu recomposition in
   error, bdu_handler, are_equal
 
 let try_partitioning parameters bdu_handler error kappa_handler
-    (rename_site_inverse : rename_sites) mvbdu restriction_bdu =
+    (rename_site_inverse : rename_sites) mvbdu =
   let i =
     Ckappa_sig.int_of_guard_parameter
       (Handler.get_nr_guard_parameters kappa_handler)
@@ -184,7 +178,7 @@ let try_partitioning parameters bdu_handler error kappa_handler
                 __POS__ Exit
             in
             let error_9, bdu_handler, bool =
-              non_relational parameters bdu_handler error case restriction_bdu
+              non_relational parameters bdu_handler error case
             in
             let error =
               Exception.check_point Exception.warn parameters error error_9
@@ -199,10 +193,7 @@ let try_partitioning parameters bdu_handler error kappa_handler
                 Exception.check_point Exception.warn parameters error error_10
                   __POS__ Exit
               in
-              let error, bdu_handler, is_equal =
-                Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error
-                  away mvbdu_ref restriction_bdu
-              in
+              let is_equal = Ckappa_sig.Views_bdu.equal away mvbdu_ref in
               if is_equal then
                 aux3 t (error, bdu_handler, output)
               else (
@@ -221,9 +212,8 @@ let try_partitioning parameters bdu_handler error kappa_handler
                         Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler
                           error mvbdu_ref elt
                       in
-                      let error, bdu_handler, are_equal =
-                        Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler
-                          error mvbdu_test mvbdu_ref restriction_bdu
+                      let are_equal =
+                        Ckappa_sig.Views_bdu.equal mvbdu_test mvbdu_ref
                       in
                       if are_equal then
                         error, bdu_handler, list
@@ -419,7 +409,7 @@ let try_partitioning parameters bdu_handler error kappa_handler
             in
             let error_10, bdu_handler, bool =
               non_relational_with_threshold parameters bdu_handler error
-                ~threshold case_with_param restriction_bdu
+                ~threshold case_with_param
             in
             let error =
               Exception.check_point Exception.warn parameters error error_10
@@ -434,10 +424,7 @@ let try_partitioning parameters bdu_handler error kappa_handler
                 Exception.check_point Exception.warn parameters error error_11
                   __POS__ Exit
               in
-              let error, bdu_handler, are_equal =
-                Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error
-                  away mvbdu_ref restriction_bdu
-              in
+              let are_equal = Ckappa_sig.Views_bdu.equal away mvbdu_ref in
               if are_equal then
                 aux3 t (error, bdu_handler, output)
               else (
@@ -457,9 +444,8 @@ let try_partitioning parameters bdu_handler error kappa_handler
                         Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler
                           error mvbdu_ref elt
                       in
-                      let error, bdu_handler, are_equal =
-                        Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler
-                          error mvbdu_test mvbdu_ref restriction_bdu
+                      let are_equal =
+                        Ckappa_sig.Views_bdu.equal mvbdu_test mvbdu_ref
                       in
                       if are_equal then
                         error, bdu_handler, list
@@ -532,20 +518,20 @@ let try_partitioning parameters bdu_handler error kappa_handler
 (****************************************************************************)
 
 let translate parameters bdu_handler error kappa_handler
-    (rename_site_inverse : rename_sites) mvbdu nsites restriction_bdu =
+    (rename_site_inverse : rename_sites) mvbdu nsites =
   let threshold = Ckappa_sig.int_of_site_name nsites - 1 in
   let error, bdu_handler, list =
     Ckappa_sig.Views_bdu.parametric_conditions_of_mvbdu parameters bdu_handler
       error ~threshold mvbdu
   in
+  let error, bdu_handler, bdu_true =
+    Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+  in
   let error, bdu_handler, list, list_with_mvbdu, all_mvbdu_are_true =
     List.fold_left
       (fun (error, bdu_handler, list, list_with_mvbdu, all_mvbdu_are_true)
            (elt1, mvbdu) ->
-        let error, bdu_handler, mvbdu_is_true =
-          Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
-            restriction_bdu
-        in
+        let mvbdu_is_true = Ckappa_sig.Views_bdu.equal mvbdu bdu_true in
         let mvbdu_opt =
           if mvbdu_is_true then
             None
@@ -687,7 +673,7 @@ let translate parameters bdu_handler error kappa_handler
         in
         let error, bdu_handler, output =
           try_partitioning parameters bdu_handler error kappa_handler
-            rename_site_inverse mvbdu restriction_bdu
+            rename_site_inverse mvbdu
         in
         (match output with
         | None -> error, (bdu_handler, No_known_translation list_with_mvbdu)
@@ -704,7 +690,7 @@ let translate parameters bdu_handler error kappa_handler
       in
       let error, bdu_handler, output =
         try_partitioning parameters bdu_handler error kappa_handler
-          rename_site_inverse mvbdu restriction_bdu
+          rename_site_inverse mvbdu
       in
       (match output with
       | None -> error, (bdu_handler, No_known_translation list_with_mvbdu)
@@ -718,8 +704,7 @@ let translate parameters bdu_handler error kappa_handler
 let rec print ?beginning_of_sentence:(beggining = true)
     ?(prompt_agent_type = true) ?(html_mode = false)
     ~show_dep_with_dimmension_higher_than:dim_min parameters kappa_handler
-    bdu_handler restriction_bdu error agent_string agent_type agent_id
-    translation t =
+    bdu_handler error agent_string agent_type agent_id translation t =
   let tab =
     if html_mode then
       "<PRE>         </PRE>"
@@ -1137,8 +1122,8 @@ let rec print ?beginning_of_sentence:(beggining = true)
                   let error, bdu_handler =
                     print ~beginning_of_sentence:false ~prompt_agent_type:false
                       ~html_mode ~show_dep_with_dimmension_higher_than:0
-                      parameters kappa_handler bdu_handler restriction_bdu error
-                      agent_string agent_type agent_id token t'
+                      parameters kappa_handler bdu_handler error agent_string
+                      agent_type agent_id token t'
                   in
                   let () = Loggers.fprintf log "%s" endenum in
                   error, bdu_handler)
@@ -1520,8 +1505,8 @@ let convert_views_internal_constraint_list
 
 let print ?beginning_of_sentence:(beggining = true) ?(prompt_agent_type = true)
     ?(html_mode = false) ~show_dep_with_dimmension_higher_than:dim_min
-    parameters kappa_handler bdu_handler restriction_bdu error agent_string
-    agent_type translation =
+    parameters kappa_handler bdu_handler error agent_string agent_type
+    translation =
   let t = Site_graphs.KaSa_site_graph.empty in
   let error, id, t =
     Site_graphs.KaSa_site_graph.add_agent parameters error kappa_handler
@@ -1529,4 +1514,4 @@ let print ?beginning_of_sentence:(beggining = true) ?(prompt_agent_type = true)
   in
   print ~beginning_of_sentence:beggining ~prompt_agent_type ~html_mode
     ~show_dep_with_dimmension_higher_than:dim_min parameters kappa_handler
-    bdu_handler restriction_bdu error agent_string agent_type id translation t
+    bdu_handler error agent_string agent_type id translation t

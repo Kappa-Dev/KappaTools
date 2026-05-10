@@ -230,13 +230,14 @@ let _pair_list_to_list parameters error kappa_handler pattern agent_id1
     (error, []) pair_list
 
 let internal_pair_list_to_list parameters error handler kappa_handler pattern
-    agent_id1 site_type1' agent_id2 site_type2' pair_list restriction_bdu =
+    agent_id1 site_type1' agent_id2 site_type2' pair_list =
+  let error, handler, bdu_true =
+    Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
+  in
   List.fold_left
     (fun (error, (handler, current_list)) (l, mvbdu) ->
-      let error, handler, is_true =
-        Ckappa_sig.mvbdu_is_true_for_guards parameters handler error mvbdu
-          restriction_bdu
-      in
+      let is_true = Ckappa_sig.Views_bdu.equal bdu_true mvbdu in
+
       let error, handler, formula =
         if is_true then
           error, handler, None

@@ -233,7 +233,7 @@ val get_state_of_site_in_precondition :
 val get_state_of_site_in_postcondition :
   ('static -> Analyzer_headers.global_static_information) ->
   ('dynamic -> Analyzer_headers.global_dynamic_information) ->
-  (Analyzer_headers.global_dynamic_information -> 'dynamic -> 'b) ->
+  (Analyzer_headers.global_dynamic_information -> 'dynamic -> 'dynamic) ->
   Exception.exceptions_caught_and_uncaught ->
   'static ->
   'dynamic ->
@@ -242,7 +242,7 @@ val get_state_of_site_in_postcondition :
   Ckappa_sig.c_site_name ->
   precondition ->
   Exception.exceptions_caught_and_uncaught
-  * 'b
+  * 'dynamic
   * precondition
   * (Ckappa_sig.c_state * Ckappa_sig.Views_bdu.mvbdu) list
 

@@ -100,11 +100,6 @@ module type Composite_domain = sig
 
   val get_parameters : static_information -> Remanent_parameters_sig.parameters
   val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
-  val get_restriction_mvbdu : static_information -> Ckappa_sig.Views_bdu.mvbdu
-
-  val set_restriction_mvbdu :
-    Ckappa_sig.Views_bdu.mvbdu -> static_information -> static_information
-
   val get_working_set_mvbdu : static_information -> Ckappa_sig.Views_bdu.mvbdu
 
   val set_working_set_mvbdu :

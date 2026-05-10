@@ -761,7 +761,6 @@ val guard_to_bdu :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Views_bdu.handler ->
   c_guard_parameter LKappa.guard ->
-  Views_bdu.mvbdu ->
   c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Views_bdu.handler
@@ -772,7 +771,6 @@ val guard_to_bdu_opt :
   Exception_without_parameter.exceptions_caught_and_uncaught ->
   Views_bdu.handler ->
   c_guard_parameter LKappa.guard option ->
-  Views_bdu.mvbdu ->
   c_site_name ->
   Exception_without_parameter.exceptions_caught_and_uncaught
   * Views_bdu.handler

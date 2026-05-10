@@ -308,12 +308,12 @@ let project2 (x, y) = project x, project y
 (***************************************************************************)
 (*PRINT*)
 (***************************************************************************)
-let print_guard_mvbdu parameters error bdu_handler kappa_handler mvbdu
-    restriction_bdu =
-  let error, bdu_handler, is_true =
-    Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
-      restriction_bdu
+let print_guard_mvbdu parameters error bdu_handler kappa_handler mvbdu =
+  let error, bdu_handler, bdu_true =
+    Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
   in
+  let is_true = Ckappa_sig.Views_bdu.equal mvbdu bdu_true in
+
   if is_true then
     error, bdu_handler
   else (
@@ -326,7 +326,7 @@ let print_guard_mvbdu parameters error bdu_handler kappa_handler mvbdu
 
 let print_site_across_bonds_domain_raw parameters error kappa_handler
     bdu_handler log final_result pair_list nsites agent_id1 site_type1'
-    agent_id2 site_type2' pattern restriction_bdu =
+    agent_id2 site_type2' pattern =
   let error =
     (*do not print the precondition if it is not the final result*)
     if final_result then (
@@ -400,7 +400,6 @@ let print_site_across_bonds_domain_raw parameters error kappa_handler
           in
           let error, bdu_handler =
             print_guard_mvbdu parameters error bdu_handler kappa_handler mvbdu
-              restriction_bdu
           in
           error, bdu_handler, true)
         (error, bdu_handler, false)
@@ -417,8 +416,7 @@ let print_site_across_bonds_domain_raw parameters error kappa_handler
 
 let print_site_across_bonds_domain_natural_language parameters error
     kappa_handler bdu_handler log pair_list nsites prefix site1 site2 site1'
-    agent1 site2' agent2 agent_type1 site_type1 agent_type2 site_type2
-    restriction_bdu =
+    agent1 site2' agent2 agent_type1 site_type1 agent_type2 site_type2 =
   let () =
     Loggers.fprintf log
       "%sWhenever the site %s of %s and the site %s of %s are bound together, \
@@ -464,7 +462,6 @@ let print_site_across_bonds_domain_natural_language parameters error
       in
       let error, bdu_handler =
         print_guard_mvbdu parameters error bdu_handler kappa_handler mvbdu
-          restriction_bdu
       in
       let () = Loggers.print_newline log in
       error, bdu_handler)
@@ -472,9 +469,15 @@ let print_site_across_bonds_domain_natural_language parameters error
 
 let print_site_across_bonds_domain ?verbose:(_verbose = true) ?(sparse = false)
     ?(final_result = false) ?dump_any:(_dump_any = false) parameters error
-    kappa_handler bdu_handler tuple mvbdu restriction_bdu =
+    kappa_handler bdu_handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
   let log = Remanent_parameters.get_logger parameters in
+  let error, bdu_handler, bdu_true =
+    Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+  in
+  let error, bdu_handler, bdu_false =
+    Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+  in
   let nsites = Handler.get_nsites kappa_handler in
   let ( (agent_type1, site_type1, site_type1', _),
         (agent_type2, site_type2, site_type2', _) ) =
@@ -493,7 +496,7 @@ let print_site_across_bonds_domain ?verbose:(_verbose = true) ?(sparse = false)
       if final_result then
         (*at the final result needs to check the non_relational condition*)
         Translation_in_natural_language.non_relational parameters bdu_handler
-          error mvbdu restriction_bdu
+          error mvbdu
       else
         (*other cases will by pass this test*)
         error, bdu_handler, false
@@ -502,14 +505,10 @@ let print_site_across_bonds_domain ?verbose:(_verbose = true) ?(sparse = false)
       error, bdu_handler
     else (
       (*----------------------------------------------------*)
-      let error, bdu_handler, is_true =
-        Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
-          restriction_bdu
-      in
-      let error, bdu_handler, is_false =
-        Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu
-          restriction_bdu
-      in
+      let is_true = Ckappa_sig.Views_bdu.equal mvbdu bdu_true in
+
+      let is_false = Ckappa_sig.Views_bdu.equal mvbdu bdu_false in
+
       if is_true || is_false then
         error, bdu_handler
       else (
@@ -536,12 +535,12 @@ let print_site_across_bonds_domain ?verbose:(_verbose = true) ?(sparse = false)
           in
           print_site_across_bonds_domain_raw parameters error kappa_handler
             bdu_handler log final_result pair_list nsites agent_id1 site_type1'
-            agent_id2 site_type2' pattern restriction_bdu
+            agent_id2 site_type2' pattern
         | Remanent_parameters_sig.Natural_language ->
           print_site_across_bonds_domain_natural_language parameters error
             kappa_handler bdu_handler log pair_list nsites prefix site1 site2
             site1' agent1 site2' agent2 agent_type1 site_type1 agent_type2
-            site_type2 restriction_bdu
+            site_type2
       )
     )
   )
@@ -561,7 +560,7 @@ let get_mvbdu_from_tuple_pair parameters error tuple bdu_false store_value =
   error, mvbdu_value
 
 let add_link parameter error bdu_false bdu_handler kappa_handler pair mvbdu
-    store_result restriction_mvbdu =
+    store_result =
   let error, bdu_old =
     get_mvbdu_from_tuple_pair parameter error pair bdu_false store_result
   in
@@ -577,7 +576,7 @@ let add_link parameter error bdu_false bdu_handler kappa_handler pair mvbdu
         Remanent_parameters.update_prefix parameter "                "
       in
       print_site_across_bonds_domain ~verbose:false ~dump_any:true parameter
-        error kappa_handler bdu_handler pair mvbdu restriction_mvbdu
+        error kappa_handler bdu_handler pair mvbdu
     ) else
       error, bdu_handler
   in
@@ -595,25 +594,24 @@ let add_sites_from_tuples parameters error tuple modified_sites =
     (error, modified_sites)
     [ agent, site1; agent, site2; agent', site1'; agent', site2' ]
 
-let check parameters error bdu_false bdu_handler pair mvbdu store_result
-    restriction_bdu =
+let check parameters error bdu_false bdu_handler pair mvbdu store_result =
   let error, bdu_old =
     get_mvbdu_from_tuple_pair parameters error pair bdu_false store_result
   in
   let error, bdu_handler, new_bdu =
     Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler error bdu_old mvbdu
   in
-  let error, bdu_handler, is_false =
-    Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error new_bdu
-      restriction_bdu
+  let error, bdu_handler, mvbdu_false =
+    Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
   in
+  let is_false = Ckappa_sig.Views_bdu.equal new_bdu mvbdu_false in
   if is_false then
     error, bdu_handler, false
   else
     error, bdu_handler, true
 
 let add_link_and_check parameter error bdu_false bdu_handler kappa_handler bool
-    dump_title x mvbdu modified_sites store_result restriction_mvbdu =
+    dump_title x mvbdu modified_sites store_result =
   let error, bdu_old =
     get_mvbdu_from_tuple_pair parameter error x bdu_false store_result
   in
@@ -625,10 +623,7 @@ let add_link_and_check parameter error bdu_false bdu_handler kappa_handler bool
   (*-----------------------------------------------------------*)
   (*check the freshness of the pair*)
   (*compare mvbdu and old mvbdu*)
-  let error, bdu_handler, are_equal =
-    Ckappa_sig.mvbdu_equal_for_guards parameter bdu_handler error new_bdu
-      bdu_old restriction_mvbdu
-  in
+  let are_equal = Ckappa_sig.Views_bdu.equal new_bdu bdu_old in
   if are_equal then
     error, bool, bdu_handler, modified_sites, store_result
   else (
@@ -644,7 +639,7 @@ let add_link_and_check parameter error bdu_false bdu_handler kappa_handler bool
             dump_title ()
         in
         print_site_across_bonds_domain ~verbose:false ~dump_any:true parameter
-          error kappa_handler bdu_handler x mvbdu restriction_mvbdu
+          error kappa_handler bdu_handler x mvbdu
       ) else
         error, bdu_handler
     in

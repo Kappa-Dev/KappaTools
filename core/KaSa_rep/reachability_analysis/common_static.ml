@@ -1229,7 +1229,7 @@ let compute_restriction_mvbdu ?patch_compute_restriction_mvbdu parameters error
    Ckappa_sig.Views_bdu.mvbdu_and parameters mvbdu_handler error mvbdu_ws mvbdu*)
 
 let collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters error
-    mvbdu_handler compilation bdu_restriction nsites =
+    mvbdu_handler compilation nsites =
   let first_rule, map =
     match patch_collect_guard_mvbdus with
     | None -> Ckappa_sig.rule_id_of_int 0, Ckappa_sig.Rule_setmap.Map.empty
@@ -1243,8 +1243,7 @@ let collect_guard_mvbdus ?patch_collect_guard_mvbdus parameters error
         | None -> error, (mvbdu_handler, guard_mvbdus)
         | Some guard ->
           let error, mvbdu_handler, bdu =
-            Ckappa_sig.guard_to_bdu parameters error mvbdu_handler guard
-              bdu_restriction nsites
+            Ckappa_sig.guard_to_bdu parameters error mvbdu_handler guard nsites
           in
           ( error,
             ( mvbdu_handler,

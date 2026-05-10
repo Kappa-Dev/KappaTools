@@ -59,10 +59,6 @@ module Domain = struct
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
   let get_compil static = lift Analyzer_headers.get_cc_code static
   let get_nsites static = lift Analyzer_headers.get_nsites static
-
-  let get_restriction_mvbdu static =
-    lift Analyzer_headers.get_restriction_mvbdu static
-
   let get_guard_mvbdus static = lift Analyzer_headers.get_guard_mvbdus static
 
   (**domain *)
@@ -149,29 +145,28 @@ module Domain = struct
         { agents_liveness = seen_agent; liveness_current_working_set = None };
     }
 
-  let is_false_mvbdu parameters error dynamic mvbdu restriction_bdu =
+  let is_false_mvbdu parameters error dynamic mvbdu =
     let bdu_handler = get_mvbdu_handler dynamic in
-    let error, bdu_handler, is_false =
-      Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler error mvbdu
-        restriction_bdu
+    let error, bdu_handler, bdu_false =
+      Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
     in
+    let is_false = Ckappa_sig.Views_bdu.equal mvbdu bdu_false in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, is_false
 
-  let is_true_mvbdu parameters error dynamic mvbdu bdu_restriction =
+  let is_true_mvbdu parameters error dynamic mvbdu =
     let bdu_handler = get_mvbdu_handler dynamic in
-    let error, bdu_handler, is_true =
-      Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error mvbdu
-        bdu_restriction
+    let error, bdu_handler, bdu_true =
+      Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
     in
+    let is_true = Ckappa_sig.Views_bdu.equal bdu_true mvbdu in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, is_true
 
-  let or_mvbdu parameters error dynamic mvbdu mvbdu' bdu_restriction =
+  let or_mvbdu parameters error dynamic mvbdu mvbdu' =
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, output =
-      Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error mvbdu mvbdu'
-        bdu_restriction
+      Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler error mvbdu mvbdu'
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, output
@@ -449,15 +444,11 @@ module Domain = struct
     match mvbdu_opt with
     | None -> Exception.warn parameters error __POS__ Exit (dynamic, event_list)
     | Some old_mvbdu ->
-      let restriction_bdu = get_restriction_mvbdu static in
       let error, dynamic, new_mvbdu =
-        or_mvbdu parameters error dynamic old_mvbdu bdu_guard restriction_bdu
+        or_mvbdu parameters error dynamic old_mvbdu bdu_guard
       in
       let bdu_handler = get_mvbdu_handler dynamic in
-      let error, bdu_handler, b =
-        Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error old_mvbdu
-          new_mvbdu restriction_bdu
-      in
+      let b = Ckappa_sig.Views_bdu.equal old_mvbdu new_mvbdu in
       let dynamic = set_mvbdu_handler bdu_handler dynamic in
       if b then
         error, (dynamic, event_list)
@@ -524,7 +515,6 @@ module Domain = struct
   let init_agents ~new_init ?modified_agents static dynamic error init_state
       event_list =
     let parameters = get_parameter static in
-    let restriction_bdu = get_restriction_mvbdu static in
     let nsites = get_nsites static in
     let error, (dynamic, event_list) =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
@@ -540,7 +530,7 @@ module Domain = struct
             let bdu_handler = get_mvbdu_handler dynamic in
             let error, bdu_handler, mvbdu_guard =
               Ckappa_sig.guard_to_bdu_opt parameters error bdu_handler
-                init_state.Cckappa_sig.e_init_guard restriction_bdu nsites
+                init_state.Cckappa_sig.e_init_guard nsites
             in
             let dynamic = set_mvbdu_handler bdu_handler dynamic in
             let error, bool =
@@ -626,7 +616,6 @@ module Domain = struct
 
   let is_enabled static dynamic error rule_id precondition =
     let parameters = get_parameter static in
-    let restriction_bdu = get_restriction_mvbdu static in
     let domain_static = get_domain_static_information static in
     let error, (bot_or_not, _) =
       match
@@ -662,7 +651,6 @@ module Domain = struct
       in
       let error, dynamic, is_false =
         is_false_mvbdu parameters error dynamic state_guard_parameters
-          restriction_bdu
       in
       if is_false then
         error, dynamic, None
@@ -683,7 +671,6 @@ module Domain = struct
 
   let maybe_reachable static dynamic error _flag pattern precondition =
     let parameters = get_parameter static in
-    let restriction_bdu = get_restriction_mvbdu static in
     let error, dynamic, state_guard_parameters =
       get_state_of_guard_parameters parameters dynamic error precondition
     in
@@ -704,7 +691,6 @@ module Domain = struct
               in
               let error, dynamic, is_false =
                 is_false_mvbdu parameters error dynamic current_mvbdu
-                  restriction_bdu
               in
               if is_false then
                 raise (False (error, dynamic))
@@ -793,7 +779,6 @@ module Domain = struct
     let error, dynamic, array =
       get_seen_agent_without_working_set_vars parameters error static dynamic
     in
-    let restriction_bdu = get_restriction_mvbdu static in
     let kappa_handler = get_kappa_handler static in
     let error, (dead_agents_list, conditionally_dead_agents_list, dynamic) =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
@@ -801,7 +786,7 @@ module Domain = struct
         (fun _parameters error agent mvbdu
              (dead_agents_list, conditionally_dead_agents_list, dynamic) ->
           let error, dynamic, is_true =
-            is_true_mvbdu parameters error dynamic mvbdu restriction_bdu
+            is_true_mvbdu parameters error dynamic mvbdu
           in
           if not is_true then (
             let error, info =
@@ -816,7 +801,7 @@ module Domain = struct
               let info = a, list, c in
               let agent = Remanent_state.info_to_agent info in
               let error, dynamic, is_false =
-                is_false_mvbdu parameters error dynamic mvbdu restriction_bdu
+                is_false_mvbdu parameters error dynamic mvbdu
               in
               if is_false then
                 ( error,
@@ -866,9 +851,8 @@ module Domain = struct
             if not bool' then
               error, (false, dynamic)
             else (
-              let restriction_bdu = get_restriction_mvbdu static in
               let error, dynamic, is_true =
-                is_true_mvbdu parameters error dynamic mvbdu restriction_bdu
+                is_true_mvbdu parameters error dynamic mvbdu
               in
               ( error,
                 if is_true then
@@ -898,9 +882,8 @@ module Domain = struct
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold parameters
           error
           (fun parameters error k mvbdu dynamic ->
-            let restriction_bdu = get_restriction_mvbdu static in
             let error, dynamic, is_true =
-              is_true_mvbdu parameters error dynamic mvbdu restriction_bdu
+              is_true_mvbdu parameters error dynamic mvbdu
             in
             if is_true then
               error, dynamic
@@ -916,7 +899,7 @@ module Domain = struct
                   __POS__ Exit
               in
               let error, dynamic, is_false =
-                is_false_mvbdu parameters error dynamic mvbdu restriction_bdu
+                is_false_mvbdu parameters error dynamic mvbdu
               in
               let error, dynamic =
                 if is_false then (

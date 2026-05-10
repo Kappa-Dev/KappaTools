@@ -128,10 +128,6 @@ module Domain = struct
     lift Analyzer_headers.get_potential_side_effects static
 
   let get_guard_mvbdus static = lift Analyzer_headers.get_guard_mvbdus static
-
-  let get_restriction_mvbdu static =
-    lift Analyzer_headers.get_restriction_mvbdu static
-
   let get_nsites static = lift Analyzer_headers.get_nsites static
 
   let get_predicate_covering_classes static =
@@ -376,12 +372,11 @@ module Domain = struct
     let log_info = get_log_info dynamic in
     let remanent_triple = get_remanent_triple static in
     let guard_mvbdus = get_guard_mvbdus static in
-    let restriction_bdu = get_restriction_mvbdu static in
     let error, (handler_bdu, log_info, result) =
       Bdu_static_views.scan_rule_set ?start ?start_cv ~modified_agents
         ~patch_store_remanent_triple parameters log_info handler_bdu error
         kappa_handler compiled potential_side_effects remanent_triple
-        guard_mvbdus restriction_bdu (get_domain_static static)
+        guard_mvbdus (get_domain_static static)
     in
     let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
@@ -851,12 +846,15 @@ module Domain = struct
     error, bdu_handler, bdu_guard_renamed
 
   let dump_view_diff static dynamic error (agent_type, cv_id) bdu_old bdu_union
-      restriction_bdu =
+      =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let site_correspondence = get_site_correspondence_array static in
     let nsites = get_nsites static in
     let bdu_handler = get_mvbdu_handler dynamic in
+    let error, bdu_handler, bdu_true =
+      Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+    in
     if
       local_trace
       || Remanent_parameters.get_dump_reachability_analysis_diff parameters
@@ -926,10 +924,7 @@ module Domain = struct
             in
             (*-----------------------------------------------------------*)
             let () = if bool then Loggers.fprintf log ")" in
-            let error, bdu_handler, is_true =
-              Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler error
-                bdu restriction_bdu
-            in
+            let is_true = Ckappa_sig.Views_bdu.equal bdu bdu_true in
             let error, bdu_handler =
               if not is_true then (
                 let () =
@@ -973,18 +968,13 @@ module Domain = struct
       | error, Some bdu -> error, bdu
     in
     let bdu_handler = get_mvbdu_handler dynamic in
-    let restriction_bdu = get_restriction_mvbdu static in
     let error, bdu_handler, bdu_union =
-      Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error bdu_old bdu
-        restriction_bdu
+      Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler error bdu_old bdu
     in
     let updates_list = [] in
     (*-----------------------------------------------------------*)
     let error, dynamic, _title, is_new_views, updates_list =
-      let error, bdu_handler, are_equal =
-        Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error bdu_old
-          bdu_union restriction_bdu
-      in
+      let are_equal = Ckappa_sig.Views_bdu.equal bdu_old bdu_union in
       let dynamic = set_mvbdu_handler bdu_handler dynamic in
       if are_equal then
         error, dynamic, title, false, updates_list
@@ -1011,7 +1001,7 @@ module Domain = struct
         in
         let error, dynamic =
           dump_view_diff static dynamic error (agent_type, cv_id) bdu_old
-            bdu_union restriction_bdu
+            bdu_union
         in
         let error, store =
           Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
@@ -1051,10 +1041,8 @@ module Domain = struct
 
   (**************************************************************************)
   let build_init_guard_bdu parameters error bdu_handler guard static =
-    let restriction_bdu = get_restriction_mvbdu static in
     let nsites = get_nsites static in
-    Ckappa_sig.guard_to_bdu_opt parameters error bdu_handler guard
-      restriction_bdu nsites
+    Ckappa_sig.guard_to_bdu_opt parameters error bdu_handler guard nsites
 
   let build_init_restriction ~new_init static dynamic error init_state =
     let parameters = get_parameter static in
@@ -1175,7 +1163,6 @@ module Domain = struct
       fixpoint_result proj_bdu_test_restriction precondition handler_kappa =
     let nr_guard_parameters = Handler.get_nr_guard_parameters handler_kappa in
     let nsites = get_nsites static in
-    let restriction_bdu = get_restriction_mvbdu static in
     let error, dynamic, state_guard_parameters =
       get_state_of_guard_parameters parameters dynamic error precondition
     in
@@ -1202,10 +1189,7 @@ module Domain = struct
               bdu_test bdu_X
           in
           let dynamic = set_mvbdu_handler bdu_handler dynamic in
-          let error, bdu_handler, are_equal =
-            Ckappa_sig.mvbdu_equal_for_guards parameters bdu_handler error
-              bdu_inter bdu_false restriction_bdu
-          in
+          let are_equal = Ckappa_sig.Views_bdu.equal bdu_inter bdu_false in
           if are_equal then
             raise (False (error, dynamic))
           else (
@@ -2549,7 +2533,6 @@ module Domain = struct
     let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
     (*-----------------------------------------------------------*)
     let kappa_handler = get_kappa_handler static in
-    let restriction_bdu = get_restriction_mvbdu static in
     let error, dynamic, fixpoint_result =
       get_fixpoint_result_without_working_set_vars parameters error static
         dynamic
@@ -2641,14 +2624,13 @@ module Domain = struct
                         (*if it does not overlap then answer false, otherwise
                           continue*)
                         let error, bdu_handler, bdu_inter =
-                          Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler
+                          Ckappa_sig.Views_bdu.mvbdu_and parameters bdu_handler
                             error bdu_test bdu_X
                         in
-                        let error, bdu_handler, are_equal =
-                          Ckappa_sig.mvbdu_equal_for_guards parameters
-                            bdu_handler error bdu_inter bdu_false
-                            restriction_bdu
+                        let are_equal =
+                          Ckappa_sig.Views_bdu.equal bdu_inter bdu_false
                         in
+
                         let dynamic = set_mvbdu_handler bdu_handler dynamic in
                         (*check if it is overlap or not?*)
                         if are_equal then
@@ -2857,7 +2839,6 @@ module Domain = struct
   let compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X
       precondition_guard_bdu =
     let parameters = get_parameter static in
-    let restriction_bdu = get_restriction_mvbdu static in
     let parameter_views =
       Remanent_parameters.update_prefix parameters "\t\t\t"
     in
@@ -2877,8 +2858,8 @@ module Domain = struct
         bdu_redefine precondition_guard_bdu
     in
     let error, bdu_handler, bdu_result =
-      Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error bdu_with_guard
-        bdu_X restriction_bdu
+      Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler error bdu_with_guard
+        bdu_X
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, bdu_result
@@ -2899,15 +2880,14 @@ module Domain = struct
       precondition_guard_bdu =
     let parameters = get_parameter static in
     let bdu_handler = get_mvbdu_handler dynamic in
-    let restriction_bdu = get_restriction_mvbdu static in
     (* add guard information from the precondition*)
     let error, bdu_handler, bdu_with_guard =
       Ckappa_sig.mvbdu_and_for_guards parameters bdu_handler error bdu_creation
         precondition_guard_bdu
     in
     let error, bdu_handler, bdu_result =
-      Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error bdu_with_guard
-        bdu_X restriction_bdu
+      Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler error bdu_with_guard
+        bdu_X
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, bdu_result
@@ -2917,13 +2897,12 @@ module Domain = struct
   let compute_bdu_update_side_effects static dynamic error bdu_test list_a
       (bdu, bdu_X) precondition_guard_bdu =
     let parameters = get_parameter static in
-    let restriction_bdu = get_restriction_mvbdu static in
     let parameter_views =
       Remanent_parameters.update_prefix parameters "\t\t\t"
     in
     let bdu_handler = get_mvbdu_handler dynamic in
     let error, bdu_handler, bdu_inter =
-      Ckappa_sig.mvbdu_and_for_guards parameter_views bdu_handler error bdu_X
+      Ckappa_sig.Views_bdu.mvbdu_and parameter_views bdu_handler error bdu_X
         bdu_test
     in
     let error, bdu_handler, bdu_inter =
@@ -2938,13 +2917,13 @@ module Domain = struct
     in
     (* add guard information from the precondition*)
     let error, bdu_handler, bdu_with_guard =
-      Ckappa_sig.mvbdu_and_for_guards parameter_views bdu_handler error
+      Ckappa_sig.Views_bdu.mvbdu_and parameter_views bdu_handler error
         bdu_redefine precondition_guard_bdu
     in
     (*do the union of bdu_redefine and bdu_X*)
     let error, bdu_handler, bdu_result =
-      Ckappa_sig.mvbdu_or_for_guards parameters bdu_handler error bdu_with_guard
-        bdu_X restriction_bdu
+      Ckappa_sig.Views_bdu.mvbdu_or parameters bdu_handler error bdu_with_guard
+        bdu_X
     in
     let dynamic = set_mvbdu_handler bdu_handler dynamic in
     error, dynamic, bdu_result
@@ -3271,7 +3250,7 @@ module Domain = struct
 
   let stabilise_bdu_update_map_gen_decomposition decomposition ~smash
       ~show_dep_with_dimmension_higher_than:dim_min parameters bdu_handler error
-      handler_kappa site_correspondence result restriction_bdu with_threshold =
+      handler_kappa site_correspondence result with_threshold =
     let nsites = Handler.get_nsites handler_kappa in
     let log = Remanent_parameters.get_logger parameters in
     let threshold =
@@ -3290,6 +3269,12 @@ module Domain = struct
         Exception.check_point Exception.warn parameters error error' __POS__
           Exit
       in
+      let error, bdu_handler, bdu_true =
+        Ckappa_sig.Views_bdu.mvbdu_true parameters bdu_handler error
+      in
+      let error, bdu_handler, bdu_false =
+        Ckappa_sig.Views_bdu.mvbdu_false parameters bdu_handler error
+      in
       let error, (bdu_handler, list) =
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
           parameters error
@@ -3305,14 +3290,8 @@ module Domain = struct
             (*-----------------------------------------------------------*)
             Wrapped_modules.LoggedIntMap.fold
               (fun _ mvbdu (error, (bdu_handler, list)) ->
-                let error, bdu_handler, is_true =
-                  Ckappa_sig.mvbdu_is_true_for_guards parameters bdu_handler
-                    error mvbdu restriction_bdu
-                in
-                let error, bdu_handler, is_false =
-                  Ckappa_sig.mvbdu_is_false_for_guards parameters bdu_handler
-                    error mvbdu restriction_bdu
-                in
+                let is_true = Ckappa_sig.Views_bdu.equal mvbdu bdu_true in
+                let is_false = Ckappa_sig.Views_bdu.equal mvbdu bdu_false in
                 if (is_true && with_threshold) || is_false then
                   error, (bdu_handler, list)
                 else (
@@ -3320,7 +3299,7 @@ module Domain = struct
                     Translation_in_natural_language.translate parameters
                       bdu_handler error handler_kappa
                       (fun _ e i -> e, i)
-                      mvbdu nsites restriction_bdu
+                      mvbdu nsites
                   in
                   (*-------------------------------------------------------*)
                   ( error,
@@ -3391,7 +3370,6 @@ module Domain = struct
                   let error, (bdu_handler, translation) =
                     Translation_in_natural_language.translate parameters
                       bdu_handler error handler_kappa rename_site mvbdu nsites
-                      restriction_bdu
                   in
                   (*----------------------------------------------------*)
                   ( error,
@@ -3409,12 +3387,11 @@ module Domain = struct
 
   let print_bdu_update_map_gen_decomposition decomposition ~sort ~smash
       ~show_dep_with_dimmension_higher_than:dim_min parameters bdu_handler error
-      handler_kappa with_threshold site_correspondence result restriction_bdu =
+      handler_kappa with_threshold site_correspondence result =
     let error, bdu_handler, list =
       stabilise_bdu_update_map_gen_decomposition decomposition ~smash
         ~show_dep_with_dimmension_higher_than:dim_min parameters bdu_handler
-        error handler_kappa site_correspondence result restriction_bdu
-        with_threshold
+        error handler_kappa site_correspondence result with_threshold
     in
     let error, list =
       if sort then
@@ -3441,8 +3418,7 @@ module Domain = struct
         (fun (error, bdu_handler) (agent_string, agent_type, _, translation) ->
           Translation_in_natural_language.print
             ~show_dep_with_dimmension_higher_than:dim_min parameters
-            handler_kappa bdu_handler restriction_bdu error agent_string
-            agent_type translation)
+            handler_kappa bdu_handler error agent_string agent_type translation)
         (error, bdu_handler) list
     in
     error, bdu_handler
@@ -3539,7 +3515,7 @@ module Domain = struct
     error, bdu_handler
 
   let print_result_fixpoint_aux parameters bdu_handler error handler_kappa
-      site_correspondence result static =
+      site_correspondence result =
     let log = Remanent_parameters.get_logger parameters in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters then (
       let error =
@@ -3582,10 +3558,9 @@ module Domain = struct
           "------------------------------------------------------------"
       in
       let () = Loggers.print_newline log in
-      let og_restriction_bdu = get_restriction_mvbdu static in
       let error, bdu_handler =
         print_bdu_update_map_cartesian_abstraction parameters bdu_handler error
-          handler_kappa (i > 0) site_correspondence result og_restriction_bdu
+          handler_kappa (i > 0) site_correspondence result
       in
       let () = Loggers.print_newline log in
       let () =
@@ -3603,7 +3578,6 @@ module Domain = struct
       let error, bdu_handler =
         print_bdu_update_map_cartesian_decomposition ~sort:true parameters
           bdu_handler error handler_kappa (i > 0) site_correspondence result
-          og_restriction_bdu
       in
       error, bdu_handler
     ) else
@@ -3640,7 +3614,7 @@ module Domain = struct
         || Remanent_parameters.get_dump_reachability_analysis_result parameters
       then
         print_result_fixpoint_aux parameters bdu_handler error kappa_handler
-          site_correspondence fixpoint_result static
+          site_correspondence fixpoint_result
       else
         error, bdu_handler
     in
@@ -3842,15 +3816,14 @@ module Domain = struct
 
   let export_relation_properties_aux ~sort ~smash
       ~show_dep_with_dimmension_higher_than:dim_min decomposition domain_name
-      parameters dynamic error handler_kappa restriction_bdu with_threshold
-      site_correspondence fixpoint_result kasa_state =
+      parameters dynamic error handler_kappa with_threshold site_correspondence
+      fixpoint_result kasa_state =
     let bdu_handler = get_mvbdu_handler dynamic in
     (*convert result to list*)
     let error', bdu_handler, list =
       stabilise_bdu_update_map_gen_decomposition decomposition ~smash
         ~show_dep_with_dimmension_higher_than:dim_min parameters bdu_handler
-        error handler_kappa site_correspondence fixpoint_result restriction_bdu
-        with_threshold
+        error handler_kappa site_correspondence fixpoint_result with_threshold
     in
     let error =
       Exception.check_point Exception.warn parameters error error' __POS__ Exit
@@ -3904,7 +3877,7 @@ module Domain = struct
     error, dynamic, kasa_state
 
   let export_relation_properties parameters dynamic error handler_kappa
-      restriction_bdu with_threshold =
+      with_threshold =
     let domain_name = "Views domain - relational properties" in
     export_relation_properties_aux ~sort:false ~smash:true
       ~show_dep_with_dimmension_higher_than:
@@ -3916,29 +3889,26 @@ module Domain = struct
          else
            1)
       mvbdu_full_cartesian_decomposition domain_name parameters dynamic error
-      handler_kappa restriction_bdu with_threshold
+      handler_kappa with_threshold
 
   let export_non_relation_properties parameters dynamic error handler_kappa
-      restriction_bdu with_threshold =
+      with_threshold =
     let domain_name = "Views domain - non relational properties" in
     export_relation_properties_aux ~sort:true ~smash:true
       ~show_dep_with_dimmension_higher_than:1 mvbdu_cartesian_abstraction
-      domain_name parameters dynamic error handler_kappa restriction_bdu
-      with_threshold
+      domain_name parameters dynamic error handler_kappa with_threshold
 
-  let export_views_properties_aux parameters error handler_kappa restriction_bdu
+  let export_views_properties_aux parameters error handler_kappa
       site_correspondence fixpoint_result dynamic kasa_state with_threshold =
     (*non relational properties*)
     let error, dynamic, kasa_state =
       export_non_relation_properties parameters dynamic error handler_kappa
-        restriction_bdu with_threshold site_correspondence fixpoint_result
-        kasa_state
+        with_threshold site_correspondence fixpoint_result kasa_state
     in
     (*relational properties*)
     let error, dynamic, kasa_state =
       export_relation_properties parameters dynamic error handler_kappa
-        restriction_bdu with_threshold site_correspondence fixpoint_result
-        kasa_state
+        with_threshold site_correspondence fixpoint_result kasa_state
     in
     error, dynamic, kasa_state
 
@@ -3950,7 +3920,6 @@ module Domain = struct
       get_fixpoint_result_without_working_set_vars parameters error static
         dynamic
     in
-    let og_restriction_bdu = get_restriction_mvbdu static in
     let i =
       Ckappa_sig.int_of_guard_parameter
         (Handler.get_nr_guard_parameters handler_kappa)
@@ -3958,12 +3927,10 @@ module Domain = struct
     let error, dynamic, kasa_state =
       if i = 0 then
         export_views_properties_aux parameters error handler_kappa
-          og_restriction_bdu site_correspondence fixpoint_result dynamic
-          kasa_state false
+          site_correspondence fixpoint_result dynamic kasa_state false
       else
         export_views_properties_aux parameters error handler_kappa
-          og_restriction_bdu site_correspondence fixpoint_result dynamic
-          kasa_state true
+          site_correspondence fixpoint_result dynamic kasa_state true
     in
     error, dynamic, kasa_state
 

@@ -497,7 +497,7 @@ let collect_rule_partition_modified_map_2 parameters error
 (***************************************************************)
 
 let collect_potential_tuple_pair_init parameters error bdu_false bdu_handler
-    kappa_handler tuple_init store_result restriction_bdu guard_bdu =
+    kappa_handler tuple_init store_result guard_bdu =
   Site_across_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set.fold
     (fun (x, y) (error, bdu_handler, store_result) ->
       let agent_type, site_type1, site_type2, state1, pair_of_state2 = x in
@@ -521,7 +521,7 @@ let collect_potential_tuple_pair_init parameters error bdu_false bdu_handler
           bdu_handler kappa_handler
           ( (agent_type, site_type1, site_type2, state1),
             (agent_type', site_type1', site_type2', state1') )
-          mvbdu_with_guard store_result restriction_bdu
+          mvbdu_with_guard store_result
       in
       error, bdu_handler, store_result)
     tuple_init

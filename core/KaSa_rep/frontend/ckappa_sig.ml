@@ -1481,7 +1481,7 @@ let mvbdu_equal_for_guards parameters handler_bdu error mvbdu1 mvbdu2
 (**Returns the bdu representation of the guard, and a bdu that maps each guard parameter of the guard to 1 or 0.
 This second bdu is used to restrict the bdus that are calculated by using "or" and "not"
 to valid bdus where the values of the guards can only be 0 and 1. *)
-let guard_to_bdu parameters error handler_bdu guard bdu_restriction nsites =
+let guard_to_bdu parameters error handler_bdu guard nsites =
   let rec aux error handler_bdu guard =
     match guard with
     | Logical_formulae.True -> Views_bdu.mvbdu_true parameters handler_bdu error
@@ -1496,37 +1496,36 @@ let guard_to_bdu parameters error handler_bdu guard bdu_restriction nsites =
         association_list
     | Logical_formulae.NOT g1 ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
-      mvbdu_not_for_guards parameters handler_bdu error mvbdu1 bdu_restriction
+      Views_bdu.mvbdu_not parameters handler_bdu error mvbdu1
     | Logical_formulae.AND (g1, g2) ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
       let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
-      mvbdu_and_for_guards parameters handler_bdu error mvbdu1 mvbdu2
+      Views_bdu.mvbdu_and parameters handler_bdu error mvbdu1 mvbdu2
     | Logical_formulae.OR (g1, g2) ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
       let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
       let error, handler, result =
-        mvbdu_or_for_guards parameters handler_bdu error mvbdu1 mvbdu2
-          bdu_restriction
+        Views_bdu.mvbdu_or parameters handler_bdu error mvbdu1 mvbdu2
       in
+
       error, handler, result
     | Logical_formulae.IMPLY (g1, g2) ->
       let error, handler_bdu, mvbdu1 = aux error handler_bdu g1 in
       let error, handler_bdu, not_mvbdu1 =
-        mvbdu_not_for_guards parameters handler_bdu error mvbdu1 bdu_restriction
+        Views_bdu.mvbdu_not parameters handler_bdu error mvbdu1
       in
       let error, handler_bdu, mvbdu2 = aux error handler_bdu g2 in
       let error, handler, result =
-        mvbdu_or_for_guards parameters handler_bdu error not_mvbdu1 mvbdu2
-          bdu_restriction
+        Views_bdu.mvbdu_or parameters handler_bdu error not_mvbdu1 mvbdu2
       in
       error, handler, result
   in
   aux error handler_bdu guard
 
-let guard_to_bdu_opt parameters error handler_bdu guard bdu_restriction nsites =
+let guard_to_bdu_opt parameters error handler_bdu guard nsites =
   match guard with
   | None -> Views_bdu.mvbdu_true parameters handler_bdu error
-  | Some g -> guard_to_bdu parameters error handler_bdu g bdu_restriction nsites
+  | Some g -> guard_to_bdu parameters error handler_bdu g nsites
 
 (*****************************************************************************)
 
