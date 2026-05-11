@@ -71,6 +71,7 @@ type step_kind =
   | Print_reachability_result
   | Enable_or_disable_rule
   | Global_initialization_update
+  | Wake_up_computation
 
 let string_of_step_kind x =
   match x with
@@ -133,6 +134,7 @@ let string_of_step_kind x =
   | Enable_or_disable_rule -> Printf.sprintf "Enable or disable a rule"
   | Global_initialization_update ->
     Printf.sprintf "Update global initialization"
+  | Wake_up_computation -> Printf.sprintf "Compute dynamic table"
 
 let print_step_kind parameters x =
   Loggers.print_cell
@@ -308,6 +310,7 @@ module StoryStats : StoryStats = struct
   let is_dummy step_kind =
     match step_kind with
     | Dummy -> true
+    | Wake_up_computation
     | Beginning | Collect_traces | Causal_compression | Weak_compression
     | Strong_compression | Partial_order_reduction | Siphon_detection
     | Decompose_initial_state | Agent_ids_disambiguation

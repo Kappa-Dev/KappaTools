@@ -523,8 +523,17 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
       Domain.initialize ?patch:patch_domain ~modified_agents static dynamic
         error
     in
-
-    let parameters = get_parameter (static, domain_static) in
+    let global = Domain.get_global_dynamic_information domain_dynamic in 
+     let log_info = Analyzer_headers.get_log_info global in 
+      let error, log_info =
+      StoryProfiling.StoryStats.add_event parameters error 
+        StoryProfiling.Wake_up_computation None
+        log_info
+    in
+    let domain_dynamic = Domain.set_global_dynamic_information 
+    (Analyzer_headers.set_log_info log_info global) domain_dynamic in 
+   
+  let parameters = get_parameter (static, domain_static) in
     let error, wake_up_tmp =
       Common_static.empty_site_to_rules parameters error
     in
@@ -538,6 +547,16 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
     let static =
       Analyzer_headers.add_wake_up_relation static wake_up, domain_static
     in
+    let global = Domain.get_global_dynamic_information domain_dynamic in 
+     let log_info = Analyzer_headers.get_log_info global in 
+      let error, log_info =
+      StoryProfiling.StoryStats.close_event parameters error 
+        StoryProfiling.Wake_up_computation None
+        log_info
+    in
+    let domain_dynamic = Domain.set_global_dynamic_information 
+    (Analyzer_headers.set_log_info log_info global) domain_dynamic in 
+   
     let working_list = empty_working_list in
     let error, sites_blackboard =
       Communication.init_sites_working_list parameters error
