@@ -720,9 +720,11 @@ module Domain = struct
      tuples, and apply the function Common_static.add_dependency_site_rule to
        update the wake_up relation *)
 
-  let complete_wake_up_relation static error wake_up =
+  let complete_wake_up_relation ?patch static error wake_up =
+    let _ = patch in 
     let parameters = get_parameter static in
     (*dealing with create a binding sites *)
+    (* TODO make all of this incrementatl *)
     let store_rule_partition_created_bonds_map_1 =
       get_rule_partition_created_bonds_map_1 static
     in

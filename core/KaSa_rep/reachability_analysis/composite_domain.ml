@@ -96,6 +96,9 @@ module type Composite_domain = sig
     dynamic_information ->
     dynamic_information
 
+  val get_global_static_information :
+    static_information -> Analyzer_headers.global_static_information
+
   val get_parameters : static_information -> Remanent_parameters_sig.parameters
   val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
   val get_working_set_mvbdu : static_information -> Ckappa_sig.Views_bdu.mvbdu
@@ -241,12 +244,12 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
   let push_modified_site static dynamic error agent site =
     let wake_up = get_wake_up_relation static in
     let parameter = get_parameter static in
-    let error, rules_list =
+    let error, rules_set =
       Common_static.wake_up parameter error agent site wake_up
     in
-    List.fold_left
-      (fun (error, dynamic) r_id -> push_rule static dynamic error r_id)
-      (error, dynamic) rules_list
+    Ckappa_sig.Rule_map_and_set.Set.fold
+      (fun r_id (error, dynamic) -> push_rule static dynamic error r_id)
+      rules_set (error, dynamic)
 
   (**[next_rule static dynamic] returns a rule_id inside a working list
      if it is not empty*)
@@ -466,6 +469,11 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
           (fun (error, dynamic) r_id -> push_rule static dynamic error r_id)
           (error, dynamic) l
       in
+      let f_set l error dynamic =
+        Ckappa_sig.Rule_map_and_set.Set.fold
+          (fun r_id (error, dynamic) -> push_rule static dynamic error r_id)
+          l (error, dynamic)
+      in
       let error, dynamic = f check_rules error dynamic in
       let wake_up = Analyzer_headers.get_wake_up_relation (fst static) in
       let error, dynamic =
@@ -474,7 +482,7 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
             let error, list_r_id =
               Common_static.wake_up parameter error agent site wake_up
             in
-            f list_r_id error dynamic)
+            f_set list_r_id error dynamic)
           modified_sites_blackboard dynamic
       in
       let error, dynamic =
@@ -523,40 +531,38 @@ module Make (Domain : Analyzer_domain_sig.Domain) = struct
       Domain.initialize ?patch:patch_domain ~modified_agents static dynamic
         error
     in
-    let global = Domain.get_global_dynamic_information domain_dynamic in 
-     let log_info = Analyzer_headers.get_log_info global in 
-      let error, log_info =
-      StoryProfiling.StoryStats.add_event parameters error 
-        StoryProfiling.Wake_up_computation None
-        log_info
+    let global = Domain.get_global_dynamic_information domain_dynamic in
+    let log_info = Analyzer_headers.get_log_info global in
+    let error, log_info =
+      StoryProfiling.StoryStats.add_event parameters error
+        StoryProfiling.Wake_up_computation None log_info
     in
-    let domain_dynamic = Domain.set_global_dynamic_information 
-    (Analyzer_headers.set_log_info log_info global) domain_dynamic in 
-   
-  let parameters = get_parameter (static, domain_static) in
-    let error, wake_up_tmp =
-      Common_static.empty_site_to_rules parameters error
+    let domain_dynamic =
+      Domain.set_global_dynamic_information
+        (Analyzer_headers.set_log_info log_info global)
+        domain_dynamic
     in
-    let error, wake_up_tmp =
-      Domain.complete_wake_up_relation domain_static error wake_up_tmp
-    in
+
+    let parameters = get_parameter (static, domain_static) in
+    let wake_up = Analyzer_headers.get_wake_up_relation static in
     let error, wake_up =
-      Common_static.consolidate_site_rule_dependencies parameters error
-        wake_up_tmp
+      Domain.complete_wake_up_relation domain_static error wake_up
     in
     let static =
       Analyzer_headers.add_wake_up_relation static wake_up, domain_static
     in
-    let global = Domain.get_global_dynamic_information domain_dynamic in 
-     let log_info = Analyzer_headers.get_log_info global in 
-      let error, log_info =
-      StoryProfiling.StoryStats.close_event parameters error 
-        StoryProfiling.Wake_up_computation None
-        log_info
+    let global = Domain.get_global_dynamic_information domain_dynamic in
+    let log_info = Analyzer_headers.get_log_info global in
+    let error, log_info =
+      StoryProfiling.StoryStats.close_event parameters error
+        StoryProfiling.Wake_up_computation None log_info
     in
-    let domain_dynamic = Domain.set_global_dynamic_information 
-    (Analyzer_headers.set_log_info log_info global) domain_dynamic in 
-   
+    let domain_dynamic =
+      Domain.set_global_dynamic_information
+        (Analyzer_headers.set_log_info log_info global)
+        domain_dynamic
+    in
+
     let working_list = empty_working_list in
     let error, sites_blackboard =
       Communication.init_sites_working_list parameters error

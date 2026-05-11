@@ -27,6 +27,7 @@ module type Set = sig
   val is_empty : t -> bool
   val singleton : elt -> t
   val is_singleton : t -> bool
+  val of_list : elt list -> t
   val add : elt -> t -> t
 
   val add_with_logs :
@@ -558,6 +559,36 @@ module Make (Ord : OrderedType) : S with type elt = Ord.t = struct
         add_while_testing_freshness warn parameters error new_value set
       in
       error, set
+
+    let of_sorted_list l =
+      let rec sub n l =
+        match n, l with
+        | 0, l -> empty, l
+        | 1, x0 :: l -> node empty x0 empty, l
+        | 2, x0 :: x1 :: l -> node (node empty x0 empty) x1 empty, l
+        | 3, x0 :: x1 :: x2 :: l ->
+          node (node empty x0 empty) x1 (node empty x2 empty), l
+        | n, l ->
+          let nl = n / 2 in
+          let left, l = sub nl l in
+          (match l with
+          | [] -> assert false
+          | mid :: l ->
+            let right, l = sub (n - nl - 1) l in
+            node left mid right, l)
+      in
+      fst (sub (List.length l) l)
+
+    let of_list l =
+      match l with
+      | [] -> empty
+      | [ x0 ] -> singleton x0
+      | [ x0; x1 ] -> add x1 (singleton x0)
+      | [ x0; x1; x2 ] -> add x2 (add x1 (singleton x0))
+      | [ x0; x1; x2; x3 ] -> add x3 (add x2 (add x1 (singleton x0)))
+      | [ x0; x1; x2; x3; x4 ] ->
+        add x4 (add x3 (add x2 (add x1 (singleton x0))))
+      | _ -> of_sorted_list (List.sort_uniq Ord.compare l)
 
     let rec join left value right =
       match left, right with

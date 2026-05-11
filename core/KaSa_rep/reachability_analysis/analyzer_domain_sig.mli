@@ -49,10 +49,11 @@ module type Domain = sig
     * Communication.event list
 
   val complete_wake_up_relation :
+    ?patch:Diff.new_indexs ->
     static_information ->
     Exception.exceptions_caught_and_uncaught ->
-    Common_static.site_to_rules_tmp ->
-    Exception.exceptions_caught_and_uncaught * Common_static.site_to_rules_tmp
+    Common_static.site_to_rules ->
+    Exception.exceptions_caught_and_uncaught * Common_static.site_to_rules
 
   type 'a zeroary =
     static_information ->

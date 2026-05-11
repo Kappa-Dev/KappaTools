@@ -1273,13 +1273,33 @@ let compute_working_set_mvbdu parameters error mvbdu_handler compilation nsites
 (******************************************************************)
 (******************************************************************)
 
-type site_to_rules_tmp =
+type site_to_rules =
   Ckappa_sig.Rule_map_and_set.Set.t
   Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t
 
-type site_to_rules =
-  Ckappa_sig.c_rule_id list
-  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t
+let dump_wake_up parameters error a =
+  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.iter
+    parameters error
+    (fun p e (ag, site) s ->
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger p)
+          "%i.%i: "
+          (Ckappa_sig.int_of_agent_name ag)
+          (Ckappa_sig.int_of_site_name site)
+      in
+      let () =
+        Ckappa_sig.Rule_map_and_set.Set.iter
+          (fun elt ->
+            Loggers.fprintf
+              (Remanent_parameters.get_logger p)
+              "%i, "
+              (Ckappa_sig.int_of_rule_id elt))
+          s
+      in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger p) in
+      e)
+    a
 
 let add_dependency_site_rule parameter error agent site rule_id site_to_rules =
   let error, oldset =
@@ -1294,30 +1314,23 @@ let add_dependency_site_rule parameter error agent site rule_id site_to_rules =
     Ckappa_sig.Rule_map_and_set.Set.add_when_not_in parameter error rule_id
       oldset
   in
-  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
-    parameter error (agent, site) newset site_to_rules
+  if newset == oldset then
+    error, site_to_rules
+  else
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
+    .set parameter error (agent, site) newset site_to_rules
 
 let empty_site_to_rules parameter error =
   Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
   .create parameter error (0, 0)
-
-let consolidate_site_rule_dependencies parameter error site_to_rules =
-  let error, output = empty_site_to_rules parameter error in
-  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
-    parameter error
-    (fun parameter error key set output ->
-      let list = Ckappa_sig.Rule_map_and_set.Set.elements set in
-      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
-      .set parameter error key list output)
-    site_to_rules output
 
 let wake_up parameter error agent site site_to_rules =
   match
     Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
     .unsafe_get parameter error (agent, site) site_to_rules
   with
-  | error, None -> error, []
-  | error, Some l -> error, l
+  | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
+  | error, Some set -> error, set
 
 let get_tuple_of_interest parameters error agent site map =
   match
@@ -1328,19 +1341,14 @@ let get_tuple_of_interest parameters error agent site map =
   | error, Some s -> error, s
 
 let remove_rule_list parameters errors site_to_rules l' =
-  let rec aux list l acc =
-    match list, l with
-    | [], _ -> List.rev acc
-    | _, [] -> List.rev acc @ list
-    | a :: b, t :: _ when compare a t < 0 -> aux b l (a :: acc)
-    | a :: b, t :: q when compare a t = 0 -> aux b q acc
-    | a :: _, t :: q when compare a t > 0 -> aux list q acc
-    | _, _ -> assert false
+  let set' = Ckappa_sig.Rule_map_and_set.Set.of_list l' in
+  let diff parameters error l l' =
+    Ckappa_sig.Rule_map_and_set.Set.diff parameters error l l'
   in
-  let diff l l' = aux l l' [] in
   Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
     parameters errors
     (fun parameters errors i l m ->
+      let errors, new_l = diff parameters errors l set' in
       Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
-      .set parameters errors i (diff l l') m)
+      .set parameters errors i new_l m)
     site_to_rules site_to_rules

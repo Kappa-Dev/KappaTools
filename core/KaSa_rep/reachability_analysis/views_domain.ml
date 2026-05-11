@@ -276,13 +276,21 @@ module Domain = struct
     let result_static = get_bdu_analysis_static static in
     result_static.Bdu_static_views.store_proj_bdu_creation_restriction_map
 
-  let get_store_proj_bdu_potential_restriction static =
-    let result_static = get_bdu_analysis_static static in
-    result_static.Bdu_static_views.store_proj_bdu_potential_restriction_map
-
   let get_store_modif_list_restriction_map static =
     let result_static = get_bdu_analysis_static static in
     result_static.Bdu_static_views.store_modif_list_restriction_map
+
+  let get_patch_store_modif_list_restriction_map static =
+    let result_static = get_bdu_analysis_static static in
+    result_static.Bdu_static_views.store_patch_modif_list_restriction_map
+
+ let get_patch_store_proj_bdu_potential_restriction_map static = 
+  let result_static = get_bdu_analysis_static static in
+    result_static.Bdu_static_views.store_patch_proj_bdu_potential_restriction_map 
+
+  let get_patch_store_proj_bdu_test_restriction static = 
+    let result_static = get_bdu_analysis_static static in
+    result_static.Bdu_static_views.store_patch_proj_bdu_test_restriction 
 
   let get_site_to_renamed_site_list static =
     let result_static = get_bdu_analysis_static static in
@@ -491,6 +499,8 @@ module Domain = struct
           {
             static' with
             global_static_information = static;
+            domain_static_information =
+              Bdu_static_views.reset static'.domain_static_information;
             domain_static_information_covering_class;
           },
           { global = dynamic; local },
@@ -548,19 +558,19 @@ module Domain = struct
     in
     error, wake_up
 
-  let complete_wake_up_relation static error wake_up =
+  let complete_wake_up_relation ?patch static error wake_up =
+    let _ = patch in 
     let parameters = get_parameter static in
     let store_list_of_site_type_in_covering_classes =
       (* TO DO *)
       get_list_of_site_type_in_covering_classes static
     in
     let store_modif_list_restriction_map =
-      (* TO DO *)
-      get_store_modif_list_restriction_map static
+      get_patch_store_modif_list_restriction_map static
     in
     let error, wake_up =
       Covering_classes_type.AgentsRuleCV_map_and_set.Map.fold
-        (fun (_, agent_type, rule_id, cv_id) _ (error, wake_up) ->
+        (fun (_agent_id, agent_type, rule_id, cv_id) _ (error, wake_up) ->
           let error, wake_up =
             add_wake_up_common parameters error rule_id (agent_type, cv_id)
               store_list_of_site_type_in_covering_classes wake_up
@@ -569,7 +579,7 @@ module Domain = struct
         store_modif_list_restriction_map (error, wake_up)
     in
     let store_proj_bdu_potential_restriction_map =
-      get_store_proj_bdu_potential_restriction static
+      get_patch_store_proj_bdu_potential_restriction_map static
     in
     let error, wake_up =
       Ckappa_sig.Rule_setmap.Map.fold
@@ -585,7 +595,7 @@ module Domain = struct
         store_proj_bdu_potential_restriction_map (error, wake_up)
     in
     let store_proj_bdu_test_restriction =
-      get_store_proj_bdu_test_restriction static
+      get_patch_store_proj_bdu_test_restriction static
     in
     let error, wake_up =
       Ckappa_sig.Rule_setmap.Map.fold

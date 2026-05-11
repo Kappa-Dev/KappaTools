@@ -415,7 +415,9 @@ module Domain = struct
     in
     error, static, dynamic, modified_agents, []
 
-  let complete_wake_up_relation _static error wake_up = error, wake_up
+  let complete_wake_up_relation ?patch _static error wake_up = 
+     let _ = patch in 
+      error, wake_up
 
   (***************************************************************************)
   (*JF: Here, you should add in the event list, each rule that test for an

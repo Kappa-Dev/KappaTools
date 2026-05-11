@@ -224,6 +224,11 @@ module Make (Domain : Composite_domain.Composite_domain) = struct
       in
       error, static, dynamic, Some modified_agents
     in
+    let global_static =
+      Analyzer_headers.add_wake_up_relation global_static
+        (Analyzer_headers.get_wake_up_relation
+           (Domain.get_global_static_information static))
+    in
     let error, dynamic =
       close_event parameters error domain_event None dynamic
     in

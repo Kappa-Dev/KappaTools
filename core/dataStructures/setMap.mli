@@ -32,6 +32,7 @@ module type Set = sig
   val is_empty : t -> bool
   val singleton : elt -> t
   val is_singleton : t -> bool
+  val of_list : elt list -> t
   val add : elt -> t -> t
 
   val add_with_logs :

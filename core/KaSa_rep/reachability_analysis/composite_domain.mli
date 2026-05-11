@@ -98,6 +98,9 @@ module type Composite_domain = sig
     dynamic_information ->
     dynamic_information
 
+  val get_global_static_information :
+    static_information -> Analyzer_headers.global_static_information
+
   val get_parameters : static_information -> Remanent_parameters_sig.parameters
   val enable_or_disable_rule : (Cckappa_sig.compil, static_information) unary
   val get_working_set_mvbdu : static_information -> Ckappa_sig.Views_bdu.mvbdu

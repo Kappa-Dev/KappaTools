@@ -584,9 +584,11 @@ module Domain = struct
   (* fold over all the rules, all the tuples of interest, all the sites in
      these tuples, and apply the function Common_static.add_dependency_site_rule
      to update the wake_up relation *)
-  let complete_wake_up_relation static error wake_up =
+  let complete_wake_up_relation ?patch static error wake_up =
+     let _ = patch in 
     let parameters = get_parameter static in
     (*fst site created a parallel bonds*)
+    (* TO DO make this incremental *)
     let store_rule_double_bonds_rhs = get_rule_double_bonds_rhs static in
     let store_rule_double_bonds_lhs = get_rule_double_bonds_lhs static in
     (*----------------------------------------------------*)

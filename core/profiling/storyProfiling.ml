@@ -310,10 +310,9 @@ module StoryStats : StoryStats = struct
   let is_dummy step_kind =
     match step_kind with
     | Dummy -> true
-    | Wake_up_computation
-    | Beginning | Collect_traces | Causal_compression | Weak_compression
-    | Strong_compression | Partial_order_reduction | Siphon_detection
-    | Decompose_initial_state | Agent_ids_disambiguation
+    | Wake_up_computation | Beginning | Collect_traces | Causal_compression
+    | Weak_compression | Strong_compression | Partial_order_reduction
+    | Siphon_detection | Decompose_initial_state | Agent_ids_disambiguation
     | Pseudo_inverse_deletion | Remove_events_after_last_observable
     | Compression | Build_grid | Build_configuration | Transitive_closure
     | Graph_reduction | Graph_conversion | Cannonic_form_computation

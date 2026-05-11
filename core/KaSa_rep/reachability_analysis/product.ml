@@ -100,12 +100,12 @@ module Product
       modified_agents,
       List.fold_left (fun list a -> a :: list) event_list event_list' )
 
-  let complete_wake_up_relation static error wake_up =
+  let complete_wake_up_relation ?patch static error wake_up =
     let error, wake_up =
-      Underlying_domain.complete_wake_up_relation static.underlying_domain error
+      Underlying_domain.complete_wake_up_relation ?patch static.underlying_domain error
         wake_up
     in
-    New_domain.complete_wake_up_relation static.new_domain error wake_up
+    New_domain.complete_wake_up_relation ?patch static.new_domain error wake_up
 
   type 'a zeroary =
     static_information ->

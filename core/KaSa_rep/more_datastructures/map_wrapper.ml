@@ -10,6 +10,7 @@ module type Set_with_logs = sig
   val is_empty : t -> bool
   val singleton : elt -> t
   val is_singleton : t -> bool
+  val of_list : elt list -> t
 
   val add :
     Remanent_parameters_sig.parameters ->
@@ -419,6 +420,7 @@ module Make (S_both : SetMap.S) :
     let singleton = S_both.Set.singleton
     let is_singleton = S_both.Set.is_singleton
     let add = lift S_both.Set.add_with_logs
+    let of_list = S_both.Set.of_list
 
     let add_when_not_in p e x s =
       let e, _, s = (lift S_both.Set.add_while_testing_freshness) p e x s in
