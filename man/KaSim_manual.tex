@@ -77,7 +77,7 @@
 \input{generated_img/version}
 
 \title{Kappa tools reference manual\\ \small (release \version)}
-\author{Pierre Boutillier, J\'er\^ome Feret\thanks{corresponding author: jereom.feret@inria.fr}, Jean Krivine\thanks{corresponding author: jean.krivine@irif.fr}, Rebecca Ghidini, Antoine Pouille and L\'y Kim Quy\^en \\\href{http://www.kappalanguage.org}{KappaLanguage.org}}
+\author{Pierre Boutillier, J\'er\^ome Feret\thanks{corresponding author: jerome.feret@inria.fr}, Jean Krivine\thanks{corresponding author: jean.krivine@irif.fr}, Rebecca Ghidini, Antoine Pouille and L\'y Kim Quy\^en \\\href{http://www.kappalanguage.org}{KappaLanguage.org}}
 
 \date{}
                                     % Activate to display a given date or no date
@@ -146,7 +146,7 @@ can consult the following note
 \href{http://www.research.ed.ac.uk/portal/files/16869853/Agile_Modelling_of_Cellular_Signalling_Invited_Paper_.pdf}{Agile
   modelling of cellular signalling (SOS'08)}. A longer article,
 expounding on causal analysis is also available:
-\href{http://fontana.med.harvard.edu/www/Documents/WF/Papers/signaling.causality.pdf}{Rule-based
+\href{https://fontana.hms.harvard.edu/sites/fontana.hms.harvard.edu/files/documents/signaling.causality.pdf}{Rule-based
   modelling of cellular signalling (CONCUR'07)}. See also this
 tutorial:
 \href{https://hal.archives-ouvertes.fr/hal-00692430}{Modelling
@@ -158,12 +158,12 @@ tutorial:
 
 \section{Show me a running example}\label{chap:abc}
 See it really running in the online user interface by clicking on the
-\emph{try} button on \url{https://www.kappalanguage.org/}.
+\emph{``online UI''} button on \url{https://www.kappalanguage.org/}.
 
 %Quyen:To load the online user interface by chosing the
 %\emph{try} button on \url{https://www.kappalanguage.org/}.
 
-A minimal \Kappa model looks like:
+A minimal \Kappa{} model looks like:
 
 % Quyen:A minimal \Kappa model is described as follow:
 %agent: B(x)               // Declaration of agent B
@@ -545,8 +545,7 @@ One may use the shortcut:
 \ITE{
 \item[] \ttt{\%obs: {\textquotesingle}var\_name{\textquotesingle} }
   \textit{algebraic\_expression}} to declare a variable and at the
-same time require it to be outputted in the data file\index{data
-  file}.
+same time require it to be outputted in the data file\index{data file}.
 
 \section{Rules}\label{sec:rules}
 
@@ -640,12 +639,12 @@ its internal state is, may beget a new copy of \ttt{A} bound to it
 \via site \ttt{x}.
 
 Note that in the RHS, the interface of the new copy is not completely
-described. Following the DCDW convention\index{don't care don't
-  write}, \KaSim~will assume that the sites that are not
+described. Following the DCDW convention\index{don't care don't write},
+\KaSim~will assume that the sites that are not
 mentioned are created in the \emph{default state}\index{default
   state}, {\ie}they appear free of any bond and their internal state
-(if any) is the first of the list shown in the signature\index{agent
-  signature} (here state \ttt{u} for \ttt{y} and \ttt{0} for \ttt{z}).
+(if any) is the first of the list shown in the signature\index{agent signature}
+ (here state \ttt{u} for \ttt{y} and \ttt{0} for \ttt{z}).
 
 \subsubsection*{Side effects}\label{sec:side-effect}
 
@@ -926,8 +925,8 @@ given in Table~\ref{tab:tokens}, the number of consumed (and produced)
 tokens can be given by a sum of the form: \ITE{
 \item[] \ttt{\textit{lhs} | a$_1$ t$_1$, ..., a$_n$ t$_n$ $\rar$
   \textit{rhs} | a$_1'$ t$_1'$, ..., a$_k'$ t$_k'$ @ r} } where each
-$a_i,a_i'$ is an arbitrary algebraic expression\index{algebraic
-  expression} ({\eg}see Table~\ref{tab:alg}) and each $t_i,t_i'$ is a
+$a_i,a_i'$ is an arbitrary algebraic expression\index{algebraic expression}
+({\eg}see Table~\ref{tab:alg}) and each $t_i,t_i'$ is a
 declared token. In the above hybrid rule, denoting by  $n_i,n_i'$ the
 respective evaluation of $a_i$ and $a_i'$, the concentration of token $t_i$ will
 decrease from $n_i$ and the concentration of token $t_i'$ will
@@ -969,8 +968,8 @@ where \textit{algebraic\_expression} is evaluated before
 initialization of the simulation (hence all token and Kappa expression
 values in the expression are evaluated to 0). This will add to the
 initial state of the model multiple copies of the graph described by
-the Kappa expression. The DCDW convention\index{don't care don't
-  write} allows us not to write the complete interface of added agents
+the Kappa expression. The DCDW convention\index{don't care don't write}
+ allows us not to write the complete interface of added agents
 (the remaining sites will be completed according to the agent's
 signature\index{agent signature}). For instance:
 \begin{lstlisting}[language=kappa]
@@ -1075,8 +1074,7 @@ the number of \lstinline[language=kappa]@|B(x[_])|@ becomes bigger than the numb
 
 When the conditions of several interventions that are tested at the
 same moment are satisfied simultanously, interventions are triggered
-in the order in which they have been declared in the KF\index{Kappa
-  file}. A intervention can only be fired once per event loop.
+in the order in which they have been declared in the KF\index{Kappa file}. A intervention can only be fired once per event loop.
 
 \subsection{shortcuts}
 If the repeat keyword and the repeat condition are ommited, it is assumed that it is
