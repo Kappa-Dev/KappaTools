@@ -28,7 +28,7 @@ def main(input_file, output_file):
         "lines.markersize": 4
     })
 
-    fig, ax = plt.subplots(figsize=(6,4))
+    fig, ax = plt.subplots(figsize=(8,4))
 
     colors = plt.get_cmap("tab10").colors
 
@@ -38,8 +38,6 @@ def main(input_file, output_file):
     ax.set_xlabel("Number of rules in the current chapter")
     ax.set_ylabel("Runtime (s)")
     ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.6)
-
-    ax.set_yscale("log")
 
     ax.legend(frameon=False, ncol=2)
 
