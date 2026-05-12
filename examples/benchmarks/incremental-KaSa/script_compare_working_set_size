@@ -80,7 +80,7 @@ done
 shift $((OPTIND - 1))
 
 MIN_NR_RULES=0
-MAX_NR_RULES=60
+MAX_NR_RULES=80
 STEP=10
 
 if $DEBUG; then
