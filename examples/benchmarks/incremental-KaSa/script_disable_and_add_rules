@@ -253,7 +253,67 @@ for MODEL in "${MODELS[@]}"; do
             break
         fi
 
+          
+        # PARAMETRIC MODEL ANALYSIS
+
+        if $VERBOSE; then
+            echo "➖ Starting parametric models analysis:"
+        fi
         
+        # choose 10 random rules to be added to the working set
+        random_rules=$(paste -s -d ',' <(shuf -i 0-$NR_RULES_MODEL -n "$NR_RULES"))
+
+        if $VERBOSE; then 
+            echo "Random list of rules that are in the working set: $random_rules"
+        fi
+
+        # choose a random valuation (true or false) for each of the rules in the working set
+        false_indices=()
+        for ((n=0; n<NR_RULES; n++)); do
+            val=$((RANDOM % 2))
+            if [ "$val" -eq 0 ]; then
+                false_indices+=("$n")
+            fi
+        done
+       
+        echo "q" > "$INPUT_INCREMENTAL_TMP"
+        
+        if $VERBOSE; then
+            echo "PARAMETRIC MODELS COMMANDS:"
+            cat "$INPUT_INCREMENTAL_TMP"
+        fi
+
+        cmd=(
+        timeout "$TIMEOUT"
+        "$KASA_INC_BINARY"
+        "$EXAMPLE_MODEL"
+        -syntax "$SYNTAX"
+        $OPTIONS
+        --rules-in-working-set "$random_rules"
+        )
+        if $VERBOSE; then
+            printf '%q ' cat "$INPUT_INCREMENTAL_TMP" '|' "${cmd[@]}"
+            printf '\n'
+        fi
+        { cat "$INPUT_INCREMENTAL_TMP"| ${cmd[@]}; } >> "$STDOUT_OUTPUT_FILE_DECREMENTAL"
+        EXIT_STATUS=$?
+
+        # Check if the program was killed by timeout
+        if [ $EXIT_STATUS -eq 124 ]; then
+            echo "⚠️ Timeout or memory overflow occurred for $MODEL in the decremental analysis."
+            break
+        fi
+
+        # copy runtimes from output/profiling.html to the csv output file
+        # initial analysis
+        store_runtime_from_profiling "Global initialization" "$MODEL,$NR_RULES_MODEL,2_decremental,1_init,1_initialization,$i,$NR_RULES"
+        store_runtime_from_profiling "Initial states computation" "$MODEL,$NR_RULES_MODEL,2_decremental,1_init,2_initial_state,$i,$NR_RULES"
+        store_runtime_from_profiling "Compute fixpoint of reachability analysis" "$MODEL,$NR_RULES_MODEL,2_decremental,1_init,3_fixpoint,$i,$NR_RULES"
+        # projection to the chosen valuation (and printing)
+          store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,2_decremental,1_init,5_print,$i,$NR_RULES"
+      
+
+
         # DECREMENTAL ANALYSIS
 
         if $VERBOSE; then
@@ -312,13 +372,11 @@ for MODEL in "${MODELS[@]}"; do
         fi
 
         # copy runtimes from output/profiling.html to the csv output file
-        # initial analysis
-        store_runtime_from_profiling "Global initialization" "$MODEL,$NR_RULES_MODEL,2_decremental,1_init,1_initialization,$i,$NR_RULES"
-        store_runtime_from_profiling "Initial states computation" "$MODEL,$NR_RULES_MODEL,2_decremental,1_init,2_initial_state,$i,$NR_RULES"
-        store_runtime_from_profiling "Compute fixpoint of reachability analysis" "$MODEL,$NR_RULES_MODEL,2_decremental,1_init,3_fixpoint,$i,$NR_RULES"
         # projection to the chosen valuation (and printing)
         store_runtime_from_profiling "Enable or disable a rule" "$MODEL,$NR_RULES_MODEL,2_decremental,4_disable,4_disable,$i,$NR_RULES"
-        store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,2_decremental,4_disable,5_print,$i,$NR_RULES" 
+        store_runtime_from_profiling "Print result of reachability analysis" "$MODEL,$NR_RULES_MODEL,2_decremental,4_disable,5_print,$i,$NR_RULES"
+
+
 
         # INCREMENTAL ADDING OFcode RULES
         # I redo the analysis instead of just adding the rules to he previous instance of the analysis, because the "update file" resets the profiling.html
