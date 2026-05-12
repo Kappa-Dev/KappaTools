@@ -2418,6 +2418,123 @@ There are some structural invariants in these models. We give in Fig.~\ref{fig:r
 \label{fig:reachability_influence}
 \end{figure}
 
+\section{Parametric models}
+
+Kappa provides the possibility to define \emph{parametric models}\index{parametric models}, in which a set of Boolean predicates are used to describe different possible versions of the model~\cite{cmsb2025FG}.
+Each rule and initial state can optionally be preceded by a boolean formula that contains these Boolean predicates. The static analysis will then infer the relationship between the reachability properties and the valuation (true or false) of the predicates. 
+
+The syntax for the boolean formulas that can be used to guard rules and initial states are defined in Table~\ref{tab:formulas}.
+
+
+\begin{table}[htbp]
+  \centering
+  \caption{The syntax of guards for rules and initial states.}
+  \begin{tabular}{@{} lcl @{}}
+        \textit{guard\_expression} &::=& \tcb{Id} | \tcb{[true]} | \tcb{[false]} \\
+    && | (\textit{guard\_expression} \tcb{||} \textit{guard\_expression}) \\
+    && | (\textit{guard\_expression} \tcb{\&\&} \textit{guard\_expression}) \\
+    && | \tcb{[not]} \textit{guard\_expression} \\\\
+    \textit{guard}\index{guard expression} &::=& \tcb{\#[}\textit{guard\_expression}\tcb{]} \\
+  \end{tabular}
+  \label{tab:formulas}
+\end{table}
+
+In order to run a simulation, the value of every predicate must be defined. The simulation will then take into account only the elements whose preceding boolean formula evaluates to true in the current valuation. 
+
+The syntax for defining the value of a predicate is \tcb{\%guard\_param: Id [true]} (or \tcb{\%guard\_param: Id [false]}).
+
+We give in the following an example of a parametric model, where the predicate \ttt{C} represents the hypothesis that there is a conflict between the sites \ttt{x} and \ttt{y} of the agent \ttt{A}, i.e., the two sites cannot be bound at the same time.
+
+\begin{lstlisting}[language=kappa]
+// Define agents
+%agent: A(x,y)
+%agent: E(t)
+
+// Initial conditions
+%init: 100 A(),E()
+
+// if there is no conflict
+'bind_x' #[[not] C] A(x[.]), E(t[.]) -> A(x[1]), E(t[1]) @ 1
+'bind_y' #[[not] C] A(y[.]), E(t[.]) -> A(y[1]), E(t[1]) @ 1
+
+// if there is a conflict
+'bind_x_conflict' #[C] A(x[.],y[.]), E(t[.]) -> A(x[1],y[.]), E(t[1]) @ 1
+'bind_y_conflict' #[C] A(y[.],x[.]), E(t[.]) -> A(y[1],x[.]), E(t[1]) @ 1
+\end{lstlisting}
+
+This Kappa description contains two possible versions of the model: when \ttt{C} is true, it means that there is a conflict between \ttt{x} and \ttt{y}, while the version where \ttt{C} is false does not have a conflict between the two sites.
+
+The static analysis is able to infer that the sites \ttt{x} and \ttt{y} can be bound at the same time only if \ttt{C} is false:
+
+\begin{verbatim}
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+A() =>
+   [
+          A(x[t.E],y[.])
+        v A(x[t.E],y[t.E]) [ only if .not.C ]
+        v A(x[.],y[.])
+        v A(x[.],y[t.E])
+   ]
+\end{verbatim}
+
+\section{Incremental analysis}
+
+\KaSa{} can also be launched in an interactive agent \ttt{KaSaIncremental}, which allows the user to update the model by disabling and re-enabling some rules or by editing the content of some of the input files.
+The \KaSa{} result is then incrementally updated by only changing the parts of the result that are impacted by the modification instead of re-analyzing the model from scratch~\cite{cmsb2026FG}.
+
+The user needs to choose in advance a subset of the model that they are currently focusing on, called the \emph{current chapter}, also referred to as the \emph{working set}. Only the rules in the current chapter can be removed, added or modified. Choosing a large current chapter entails a possibly longer analysis time for the initial analysis, but a smaller current chapter means less flexibility for the modeler on the allowed updates. 
+
+The current chapter can be specified by wrapping the chosen elements in the directive \tcb{\%working\_set:[\dots]}, or by adding a command-line option (\texttt{---current-chapter}) listing the files that represent the current chapter.
+
+The incremental version of \KaSa{} can be invoked by typing the following command line:
+
+\ITE{
+\item[\$] \ttt{KaSaIncremental files...  ---current-chapter more\_files...}
+}
+
+All options that are available for the classsical \KaSa{} tool are also valid for \ttt{KaSaIncremental}.
+When the tool is launched, it performs the initial analysis and then prints the analysis result as text. Next, it is possible to enable or disable some elements of the current chapter or to update a file and to print the analysis result for the updated version of the model. The update is rejected when an element outside of the current chapter is removed or modified.
+The available commands for the interactive interface are: 
+
+\begin{verbatim}
+    quit/q
+        Quits the program.
+    help/h
+        Prints this help message.
+    print rules/print working set/print ws
+        Prints all rules (or just the working set) with the indexes of each 
+        rule and an indication of which rules are enabled.
+    print result
+        Prints the KaSa reachability analysis result.
+    enable/disable <index>
+        Enables (or disables) the rule at index <index> in the working set.
+    enable/disable <label>
+        Enables (or disables) the rule with label <label> in the working set.
+    update file foo.ka
+        Replace the content of the current version of foo.ka with the new one.
+    update file foo.ka as foo'.ka
+        Replace the content of the current version of the file foo'.ka with the 
+        content of the file foo.ka
+    output contact map
+        Outputs the contact map in output/contact.dot.
+    output influence map
+        Outputs the influence graph in output/influence.dot.
+\end{verbatim}
+
+The elements of the current chapter are numbered in the order they appear in the file. These indexes can be used to temporailiy enable or disable the rules with the commands \ttt{enable} and \ttt{disable}. 
+The indexes can be consulted by printing the current chapter (\ttt{print ws}).
+Alternatively, rules that have a label can be enabled and disabled by referencing their label.
+To add new rules or to permanently remove some rules, the original input files may be changed and synchronized with the analyzer by typing \ttt{update file} followed by the name of the file.
+The contents of a file in the current chapter can also be replaced by a different file with \ttt{update file new\_file.ka as old\_file.ka}. 
+The elements that were removed by updating a file to a version that does not contain this element cannot be re-enabled.
+
+The graphical user interface of Kappa supports the incremental analysis. For each change in the text editor, the analysis result is updated incrementally.
+The current chapter is chosen to be the currently open file in the text editor.
+Rules can also be temporarily disabled by unchecking the checkbox next to it.
+The incremental analysis can be deactivated in the ``Preferences'', in which case the KaSa result will always be recomputed from scratch at each modification.
+
 \chapter{The \KaDE~ODEs generator}
 
 \section{General usage}

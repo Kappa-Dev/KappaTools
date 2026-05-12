@@ -17,7 +17,7 @@ let help_message =
   \        Replace the content of the current version of foo.ka with the new \
    one.\n\
   \    update file foo.ka as foo'.ka\n\
-  \        Replace the content of the current verion of the file foo'.ka with \
+  \        Replace the content of the current version of the file foo'.ka with \
    the content of the file foo.ka\n\
   \    output contact map\n\
   \        Outputs the contact map in output/contact.dot.\n\
