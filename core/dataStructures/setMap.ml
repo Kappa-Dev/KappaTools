@@ -89,7 +89,7 @@ module type Set = sig
   val equal : t -> t -> bool
   val subset : t -> t -> bool
   val iter : (elt -> unit) -> t -> unit
-  val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+  val fold : ?start:elt -> (elt -> 'a -> 'a) -> t -> 'a -> 'a
   val fold_inv : (elt -> 'a -> 'a) -> t -> 'a -> 'a
   val elements : t -> elt list
   val print : Format.formatter -> t -> unit
@@ -258,7 +258,7 @@ module type Map = sig
     with_log_wrap
 
   val iter : (elt -> 'a -> unit) -> 'a t -> unit
-  val fold : (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+  val fold : ?start:elt -> (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
 
   val fold_with_interruption :
     (elt -> 'a -> 'b -> ('b, 'c) Stop.stop) -> 'a t -> 'b -> ('b, 'c) Stop.stop
@@ -1144,6 +1144,23 @@ module Make (Ord : OrderedType) : S with type elt = Ord.t = struct
       | Private.Node (left, value, right, _, _) ->
         fold f right (f value (fold f left accu))
 
+    let rec fold_start (start : elt) f set accu =
+      match set with
+      | Private.Empty -> accu
+      | Private.Node (left, value, right, _, _) ->
+        let cmp = Ord.compare start value in
+        if cmp = 0 then
+          fold f right (f value accu)
+        else if cmp > 0 then
+          fold_start start f right accu
+        else
+          fold f right (f value (fold_start start f left accu))
+
+    let fold ?start f set accu =
+      match start with
+      | None -> fold f set accu
+      | Some start -> fold_start start f set accu
+
     let rec fold_inv f s accu =
       match s with
       | Private.Empty -> accu
@@ -1837,6 +1854,25 @@ module Make (Ord : OrderedType) : S with type elt = Ord.t = struct
       | Private.Node (left, key, data, right, _, _) ->
         fold f right (f key data (fold f left value))
 
+    let rec fold_start start f map value =
+      match map with
+      | Private.Empty -> value
+      | Private.Node (left, key, data, right, _, _) ->
+        let cmp = Ord.compare start key in
+        if cmp = 0 then
+          fold f right (f key data value)
+        else if cmp > 0 then
+          fold_start start f right value
+        else
+          fold f right (f key data (fold_start start f left value))
+
+    let just_fold = fold
+
+    let fold ?start f map value =
+      match start with
+      | None -> fold f map value
+      | Some start -> fold_start start f map value
+
     let rec fold_with_interruption f map value =
       match map with
       | Private.Empty -> false, Stop.success value
@@ -2228,7 +2264,7 @@ module Make (Ord : OrderedType) : S with type elt = Ord.t = struct
         set map res
 
     let to_json ?(lab_key = "key") ?(lab_value = "value") =
-      JsonUtil.of_map ~lab_key ~lab_value ~fold
+      JsonUtil.of_map ~lab_key ~lab_value ~fold:just_fold
 
     let of_json ?(lab_key = "key") ?(lab_value = "value")
         ?(error_msg = JsonUtil.exn_msg_cant_import_from_json "map") =

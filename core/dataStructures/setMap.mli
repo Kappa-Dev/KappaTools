@@ -91,7 +91,7 @@ module type Set = sig
   val equal : t -> t -> bool
   val subset : t -> t -> bool
   val iter : (elt -> unit) -> t -> unit
-  val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+  val fold : ?start:elt -> (elt -> 'a -> 'a) -> t -> 'a -> 'a
   val fold_inv : (elt -> 'a -> 'a) -> t -> 'a -> 'a
   val elements : t -> elt list
   val print : Format.formatter -> t -> unit
@@ -260,7 +260,7 @@ module type Map = sig
     with_log_wrap
 
   val iter : (elt -> 'a -> unit) -> 'a t -> unit
-  val fold : (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+  val fold : ?start:elt -> (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
 
   val fold_with_interruption :
     (elt -> 'a -> 'b -> ('b, 'c) Stop.stop) -> 'a t -> 'b -> ('b, 'c) Stop.stop

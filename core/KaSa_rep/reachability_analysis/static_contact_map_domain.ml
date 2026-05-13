@@ -95,9 +95,9 @@ module Domain = struct
       modified_agents,
       event_list )
 
-  let complete_wake_up_relation ?patch _static error wake_up = 
-     let _ = patch in 
- error, wake_up
+  let complete_wake_up_relation ?patch _static error wake_up =
+    let _ = patch in
+    error, wake_up
 
   (**************************************************************************)
 

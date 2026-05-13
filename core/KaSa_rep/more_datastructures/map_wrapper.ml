@@ -78,7 +78,7 @@ module type Set_with_logs = sig
   val equal : t -> t -> bool
   val subset : t -> t -> bool
   val iter : (elt -> unit) -> t -> unit
-  val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+  val fold : ?start:elt -> (elt -> 'a -> 'a) -> t -> 'a -> 'a
   val fold_inv : (elt -> 'a -> 'a) -> t -> 'a -> 'a
   val elements : t -> elt list
   val choose : t -> elt option
@@ -354,7 +354,7 @@ module type Map_with_logs = sig
     'b t ->
     Exception.exceptions_caught_and_uncaught
 
-  val fold : (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+  val fold : ?start:elt -> (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
   val mapi : (elt -> 'a -> 'b) -> 'a t -> 'b t
   val map : ('a -> 'b) -> 'a t -> 'b t
 

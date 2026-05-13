@@ -102,8 +102,8 @@ module Product
 
   let complete_wake_up_relation ?patch static error wake_up =
     let error, wake_up =
-      Underlying_domain.complete_wake_up_relation ?patch static.underlying_domain error
-        wake_up
+      Underlying_domain.complete_wake_up_relation ?patch
+        static.underlying_domain error wake_up
     in
     New_domain.complete_wake_up_relation ?patch static.new_domain error wake_up
 

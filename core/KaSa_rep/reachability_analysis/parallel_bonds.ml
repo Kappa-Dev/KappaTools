@@ -521,9 +521,9 @@ module Domain = struct
     in
     error, static, dynamic, modified_agents, []
 
-  let add_rules_tuples_into_wake_up_relation parameters error rule_tuples
+  let add_rules_tuples_into_wake_up_relation ?start parameters error rule_tuples
       wake_up =
-    Ckappa_sig.Rule_map_and_set.Map.fold
+    Ckappa_sig.Rule_map_and_set.Map.fold ?start
       (fun rule_id map (error, wake_up) ->
         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
           (fun _ list (error, wake_up) ->
@@ -552,9 +552,9 @@ module Domain = struct
           map (error, wake_up))
       rule_tuples (error, wake_up)
 
-  let add_rules_tuples_into_wake_up_relation' parameters error store_map wake_up
-      =
-    Ckappa_sig.Rule_map_and_set.Map.fold
+  let add_rules_tuples_into_wake_up_relation' ?start parameters error store_map
+      wake_up =
+    Ckappa_sig.Rule_map_and_set.Map.fold ?start
       (fun rule_id map (error, wake_up) ->
         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
           (fun ( _,
@@ -585,7 +585,11 @@ module Domain = struct
      these tuples, and apply the function Common_static.add_dependency_site_rule
      to update the wake_up relation *)
   let complete_wake_up_relation ?patch static error wake_up =
-     let _ = patch in 
+    let start =
+      match patch with
+      | None -> None
+      | Some a -> Some a.Diff.next_rule
+    in
     let parameters = get_parameter static in
     (*fst site created a parallel bonds*)
     (* TO DO make this incremental *)
@@ -600,21 +604,21 @@ module Domain = struct
     in
     (*----------------------------------------------------*)
     let error, wake_up =
-      add_rules_tuples_into_wake_up_relation' parameters error
+      add_rules_tuples_into_wake_up_relation' ?start parameters error
         store_rule_double_bonds_rhs wake_up
     in
     let error, wake_up =
-      add_rules_tuples_into_wake_up_relation' parameters error
+      add_rules_tuples_into_wake_up_relation' ?start parameters error
         store_rule_double_bonds_lhs wake_up
     in
     (*----------------------------------------------------*)
     let error, wake_up =
-      add_rules_tuples_into_wake_up_relation parameters error
+      add_rules_tuples_into_wake_up_relation ?start parameters error
         store_fst_site_create_parallel_bonds_rhs wake_up
     in
     (*----------------------------------------------------*)
     let error, wake_up =
-      add_rules_tuples_into_wake_up_relation parameters error
+      add_rules_tuples_into_wake_up_relation ?start parameters error
         store_snd_site_create_parallel_bonds_rhs wake_up
     in
     error, wake_up

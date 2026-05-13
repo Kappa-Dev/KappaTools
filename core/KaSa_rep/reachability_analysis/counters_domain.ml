@@ -195,16 +195,16 @@ functor
        these tuples, and apply the function Common_static.add_dependency_site_rule
        to update the wake_up relation *)
     let complete_wake_up_relation ?patch static error wake_up =
-      let start = 
-        match patch with 
-          | None -> Ckappa_sig.rule_id_of_int 0 
-          | Some a -> a.Diff.next_rule 
-      in 
+      let start =
+        match patch with
+        | None -> Ckappa_sig.rule_id_of_int 0
+        | Some a -> a.Diff.next_rule
+      in
       let parameters = get_parameter static in
       let rule_restriction = get_rule_restriction static in
       let packs = get_packs static in
-      Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.fold ~start parameters
-        error
+      Ckappa_sig.Rule_id_quick_nearly_Inf_Int_storage_Imperatif.fold ~start
+        parameters error
         (fun parameters error rule_id agent_map wake_up ->
           let error, rule = get_rule parameters error static rule_id in
           match rule with

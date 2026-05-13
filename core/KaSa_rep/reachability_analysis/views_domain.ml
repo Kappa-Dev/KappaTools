@@ -284,13 +284,14 @@ module Domain = struct
     let result_static = get_bdu_analysis_static static in
     result_static.Bdu_static_views.store_patch_modif_list_restriction_map
 
- let get_patch_store_proj_bdu_potential_restriction_map static = 
-  let result_static = get_bdu_analysis_static static in
-    result_static.Bdu_static_views.store_patch_proj_bdu_potential_restriction_map 
-
-  let get_patch_store_proj_bdu_test_restriction static = 
+  let get_patch_store_proj_bdu_potential_restriction_map static =
     let result_static = get_bdu_analysis_static static in
-    result_static.Bdu_static_views.store_patch_proj_bdu_test_restriction 
+    result_static
+      .Bdu_static_views.store_patch_proj_bdu_potential_restriction_map
+
+  let get_patch_store_proj_bdu_test_restriction static =
+    let result_static = get_bdu_analysis_static static in
+    result_static.Bdu_static_views.store_patch_proj_bdu_test_restriction
 
   let get_site_to_renamed_site_list static =
     let result_static = get_bdu_analysis_static static in
@@ -559,7 +560,7 @@ module Domain = struct
     error, wake_up
 
   let complete_wake_up_relation ?patch static error wake_up =
-    let _ = patch in 
+    let _ = patch in
     let parameters = get_parameter static in
     let store_list_of_site_type_in_covering_classes =
       (* TO DO *)

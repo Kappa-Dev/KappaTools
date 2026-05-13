@@ -53,14 +53,15 @@ type bdu_analysis_static = {
     (Ckappa_sig.Views_bdu.mvbdu * Ckappa_sig.Views_bdu.hconsed_association_list)
     Covering_classes_type.AgentSiteCV_setmap.Map.t
     Ckappa_sig.Rule_setmap.Map.t;
-  store_patch_proj_bdu_potential_restriction_map: 
-     (Ckappa_sig.Views_bdu.mvbdu * Ckappa_sig.Views_bdu.hconsed_association_list)
+  store_patch_proj_bdu_potential_restriction_map:
+    (Ckappa_sig.Views_bdu.mvbdu * Ckappa_sig.Views_bdu.hconsed_association_list)
     Covering_classes_type.AgentSiteCV_setmap.Map.t
     Ckappa_sig.Rule_setmap.Map.t;
   store_proj_bdu_test_restriction:
     Ckappa_sig.Views_bdu.mvbdu Covering_classes_type.AgentsCV_setmap.Map.t
     Ckappa_sig.Rule_setmap.Map.t;
-    store_patch_proj_bdu_test_restriction: Ckappa_sig.Views_bdu.mvbdu Covering_classes_type.AgentsCV_setmap.Map.t
+  store_patch_proj_bdu_test_restriction:
+    Ckappa_sig.Views_bdu.mvbdu Covering_classes_type.AgentsCV_setmap.Map.t
     Ckappa_sig.Rule_setmap.Map.t;
   site_to_renamed_site_list:
     (Covering_classes_type.cv_id * Ckappa_sig.c_mvbdu_var) list
@@ -92,7 +93,7 @@ let init_bdu_analysis_static parameters error =
       store_patch_proj_bdu_test_restriction = Ckappa_sig.Rule_setmap.Map.empty;
       store_patch_proj_bdu_potential_restriction_map =
         Ckappa_sig.Rule_setmap.Map.empty;
-  site_to_renamed_site_list = init_site_to_renamed_site_list;
+      site_to_renamed_site_list = init_site_to_renamed_site_list;
     }
   in
   error, init_bdu_analysis_static
@@ -670,9 +671,8 @@ let collect_site_to_renamed_site_list parameters error store_remanent_triple
 (**************************************************************************)
 (*projection with rule_id*)
 
-let collect_proj_bdu_potential_restriction_map 
-    ~patch_store_remanent_triple parameters bdu_handler error
-    store_potential_side_effects  guard_mvbdus =
+let collect_proj_bdu_potential_restriction_map ~patch_store_remanent_triple
+    parameters bdu_handler error store_potential_side_effects guard_mvbdus =
   let store_init_bdu_potential_restriction_map =
     Covering_classes_type.AgentSiteRuleCV_setmap.Map.empty
   in
@@ -871,8 +871,8 @@ let collect_bdu_test_restriction_map ?start_cv ~new_rule ~modified_agents
 
 let collect_proj_bdu_test_restriction ?start_cv ~new_rule ~modified_agents
     parameters handler_kappa error rule_id rule
-    (*store_new_index_pair_map*) store_remanent_triple (store_result, patch_store_result) 
-    store_guard_bdu =
+    (*store_new_index_pair_map*) store_remanent_triple
+    (store_result, patch_store_result) store_guard_bdu =
   let store_init_bdu_test_restriction_map =
     Covering_classes_type.AgentsRuleCV_setmap.Map.empty
   in
@@ -903,7 +903,7 @@ let collect_proj_bdu_test_restriction ?start_cv ~new_rule ~modified_agents
     Ckappa_sig.Rule_setmap.Map.fold Ckappa_sig.Rule_setmap.Map.add store_result'
       store_result
   in
-   let patch_store_result =
+  let patch_store_result =
     Ckappa_sig.Rule_setmap.Map.fold Ckappa_sig.Rule_setmap.Map.add store_result'
       patch_store_result
   in
@@ -939,12 +939,14 @@ let scan_rule_static ?start_cv ~new_rule ~modified_agents parameters log_info
         store_result.store_patch_modif_list_restriction_map )
   in
   (*------------------------------------------------------------------------*)
-  let (error, handler_bdu), (store_proj_bdu_test_restriction, store_patch_proj_bdu_test_restriction) =
+  let ( (error, handler_bdu),
+        (store_proj_bdu_test_restriction, store_patch_proj_bdu_test_restriction)
+      ) =
     collect_proj_bdu_test_restriction ?start_cv ~new_rule ~modified_agents
       parameters handler_bdu error rule_id rule store_remanent_triple
-      (store_result.store_proj_bdu_test_restriction, 
-       store_result.store_patch_proj_bdu_test_restriction)
-        guard_mvbdus
+      ( store_result.store_proj_bdu_test_restriction,
+        store_result.store_patch_proj_bdu_test_restriction )
+      guard_mvbdus
   in
   (*------------------------------------------------------------------------*)
   let error, log_info =
@@ -960,7 +962,7 @@ let scan_rule_static ?start_cv ~new_rule ~modified_agents parameters log_info
       store_proj_bdu_creation_restriction_map;
       store_modif_list_restriction_map;
       store_patch_modif_list_restriction_map;
-      store_patch_proj_bdu_test_restriction; 
+      store_patch_proj_bdu_test_restriction;
       store_proj_bdu_test_restriction;
     } )
 
@@ -978,14 +980,11 @@ let scan_rule_set ?start ?start_cv ~patch_store_remanent_triple ~modified_agents
     parameters log_info handler_bdu error handler_kappa compiled
     store_potential_side_effects store_remanent_triple guard_mvbdus init =
   let nsites = Handler.get_nsites handler_kappa in
-  let (error, handler_bdu), store_patch_proj_bdu_potential_restriction_map  =
-    collect_proj_bdu_potential_restriction_map 
-      ~patch_store_remanent_triple parameters handler_bdu error
-      store_potential_side_effects 
-      guard_mvbdus
+  let (error, handler_bdu), store_patch_proj_bdu_potential_restriction_map =
+    collect_proj_bdu_potential_restriction_map ~patch_store_remanent_triple
+      parameters handler_bdu error store_potential_side_effects guard_mvbdus
   in
-  let init = { init with 
-  store_patch_proj_bdu_potential_restriction_map} in
+  let init = { init with store_patch_proj_bdu_potential_restriction_map } in
 
   let error, (handler_bdu, log_info, store_results) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold_two_steps ?start

@@ -688,9 +688,9 @@ module Domain = struct
   (*IMPLEMENTATION*)
   (***************************************************************************)
 
-  let add_rules_tuples_into_wake_up_relation parameters error rule_tuples
+  let add_rules_tuples_into_wake_up_relation ?start parameters error rule_tuples
       wake_up =
-    Ckappa_sig.Rule_map_and_set.Map.fold
+    Ckappa_sig.Rule_map_and_set.Map.fold ?start
       (fun rule_id tuple_pairs (error, wake_up) ->
         Site_across_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
           (fun (x, y) (error, wake_up) ->
@@ -721,7 +721,11 @@ module Domain = struct
        update the wake_up relation *)
 
   let complete_wake_up_relation ?patch static error wake_up =
-    let _ = patch in 
+    let start =
+      match patch with
+      | None -> None
+      | Some a -> Some a.Diff.next_rule
+    in
     let parameters = get_parameter static in
     (*dealing with create a binding sites *)
     (* TODO make all of this incrementatl *)
@@ -740,27 +744,27 @@ module Domain = struct
     let store_potential_side_effects = get_potential_side_effects static in
     (*----------------------------------------------------*)
     let error, wake_up =
-      add_rules_tuples_into_wake_up_relation parameters error
+      add_rules_tuples_into_wake_up_relation ?start parameters error
         store_rule_partition_created_bonds_map_1 wake_up
     in
     let error, wake_up =
-      add_rules_tuples_into_wake_up_relation parameters error
+      add_rules_tuples_into_wake_up_relation ?start parameters error
         store_rule_partition_created_bonds_map_2 wake_up
     in
     (*----------------------------------------------------*)
     (*dealing with site that is modified*)
     let error, wake_up =
-      add_rules_tuples_into_wake_up_relation parameters error
+      add_rules_tuples_into_wake_up_relation ?start parameters error
         store_rule_partition_modified_map_1 wake_up
     in
     let error, wake_up =
-      add_rules_tuples_into_wake_up_relation parameters error
+      add_rules_tuples_into_wake_up_relation ?start parameters error
         store_rule_partition_modified_map_2 wake_up
     in
     (*----------------------------------------------------*)
     (*dealing with side effects*)
     let error, wake_up =
-      Ckappa_sig.Rule_map_and_set.Map.fold
+      Ckappa_sig.Rule_map_and_set.Map.fold ?start
         (fun rule_id list (error, wake_up) ->
           List.fold_left
             (fun (error, wake_up) (_, (agent_type, site_type, _)) ->

@@ -248,9 +248,9 @@ module Domain = struct
       modified_agents,
       [] )
 
-  let complete_wake_up_relation ?patch _static error wake_up = 
-     let _ = patch in 
-      error, wake_up
+  let complete_wake_up_relation ?patch _static error wake_up =
+    let _ = patch in
+    error, wake_up
 
   let add_initial_state ~new_init ?patch ?modified_agents _static dynamic error
       _species =
