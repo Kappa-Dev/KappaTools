@@ -96,9 +96,9 @@ def main(inp_path, out_path):
     alternative_description = []
     alternative_description.append(r"\AltTextCMSB{")
     alternative_description.append(r"The plot shows the runtimes of the evaluation for " + str(len(all_steps)) + " models from the literature with different sizes of the current chapter. ")
-    for model in sorted_data:
+    for test_instance in sorted_data:
         row_elems = []
-        row_elems.append(r"The runtimes of the models with " + latex_escape(model) + " rules in the current chapter are: ")
+        row_elems.append(r"The runtimes of the models with " + latex_escape(test_instance) + " rules in the current chapter are: ")
         analysis_items = all_steps
         for s in analysis_items:
             val = data[test_instance].get(s, "")
