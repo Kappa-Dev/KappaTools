@@ -210,6 +210,7 @@ class KappaApi(ABC):
 
     def __init__(self):
         self.__default_param = None
+        self.current_chapter = None
         return
 
     @classmethod
@@ -254,6 +255,22 @@ class KappaApi(ABC):
             file_id = self.make_unique_id('file_input')
         ret_data = self.file_create(File.from_file(model_fpath, position,
                                                    file_id))
+        return ret_data
+    
+    def update_model_string(self, file_id, model_str):
+        """Update the content of a file by replacing it with the given string."""
+        if self.current_chapter != file_id:
+            raise KappaError("Cannot update a file which is not in the current chapter.")
+        ret_data = self.update_file(file_id, model_str)
+        return ret_data
+    
+    def update_model_file(self, file_id, updated_fpath):
+        """Update the content of a file by providing a new file."""
+        if self.current_chapter != file_id:
+            raise KappaError("Cannot update a file which is not in the current chapter.")
+        new_file_id = self.make_unique_id('file_input_updated')
+        new_file = File.from_file(updated_fpath, 1, new_file_id)
+        ret_data = self.update_file(file_id, new_file.get_content())
         return ret_data
 
     def set_default_sim_param(self, *args, **kwargs):
@@ -321,8 +338,10 @@ class KappaApi(ABC):
         """
 
     @abc.abstractmethod
-    def project_parse(self, sharing_level="compatible_patterns", **kwargs):
+    def project_parse(self, sharing_level="compatible_patterns", force=False, **kwargs):
         """Parses the project
+
+        :param force: if True, the static analysis will recompute from scratch, even when an incremental update would have been possible
 
         :param kwargs: list of algebraic variables to overwrite
            Each element has the form variable_name=numerical_val
@@ -336,6 +355,10 @@ class KappaApi(ABC):
         :param file_object: a Kappa_common.File
 
         """
+
+    @abc.abstractmethod
+    def file_set_current_chapter(self, file_id):
+        """Set a file to be the current chapter. Only one file at a time can be the current chapter, so calling this function overwrites the previous current chapter."""
 
     @abc.abstractmethod
     def file_delete(self, file_id):
@@ -452,6 +475,11 @@ class KappaApi(ABC):
 
         """
 
+    def analyses_conditionally_dead_rules(self):
+        """Returns the rules that are dead for a certain valuation of the Boolean parameters
+
+        """
+
     @abc.abstractmethod
     def analyses_constraints_list(self):
         """Returns a bunch of invarients on the last parsed model
@@ -481,3 +509,21 @@ class KappaApi(ABC):
         """Returns the list of potential polymers of the last parsed model
 
         """
+
+    def analyses_working_set_elements(self):
+        """Returns a list of initial states and rules that are in the current working set
+
+        """
+
+    @abc.abstractmethod
+    def analyses_enable_rule(self, rule_id):
+        """Enables an initial state or rule and then updates the analysis result incrementally
+
+        """
+
+    @abc.abstractmethod
+    def analyses_disable_rule(self, rule_id):
+        """Disables an initial state or rule and then updates the analysis result incrementally
+
+        """
+

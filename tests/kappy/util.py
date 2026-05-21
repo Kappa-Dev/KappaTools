@@ -196,6 +196,73 @@ class _KappaClientTest(unittest.TestCase):
         print("Get high accuracy influence_map...")
         im = runtime.analyses_influence_map("medium")
 
+    def test_incremental_static_analyses(self):
+        runtime = self.getRuntime()
+        file_id = runtime.make_unique_id("wrong_model.ka")
+        test_dir = path.join(MODELS_DIR, "..", "examples", "incremental_analysis", "use_case")
+        fpath = path.join(test_dir, 'wrong_model.ka')
+        updated_fpath = path.join(test_dir, 'correct_model.ka')
+        runtime.add_model_file(fpath, 1, file_id)
+
+        runtime.file_set_current_chapter(file_id)
+
+        print("Parse wrong model...")
+        runtime.project_parse()
+        dead_rules = runtime.analyses_dead_rules()
+        working_set = runtime.analyses_working_set_elements()
+        self.assertEqual(len(dead_rules['dead rules']), 0)
+        self.assertEqual(len(working_set['working set elements']), 9)
+        
+        print("Parse correct model...")
+        runtime.update_model_file(file_id, updated_fpath)
+        runtime.project_parse()
+        dead_rules = runtime.analyses_dead_rules()
+        working_set = runtime.analyses_working_set_elements()
+        self.assertEqual(len(dead_rules['dead rules']), 1)
+        self.assertEqual(len(working_set['working set elements']), 9)
+
+        print("Disable rule...")
+        runtime.analyses_disable_rule(1) # this disables one of the initial states
+        dead_rules = runtime.analyses_dead_rules()
+        working_set = runtime.analyses_working_set_elements()
+        self.assertEqual(len(dead_rules['dead rules']), 7)
+        self.assertEqual(len(working_set['working set elements']), 9)
+
+        print("Re-enable rule...")
+        runtime.analyses_enable_rule(1)
+        dead_rules = runtime.analyses_dead_rules()
+        working_set = runtime.analyses_working_set_elements()
+        self.assertEqual(len(dead_rules['dead rules']), 1)
+        self.assertEqual(len(working_set['working set elements']), 9)
+        
+        print("Parse empty model...")
+        runtime.update_model_string(file_id, "") # the whole content of the file is removed
+        runtime.project_parse()
+        dead_rules = runtime.analyses_dead_rules()
+        working_set = runtime.analyses_working_set_elements()
+        self.assertEqual(len(dead_rules['dead rules']), 0)
+        self.assertEqual(len(working_set['working set elements']), 0)
+
+        return
+    
+    def test_incremental_update_not_current_file(self):
+        runtime = self.getRuntime()
+        file_id = runtime.make_unique_id("wrong_model.ka")
+        file_id2 = runtime.make_unique_id("empty_file.ka")
+        test_dir = path.join(MODELS_DIR, "..", "examples", "incremental_analysis", "use_case")
+        fpath = path.join(test_dir, 'wrong_model.ka')
+        updated_fpath = path.join(test_dir, 'correct_model.ka')
+
+        runtime.add_model_file(fpath, 1, file_id)
+        runtime.add_model_string("", 2, file_id2)
+        runtime.file_set_current_chapter(file_id2)
+        runtime.project_parse()
+        
+        with self.assertRaises(kappy.KappaError):
+            # a file is updated which is not the current chapter
+            runtime.update_model_file(file_id, updated_fpath)
+        return
+
 def run_nose(fname):
     import nose
     fpath = path.abspath(fname)

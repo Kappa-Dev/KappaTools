@@ -142,9 +142,9 @@ class KappaStd(KappaApi):
 
     # Standardized API methods. Docs are provided by parent.
 
-    def project_parse(self, sharing_level="compatible_patterns", **kwargs):
+    def project_parse(self, sharing_level="compatible_patterns", force=False, **kwargs):
         overwrites = list(kwargs.items())
-        self._dispatch(["ProjectParse", sharing_level, overwrites, True])
+        self._dispatch(["ProjectParse", sharing_level, overwrites, force])
 
     def project_overwrite(self, ast, file_id="model.ka"):
         self._dispatch(["ProjectOverwrite", file_id, ast])
@@ -152,6 +152,10 @@ class KappaStd(KappaApi):
     def file_create(self, file_):
         return self._dispatch(
             ["FileCreate", file_.get_position(), file_.get_id(), file_.get_content()])
+    
+    def file_set_current_chapter(self, file_id):
+        self.current_chapter = file_id
+        return self._dispatch(["FileUpdateWS", file_id])
 
     def file_delete(self, file_id):
         return self._dispatch(["FileDelete", file_id])
@@ -163,6 +167,9 @@ class KappaStd(KappaApi):
     def file_info(self):
         info = self._dispatch(["FileCatalog"])
         return FileMetadata.from_metadata_list(info)
+    
+    def update_file(self, file_id, content):
+        return self._dispatch(["FileUpdate", file_id, content])
 
     def simulation_delete(self):
         return self._dispatch(["SimulationDelete"])
@@ -217,6 +224,9 @@ class KappaStd(KappaApi):
 
     def analyses_dead_rules(self):
         return self._dispatch(["DEAD_RULES"])
+    
+    def analyses_conditionally_dead_rules(self):
+        return self._dispatch(["CONDITIONALLY_DEAD_RULES"])
 
     def analyses_constraints_list(self):
         return self._dispatch(["CONSTRAINTS"])
@@ -232,3 +242,14 @@ class KappaStd(KappaApi):
     def analyses_potential_polymers(
             self, accuracy_cm="high", accuracy_scc="high"):
         return self._dispatch(["POLYMERS", accuracy_cm, accuracy_scc])
+    
+    def analyses_working_set_elements(self):
+        return self._dispatch(["WORKING_SET_ELEMENTS"])
+    
+    def analyses_enable_rule(self, rule_id):
+        return self._dispatch(["RULE_ENABLE_OR_DISABLE", rule_id, True])
+
+    def analyses_disable_rule(self, rule_id):
+        return self._dispatch(["RULE_ENABLE_OR_DISABLE", rule_id, False])
+
+
