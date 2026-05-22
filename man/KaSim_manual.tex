@@ -2423,7 +2423,7 @@ There are some structural invariants in these models. We give in Fig.~\ref{fig:r
 Kappa provides the possibility to define \emph{parametric models}\index{parametric models}, in which a set of Boolean predicates are used to describe different possible versions of the model~\cite{cmsb2025FG}.
 Each rule and initial state can optionally be preceded by a boolean formula that contains these Boolean predicates. The static analysis will then infer the relationship between the reachability properties and the valuation (true or false) of the predicates. 
 
-The syntax for the boolean formulas that can be used to guard rules and initial states are defined in Table~\ref{tab:formulas}.
+The syntax for the boolean formulas that can be used to guard rules and initial states is defined in Table~\ref{tab:formulas}.
 
 
 \begin{table}[htbp]
@@ -2482,7 +2482,7 @@ A() =>
 \section{Incremental analysis}
 
 \KaSa{} can also be launched in an interactive agent \ttt{KaSaIncremental}, which allows the user to update the model by disabling and re-enabling some rules or by editing the content of some of the input files.
-The \KaSa{} result is then incrementally updated by only changing the parts of the result that are impacted by the modification instead of re-analyzing the model from scratch~\cite{cmsb2026FG}.
+The \KaSa{} result is then incrementally updated by only changing the parts of the result that are impacted by the modification, instead of re-analyzing the model from scratch~\cite{cmsb2026FG}.
 
 The user needs to choose in advance a subset of the model that they are currently focusing on, called the \emph{current chapter}, also referred to as the \emph{working set}. Only the rules in the current chapter can be removed, added or modified. Choosing a large current chapter entails a possibly longer analysis time for the initial analysis, but a smaller current chapter means less flexibility for the modeler on the allowed updates. 
 
@@ -2523,7 +2523,7 @@ The available commands for the interactive interface are:
         Outputs the influence graph in output/influence.dot.
 \end{verbatim}
 
-The elements of the current chapter are numbered in the order they appear in the file. These indexes can be used to temporailiy enable or disable the rules with the commands \ttt{enable} and \ttt{disable}. 
+The elements of the current chapter are numbered in the order they appear in the file. These indexes can be used to temporarily enable or disable the rules with the commands \ttt{enable} and \ttt{disable}. 
 The indexes can be consulted by printing the current chapter (\ttt{print ws}).
 Alternatively, rules that have a label can be enabled and disabled by referencing their label.
 To add new rules or to permanently remove some rules, the original input files may be changed and synchronized with the analyzer by typing \ttt{update file} followed by the name of the file.
@@ -2533,7 +2533,7 @@ The elements that were removed by updating a file to a version that does not con
 The graphical user interface of Kappa supports the incremental analysis. For each change in the text editor, the analysis result is updated incrementally.
 The current chapter is chosen to be the currently open file in the text editor.
 Rules can also be temporarily disabled by unchecking the checkbox next to it.
-The incremental analysis can be deactivated in the ``Preferences'', in which case the KaSa result will always be recomputed from scratch at each modification.
+The incremental analysis can be deactivated in the ``Preferences'', in which case the \KaSa{} result will always be recomputed from scratch at each modification.
 
 \chapter{The \KaDE~ODEs generator}
 
